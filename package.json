@@ -1,0 +1,21 @@
+{
+  "name": "prop",
+  "version": "0.0.1",
+  "description": "Propositional logic stuff",
+  "main": "index.js",
+  "author": "Toni Ruottu <toni.ruottu@iki.fi>",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/jest": "^29.5.12",
+    "jest": "^29.7.0",
+    "prettier": "^3.2.5",
+    "ts-jest": "^29.1.2",
+    "typescript": "^5.3.3"
+  },
+  "scripts": {
+    "build": "yarn tsc",
+    "lk": "yarn build && node ./lib/lk.js",
+    "la3": "yarn build && node ./lib/la3.js",
+    "prettify": "prettier . --write"
+  }
+}
