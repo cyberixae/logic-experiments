@@ -1,6 +1,7 @@
 import * as prop from '../lib/prop'
+import * as array from '../lib/array'
 import * as utils from '../lib/utils'
-import { Conclusion, conclusion } from '../lib/judgement'
+import { AnyConclusion, Conclusion, conclusion } from '../lib/judgement'
 import * as print from '../lib/print'
 import {
   introduction,
@@ -9,7 +10,12 @@ import {
   transformation,
   premise,
   Transformation,
+  refineDerivation,
+  editBranch as editBranchG,
+  toProof,
+  Edit,
 } from '../lib/derivation'
+import { Refinement } from '../lib/generic'
 
 // Connectives
 
@@ -49,69 +55,280 @@ export const conjunction = <A extends Prop, B extends Prop>(
 
 // Axioms
 
-export type A1<P extends Prop, Q extends Prop> = Introduction<
-  Conclusion<Implication<P, Implication<Q, P>>>,
-  'A1'
+export type A1Result<P extends Prop, Q extends Prop> = Conclusion<
+  Implication<P, Implication<Q, P>>
 >
-export const a1 = <P extends Prop, Q extends Prop>(p: P, q: Q): A1<P, Q> =>
-  introduction(conclusion(implication(p, implication(q, p))), 'A1')
+export type AnyA1Result = A1Result<Prop, Prop>
+export const isA1Result: Refinement<AnyConclusion, AnyA1Result> = (
+  c,
+): c is AnyA1Result => {
+  const piqip = array.head(c.succedent)
+  if (piqip.kind !== 'implication') {
+    return false
+  }
+  const p1 = piqip.antecedent
+  const qip = piqip.consequent
+  if (qip.kind !== 'implication') {
+    return false
+  }
+  const p2 = qip.consequent
+  return prop.equals(p1, p2)
+}
+export const isA1ResultDerivation = refineDerivation(isA1Result)
+export type A1<
+  P extends Prop,
+  Q extends Prop,
+  C extends A1Result<P, Q>,
+> = Introduction<C, 'A1'>
+export type AnyA1 = A1<Prop, Prop, AnyA1Result>
+export const a1 = <P extends Prop, Q extends Prop, C extends A1Result<P, Q>>(
+  result: C,
+): A1<P, Q, C> => {
+  return introduction(result, 'A1')
+}
+export type ApplyA1<P extends Prop, Q extends Prop> = A1<P, Q, A1Result<P, Q>>
+export const applyA1 = <P extends Prop, Q extends Prop>(
+  p: P,
+  q: Q,
+): ApplyA1<P, Q> => {
+  return a1(conclusion(implication(p, implication(q, p))))
+}
+export const reverseA1 = <
+  P extends Prop,
+  Q extends Prop,
+  C extends A1Result<P, Q>,
+>(
+  p: Derivation<C>,
+): A1<P, Q, C> => {
+  return a1(p.result)
+}
+export const tryReverseA1 = <C extends AnyConclusion>(
+  d: Derivation<C>,
+): Derivation<C> | null => {
+  return isA1ResultDerivation(d) ? reverseA1(d) : null
+}
 
-export type A2<P extends Prop, Q extends Prop, R extends Prop> = Introduction<
-  Conclusion<
-    Implication<
-      Implication<P, Implication<Q, R>>,
-      Implication<Implication<P, Q>, Implication<P, R>>
-    >
-  >,
-  'A2'
+export type A2Result<
+  P extends Prop,
+  Q extends Prop,
+  R extends Prop,
+> = Conclusion<
+  Implication<
+    Implication<P, Implication<Q, R>>,
+    Implication<Implication<P, Q>, Implication<P, R>>
+  >
 >
-export const a2 = <P extends Prop, Q extends Prop, R extends Prop>(
+export type AnyA2Result = A2Result<Prop, Prop, Prop>
+export const isA2Result: Refinement<AnyConclusion, AnyA2Result> = (
+  c,
+): c is AnyA2Result => {
+  const piqiripiqipir = array.head(c.succedent)
+  if (piqiripiqipir.kind !== 'implication') {
+    return false
+  }
+  const piqir = piqiripiqipir.antecedent
+  if (piqir.kind !== 'implication') {
+    return false
+  }
+  const p1 = piqir.antecedent
+  const qir = piqir.consequent
+  if (qir.kind !== 'implication') {
+    return false
+  }
+  const q1 = qir.antecedent
+  const r1 = qir.consequent
+
+  const piqipir = piqiripiqipir.consequent
+  if (piqipir.kind !== 'implication') {
+    return false
+  }
+  const piq = piqipir.antecedent
+  if (piq.kind !== 'implication') {
+    return false
+  }
+  const p2 = piq.antecedent
+  const q2 = piq.consequent
+  const pir = piqipir.consequent
+  if (pir.kind !== 'implication') {
+    return false
+  }
+  const p3 = pir.antecedent
+  const r2 = pir.consequent
+
+  if (!prop.equals(p1, p2)) {
+    return false
+  }
+  if (!prop.equals(p2, p3)) {
+    return false
+  }
+  if (!prop.equals(q1, q2)) {
+    return false
+  }
+  if (!prop.equals(r1, r2)) {
+    return false
+  }
+  return true
+}
+export const isA2ResultDerivation = refineDerivation(isA2Result)
+export type A2<
+  P extends Prop,
+  Q extends Prop,
+  R extends Prop,
+  C extends A2Result<P, Q, R>,
+> = Introduction<C, 'A2'>
+export const a2 = <
+  P extends Prop,
+  Q extends Prop,
+  R extends Prop,
+  C extends A2Result<P, Q, R>,
+>(
+  result: C,
+): A2<P, Q, R, C> => {
+  return introduction(result, 'A2')
+}
+export type AnyA2 = A2<Prop, Prop, Prop, AnyA2Result>
+export type ApplyA2<P extends Prop, Q extends Prop, R extends Prop> = A2<
+  P,
+  Q,
+  R,
+  A2Result<P, Q, R>
+>
+export const applyA2 = <P extends Prop, Q extends Prop, R extends Prop>(
   p: P,
   q: Q,
   r: R,
-): A2<P, Q, R> =>
-  introduction(
+): ApplyA2<P, Q, R> =>
+  a2(
     conclusion(
       implication(
         implication(p, implication(q, r)),
         implication(implication(p, q), implication(p, r)),
       ),
     ),
-    'A2',
   )
+export const reverseA2 = <
+  P extends Prop,
+  Q extends Prop,
+  R extends Prop,
+  C extends A2Result<P, Q, R>,
+>(
+  p: Derivation<C>,
+): A2<P, Q, R, C> => {
+  return a2(p.result)
+}
+export const tryReverseA2 = <C extends AnyConclusion>(
+  d: Derivation<C>,
+): Derivation<C> | null => {
+  return isA2ResultDerivation(d) ? reverseA2(d) : null
+}
 
-export type A3<P extends Prop, Q extends Prop> = Introduction<
-  Conclusion<
-    Implication<Implication<Negation<P>, Negation<Q>>, Implication<Q, P>>
-  >,
-  'A3'
+export type A3Result<P extends Prop, Q extends Prop> = Conclusion<
+  Implication<Implication<Negation<P>, Negation<Q>>, Implication<Q, P>>
 >
-export const a3 = <P extends Prop, Q extends Prop>(p: P, q: Q): A3<P, Q> =>
-  introduction(
+export type AnyA3Result = A3Result<Prop, Prop>
+export const isA3Result: Refinement<AnyConclusion, AnyA3Result> = (
+  c,
+): c is AnyA3Result => {
+  const npinqiqip = array.head(c.succedent)
+  if (npinqiqip.kind !== 'implication') {
+    return false
+  }
+  const npinq = npinqiqip.antecedent
+  if (npinq.kind !== 'implication') {
+    return false
+  }
+  const np = npinq.antecedent
+  if (np.kind !== 'negation') {
+    return false
+  }
+  const p1 = np.negand
+  const nq = npinq.consequent
+  if (nq.kind !== 'negation') {
+    return false
+  }
+  const q1 = nq.negand
+  const qip = npinqiqip.consequent
+  if (qip.kind !== 'implication') {
+    return false
+  }
+  const q2 = qip.antecedent
+  const p2 = qip.consequent
+  return prop.equals(p1, p2) && prop.equals(q1, q2)
+}
+export const isA3ResultDerivation = refineDerivation(isA3Result)
+export type A3<
+  P extends Prop,
+  Q extends Prop,
+  C extends A3Result<P, Q>,
+> = Introduction<C, 'A3'>
+export type AnyA3 = A3<Prop, Prop, AnyA3Result>
+export const a3 = <P extends Prop, Q extends Prop, C extends A3Result<P, Q>>(
+  result: C,
+): A3<P, Q, C> => {
+  return introduction(result, 'A3')
+}
+export type ApplyA3<P extends Prop, Q extends Prop> = A3<P, Q, A3Result<P, Q>>
+export const applyA3 = <P extends Prop, Q extends Prop>(
+  p: P,
+  q: Q,
+): ApplyA3<P, Q> =>
+  a3(
     conclusion(
       implication(implication(negation(p), negation(q)), implication(q, p)),
     ),
-    'A3',
   )
+export const reverseA3 = <
+  P extends Prop,
+  Q extends Prop,
+  C extends A3Result<P, Q>,
+>(
+  p: Derivation<C>,
+): A3<P, Q, C> => {
+  return a3(p.result)
+}
+export const tryReverseA3 = <C extends AnyConclusion>(
+  d: Derivation<C>,
+): Derivation<C> | null => {
+  return isA3ResultDerivation(d) ? reverseA3(d) : null
+}
 
 // Implication
 
+export type MPResult<Q extends Prop> = Conclusion<Q>
+export type AnyMPResult = MPResult<Prop>
+export const isMPResult: Refinement<AnyConclusion, AnyMPResult> = (
+  c: AnyConclusion,
+): c is AnyMPResult => true
+export const isMPResultDerivation = refineDerivation(isMPResult)
 export type MP<
+  Q extends Prop,
+  P extends Prop,
+  C extends MPResult<Q>,
+> = Transformation<
+  C,
+  [Derivation<Conclusion<Implication<P, Q>>>, Derivation<Conclusion<P>>],
+  'MP'
+>
+export type AnyMP = MP<Prop, Prop, AnyMPResult>
+export const mp = <Q extends Prop, P extends Prop, C extends MPResult<Q>>(
+  result: C,
+  deps: [Derivation<Conclusion<Implication<P, Q>>>, Derivation<Conclusion<P>>],
+): MP<Q, P, C> => transformation(result, deps, 'MP')
+export type ApplyMP<
   S1 extends Derivation<
     Conclusion<Implication<S2['result']['succedent'][0], Prop>>
   >,
   S2 extends Derivation<Conclusion<Prop>>,
-> = Transformation<
-  S1 extends Derivation<Conclusion<Implication<Prop, infer Q extends Prop>>>
-    ? Conclusion<Q>
-    : never,
-  [S1, S2],
-  'MP'
->
-export const mp = <A extends Prop, C extends Prop>(
+> =
+  S1 extends Derivation<
+    Conclusion<Implication<infer P extends Prop, infer Q extends Prop>>
+  >
+    ? MP<Q, P, MPResult<Q>>
+    : never
+export const applyMP = <A extends Prop, C extends Prop>(
   s1: Derivation<Conclusion<Implication<A, C>>>,
   s2: Derivation<Conclusion<A>>,
-): MP<
+): ApplyMP<
   Derivation<Conclusion<Implication<A & Prop, C>>>,
   Derivation<Conclusion<A>>
 > => {
@@ -120,6 +337,24 @@ export const mp = <A extends Prop, C extends Prop>(
   const _a: A = utils.assertEqual(a1, a2)
   const c: C = s1.result.succedent[0].consequent
   return transformation(conclusion(c), [s1, s2], 'MP')
+}
+export const reverseMP = <
+  Q extends Prop,
+  P extends Prop,
+  C extends MPResult<Q>,
+>(
+  d: Derivation<C>,
+  p: P,
+): MP<Q, P, C> => {
+  const q: Q = array.head(d.result.succedent)
+  const piq: Implication<P, Q> = implication(p, q)
+  return mp(d.result, [premise(conclusion(piq)), premise(conclusion(p))])
+}
+export const tryReverseMP = <C extends AnyConclusion, P extends Prop>(
+  d: Derivation<C>,
+  p: P,
+): Derivation<C> | null => {
+  return isMPResultDerivation(d) ? reverseMP(d, p) : null
 }
 
 // Language
@@ -133,12 +368,12 @@ const omega = {
   p2: { implication },
 }
 const iota = {
-  a1,
-  a2,
-  a3,
+  a1: applyA1,
+  a2: applyA2,
+  a3: applyA3,
 }
 const zeta = {
-  mp,
+  mp: applyMP,
 }
 
 export const meta = {
@@ -167,9 +402,9 @@ export const meta = {
       title: 'Axioms',
       examples: [
         [
-          a1(atom('A'), atom('B')),
-          a2(atom('A'), atom('B'), atom('C')),
-          a3(atom('A'), atom('B')),
+          applyA1(atom('A'), atom('B')),
+          applyA2(atom('A'), atom('B'), atom('C')),
+          applyA3(atom('A'), atom('B')),
         ],
       ],
     },
@@ -177,7 +412,7 @@ export const meta = {
       title: 'Rule',
       examples: [
         [
-          mp(
+          applyMP(
             premise(conclusion(implication(atom('A'), atom('B')))),
             premise(conclusion(atom('A'))),
           ),
@@ -195,3 +430,9 @@ export const la3 = {
   i: iota,
   z: zeta,
 }
+
+export const editBranch = <J extends AnyConclusion>(
+  root: Derivation<J> | null,
+  path: array.NonEmptyArray<number>,
+  edit: <J2 extends AnyConclusion>(d: Derivation<J2>) => Derivation<J2> | null,
+): Derivation<J> | null => editBranchG(root, path, edit as Edit)

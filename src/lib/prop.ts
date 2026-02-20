@@ -88,3 +88,34 @@ export type Prop =
   | Implication<Prop, Prop>
   | Conjunction<Prop, Prop>
   | Disjunction<Prop, Prop>
+
+export const equals = (a: Prop, b: Prop): boolean => {
+  switch (a.kind) {
+    case 'atom':
+      return b.kind === 'atom' && b.value === a.value
+    case 'falsum':
+      return b.kind === 'falsum'
+    case 'verum':
+      return b.kind === 'verum'
+    case 'negation':
+      return b.kind === 'negation' && equals(b.negand, a.negand)
+    case 'implication':
+      return (
+        b.kind === 'implication' &&
+        equals(b.antecedent, a.antecedent) &&
+        equals(b.consequent, a.consequent)
+      )
+    case 'conjunction':
+      return (
+        b.kind === 'conjunction' &&
+        equals(b.leftConjunct, a.leftConjunct) &&
+        equals(b.rightConjunct, a.rightConjunct)
+      )
+    case 'disjunction':
+      return (
+        b.kind === 'disjunction' &&
+        equals(b.leftDisjunct, a.leftDisjunct) &&
+        equals(b.rightDisjunct, a.rightDisjunct)
+      )
+  }
+}
