@@ -1,7 +1,22 @@
 import { Derivation } from "./lib/derivation"
 import { Conclusion } from "./lib/judgement"
-import { Atom, Implication, Negation, Prop } from "./lib/prop"
-import { lk } from './systems/lk'
+import { lk,Atom, Implication, Negation, Prop  } from './systems/lk'
+
+type I = {
+  kind: 'i'
+}
+const i = (): I => ({ kind : 'i' })
+
+type IR = {
+  kind: 'ir'
+}
+const ir = (): IR => ({ kind: 'ir' })
+
+type WL = {
+  kind: 'wl'
+}
+const wl = (): WL => ({ kind: 'wl' })
+
 
 type Draft<P extends Prop> = {
     
