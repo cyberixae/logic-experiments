@@ -7,6 +7,7 @@ import {
   Judgement as Sequent,
   judgement as sequent,
   judgement,
+  Judgement,
 } from '../lib/judgement'
 import {
   AnyDerivation,
@@ -16,6 +17,7 @@ import {
   introduction,
   Transformation,
   premise,
+  Premise,
 } from '../lib/derivation'
 
 // Connectives
@@ -53,6 +55,14 @@ export type Prop =
   | Implication<Prop, Prop>
   | Conjunction<Prop, Prop>
   | Disjunction<Prop, Prop>
+
+// Goal
+
+export type Goal<J extends Judgement<Array<Prop>, Array<Prop>>> = Premise<J>
+export const goal = <J extends Judgement<Array<Prop>, Array<Prop>>>(j: J) => premise(j)
+export const isReachableWith = (g: Goal<Judgement<Array<Prop>, Array<Prop>>>): boolean => {
+
+}
 
 // Axiom
 
