@@ -7,8 +7,7 @@ import {
   Judgement as Sequent,
   judgement as sequent,
   judgement,
-  Judgement,
-  AnyJudgement,
+  AnyJudgement as AnySequent,
 } from '../lib/judgement'
 import {
   AnyDerivation,
@@ -97,15 +96,30 @@ export const cut = <
 
 // Conjunction & Disjunction
 
-export type Cl1<B extends Prop, S extends AnyDerivation> = Transformation<
-  S extends Derivation<
-    Sequent<[...infer Γ extends Formulas, infer A extends Prop], infer Δ>
-  >
-    ? Sequent<[...Γ, Conjunction<A, B>], Δ>
-    : never,
-  [S],
+export type Refinement<A, B extends A> = (a: A) => a is B
+export const refinePremise = <A extends AnySequent, B extends A>(r: Refinement<A, B>) => (s: Premise<A>): s is Premise<B> => {
+  return r(s.result)
+}
+
+export type Cl1Bob<Γ extends Formulas, A extends Prop, B extends Prop, Δ extends Formulas> = Transformation<
+  Sequent<[...Γ, Conjunction<A, B>], Δ>,
+  [Derivation<Sequent<[...Γ, A], Δ>>],
   'cl1'
 >
+export type AnyCl1 = Cl1Bob<Formulas, Prop, Prop, Formulas>
+export const cl1Bob = <Γ extends Formulas, A extends Prop, B extends Prop, Δ extends Formulas>(result: Sequent<[...Γ, Conjunction<A, B>], Δ>, deps: [Derivation<Sequent<[...Γ, A], Δ>>]): Cl1Bob<Γ, A, B, Δ> => {
+  return transformation(result, deps, 'cl1')
+}
+
+export type AnyCl1Result = AnyCl1['result']
+export const isCl1Result: Refinement<AnySequent, AnyCl1Result > = (s): s is AnyCl1Result  => {
+  return s.antecedent.at(-1)?.kind === 'conjunction'
+}
+export const isCl1ResultPremise = refinePremise(isCl1Result)
+export type Cl1<B extends Prop, S extends AnyDerivation> =S extends Derivation<
+    Sequent<[...infer Γ extends Formulas, infer A extends Prop], infer Δ>
+  >
+    ?  Cl1Bob<Γ, A, B, Δ> : never
 export const cl1 = <
   B extends Prop,
   Γ extends Formulas,
@@ -118,34 +132,19 @@ export const cl1 = <
   const γ: Γ = array.init(s.result.antecedent)
   const a: A = array.last(s.result.antecedent)
   const δ: Δ = s.result.succedent
-  return transformation(sequent([...γ, conjunction(a, b)], δ), [s], 'cl1')
+  return cl1Bob(sequent([...γ, conjunction(a, b)], δ), [s])
 }
-export const cl1BrutePrime = function*<Γ extends Formulas, A extends Prop, B extends Prop, Δ extends Formulas>(p: Premise<Sequent<[...Γ, Conjunction<A, B>], Δ>>): Generator<Cl1<B, Derivation<Sequent<[...Γ, A], Δ>>>, void, unknown> {
+export const cl1Reverse = <Γ extends Formulas, A extends Prop, B extends Prop, Δ extends Formulas>(p: Premise<Cl1Bob<Γ, A, B, Δ>['result']>): Cl1<B, Derivation<Sequent<[...Γ, A], Δ>>>  => {
     const γ: Γ = array.init(p.result.antecedent)
     const acb: Conjunction<A, B> = array.last(p.result.antecedent)
-    const δ: Δ = p.result.succedent
-
     const a: A = acb.leftConjunct
     const b: B = acb.rightConjunct
-    const j: Sequent<[...Γ, A], Δ> = judgement([...γ, a], δ)
-    const dj: Premise<Sequent<[...Γ, A], Δ>> = premise(j)
-    yield cl1(b, dj)
+    const δ: Δ = p.result.succedent
+    return cl1(b, premise(sequent([...γ, a], δ)))
 }
-export const cl1Brute = function*<J extends AnyJudgement>(p: Premise<J>): Generator<J extends Sequent<[...infer Γ extends Formulas, Conjunction<infer A extends Prop, infer B extends Prop>], infer Δ extends Formulas> ? Cl1<B, Premise<Sequent<[...Γ, A], Δ>>> : never, void, unknown> {
-  if (array.isNonEmptyArray(p.result.antecedent)) {
-    const γ = array.init(p.result.antecedent)
-    const acb = array.last(p.result.antecedent)
-    const δ = p.result.succedent
-
-    if (acb.kind !== 'conjunction') {
-      return
-    }
-    const a = acb.leftConjunct
-    const b = acb.rightConjunct
-    const j = judgement([...γ, a],[...δ])
-    const dj = premise(j)
-    const ret = cl1(b, dj)
-    yield ret
+export const cl1Brute = function*(p: Premise<AnySequent>): Generator<AnyCl1, void, unknown> {
+  if (isCl1ResultPremise(p)) {
+    yield cl1Reverse(p)
   }
 }
 
