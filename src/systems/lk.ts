@@ -304,7 +304,6 @@ export const cr = <
 ): Cr<Γ, A, B, Δ> => {
   return transformation(result, deps, 'cr')
 }
-
 export type AnyCrResult = AnyCr['result']
 export const isCrResult: Refinement<AnySequent, AnyCrResult> = (
   s,
@@ -312,7 +311,6 @@ export const isCrResult: Refinement<AnySequent, AnyCrResult> = (
   return s.succedent.at(0)?.kind === 'conjunction'
 }
 export const isCrResultPremise = refinePremise(isCrResult)
-
 export type ApplyCr<S1 extends AnyDerivation, S2 extends AnyDerivation> = [
   S1,
   S2,
@@ -326,7 +324,6 @@ export type ApplyCr<S1 extends AnyDerivation, S2 extends AnyDerivation> = [
 ]
   ? Cr<Γ, A, B, Δ>
   : never
-
 export const applyCr = <
   Γ extends Formulas,
   A extends Prop,
@@ -345,7 +342,6 @@ export const applyCr = <
   const δ: Δ = array.tail(s1.result.succedent)
   return cr(sequent(γ, [conjunction(a, b), ...δ]), [s1, s2])
 }
-
 export const reverseCr = <
   Γ extends Formulas,
   A extends Prop,
