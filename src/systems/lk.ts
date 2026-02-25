@@ -282,15 +282,7 @@ export const dl = <
   )
 }
 
-export type AnyCr = Transformation<
-  Sequent<Formulas, [Conjunction<Prop, Prop>, ...Formulas]>,
-  [
-    Derivation<Sequent<Formulas, [Prop, ...Formulas]>>,
-    Derivation<Sequent<Formulas, [Prop, ...Formulas]>>,
-  ],
-  'cr'
->
-
+/*
 export type AppCr<
   Γ extends Formulas,
   A extends Prop,
@@ -316,6 +308,7 @@ export const appCr = <
 ): AppCr<Γ, A, Δ, Σ, B, Π> => {
   return transformation(result, deps, 'cr')
 }
+*/
 
 export type RevCr<
   Γ extends Formulas,
@@ -327,6 +320,7 @@ export type RevCr<
   [Derivation<Sequent<Γ, [A, ...Δ]>>, Derivation<Sequent<Γ, [B, ...Δ]>>],
   'cr'
 >
+export type AnyCr = RevCr<Formulas, Prop, Prop, Formulas>
 export const revCr = <
   Γ extends Formulas,
   A extends Prop,
@@ -347,38 +341,37 @@ export const isCrResult: Refinement<AnySequent, AnyCrResult> = (
 }
 export const isCrResultPremise = refinePremise(isCrResult)
 
-export type ApplyCr<S1 extends AnyDerivation, S2 extends AnyDerivation> =
-  S1 extends Derivation<
+export type ApplyCr<S1 extends AnyDerivation, S2 extends AnyDerivation> = [
+  S1,
+  S2,
+] extends [
+  Derivation<
     Sequent<infer Γ, [infer A extends Prop, ...infer Δ extends Formulas]>
-  >
-    ? S2 extends Derivation<
-        Sequent<infer Σ, [infer B extends Prop, ...infer Π extends Formulas]>
-      >
-      ? AppCr<Γ, A, Δ, Σ, B, Π>
-      : never
-    : never
+  >,
+  Derivation<
+    Sequent<infer Γ, [infer B extends Prop, ...infer Δ extends Formulas]>
+  >,
+]
+  ? RevCr<Γ, A, B, Δ>
+  : never
 
 export const applyCr = <
   Γ extends Formulas,
   A extends Prop,
-  Δ extends Formulas,
-  Σ extends Formulas,
   B extends Prop,
-  Π extends Formulas,
+  Δ extends Formulas,
 >(
   s1: Derivation<Sequent<Γ, [A, ...Δ]>>,
-  s2: Derivation<Sequent<Σ, [B, ...Π]>>,
+  s2: Derivation<Sequent<Γ, [B, ...Δ]>>,
 ): ApplyCr<
   Derivation<Sequent<Γ, [A, ...Δ]>>,
-  Derivation<Sequent<Σ, [B, ...Π]>>
+  Derivation<Sequent<Γ, [B, ...Δ]>>
 > => {
   const γ: Γ = s1.result.antecedent
-  const ς: Σ = s2.result.antecedent
   const a: A = array.head(s1.result.succedent)
   const b: B = array.head(s2.result.succedent)
   const δ: Δ = array.tail(s1.result.succedent)
-  const π: Π = array.tail(s2.result.succedent)
-  return appCr(sequent([...γ, ...ς], [conjunction(a, b), ...δ, ...π]), [s1, s2])
+  return revCr(sequent(γ, [conjunction(a, b), ...δ]), [s1, s2])
 }
 
 export const reverseCr = <
@@ -805,7 +798,7 @@ export const meta = {
           ),
           applyCr(
             premise(judgement([atom('Γ')], [atom('A'), atom('Δ')])),
-            premise(judgement([atom('Σ')], [atom('B'), atom('Π')])),
+            premise(judgement([atom('Γ')], [atom('B'), atom('Δ')])),
           ),
         ],
         [
