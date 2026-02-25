@@ -162,13 +162,6 @@ export const reverseCl1 = <
   const δ: Δ = p.result.succedent
   return cl1(p.result, [premise(sequent([...γ, a], δ))])
 }
-export const bruteCl1 = function* (
-  p: Premise<AnySequent>,
-): Generator<AnyCl1, void, unknown> {
-  if (isCl1ResultPremise(p)) {
-    yield reverseCl1(p)
-  }
-}
 
 export type Dr1<B extends Prop, S extends AnyDerivation> = Transformation<
   S extends Derivation<
@@ -359,13 +352,6 @@ export const reverseCr = <
     premise(sequent(γ, [a, ...δ])),
     premise(sequent(γ, [b, ...δ])),
   ])
-}
-export const bruteCr = function* (
-  p: Premise<AnySequent>,
-): Generator<AnyCr, void, unknown> {
-  if (isCrResultPremise(p)) {
-    yield reverseCr(p)
-  }
 }
 
 // Implication
