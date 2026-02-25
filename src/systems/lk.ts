@@ -97,29 +97,48 @@ export const cut = <
 // Conjunction & Disjunction
 
 export type Refinement<A, B extends A> = (a: A) => a is B
-export const refinePremise = <A extends AnySequent, B extends A>(r: Refinement<A, B>) => (s: Premise<A>): s is Premise<B> => {
-  return r(s.result)
-}
+export const refinePremise =
+  <A extends AnySequent, B extends A>(r: Refinement<A, B>) =>
+  (s: Premise<A>): s is Premise<B> => {
+    return r(s.result)
+  }
 
-export type Cl1Bob<Γ extends Formulas, A extends Prop, B extends Prop, Δ extends Formulas> = Transformation<
+export type Cl1Bob<
+  Γ extends Formulas,
+  A extends Prop,
+  B extends Prop,
+  Δ extends Formulas,
+> = Transformation<
   Sequent<[...Γ, Conjunction<A, B>], Δ>,
   [Derivation<Sequent<[...Γ, A], Δ>>],
   'cl1'
 >
 export type AnyCl1 = Cl1Bob<Formulas, Prop, Prop, Formulas>
-export const cl1Bob = <Γ extends Formulas, A extends Prop, B extends Prop, Δ extends Formulas>(result: Sequent<[...Γ, Conjunction<A, B>], Δ>, deps: [Derivation<Sequent<[...Γ, A], Δ>>]): Cl1Bob<Γ, A, B, Δ> => {
+export const cl1Bob = <
+  Γ extends Formulas,
+  A extends Prop,
+  B extends Prop,
+  Δ extends Formulas,
+>(
+  result: Sequent<[...Γ, Conjunction<A, B>], Δ>,
+  deps: [Derivation<Sequent<[...Γ, A], Δ>>],
+): Cl1Bob<Γ, A, B, Δ> => {
   return transformation(result, deps, 'cl1')
 }
 
 export type AnyCl1Result = AnyCl1['result']
-export const isCl1Result: Refinement<AnySequent, AnyCl1Result > = (s): s is AnyCl1Result  => {
+export const isCl1Result: Refinement<AnySequent, AnyCl1Result> = (
+  s,
+): s is AnyCl1Result => {
   return s.antecedent.at(-1)?.kind === 'conjunction'
 }
 export const isCl1ResultPremise = refinePremise(isCl1Result)
-export type Cl1<B extends Prop, S extends AnyDerivation> =S extends Derivation<
+export type Cl1<B extends Prop, S extends AnyDerivation> =
+  S extends Derivation<
     Sequent<[...infer Γ extends Formulas, infer A extends Prop], infer Δ>
   >
-    ?  Cl1Bob<Γ, A, B, Δ> : never
+    ? Cl1Bob<Γ, A, B, Δ>
+    : never
 export const cl1 = <
   B extends Prop,
   Γ extends Formulas,
@@ -134,15 +153,24 @@ export const cl1 = <
   const δ: Δ = s.result.succedent
   return cl1Bob(sequent([...γ, conjunction(a, b)], δ), [s])
 }
-export const cl1Reverse = <Γ extends Formulas, A extends Prop, B extends Prop, Δ extends Formulas>(p: Premise<Cl1Bob<Γ, A, B, Δ>['result']>): Cl1<B, Derivation<Sequent<[...Γ, A], Δ>>>  => {
-    const γ: Γ = array.init(p.result.antecedent)
-    const acb: Conjunction<A, B> = array.last(p.result.antecedent)
-    const a: A = acb.leftConjunct
-    const b: B = acb.rightConjunct
-    const δ: Δ = p.result.succedent
-    return cl1(b, premise(sequent([...γ, a], δ)))
+export const cl1Reverse = <
+  Γ extends Formulas,
+  A extends Prop,
+  B extends Prop,
+  Δ extends Formulas,
+>(
+  p: Premise<Cl1Bob<Γ, A, B, Δ>['result']>,
+): Cl1<B, Derivation<Sequent<[...Γ, A], Δ>>> => {
+  const γ: Γ = array.init(p.result.antecedent)
+  const acb: Conjunction<A, B> = array.last(p.result.antecedent)
+  const a: A = acb.leftConjunct
+  const b: B = acb.rightConjunct
+  const δ: Δ = p.result.succedent
+  return cl1(b, premise(sequent([...γ, a], δ)))
 }
-export const cl1Brute = function*(p: Premise<AnySequent>): Generator<AnyCl1, void, unknown> {
+export const cl1Brute = function* (
+  p: Premise<AnySequent>,
+): Generator<AnyCl1, void, unknown> {
   if (isCl1ResultPremise(p)) {
     yield cl1Reverse(p)
   }

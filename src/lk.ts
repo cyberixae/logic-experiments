@@ -4,7 +4,10 @@ import { lk, usage } from './systems/lk'
 
 const example = lk.z.ir(
   lk.z.swl(
-    lk.o.p2.implication(lk.a('p'), lk.o.p2.implication(lk.a('q'), lk.o.p1.negation(lk.a('p')))),
+    lk.o.p2.implication(
+      lk.a('p'),
+      lk.o.p2.implication(lk.a('q'), lk.o.p1.negation(lk.a('p'))),
+    ),
     lk.z.ir(lk.i.i(lk.a('p'))),
   ),
 )

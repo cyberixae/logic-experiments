@@ -3,11 +3,7 @@ import * as prop from './prop'
 import * as judge from './judgement'
 import * as block from './block'
 import { NonEmptyArray, isNonEmptyArray } from './array'
-import {
-  AnyDerivation,
-  AnyPremise,
-  AnyTransformation,
-} from './derivation'
+import { AnyDerivation, AnyPremise, AnyTransformation } from './derivation'
 
 export type NullaryTemplate = [string]
 export const NullaryTemplateId = {

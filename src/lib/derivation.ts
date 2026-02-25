@@ -64,43 +64,61 @@ export interface Proof<
 > extends Transformation<J, D, R> {}
 export type AnyProof = Proof<AnyJudgement, Array<AnyProof>, Rule>
 
-export const isProof = <J extends AnyJudgement>(d: Derivation<J>): d is Proof<J> => {
+export const isProof = <J extends AnyJudgement>(
+  d: Derivation<J>,
+): d is Proof<J> => {
   return d.kind === 'transformation' && d.deps.every((dep) => isProof(dep))
 }
 
-export const toProof = <J extends AnyJudgement>(d: Derivation<J>): Proof<J> | null => {
-    return isProof(d) ? d : null
+export const toProof = <J extends AnyJudgement>(
+  d: Derivation<J>,
+): Proof<J> | null => {
+  return isProof(d) ? d : null
 }
 
-export const isEquivalent = <J extends AnyJudgement>(a: Derivation<J>, b: Derivation<J>) => equals(a.result, b.result)
+export const isEquivalent = <J extends AnyJudgement>(
+  a: Derivation<J>,
+  b: Derivation<J>,
+) => equals(a.result, b.result)
 
-export const replaceDep = <P extends Transformation<AnyJudgement, Array<AnyNode>, Rule>, I extends number>(parent: P, index: I, d: P['deps'][I]): P | null => {
+export const replaceDep = <
+  P extends Transformation<AnyJudgement, Array<AnyNode>, Rule>,
+  I extends number,
+>(
+  parent: P,
+  index: I,
+  d: P['deps'][I],
+): P | null => {
   const deps = replaceItem(parent.deps, index, d)
   if (!deps) {
     return null
   }
-  if(!zip(parent.deps, deps).every(([a, b]) => isEquivalent(a, b))) {
+  if (!zip(parent.deps, deps).every(([a, b]) => isEquivalent(a, b))) {
     return null
   }
-  return ({ ...parent, deps })
+  return { ...parent, deps }
 }
 
-export const replaceBranch = <J extends AnyJudgement>(root: Derivation<J>, path: NonEmptyArray<number>, d: AnyDerivation): Derivation<J> | null => {
-   if (root.kind === 'premise') {
-     return null
-   }
-   const [index, ...rest] = path
-   if (isNonEmptyArray(rest)) {
-     const dep = root.deps[index]
-     if (!dep) {
-       return null
-     }
-     const tmp = replaceBranch(dep, rest, d)
-     if (!tmp) {
-       return null
-     }
-     return replaceDep(root, index, tmp)
-   } else {
-     return replaceDep(root, index, d)
-   }
+export const replaceBranch = <J extends AnyJudgement>(
+  root: Derivation<J>,
+  path: NonEmptyArray<number>,
+  d: AnyDerivation,
+): Derivation<J> | null => {
+  if (root.kind === 'premise') {
+    return null
+  }
+  const [index, ...rest] = path
+  if (isNonEmptyArray(rest)) {
+    const dep = root.deps[index]
+    if (!dep) {
+      return null
+    }
+    const tmp = replaceBranch(dep, rest, d)
+    if (!tmp) {
+      return null
+    }
+    return replaceDep(root, index, tmp)
+  } else {
+    return replaceDep(root, index, d)
+  }
 }
