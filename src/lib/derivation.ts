@@ -16,9 +16,11 @@ export function premise<J extends AnyJudgement>(result: J): Premise<J> {
   }
 }
 export type AnyPremise = Premise<AnyJudgement>
-export const refinePremise = <A extends AnyJudgement, B extends A>(r: Refinement<A, B>) => (s: Premise<A>): s is Premise<B> => {
-  return r(s.result)
-}
+export const refinePremise =
+  <A extends AnyJudgement, B extends A>(r: Refinement<A, B>) =>
+  (s: Premise<A>): s is Premise<B> => {
+    return r(s.result)
+  }
 
 export interface Transformation<
   J extends AnyJudgement,
