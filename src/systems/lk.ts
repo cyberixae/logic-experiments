@@ -8,6 +8,7 @@ import {
   judgement as sequent,
   judgement,
   Judgement,
+  AnyJudgement,
 } from '../lib/judgement'
 import {
   AnyDerivation,
@@ -55,14 +56,6 @@ export type Prop =
   | Implication<Prop, Prop>
   | Conjunction<Prop, Prop>
   | Disjunction<Prop, Prop>
-
-// Goal
-
-export type Goal<J extends Judgement<Array<Prop>, Array<Prop>>> = Premise<J>
-export const goal = <J extends Judgement<Array<Prop>, Array<Prop>>>(j: J) => premise(j)
-export const isReachableWith = (g: Goal<Judgement<Array<Prop>, Array<Prop>>>): boolean => {
-
-}
 
 // Axiom
 
@@ -126,6 +119,34 @@ export const cl1 = <
   const a: A = array.last(s.result.antecedent)
   const δ: Δ = s.result.succedent
   return transformation(sequent([...γ, conjunction(a, b)], δ), [s], 'cl1')
+}
+export const cl1BrutePrime = function*<Γ extends Formulas, A extends Prop, B extends Prop, Δ extends Formulas>(p: Premise<Sequent<[...Γ, Conjunction<A, B>], Δ>>): Generator<Cl1<B, Derivation<Sequent<[...Γ, A], Δ>>>, void, unknown> {
+    const γ: Γ = array.init(p.result.antecedent)
+    const acb: Conjunction<A, B> = array.last(p.result.antecedent)
+    const δ: Δ = p.result.succedent
+
+    const a: A = acb.leftConjunct
+    const b: B = acb.rightConjunct
+    const j: Sequent<[...Γ, A], Δ> = judgement([...γ, a], δ)
+    const dj: Premise<Sequent<[...Γ, A], Δ>> = premise(j)
+    yield cl1(b, dj)
+}
+export const cl1Brute = function*<J extends AnyJudgement>(p: Premise<J>): Generator<J extends Sequent<[...infer Γ extends Formulas, Conjunction<infer A extends Prop, infer B extends Prop>], infer Δ extends Formulas> ? Cl1<B, Premise<Sequent<[...Γ, A], Δ>>> : never, void, unknown> {
+  if (array.isNonEmptyArray(p.result.antecedent)) {
+    const γ = array.init(p.result.antecedent)
+    const acb = array.last(p.result.antecedent)
+    const δ = p.result.succedent
+
+    if (acb.kind !== 'conjunction') {
+      return
+    }
+    const a = acb.leftConjunct
+    const b = acb.rightConjunct
+    const j = judgement([...γ, a],[...δ])
+    const dj = premise(j)
+    const ret = cl1(b, dj)
+    yield ret
+  }
 }
 
 export type Dr1<B extends Prop, S extends AnyDerivation> = Transformation<

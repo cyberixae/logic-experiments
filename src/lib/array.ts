@@ -1,6 +1,6 @@
-export type NonEmptyArray<A> = ReadonlyArray<A> & { 0: A }
+export type NonEmptyArray<A> = Array<A> & { 0: A }
 export const isNonEmptyArray = <A>(
-  a: ReadonlyArray<A>,
+  a: Array<A>,
 ): a is NonEmptyArray<A> => {
   return a.hasOwnProperty(0)
 }
