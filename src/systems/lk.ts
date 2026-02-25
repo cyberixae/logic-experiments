@@ -282,35 +282,7 @@ export const dl = <
   )
 }
 
-/*
-export type AppCr<
-  Γ extends Formulas,
-  A extends Prop,
-  Δ extends Formulas,
-  Σ extends Formulas,
-  B extends Prop,
-  Π extends Formulas,
-> = Transformation<
-  Sequent<[...Γ, ...Σ], [Conjunction<A, B>, ...Δ, ...Π]>,
-  [Derivation<Sequent<Γ, [A, ...Δ]>>, Derivation<Sequent<Σ, [B, ...Π]>>],
-  'cr'
->
-export const appCr = <
-  Γ extends Formulas,
-  A extends Prop,
-  Δ extends Formulas,
-  Σ extends Formulas,
-  B extends Prop,
-  Π extends Formulas,
->(
-  result: Sequent<[...Γ, ...Σ], [Conjunction<A, B>, ...Δ, ...Π]>,
-  deps: [Derivation<Sequent<Γ, [A, ...Δ]>>, Derivation<Sequent<Σ, [B, ...Π]>>],
-): AppCr<Γ, A, Δ, Σ, B, Π> => {
-  return transformation(result, deps, 'cr')
-}
-*/
-
-export type RevCr<
+export type Cr<
   Γ extends Formulas,
   A extends Prop,
   B extends Prop,
@@ -320,8 +292,8 @@ export type RevCr<
   [Derivation<Sequent<Γ, [A, ...Δ]>>, Derivation<Sequent<Γ, [B, ...Δ]>>],
   'cr'
 >
-export type AnyCr = RevCr<Formulas, Prop, Prop, Formulas>
-export const revCr = <
+export type AnyCr = Cr<Formulas, Prop, Prop, Formulas>
+export const cr = <
   Γ extends Formulas,
   A extends Prop,
   B extends Prop,
@@ -329,7 +301,7 @@ export const revCr = <
 >(
   result: Sequent<Γ, [Conjunction<A, B>, ...Δ]>,
   deps: [Derivation<Sequent<Γ, [A, ...Δ]>>, Derivation<Sequent<Γ, [B, ...Δ]>>],
-): RevCr<Γ, A, B, Δ> => {
+): Cr<Γ, A, B, Δ> => {
   return transformation(result, deps, 'cr')
 }
 
@@ -352,7 +324,7 @@ export type ApplyCr<S1 extends AnyDerivation, S2 extends AnyDerivation> = [
     Sequent<infer Γ, [infer B extends Prop, ...infer Δ extends Formulas]>
   >,
 ]
-  ? RevCr<Γ, A, B, Δ>
+  ? Cr<Γ, A, B, Δ>
   : never
 
 export const applyCr = <
@@ -371,7 +343,7 @@ export const applyCr = <
   const a: A = array.head(s1.result.succedent)
   const b: B = array.head(s2.result.succedent)
   const δ: Δ = array.tail(s1.result.succedent)
-  return revCr(sequent(γ, [conjunction(a, b), ...δ]), [s1, s2])
+  return cr(sequent(γ, [conjunction(a, b), ...δ]), [s1, s2])
 }
 
 export const reverseCr = <
@@ -380,14 +352,14 @@ export const reverseCr = <
   B extends Prop,
   Δ extends Formulas,
 >(
-  p: Premise<RevCr<Γ, A, B, Δ>['result']>,
-): RevCr<Γ, A, B, Δ> => {
+  p: Premise<Cr<Γ, A, B, Δ>['result']>,
+): Cr<Γ, A, B, Δ> => {
   const γ: Γ = p.result.antecedent
   const acb: Conjunction<A, B> = array.head(p.result.succedent)
   const a: A = acb.leftConjunct
   const b: B = acb.rightConjunct
   const δ: Δ = array.tail(p.result.succedent)
-  return revCr(p.result, [
+  return cr(p.result, [
     premise(sequent(γ, [a, ...δ])),
     premise(sequent(γ, [b, ...δ])),
   ])
