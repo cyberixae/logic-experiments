@@ -18,6 +18,8 @@ import {
   Transformation,
   premise,
   Premise,
+  Refinement,
+  refinePremise,
 } from '../lib/derivation'
 
 // Connectives
@@ -95,13 +97,6 @@ export const cut = <
 }
 
 // Conjunction & Disjunction
-
-export type Refinement<A, B extends A> = (a: A) => a is B
-export const refinePremise =
-  <A extends AnySequent, B extends A>(r: Refinement<A, B>) =>
-  (s: Premise<A>): s is Premise<B> => {
-    return r(s.result)
-  }
 
 export type Cl1Bob<
   Γ extends Formulas,

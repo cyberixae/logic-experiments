@@ -1,6 +1,8 @@
 import { isNonEmptyArray, NonEmptyArray, replaceItem, zip } from './array'
 import { AnyJudgement, equals } from './judgement'
 
+export type Refinement<A, B extends A> = (a: A) => a is B
+
 export type Rule = string
 
 export interface Premise<J extends AnyJudgement> {
@@ -14,6 +16,9 @@ export function premise<J extends AnyJudgement>(result: J): Premise<J> {
   }
 }
 export type AnyPremise = Premise<AnyJudgement>
+export const refinePremise = <A extends AnyJudgement, B extends A>(r: Refinement<A, B>) => (s: Premise<A>): s is Premise<B> => {
+  return r(s.result)
+}
 
 export interface Transformation<
   J extends AnyJudgement,
