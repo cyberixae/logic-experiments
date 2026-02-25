@@ -282,23 +282,83 @@ export const dl = <
   )
 }
 
-export type CR<
-  S1 extends AnyDerivation,
-  S2 extends AnyDerivation,
+export type AnyCr = Transformation<
+  Sequent<Formulas, [Conjunction<Prop, Prop>, ...Formulas]>,
+  [
+    Derivation<Sequent<Formulas, [Prop, ...Formulas]>>,
+    Derivation<Sequent<Formulas, [Prop, ...Formulas]>>,
+  ],
+  'cr'
+>
+
+export type AppCr<
+  Γ extends Formulas,
+  A extends Prop,
+  Δ extends Formulas,
+  Σ extends Formulas,
+  B extends Prop,
+  Π extends Formulas,
 > = Transformation<
+  Sequent<[...Γ, ...Σ], [Conjunction<A, B>, ...Δ, ...Π]>,
+  [Derivation<Sequent<Γ, [A, ...Δ]>>, Derivation<Sequent<Σ, [B, ...Π]>>],
+  'cr'
+>
+export const appCr = <
+  Γ extends Formulas,
+  A extends Prop,
+  Δ extends Formulas,
+  Σ extends Formulas,
+  B extends Prop,
+  Π extends Formulas,
+>(
+  result: Sequent<[...Γ, ...Σ], [Conjunction<A, B>, ...Δ, ...Π]>,
+  deps: [Derivation<Sequent<Γ, [A, ...Δ]>>, Derivation<Sequent<Σ, [B, ...Π]>>],
+): AppCr<Γ, A, Δ, Σ, B, Π> => {
+  return transformation(result, deps, 'cr')
+}
+
+export type RevCr<
+  Γ extends Formulas,
+  A extends Prop,
+  B extends Prop,
+  Δ extends Formulas,
+> = Transformation<
+  Sequent<Γ, [Conjunction<A, B>, ...Δ]>,
+  [Derivation<Sequent<Γ, [A, ...Δ]>>, Derivation<Sequent<Γ, [B, ...Δ]>>],
+  'cr'
+>
+export const revCr = <
+  Γ extends Formulas,
+  A extends Prop,
+  B extends Prop,
+  Δ extends Formulas,
+>(
+  result: Sequent<Γ, [Conjunction<A, B>, ...Δ]>,
+  deps: [Derivation<Sequent<Γ, [A, ...Δ]>>, Derivation<Sequent<Γ, [B, ...Δ]>>],
+): RevCr<Γ, A, B, Δ> => {
+  return transformation(result, deps, 'cr')
+}
+
+export type AnyCrResult = AnyCr['result']
+export const isCrResult: Refinement<AnySequent, AnyCrResult> = (
+  s,
+): s is AnyCrResult => {
+  return s.succedent.at(0)?.kind === 'conjunction'
+}
+export const isCrResultPremise = refinePremise(isCrResult)
+
+export type ApplyCr<S1 extends AnyDerivation, S2 extends AnyDerivation> =
   S1 extends Derivation<
     Sequent<infer Γ, [infer A extends Prop, ...infer Δ extends Formulas]>
   >
     ? S2 extends Derivation<
         Sequent<infer Σ, [infer B extends Prop, ...infer Π extends Formulas]>
       >
-      ? Sequent<[...Γ, ...Σ], [Conjunction<A, B>, ...Δ, ...Π]>
+      ? AppCr<Γ, A, Δ, Σ, B, Π>
       : never
-    : never,
-  [S1, S2],
-  'cr'
->
-export const cr = <
+    : never
+
+export const applyCr = <
   Γ extends Formulas,
   A extends Prop,
   Δ extends Formulas,
@@ -308,18 +368,43 @@ export const cr = <
 >(
   s1: Derivation<Sequent<Γ, [A, ...Δ]>>,
   s2: Derivation<Sequent<Σ, [B, ...Π]>>,
-): CR<Derivation<Sequent<Γ, [A, ...Δ]>>, Derivation<Sequent<Σ, [B, ...Π]>>> => {
+): ApplyCr<
+  Derivation<Sequent<Γ, [A, ...Δ]>>,
+  Derivation<Sequent<Σ, [B, ...Π]>>
+> => {
   const γ: Γ = s1.result.antecedent
   const ς: Σ = s2.result.antecedent
   const a: A = array.head(s1.result.succedent)
   const b: B = array.head(s2.result.succedent)
   const δ: Δ = array.tail(s1.result.succedent)
   const π: Π = array.tail(s2.result.succedent)
-  return transformation(
-    sequent([...γ, ...ς], [conjunction(a, b), ...δ, ...π]),
-    [s1, s2],
-    'cr',
-  )
+  return appCr(sequent([...γ, ...ς], [conjunction(a, b), ...δ, ...π]), [s1, s2])
+}
+
+export const reverseCr = <
+  Γ extends Formulas,
+  A extends Prop,
+  B extends Prop,
+  Δ extends Formulas,
+>(
+  p: Premise<RevCr<Γ, A, B, Δ>['result']>,
+): RevCr<Γ, A, B, Δ> => {
+  const γ: Γ = p.result.antecedent
+  const acb: Conjunction<A, B> = array.head(p.result.succedent)
+  const a: A = acb.leftConjunct
+  const b: B = acb.rightConjunct
+  const δ: Δ = array.tail(p.result.succedent)
+  return revCr(p.result, [
+    premise(sequent(γ, [a, ...δ])),
+    premise(sequent(γ, [b, ...δ])),
+  ])
+}
+export const bruteCr = function* (
+  p: Premise<AnySequent>,
+): Generator<AnyCr, void, unknown> {
+  if (isCrResultPremise(p)) {
+    yield reverseCr(p)
+  }
 }
 
 // Implication
@@ -631,7 +716,7 @@ const zeta = {
   cl2,
   dr2,
   dl,
-  cr,
+  cr: applyCr,
   il,
   ir,
   nl,
@@ -718,7 +803,7 @@ export const meta = {
             premise(judgement([atom('Γ'), atom('A')], [atom('Δ')])),
             premise(judgement([atom('Σ'), atom('B')], [atom('Π')])),
           ),
-          cr(
+          applyCr(
             premise(judgement([atom('Γ')], [atom('A'), atom('Δ')])),
             premise(judgement([atom('Σ')], [atom('B'), atom('Π')])),
           ),
