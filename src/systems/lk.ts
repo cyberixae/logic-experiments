@@ -124,7 +124,7 @@ export const applyCut = <
   Δ extends Formulas,
   A extends Prop,
 >(
-  s1: Derivation<Sequent<Γ, [...Δ, A]>>,
+  s1: Derivation<Sequent<Γ, [...Δ, NoInfer<A>]>>,
   s2: Derivation<Sequent<[A, ...Γ], Δ>>,
 ): ApplyCut<
   Derivation<Sequent<Γ, [...Δ, A]>>,
