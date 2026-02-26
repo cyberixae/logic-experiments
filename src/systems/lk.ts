@@ -87,24 +87,16 @@ export type Cut<
   Γ extends Formulas,
   Δ extends Formulas,
   A extends Prop,
-  Σ extends Formulas,
-  Π extends Formulas,
 > = Transformation<
-  Sequent<[...Γ, ...Σ], [...Δ, ...Π]>,
-  [Derivation<Sequent<Γ, [...Δ, A]>>, Derivation<Sequent<[A, ...Σ], Π>>],
+  Sequent<Γ, Δ>,
+  [Derivation<Sequent<Γ, [...Δ, A]>>, Derivation<Sequent<[A, ...Γ], Δ>>],
   'Cut'
 >
-export type AnyCut = Cut<Formulas, Formulas, Prop, Formulas, Formulas>
-export const cut = <
-  Γ extends Formulas,
-  Δ extends Formulas,
-  A extends Prop,
-  Σ extends Formulas,
-  Π extends Formulas,
->(
-  result: Sequent<[...Γ, ...Σ], [...Δ, ...Π]>,
-  deps: [Derivation<Sequent<Γ, [...Δ, A]>>, Derivation<Sequent<[A, ...Σ], Π>>],
-): Cut<Γ, Δ, A, Σ, Π> => {
+export type AnyCut = Cut<Formulas, Formulas, Prop>
+export const cut = <Γ extends Formulas, Δ extends Formulas, A extends Prop>(
+  result: Sequent<Γ, Δ>,
+  deps: [Derivation<Sequent<Γ, [...Δ, A]>>, Derivation<Sequent<[A, ...Γ], Δ>>],
+): Cut<Γ, Δ, A> => {
   return transformation(result, deps, 'Cut')
 }
 export type AnyCutResult = AnyCut['result']
@@ -122,29 +114,40 @@ export type ApplyCut<S1 extends AnyDerivation, S2 extends AnyDerivation> = [
     Sequent<infer Γ, [...infer Δ extends Formulas, infer A extends Prop]>
   >,
   Derivation<
-    Sequent<[infer A extends Prop, ...infer Σ extends Formulas], infer Π>
+    Sequent<[infer A extends Prop, ...infer Γ extends Formulas], infer Δ>
   >,
 ]
-  ? Cut<Γ, Δ, A, Σ, Π>
+  ? Cut<Γ, Δ, A>
   : never
 export const applyCut = <
   Γ extends Formulas,
   Δ extends Formulas,
   A extends Prop,
-  Σ extends Formulas,
-  Π extends Formulas,
 >(
   s1: Derivation<Sequent<Γ, [...Δ, A]>>,
-  s2: Derivation<Sequent<[A, ...Σ], Π>>,
+  s2: Derivation<Sequent<[A, ...Γ], Δ>>,
 ): ApplyCut<
   Derivation<Sequent<Γ, [...Δ, A]>>,
-  Derivation<Sequent<[A, ...Σ], Π>>
+  Derivation<Sequent<[A, ...Γ], Δ>>
 > => {
   const γ: Γ = s1.result.antecedent
   const δ: Δ = array.init(s1.result.succedent)
-  const π: Π = s2.result.succedent
-  const ς: Σ = array.tail(s2.result.antecedent)
-  return cut(sequent([...γ, ...ς], [...δ, ...π]), [s1, s2])
+  return cut(sequent(γ, δ), [s1, s2])
+}
+export const reverseCut = <
+  Γ extends Formulas,
+  Δ extends Formulas,
+  A extends Prop,
+>(
+  p: Premise<Cut<Γ, Δ, A>['result']>,
+  a: A,
+): Cut<Γ, Δ, A> => {
+  const γ: Γ = p.result.antecedent
+  const δ: Δ = p.result.succedent
+  return cut(p.result, [
+    premise(sequent(γ, [...δ, a])),
+    premise(sequent([a, ...γ], δ)),
+  ])
 }
 
 // Conjunction & Disjunction
@@ -760,7 +763,7 @@ export const meta = {
   rules: [
     {
       title: 'Axiom',
-      examples: [[i(atom('A'))]],
+      examples: [[applyI(atom('A'))]],
     },
     {
       title: 'Cut',
@@ -768,7 +771,7 @@ export const meta = {
         [
           applyCut(
             premise(judgement([atom('Γ')], [atom('Δ'), atom('A')])),
-            premise(judgement([atom('A'), atom('Σ')], [atom('Π')])),
+            premise(judgement([atom('A'), atom('Γ')], [atom('Δ')])),
           ),
         ],
       ],
