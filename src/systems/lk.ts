@@ -75,7 +75,8 @@ export const isIResult: Refinement<AnySequent, AnyIResult> = (
   )
 }
 export const isIResultPremise = refinePremise(isIResult)
-export const applyI = <A extends Prop>(a: A): I<A> => i(sequent([a], [a]))
+export type ApplyI<A extends Prop> = I<A>
+export const applyI = <A extends Prop>(a: A): ApplyI<A> => i(sequent([a], [a]))
 export const reverseI = <A extends Prop>(p: Premise<I<A>['result']>): I<A> => {
   return i(p.result)
 }
