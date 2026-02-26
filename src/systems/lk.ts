@@ -61,9 +61,9 @@ export type Prop =
 // Axiom
 
 export type I<A extends Prop> = Introduction<Sequent<[A], [A]>, 'I'>
-export const i = <A extends Prop>(a: A): I<A> =>
-  introduction(sequent([a], [a]), 'I')
 export type AnyI = I<Prop>
+export const i = <A extends Prop>(result: Sequent<[NoInfer<A>], [A]>): I<A> =>
+  introduction(result, 'I')
 export type AnyIResult = AnyI['result']
 export const isIResult: Refinement<AnySequent, AnyIResult> = (
   s,
@@ -75,9 +75,9 @@ export const isIResult: Refinement<AnySequent, AnyIResult> = (
   )
 }
 export const isIResultPremise = refinePremise(isIResult)
+export const applyI = <A extends Prop>(a: A): I<A> => i(sequent([a], [a]))
 export const reverseI = <A extends Prop>(p: Premise<I<A>['result']>): I<A> => {
-  const a: A = array.last(p.result.antecedent)
-  return i(a)
+  return i(p.result)
 }
 
 // Cut
