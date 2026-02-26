@@ -63,6 +63,22 @@ export type Prop =
 export type I<A extends Prop> = Introduction<Sequent<[A], [A]>, 'I'>
 export const i = <A extends Prop>(a: A): I<A> =>
   introduction(sequent([a], [a]), 'I')
+export type AnyI = I<Prop>
+export type AnyIResult = AnyI['result']
+export const isIResult: Refinement<AnySequent, AnyIResult> = (
+  s,
+): s is AnyIResult => {
+  return (
+    array.isTupleOf1(s.antecedent) &&
+    array.isTupleOf1(s.succedent) &&
+    prop.equals(s.antecedent[0], s.succedent[0])
+  )
+}
+export const isIResultPremise = refinePremise(isIResult)
+export const reverseI = <A extends Prop>(p: Premise<I<A>['result']>): I<A> => {
+  const a: A = array.last(p.result.antecedent)
+  return i(a)
+}
 
 // Cut
 

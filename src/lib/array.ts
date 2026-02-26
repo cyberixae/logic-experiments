@@ -26,6 +26,8 @@ export const zip = <A, B>(a: Array<A>, b: Array<B>): Array<[A, B]> => {
   )
 }
 
+export const isTupleOf1 = <A>(arr: Array<A>): arr is [A] => arr.length === 1
+
 export const replaceItem = <T>(
   arr: Array<T>,
   index: number,
