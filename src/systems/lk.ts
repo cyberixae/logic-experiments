@@ -84,33 +84,67 @@ export const reverseI = <A extends Prop>(p: Premise<I<A>['result']>): I<A> => {
 // Cut
 
 export type Cut<
-  S1 extends AnyDerivation,
-  S2 extends AnyDerivation,
+  Γ extends Formulas,
+  Δ extends Formulas,
+  A extends Prop,
+  Σ extends Formulas,
+  Π extends Formulas,
 > = Transformation<
-  S1 extends Derivation<Sequent<infer Γ, [...infer Δ extends Formulas, Prop]>>
-    ? S2 extends Derivation<
-        Sequent<[Prop, ...infer Σ extends Formulas], infer Π>
-      >
-      ? Sequent<[...Γ, ...Σ], [...Δ, ...Π]>
-      : never
-    : never,
-  [S1, S2],
+  Sequent<[...Γ, ...Σ], [...Δ, ...Π]>,
+  [Derivation<Sequent<Γ, [...Δ, A]>>, Derivation<Sequent<[A, ...Σ], Π>>],
   'Cut'
 >
+export type AnyCut = Cut<Formulas, Formulas, Prop, Formulas, Formulas>
 export const cut = <
   Γ extends Formulas,
   Δ extends Formulas,
+  A extends Prop,
   Σ extends Formulas,
   Π extends Formulas,
 >(
-  s1: Derivation<Sequent<Γ, [...Δ, Prop]>>,
-  s2: Derivation<Sequent<[Prop, ...Σ], Π>>,
-) => {
+  result: Sequent<[...Γ, ...Σ], [...Δ, ...Π]>,
+  deps: [Derivation<Sequent<Γ, [...Δ, A]>>, Derivation<Sequent<[A, ...Σ], Π>>],
+): Cut<Γ, Δ, A, Σ, Π> => {
+  return transformation(result, deps, 'Cut')
+}
+export type AnyCutResult = AnyCut['result']
+export const isCutResult: Refinement<AnySequent, AnyCutResult> = (
+  s,
+): s is AnyCutResult => {
+  return true
+}
+export const isCutResultPremise = refinePremise(isCutResult)
+export type ApplyCut<S1 extends AnyDerivation, S2 extends AnyDerivation> = [
+  S1,
+  S2,
+] extends [
+  Derivation<
+    Sequent<infer Γ, [...infer Δ extends Formulas, infer A extends Prop]>
+  >,
+  Derivation<
+    Sequent<[infer A extends Prop, ...infer Σ extends Formulas], infer Π>
+  >,
+]
+  ? Cut<Γ, Δ, A, Σ, Π>
+  : never
+export const applyCut = <
+  Γ extends Formulas,
+  Δ extends Formulas,
+  A extends Prop,
+  Σ extends Formulas,
+  Π extends Formulas,
+>(
+  s1: Derivation<Sequent<Γ, [...Δ, A]>>,
+  s2: Derivation<Sequent<[A, ...Σ], Π>>,
+): ApplyCut<
+  Derivation<Sequent<Γ, [...Δ, A]>>,
+  Derivation<Sequent<[A, ...Σ], Π>>
+> => {
   const γ: Γ = s1.result.antecedent
   const δ: Δ = array.init(s1.result.succedent)
   const π: Π = s2.result.succedent
   const ς: Σ = array.tail(s2.result.antecedent)
-  return transformation(sequent([...γ, ...ς], [...δ, ...π]), [s1, s2], 'Cut')
+  return cut(sequent([...γ, ...ς], [...δ, ...π]), [s1, s2])
 }
 
 // Conjunction & Disjunction
@@ -674,7 +708,7 @@ const iota = {
   i,
 }
 const zeta = {
-  cut,
+  cut: applyCut,
   cl1: applyCl1,
   dr1,
   cl2,
@@ -732,7 +766,7 @@ export const meta = {
       title: 'Cut',
       examples: [
         [
-          cut(
+          applyCut(
             premise(judgement([atom('Γ')], [atom('Δ'), atom('A')])),
             premise(judgement([atom('A'), atom('Σ')], [atom('Π')])),
           ),
