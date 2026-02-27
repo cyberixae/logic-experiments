@@ -216,15 +216,22 @@ export const reverseCL1 = <
   return cl1(p.result, [premise(sequent([...γ, a], δ))])
 }
 
-export type ApplyDR1<B extends Prop, S extends AnyDerivation> = Transformation<
+export type DR1<
+  Γ extends Formulas,
+  A extends Prop,
+  B extends Prop,
+  Δ extends Formulas,
+> = Transformation<
+  Sequent<Γ, [Disjunction<A, B>, ...Δ]>,
+  [Derivation<Sequent<Γ, [A, ...Δ]>>],
+  'dr1'
+>
+export type ApplyDR1<B extends Prop, S extends AnyDerivation> =
   S extends Derivation<
     Sequent<infer Γ, [infer A extends Prop, ...infer Δ extends Formulas]>
   >
-    ? Sequent<Γ, [Disjunction<A, B>, ...Δ]>
-    : never,
-  [S],
-  'dr1'
->
+    ? DR1<Γ, A, B, Δ>
+    : never
 export const applyDR1 = <
   B extends Prop,
   Γ extends Formulas,
@@ -240,15 +247,22 @@ export const applyDR1 = <
   return transformation(sequent(γ, [disjunction(a, b), ...δ]), [s], 'dr1')
 }
 
-export type ApplyCL2<A extends Prop, S extends AnyDerivation> = Transformation<
+export type CL2<
+  Γ extends Formulas,
+  A extends Prop,
+  B extends Prop,
+  Δ extends Formulas,
+> = Transformation<
+  Sequent<[...Γ, Conjunction<A, B>], Δ>,
+  [Derivation<Sequent<[...Γ, B], Δ>>],
+  'cl2'
+>
+export type ApplyCL2<A extends Prop, S extends AnyDerivation> =
   S extends Derivation<
     Sequent<[...infer Γ extends Formulas, infer B extends Prop], infer Δ>
   >
-    ? Sequent<[...Γ, Conjunction<A, B>], Δ>
-    : never,
-  [S],
-  'cl2'
->
+    ? CL2<Γ, A, B, Δ>
+    : never
 export const applyCL2 = <
   A extends Prop,
   Γ extends Formulas,
@@ -264,15 +278,22 @@ export const applyCL2 = <
   return transformation(sequent([...γ, conjunction(a, b)], δ), [s], 'cl2')
 }
 
-export type ApplyDR2<A extends Prop, S extends AnyDerivation> = Transformation<
+export type DR2<
+  Γ extends Formulas,
+  A extends Prop,
+  B extends Prop,
+  Δ extends Formulas,
+> = Transformation<
+  Sequent<Γ, [Disjunction<A, B>, ...Δ]>,
+  [Derivation<Sequent<Γ, [B, ...Δ]>>],
+  'dr2'
+>
+export type ApplyDR2<A extends Prop, S extends AnyDerivation> =
   S extends Derivation<
     Sequent<infer Γ, [infer B extends Prop, ...infer Δ extends Formulas]>
   >
-    ? Sequent<Γ, [Disjunction<A, B>, ...Δ]>
-    : never,
-  [S],
-  'dr2'
->
+    ? DR2<Γ, A, B, Δ>
+    : never
 export const applyDR2 = <
   A extends Prop,
   Γ extends Formulas,
@@ -289,17 +310,13 @@ export const applyDR2 = <
 }
 
 export type DL<
-Γ extends Formulas,
-A extends Prop,
-B extends Prop,
-Δ extends Formulas,
+  Γ extends Formulas,
+  A extends Prop,
+  B extends Prop,
+  Δ extends Formulas,
 > = Transformation<
-       Sequent<[...Γ, Disjunction<A, B>], Δ>,
-  [Derivation<
-    Sequent<[...Γ, A ], Δ>
-  >, Derivation<
-        Sequent<[...Γ , B ], Δ>
-      >],
+  Sequent<[...Γ, Disjunction<A, B>], Δ>,
+  [Derivation<Sequent<[...Γ, A], Δ>>, Derivation<Sequent<[...Γ, B], Δ>>],
   'dl'
 >
 export const dl = <
@@ -309,26 +326,23 @@ export const dl = <
   Δ extends Formulas,
 >(
   result: Sequent<[...Γ, Disjunction<A, B>], Δ>,
-  deps: [Derivation<
-    Sequent<[...Γ, A ], Δ>
-  >, Derivation<
-        Sequent<[...Γ , B ], Δ>
-      >],
+  deps: [Derivation<Sequent<[...Γ, A], Δ>>, Derivation<Sequent<[...Γ, B], Δ>>],
 ): DL<Γ, A, B, Δ> => {
   return transformation(result, deps, 'dl')
 }
-export type ApplyDL<
-  S1 extends AnyDerivation,
-  S2 extends AnyDerivation,
-> = 
-  [S1, S2] extends [Derivation<
+export type ApplyDL<S1 extends AnyDerivation, S2 extends AnyDerivation> = [
+  S1,
+  S2,
+] extends [
+  Derivation<
     Sequent<[...infer Γ extends Formulas, infer A extends Prop], infer Δ>
   >,
-     Derivation<
-        Sequent<[...infer Γ extends Formulas, infer B extends Prop], infer Δ>
-      >]
-      ? DL<Γ, A, B, Δ>
-    : never
+  Derivation<
+    Sequent<[...infer Γ extends Formulas, infer B extends Prop], infer Δ>
+  >,
+]
+  ? DL<Γ, A, B, Δ>
+  : never
 export const applyDL = <
   Γ extends Formulas,
   A extends Prop,
@@ -337,15 +351,15 @@ export const applyDL = <
 >(
   s1: Derivation<Sequent<[...Γ, A], Δ>>,
   s2: Derivation<Sequent<[...Γ, B], Δ>>,
-): ApplyDL<Derivation<Sequent<[...Γ, A], Δ>>, Derivation<Sequent<[...Γ, B], Δ>>> => {
+): ApplyDL<
+  Derivation<Sequent<[...Γ, A], Δ>>,
+  Derivation<Sequent<[...Γ, B], Δ>>
+> => {
   const γ: Γ = array.init(s1.result.antecedent)
   const a: A = array.last(s1.result.antecedent)
   const b: B = array.last(s2.result.antecedent)
   const δ: Δ = s1.result.succedent
-  return dl(
-    sequent([...γ, disjunction(a, b)], δ),
-    [s1, s2],
-  )
+  return dl(sequent([...γ, disjunction(a, b)], δ), [s1, s2])
 }
 
 export type CR<
@@ -435,12 +449,8 @@ export type IL<
   B extends Prop,
   Δ extends Formulas,
 > = Transformation<
-   Sequent<[...Γ, Implication<A, B>], Δ> ,
-  [Derivation<
-    Sequent<Γ, [A, ...Δ]>
-  >, Derivation<
-        Sequent<[...Γ, B], Δ>
-      >],
+  Sequent<[...Γ, Implication<A, B>], Δ>,
+  [Derivation<Sequent<Γ, [A, ...Δ]>>, Derivation<Sequent<[...Γ, B], Δ>>],
   'il'
 >
 export const il = <
@@ -450,26 +460,23 @@ export const il = <
   Δ extends Formulas,
 >(
   result: Sequent<[...Γ, Implication<A, B>], Δ>,
-  deps: [Derivation<
-    Sequent<Γ, [A, ...Δ]>
-  >, Derivation<
-        Sequent<[...Γ, B], Δ>
-      >],
+  deps: [Derivation<Sequent<Γ, [A, ...Δ]>>, Derivation<Sequent<[...Γ, B], Δ>>],
 ): IL<Γ, A, B, Δ> => {
   return transformation(result, deps, 'il')
 }
-export type ApplyIL<
-  S1 extends AnyDerivation,
-  S2 extends AnyDerivation,
-> = 
-  [S1, S2] extends [Derivation<
+export type ApplyIL<S1 extends AnyDerivation, S2 extends AnyDerivation> = [
+  S1,
+  S2,
+] extends [
+  Derivation<
     Sequent<infer Γ, [infer A extends Prop, ...infer Δ extends Formulas]>
   >,
-    Derivation<
-        Sequent<[...infer Γ extends Formulas, infer B extends Prop], infer Δ>
-      >]
-      ? IL<Γ, A, B, Δ>
-    : never
+  Derivation<
+    Sequent<[...infer Γ extends Formulas, infer B extends Prop], infer Δ>
+  >,
+]
+  ? IL<Γ, A, B, Δ>
+  : never
 export const applyIL = <
   Γ extends Formulas,
   A extends Prop,
@@ -478,29 +485,36 @@ export const applyIL = <
 >(
   s1: Derivation<Sequent<Γ, [A, ...Δ]>>,
   s2: Derivation<Sequent<[...Γ, B], Δ>>,
-): ApplyIL<Derivation<Sequent<Γ, [A, ...Δ]>>, Derivation<Sequent<[...Γ, B], Δ>>> => {
+): ApplyIL<
+  Derivation<Sequent<Γ, [A, ...Δ]>>,
+  Derivation<Sequent<[...Γ, B], Δ>>
+> => {
   const γ: Γ = s1.result.antecedent
   const a: A = array.head(s1.result.succedent)
   const b: B = array.last(s2.result.antecedent)
   const δ: Δ = array.tail(s1.result.succedent)
-  return il(
-    sequent([...γ, implication(a, b)], δ),
-    [s1, s2],
-  )
+  return il(sequent([...γ, implication(a, b)], δ), [s1, s2])
 }
 
-export type ApplyIR<S extends AnyDerivation> = Transformation<
+export type IR<
+  Γ extends Formulas,
+  A extends Prop,
+  B extends Prop,
+  Δ extends Formulas,
+> = Transformation<
+  Sequent<Γ, [Implication<A, B>, ...Δ]>,
+  [Derivation<Sequent<[...Γ, A], [B, ...Δ]>>],
+  'ir'
+>
+export type ApplyIR<S extends AnyDerivation> =
   S extends Derivation<
     Sequent<
       [...infer Γ extends Formulas, infer A extends Prop],
       [infer B extends Prop, ...infer Δ extends Formulas]
     >
   >
-    ? Sequent<Γ, [Implication<A, B>, ...Δ]>
-    : never,
-  [S],
-  'ir'
->
+    ? IR<Γ, A, B, Δ>
+    : never
 export const applyIR = <
   Γ extends Formulas,
   A extends Prop,
@@ -518,15 +532,21 @@ export const applyIR = <
 
 // Negation
 
-export type ApplyNL<S extends AnyDerivation> = Transformation<
+export type NL<
+  Γ extends Formulas,
+  A extends Prop,
+  Δ extends Formulas,
+> = Transformation<
+  Sequent<[...Γ, Negation<A>], Δ>,
+  [Derivation<Sequent<Γ, [A, ...Δ]>>],
+  'nl'
+>
+export type ApplyNL<S extends AnyDerivation> =
   S extends Derivation<
     Sequent<infer Γ, [infer A extends Prop, ...infer Δ extends Formulas]>
   >
-    ? Sequent<[...Γ, Negation<A>], Δ>
-    : never,
-  [S],
-  'nl'
->
+    ? NL<Γ, A, Δ>
+    : never
 export const applyNL = <Γ extends Formulas, A extends Prop, Δ extends Formulas>(
   s: Derivation<Sequent<Γ, [A, ...Δ]>>,
 ): ApplyNL<Derivation<Sequent<Γ, [A, ...Δ]>>> => {
@@ -536,15 +556,22 @@ export const applyNL = <Γ extends Formulas, A extends Prop, Δ extends Formulas
   return transformation(sequent([...γ, negation(a)], δ), [s], 'nl')
 }
 
-export type ApplyNR<S extends AnyDerivation> = Transformation<
+export type NR<
+  Γ extends Formulas,
+  A extends Prop,
+  Δ extends Formulas,
+> = Transformation<
+  Sequent<Γ, [Negation<A>, ...Δ]>,
+  [Derivation<Sequent<[...Γ, A], Δ>>],
+  'nr'
+>
+export type ApplyNR<S extends AnyDerivation> =
   S extends Derivation<
     Sequent<[...infer Γ extends Formulas, infer A extends Prop], infer Δ>
   >
-    ? Sequent<Γ, [Negation<A>, ...Δ]>
-    : never,
-  [S],
-  'nr'
->
+    ? NR<Γ, A, Δ>
+    : never
+
 export const applyNR = <Γ extends Formulas, A extends Prop, Δ extends Formulas>(
   s: Derivation<Sequent<[...Γ, A], Δ>>,
 ): ApplyNR<Derivation<Sequent<[...Γ, A], Δ>>> => {
@@ -556,14 +583,18 @@ export const applyNR = <Γ extends Formulas, A extends Prop, Δ extends Formulas
 
 // Weakening
 
-export type ApplySWL<A extends Prop, S extends AnyDerivation> = Transformation<
-  S extends Derivation<Sequent<infer Γ, infer Δ>>
-    ? Sequent<[...Γ, A], Δ>
-    : never,
-  [S],
-  'swl'
->
-export const applySWL = <A extends Prop, Γ extends Formulas, Δ extends Formulas>(
+export type SWL<
+  Γ extends Formulas,
+  A extends Prop,
+  Δ extends Formulas,
+> = Transformation<Sequent<[...Γ, A], Δ>, [Derivation<Sequent<Γ, Δ>>], 'swl'>
+export type ApplySWL<A extends Prop, S extends AnyDerivation> =
+  S extends Derivation<Sequent<infer Γ, infer Δ>> ? SWL<Γ, A, Δ> : never
+export const applySWL = <
+  A extends Prop,
+  Γ extends Formulas,
+  Δ extends Formulas,
+>(
   a: A,
   s: Derivation<Sequent<Γ, Δ>>,
 ): ApplySWL<A, Derivation<Sequent<Γ, Δ>>> => {
@@ -572,14 +603,18 @@ export const applySWL = <A extends Prop, Γ extends Formulas, Δ extends Formula
   return transformation(sequent([...γ, a], δ), [s], 'swl')
 }
 
-export type ApplySWR<A extends Prop, S extends AnyDerivation> = Transformation<
-  S extends Derivation<Sequent<infer Γ, infer Δ>>
-    ? Sequent<Γ, [A, ...Δ]>
-    : never,
-  [S],
-  'swr'
->
-export const applySWR = <A extends Prop, Γ extends Formulas, Δ extends Formulas>(
+export type SWR<
+  Γ extends Formulas,
+  A extends Prop,
+  Δ extends Formulas,
+> = Transformation<Sequent<Γ, [A, ...Δ]>, [Derivation<Sequent<Γ, Δ>>], 'swr'>
+export type ApplySWR<A extends Prop, S extends AnyDerivation> =
+  S extends Derivation<Sequent<infer Γ, infer Δ>> ? SWR<Γ, A, Δ> : never
+export const applySWR = <
+  A extends Prop,
+  Γ extends Formulas,
+  Δ extends Formulas,
+>(
   a: A,
   s: Derivation<Sequent<Γ, Δ>>,
 ): ApplySWR<A, Derivation<Sequent<Γ, Δ>>> => {
@@ -590,21 +625,31 @@ export const applySWR = <A extends Prop, Γ extends Formulas, Δ extends Formula
 
 // Contraction
 
+export type SCL<
+  Γ extends Formulas,
+  A extends Prop,
+  Δ extends Formulas,
+> = Transformation<
+  Sequent<[...Γ, A], Δ>,
+  [Derivation<Sequent<[...Γ, A, A], Δ>>],
+  'scl'
+>
 export type ApplySCL<
   S extends Derivation<Sequent<[...Formulas, Prop, Prop], Formulas>>,
-> = Transformation<
+> =
   S extends Derivation<
     Sequent<
       [...infer Γ extends Formulas, infer A extends Prop, infer A extends Prop],
       infer Δ
     >
   >
-    ? Sequent<[...Γ, A], Δ>
-    : never,
-  [S],
-  'scl'
->
-export const applySCL = <Γ extends Formulas, Δ extends Formulas, A extends Prop>(
+    ? SCL<Γ, A, Δ>
+    : never
+export const applySCL = <
+  Γ extends Formulas,
+  Δ extends Formulas,
+  A extends Prop,
+>(
   s: Derivation<Sequent<[...Γ, A, A], Δ>>,
 ): ApplySCL<Derivation<Sequent<[...Γ, A, A], Δ>>> => {
   const γ: Γ = array.init(array.init(s.result.antecedent))
@@ -615,21 +660,31 @@ export const applySCL = <Γ extends Formulas, Δ extends Formulas, A extends Pro
   return transformation(sequent([...γ, a], δ), [s], 'scl')
 }
 
+export type SCR<
+  Γ extends Formulas,
+  A extends Prop,
+  Δ extends Formulas,
+> = Transformation<
+  Sequent<Γ, [A, ...Δ]>,
+  [Derivation<Sequent<Γ, [A, A, ...Δ]>>],
+  'scr'
+>
 export type ApplySCR<
   S extends Derivation<Sequent<Formulas, [Prop, Prop, ...Formulas]>>,
-> = Transformation<
+> =
   S extends Derivation<
     Sequent<
       infer Γ,
       [infer A extends Prop, infer A extends Prop, ...infer Δ extends Formulas]
     >
   >
-    ? Sequent<Γ, [A, ...Δ]>
-    : never,
-  [S],
-  'scr'
->
-export const applySCR = <Γ extends Formulas, Δ extends Formulas, A extends Prop>(
+    ? SCR<Γ, A, Δ>
+    : never
+export const applySCR = <
+  Γ extends Formulas,
+  Δ extends Formulas,
+  A extends Prop,
+>(
   s: Derivation<Sequent<Γ, [A, A, ...Δ]>>,
 ): ApplySCR<Derivation<Sequent<Γ, [A, A, ...Δ]>>> => {
   const γ: Γ = s.result.antecedent
@@ -642,6 +697,15 @@ export const applySCR = <Γ extends Formulas, Δ extends Formulas, A extends Pro
 
 // Permutation
 
+export type SRotL<
+  Γ extends Formulas,
+  A extends Prop,
+  Δ extends Formulas,
+> = Transformation<
+  Sequent<[...Γ, A], Δ>,
+  [Derivation<Sequent<[A, ...Γ], Δ>>],
+  'srotl'
+>
 export type ApplySRotL<S extends AnyDerivation> = Transformation<
   S extends Derivation<
     Sequent<[infer A extends Prop, ...infer Γ extends Formulas], infer Δ>
@@ -651,7 +715,11 @@ export type ApplySRotL<S extends AnyDerivation> = Transformation<
   [S],
   'srotl'
 >
-export const applySRotL = <A extends Prop, Γ extends Formulas, Δ extends Formulas>(
+export const applySRotL = <
+  A extends Prop,
+  Γ extends Formulas,
+  Δ extends Formulas,
+>(
   s: Derivation<Sequent<[A, ...Γ], Δ>>,
 ): ApplySRotL<Derivation<Sequent<[A, ...Γ], Δ>>> => {
   const γ: Γ = array.tail(s.result.antecedent)
@@ -660,16 +728,26 @@ export const applySRotL = <A extends Prop, Γ extends Formulas, Δ extends Formu
   return transformation(sequent([...γ, a], δ), [s], 'srotl')
 }
 
-export type ApplySRotR<S extends AnyDerivation> = Transformation<
+export type SRotR<
+  Γ extends Formulas,
+  A extends Prop,
+  Δ extends Formulas,
+> = Transformation<
+  Sequent<Γ, [...Δ, A]>,
+  [Derivation<Sequent<Γ, [A, ...Δ]>>],
+  'srotr'
+>
+export type ApplySRotR<S extends AnyDerivation> =
   S extends Derivation<
     Sequent<infer Γ, [infer A extends Prop, ...infer Δ extends Formulas]>
   >
-    ? Sequent<Γ, [...Δ, A]>
-    : never,
-  [S],
-  'srotr'
->
-export const applySRotR = <Γ extends Formulas, A extends Prop, Δ extends Formulas>(
+    ? SRotR<Γ, A, Δ>
+    : never
+export const applySRotR = <
+  Γ extends Formulas,
+  A extends Prop,
+  Δ extends Formulas,
+>(
   s: Derivation<Sequent<Γ, [A, ...Δ]>>,
 ): ApplySRotR<Derivation<Sequent<Γ, [A, ...Δ]>>> => {
   const γ: Γ = s.result.antecedent
@@ -678,20 +756,27 @@ export const applySRotR = <Γ extends Formulas, A extends Prop, Δ extends Formu
   return transformation(sequent(γ, [...δ, a]), [s], 'srotr')
 }
 
+export type SSwpL<
+  Γ extends Formulas,
+  B extends Prop,
+  A extends Prop,
+  Δ extends Formulas,
+> = Transformation<
+  Sequent<[...Γ, B, A], Δ>,
+  [Derivation<Sequent<[...Γ, A, B], Δ>>],
+  'sswpl'
+>
 export type ApplySSwpL<
   S extends Derivation<Sequent<[...Formulas, Prop, Prop], Formulas>>,
-> = Transformation<
+> =
   S extends Derivation<
     Sequent<
       [...infer Γ extends Formulas, infer A extends Prop, infer B extends Prop],
       infer Δ
     >
   >
-    ? Sequent<[...Γ, B, A], Δ>
-    : never,
-  [S],
-  'sswpl'
->
+    ? SSwpL<Γ, B, A, Δ>
+    : never
 export const applySSwpL = <
   Γ extends Formulas,
   A extends Prop,
@@ -707,20 +792,27 @@ export const applySSwpL = <
   return transformation(sequent([...γ, b, a], δ), [s], 'sswpl')
 }
 
+export type SSwpR<
+  Γ extends Formulas,
+  B extends Prop,
+  A extends Prop,
+  Δ extends Formulas,
+> = Transformation<
+  Sequent<Γ, [B, A, ...Δ]>,
+  [Derivation<Sequent<Γ, [A, B, ...Δ]>>],
+  'sswpr'
+>
 export type ApplySSwpR<
   S extends Derivation<Sequent<Formulas, [Prop, Prop, ...Formulas]>>,
-> = Transformation<
+> =
   S extends Derivation<
     Sequent<
       infer Γ,
       [infer A extends Prop, infer B extends Prop, ...infer Δ extends Formulas]
     >
   >
-    ? Sequent<Γ, [B, A, ...Δ]>
-    : never,
-  [S],
-  'sswpr'
->
+    ? SSwpR<Γ, B, A, Δ>
+    : never
 export const applySSwpR = <
   Γ extends Formulas,
   A extends Prop,
