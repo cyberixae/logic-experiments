@@ -255,7 +255,7 @@ export const applyDR1 = <
   const γ: Γ = s.result.antecedent
   const δ: Δ = array.tail(s.result.succedent)
   const a: A = array.head(s.result.succedent)
-  return transformation(sequent(γ, [disjunction(a, b), ...δ]), [s], 'dr1')
+  return dr1(sequent(γ, [disjunction(a, b), ...δ]), [s])
 }
 
 export type CL2<
@@ -297,7 +297,7 @@ export const applyCL2 = <
   const γ: Γ = array.init(s.result.antecedent)
   const b: B = array.last(s.result.antecedent)
   const δ: Δ = s.result.succedent
-  return transformation(sequent([...γ, conjunction(a, b)], δ), [s], 'cl2')
+  return cl2(sequent([...γ, conjunction(a, b)], δ), [s])
 }
 
 export type DR2<
@@ -339,7 +339,7 @@ export const applyDR2 = <
   const γ: Γ = s.result.antecedent
   const δ: Δ = array.tail(s.result.succedent)
   const b: B = array.head(s.result.succedent)
-  return transformation(sequent(γ, [disjunction(a, b), ...δ]), [s], 'dr2')
+  return dr2(sequent(γ, [disjunction(a, b), ...δ]), [s])
 }
 
 export type DL<
@@ -571,7 +571,7 @@ export const applyIR = <
   const a: A = array.last(s.result.antecedent)
   const b: B = array.head(s.result.succedent)
   const δ: Δ = array.tail(s.result.succedent)
-  return transformation(sequent(γ, [implication(a, b), ...δ]), [s], 'ir')
+  return ir(sequent(γ, [implication(a, b), ...δ]), [s])
 }
 
 // Negation
@@ -603,7 +603,7 @@ export const applyNL = <Γ extends Formulas, A extends Prop, Δ extends Formulas
   const γ: Γ = s.result.antecedent
   const a: A = array.head(s.result.succedent)
   const δ: Δ = array.tail(s.result.succedent)
-  return transformation(sequent([...γ, negation(a)], δ), [s], 'nl')
+  return n(sequent([...γ, negation(a)], δ), [s])
 }
 
 export type NR<
@@ -634,7 +634,7 @@ export const applyNR = <Γ extends Formulas, A extends Prop, Δ extends Formulas
   const γ: Γ = array.init(s.result.antecedent)
   const a: A = array.last(s.result.antecedent)
   const δ: Δ = s.result.succedent
-  return transformation(sequent(γ, [negation(a), ...δ]), [s], 'nr')
+  return nr(sequent(γ, [negation(a), ...δ]), [s])
 }
 
 // Weakening
@@ -662,7 +662,7 @@ export const applySWL = <
 ): ApplySWL<A, Derivation<Sequent<Γ, Δ>>> => {
   const γ: Γ = s.result.antecedent
   const δ: Δ = s.result.succedent
-  return transformation(sequent([...γ, a], δ), [s], 'swl')
+  return swl(sequent([...γ, a], δ), [s])
 }
 
 export type SWR<
@@ -688,7 +688,7 @@ export const applySWR = <
 ): ApplySWR<A, Derivation<Sequent<Γ, Δ>>> => {
   const γ: Γ = s.result.antecedent
   const δ: Δ = s.result.succedent
-  return transformation(sequent(γ, [a, ...δ]), [s], 'swr')
+  return swr(sequent(γ, [a, ...δ]), [s])
 }
 
 // Contraction
@@ -731,7 +731,7 @@ export const applySCL = <
   const a2: A = array.last(array.init(s.result.antecedent))
   const a: A = utils.assertEqual(a1, a2)
   const δ: Δ = s.result.succedent
-  return transformation(sequent([...γ, a], δ), [s], 'scl')
+  return scl(sequent([...γ, a], δ), [s])
 }
 
 export type SCR<
@@ -772,7 +772,7 @@ export const applySCR = <
   const a2: A = array.head(array.tail(s.result.succedent))
   const a: A = utils.assertEqual(a1, a2)
   const δ: Δ = array.tail(array.tail(s.result.succedent))
-  return transformation(sequent(γ, [a, ...δ]), [s], 'scr')
+  return scr(sequent(γ, [a, ...δ]), [s])
 }
 
 // Permutation
@@ -811,7 +811,7 @@ export const applySRotL = <
   const γ: Γ = array.tail(s.result.antecedent)
   const a: A = array.head(s.result.antecedent)
   const δ: Δ = s.result.succedent
-  return transformation(sequent([...γ, a], δ), [s], 'srotl')
+  return srotl(sequent([...γ, a], δ), [s])
 }
 
 export type SRotR<
@@ -845,7 +845,7 @@ export const applySRotR = <
   const γ: Γ = s.result.antecedent
   const δ: Δ = array.tail(s.result.succedent)
   const a: A = array.head(s.result.succedent)
-  return transformation(sequent(γ, [...δ, a]), [s], 'srotr')
+  return srotr(sequent(γ, [...δ, a]), [s])
 }
 
 export type SSwpL<
@@ -892,7 +892,7 @@ export const applySSwpL = <
   const b: B = array.last(s.result.antecedent)
   const a: A = array.last(array.init(s.result.antecedent))
   const δ: Δ = s.result.succedent
-  return transformation(sequent([...γ, b, a], δ), [s], 'sswpl')
+  return sswpl(sequent([...γ, b, a], δ), [s])
 }
 
 export type SSwpR<
@@ -939,7 +939,7 @@ export const applySSwpR = <
   const b: B = array.head(array.tail(s.result.succedent))
   const a: A = array.head(s.result.succedent)
   const δ: Δ = array.tail(array.tail(s.result.succedent))
-  return transformation(sequent(γ, [b, a, ...δ]), [s], 'sswpr')
+  return sswpr(sequent(γ, [b, a, ...δ]), [s])
 }
 
 // Language
