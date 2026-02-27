@@ -288,43 +288,63 @@ export const applyDR2 = <
   return transformation(sequent(γ, [disjunction(a, b), ...δ]), [s], 'dr2')
 }
 
+export type DL<
+Γ extends Formulas,
+A extends Prop,
+B extends Prop,
+Δ extends Formulas,
+> = Transformation<
+       Sequent<[...Γ, Disjunction<A, B>], Δ>,
+  [Derivation<
+    Sequent<[...Γ, A ], Δ>
+  >, Derivation<
+        Sequent<[...Γ , B ], Δ>
+      >],
+  'dl'
+>
+export const dl = <
+  Γ extends Formulas,
+  A extends Prop,
+  B extends Prop,
+  Δ extends Formulas,
+>(
+  result: Sequent<[...Γ, Disjunction<A, B>], Δ>,
+  deps: [Derivation<
+    Sequent<[...Γ, A ], Δ>
+  >, Derivation<
+        Sequent<[...Γ , B ], Δ>
+      >],
+): DL<Γ, A, B, Δ> => {
+  return transformation(result, deps, 'dl')
+}
 export type ApplyDL<
   S1 extends AnyDerivation,
   S2 extends AnyDerivation,
-> = Transformation<
-  S1 extends Derivation<
+> = 
+  [S1, S2] extends [Derivation<
     Sequent<[...infer Γ extends Formulas, infer A extends Prop], infer Δ>
-  >
-    ? S2 extends Derivation<
-        Sequent<[...infer Σ extends Formulas, infer B extends Prop], infer Π>
-      >
-      ? Sequent<[...Γ, ...Σ, Disjunction<A, B>], [...Δ, ...Π]>
-      : never
-    : never,
-  [S1, S2],
-  'dl'
->
+  >,
+     Derivation<
+        Sequent<[...infer Γ extends Formulas, infer B extends Prop], infer Δ>
+      >]
+      ? DL<Γ, A, B, Δ>
+    : never
 export const applyDL = <
   Γ extends Formulas,
   A extends Prop,
-  Δ extends Formulas,
-  Σ extends Formulas,
   B extends Prop,
-  Π extends Formulas,
+  Δ extends Formulas,
 >(
   s1: Derivation<Sequent<[...Γ, A], Δ>>,
-  s2: Derivation<Sequent<[...Σ, B], Π>>,
-): ApplyDL<Derivation<Sequent<[...Γ, A], Δ>>, Derivation<Sequent<[...Σ, B], Π>>> => {
+  s2: Derivation<Sequent<[...Γ, B], Δ>>,
+): ApplyDL<Derivation<Sequent<[...Γ, A], Δ>>, Derivation<Sequent<[...Γ, B], Δ>>> => {
   const γ: Γ = array.init(s1.result.antecedent)
-  const ς: Σ = array.init(s2.result.antecedent)
   const a: A = array.last(s1.result.antecedent)
   const b: B = array.last(s2.result.antecedent)
   const δ: Δ = s1.result.succedent
-  const π: Π = s2.result.succedent
-  return transformation(
-    sequent([...γ, ...ς, disjunction(a, b)], [...δ, ...π]),
+  return dl(
+    sequent([...γ, disjunction(a, b)], δ),
     [s1, s2],
-    'dl',
   )
 }
 
@@ -409,43 +429,63 @@ export const reverseCR = <
 
 // Implication
 
+export type IL<
+  Γ extends Formulas,
+  A extends Prop,
+  B extends Prop,
+  Δ extends Formulas,
+> = Transformation<
+   Sequent<[...Γ, Implication<A, B>], Δ> ,
+  [Derivation<
+    Sequent<Γ, [A, ...Δ]>
+  >, Derivation<
+        Sequent<[...Γ, B], Δ>
+      >],
+  'il'
+>
+export const il = <
+  Γ extends Formulas,
+  A extends Prop,
+  B extends Prop,
+  Δ extends Formulas,
+>(
+  result: Sequent<[...Γ, Implication<A, B>], Δ>,
+  deps: [Derivation<
+    Sequent<Γ, [A, ...Δ]>
+  >, Derivation<
+        Sequent<[...Γ, B], Δ>
+      >],
+): IL<Γ, A, B, Δ> => {
+  return transformation(result, deps, 'il')
+}
 export type ApplyIL<
   S1 extends AnyDerivation,
   S2 extends AnyDerivation,
-> = Transformation<
-  S1 extends Derivation<
+> = 
+  [S1, S2] extends [Derivation<
     Sequent<infer Γ, [infer A extends Prop, ...infer Δ extends Formulas]>
-  >
-    ? S2 extends Derivation<
-        Sequent<[...infer Σ extends Formulas, infer B extends Prop], infer Π>
-      >
-      ? Sequent<[...Γ, ...Σ, Implication<A, B>], [...Δ, ...Π]>
-      : never
-    : never,
-  [S1, S2],
-  'il'
->
+  >,
+    Derivation<
+        Sequent<[...infer Γ extends Formulas, infer B extends Prop], infer Δ>
+      >]
+      ? IL<Γ, A, B, Δ>
+    : never
 export const applyIL = <
   Γ extends Formulas,
   A extends Prop,
   Δ extends Formulas,
-  Σ extends Formulas,
   B extends Prop,
-  Π extends Formulas,
 >(
   s1: Derivation<Sequent<Γ, [A, ...Δ]>>,
-  s2: Derivation<Sequent<[...Σ, B], Π>>,
-): ApplyIL<Derivation<Sequent<Γ, [A, ...Δ]>>, Derivation<Sequent<[...Σ, B], Π>>> => {
+  s2: Derivation<Sequent<[...Γ, B], Δ>>,
+): ApplyIL<Derivation<Sequent<Γ, [A, ...Δ]>>, Derivation<Sequent<[...Γ, B], Δ>>> => {
   const γ: Γ = s1.result.antecedent
-  const ς: Σ = array.init(s2.result.antecedent)
   const a: A = array.head(s1.result.succedent)
   const b: B = array.last(s2.result.antecedent)
   const δ: Δ = array.tail(s1.result.succedent)
-  const π: Π = s2.result.succedent
-  return transformation(
-    sequent([...γ, ...ς, implication(a, b)], [...δ, ...π]),
+  return il(
+    sequent([...γ, implication(a, b)], δ),
     [s1, s2],
-    'il',
   )
 }
 
@@ -801,7 +841,7 @@ export const meta = {
         [
           applyDL(
             premise(sequent([atom('Γ'), atom('A')], [atom('Δ')])),
-            premise(sequent([atom('Σ'), atom('B')], [atom('Π')])),
+            premise(sequent([atom('Γ'), atom('B')], [atom('Δ')])),
           ),
           applyCR(
             premise(sequent([atom('Γ')], [atom('A'), atom('Δ')])),
@@ -811,7 +851,7 @@ export const meta = {
         [
           applyIL(
             premise(sequent([atom('Γ')], [atom('A'), atom('Δ')])),
-            premise(sequent([atom('Σ'), atom('B')], [atom('Π')])),
+            premise(sequent([atom('Γ'), atom('B')], [atom('Δ')])),
           ),
           applyIR(
             premise(sequent([atom('Γ'), atom('A')], [atom('B'), atom('Δ')])),
