@@ -7,7 +7,7 @@ import {
   Judgement as Sequent,
   judgement as sequent,
 } from './lib/judgement'
-import { lk, Prop, SWL } from './systems/lk'
+import { lk, Prop, ApplySWL } from './systems/lk'
 
 const example = {
   state: conclusion(

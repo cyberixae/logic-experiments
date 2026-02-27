@@ -6,7 +6,6 @@ import {
   Formulas,
   Judgement as Sequent,
   judgement as sequent,
-  judgement,
   AnyJudgement as AnySequent,
 } from '../lib/judgement'
 import {
@@ -152,7 +151,7 @@ export const reverseCut = <
 
 // Conjunction & Disjunction
 
-export type Cl1<
+export type CL1<
   Γ extends Formulas,
   A extends Prop,
   B extends Prop,
@@ -162,7 +161,7 @@ export type Cl1<
   [Derivation<Sequent<[...Γ, A], Δ>>],
   'cl1'
 >
-export type AnyCl1 = Cl1<Formulas, Prop, Prop, Formulas>
+export type AnyCL1 = CL1<Formulas, Prop, Prop, Formulas>
 export const cl1 = <
   Γ extends Formulas,
   A extends Prop,
@@ -171,24 +170,24 @@ export const cl1 = <
 >(
   result: Sequent<[...Γ, Conjunction<A, B>], Δ>,
   deps: [Derivation<Sequent<[...Γ, A], Δ>>],
-): Cl1<Γ, A, B, Δ> => {
+): CL1<Γ, A, B, Δ> => {
   return transformation(result, deps, 'cl1')
 }
 
-export type AnyCl1Result = AnyCl1['result']
-export const isCl1Result: Refinement<AnySequent, AnyCl1Result> = (
+export type AnyCL1Result = AnyCL1['result']
+export const isCL1Result: Refinement<AnySequent, AnyCL1Result> = (
   s,
-): s is AnyCl1Result => {
+): s is AnyCL1Result => {
   return s.antecedent.at(-1)?.kind === 'conjunction'
 }
-export const isCl1ResultPremise = refinePremise(isCl1Result)
-export type ApplyCl1<B extends Prop, S extends AnyDerivation> =
+export const isCL1ResultPremise = refinePremise(isCL1Result)
+export type ApplyCL1<B extends Prop, S extends AnyDerivation> =
   S extends Derivation<
     Sequent<[...infer Γ extends Formulas, infer A extends Prop], infer Δ>
   >
-    ? Cl1<Γ, A, B, Δ>
+    ? CL1<Γ, A, B, Δ>
     : never
-export const applyCl1 = <
+export const applyCL1 = <
   B extends Prop,
   Γ extends Formulas,
   A extends Prop,
@@ -196,20 +195,20 @@ export const applyCl1 = <
 >(
   b: B,
   s: Derivation<Sequent<[...Γ, A], Δ>>,
-): ApplyCl1<B, Derivation<Sequent<[...Γ, A], Δ>>> => {
+): ApplyCL1<B, Derivation<Sequent<[...Γ, A], Δ>>> => {
   const γ: Γ = array.init(s.result.antecedent)
   const a: A = array.last(s.result.antecedent)
   const δ: Δ = s.result.succedent
   return cl1(sequent([...γ, conjunction(a, b)], δ), [s])
 }
-export const reverseCl1 = <
+export const reverseCL1 = <
   Γ extends Formulas,
   A extends Prop,
   B extends Prop,
   Δ extends Formulas,
 >(
-  p: Premise<Cl1<Γ, A, B, Δ>['result']>,
-): Cl1<Γ, A, B, Δ> => {
+  p: Premise<CL1<Γ, A, B, Δ>['result']>,
+): CL1<Γ, A, B, Δ> => {
   const γ: Γ = array.init(p.result.antecedent)
   const acb: Conjunction<A, B> = array.last(p.result.antecedent)
   const a: A = acb.leftConjunct
@@ -217,7 +216,7 @@ export const reverseCl1 = <
   return cl1(p.result, [premise(sequent([...γ, a], δ))])
 }
 
-export type Dr1<B extends Prop, S extends AnyDerivation> = Transformation<
+export type ApplyDR1<B extends Prop, S extends AnyDerivation> = Transformation<
   S extends Derivation<
     Sequent<infer Γ, [infer A extends Prop, ...infer Δ extends Formulas]>
   >
@@ -226,7 +225,7 @@ export type Dr1<B extends Prop, S extends AnyDerivation> = Transformation<
   [S],
   'dr1'
 >
-export const dr1 = <
+export const applyDR1 = <
   B extends Prop,
   Γ extends Formulas,
   A extends Prop,
@@ -234,14 +233,14 @@ export const dr1 = <
 >(
   b: B,
   s: Derivation<Sequent<Γ, [A, ...Δ]>>,
-): Dr1<B, Derivation<Sequent<Γ, [A, ...Δ]>>> => {
+): ApplyDR1<B, Derivation<Sequent<Γ, [A, ...Δ]>>> => {
   const γ: Γ = s.result.antecedent
   const δ: Δ = array.tail(s.result.succedent)
   const a: A = array.head(s.result.succedent)
   return transformation(sequent(γ, [disjunction(a, b), ...δ]), [s], 'dr1')
 }
 
-export type Cl2<A extends Prop, S extends AnyDerivation> = Transformation<
+export type ApplyCL2<A extends Prop, S extends AnyDerivation> = Transformation<
   S extends Derivation<
     Sequent<[...infer Γ extends Formulas, infer B extends Prop], infer Δ>
   >
@@ -250,7 +249,7 @@ export type Cl2<A extends Prop, S extends AnyDerivation> = Transformation<
   [S],
   'cl2'
 >
-export const cl2 = <
+export const applyCL2 = <
   A extends Prop,
   Γ extends Formulas,
   B extends Prop,
@@ -258,14 +257,14 @@ export const cl2 = <
 >(
   a: A,
   s: Derivation<Sequent<[...Γ, B], Δ>>,
-): Cl2<A, Derivation<Sequent<[...Γ, B], Δ>>> => {
+): ApplyCL2<A, Derivation<Sequent<[...Γ, B], Δ>>> => {
   const γ: Γ = array.init(s.result.antecedent)
   const b: B = array.last(s.result.antecedent)
   const δ: Δ = s.result.succedent
   return transformation(sequent([...γ, conjunction(a, b)], δ), [s], 'cl2')
 }
 
-export type DR2<A extends Prop, S extends AnyDerivation> = Transformation<
+export type ApplyDR2<A extends Prop, S extends AnyDerivation> = Transformation<
   S extends Derivation<
     Sequent<infer Γ, [infer B extends Prop, ...infer Δ extends Formulas]>
   >
@@ -274,7 +273,7 @@ export type DR2<A extends Prop, S extends AnyDerivation> = Transformation<
   [S],
   'dr2'
 >
-export const dr2 = <
+export const applyDR2 = <
   A extends Prop,
   Γ extends Formulas,
   B extends Prop,
@@ -282,14 +281,14 @@ export const dr2 = <
 >(
   a: A,
   s: Derivation<Sequent<Γ, [B, ...Δ]>>,
-): DR2<A, Derivation<Sequent<Γ, [B, ...Δ]>>> => {
+): ApplyDR2<A, Derivation<Sequent<Γ, [B, ...Δ]>>> => {
   const γ: Γ = s.result.antecedent
   const δ: Δ = array.tail(s.result.succedent)
   const b: B = array.head(s.result.succedent)
   return transformation(sequent(γ, [disjunction(a, b), ...δ]), [s], 'dr2')
 }
 
-export type DL<
+export type ApplyDL<
   S1 extends AnyDerivation,
   S2 extends AnyDerivation,
 > = Transformation<
@@ -305,7 +304,7 @@ export type DL<
   [S1, S2],
   'dl'
 >
-export const dl = <
+export const applyDL = <
   Γ extends Formulas,
   A extends Prop,
   Δ extends Formulas,
@@ -315,7 +314,7 @@ export const dl = <
 >(
   s1: Derivation<Sequent<[...Γ, A], Δ>>,
   s2: Derivation<Sequent<[...Σ, B], Π>>,
-): DL<Derivation<Sequent<[...Γ, A], Δ>>, Derivation<Sequent<[...Σ, B], Π>>> => {
+): ApplyDL<Derivation<Sequent<[...Γ, A], Δ>>, Derivation<Sequent<[...Σ, B], Π>>> => {
   const γ: Γ = array.init(s1.result.antecedent)
   const ς: Σ = array.init(s2.result.antecedent)
   const a: A = array.last(s1.result.antecedent)
@@ -329,7 +328,7 @@ export const dl = <
   )
 }
 
-export type Cr<
+export type CR<
   Γ extends Formulas,
   A extends Prop,
   B extends Prop,
@@ -339,7 +338,7 @@ export type Cr<
   [Derivation<Sequent<Γ, [A, ...Δ]>>, Derivation<Sequent<Γ, [B, ...Δ]>>],
   'cr'
 >
-export type AnyCr = Cr<Formulas, Prop, Prop, Formulas>
+export type AnyCR = CR<Formulas, Prop, Prop, Formulas>
 export const cr = <
   Γ extends Formulas,
   A extends Prop,
@@ -348,17 +347,17 @@ export const cr = <
 >(
   result: Sequent<Γ, [Conjunction<A, B>, ...Δ]>,
   deps: [Derivation<Sequent<Γ, [A, ...Δ]>>, Derivation<Sequent<Γ, [B, ...Δ]>>],
-): Cr<Γ, A, B, Δ> => {
+): CR<Γ, A, B, Δ> => {
   return transformation(result, deps, 'cr')
 }
-export type AnyCrResult = AnyCr['result']
-export const isCrResult: Refinement<AnySequent, AnyCrResult> = (
+export type AnyCRResult = AnyCR['result']
+export const isCRResult: Refinement<AnySequent, AnyCRResult> = (
   s,
-): s is AnyCrResult => {
+): s is AnyCRResult => {
   return s.succedent.at(0)?.kind === 'conjunction'
 }
-export const isCrResultPremise = refinePremise(isCrResult)
-export type ApplyCr<S1 extends AnyDerivation, S2 extends AnyDerivation> = [
+export const isCRResultPremise = refinePremise(isCRResult)
+export type ApplyCR<S1 extends AnyDerivation, S2 extends AnyDerivation> = [
   S1,
   S2,
 ] extends [
@@ -369,9 +368,9 @@ export type ApplyCr<S1 extends AnyDerivation, S2 extends AnyDerivation> = [
     Sequent<infer Γ, [infer B extends Prop, ...infer Δ extends Formulas]>
   >,
 ]
-  ? Cr<Γ, A, B, Δ>
+  ? CR<Γ, A, B, Δ>
   : never
-export const applyCr = <
+export const applyCR = <
   Γ extends Formulas,
   A extends Prop,
   B extends Prop,
@@ -379,7 +378,7 @@ export const applyCr = <
 >(
   s1: Derivation<Sequent<Γ, [A, ...Δ]>>,
   s2: Derivation<Sequent<Γ, [B, ...Δ]>>,
-): ApplyCr<
+): ApplyCR<
   Derivation<Sequent<Γ, [A, ...Δ]>>,
   Derivation<Sequent<Γ, [B, ...Δ]>>
 > => {
@@ -389,14 +388,14 @@ export const applyCr = <
   const δ: Δ = array.tail(s1.result.succedent)
   return cr(sequent(γ, [conjunction(a, b), ...δ]), [s1, s2])
 }
-export const reverseCr = <
+export const reverseCR = <
   Γ extends Formulas,
   A extends Prop,
   B extends Prop,
   Δ extends Formulas,
 >(
-  p: Premise<Cr<Γ, A, B, Δ>['result']>,
-): Cr<Γ, A, B, Δ> => {
+  p: Premise<CR<Γ, A, B, Δ>['result']>,
+): CR<Γ, A, B, Δ> => {
   const γ: Γ = p.result.antecedent
   const acb: Conjunction<A, B> = array.head(p.result.succedent)
   const a: A = acb.leftConjunct
@@ -410,7 +409,7 @@ export const reverseCr = <
 
 // Implication
 
-export type IL<
+export type ApplyIL<
   S1 extends AnyDerivation,
   S2 extends AnyDerivation,
 > = Transformation<
@@ -426,7 +425,7 @@ export type IL<
   [S1, S2],
   'il'
 >
-export const il = <
+export const applyIL = <
   Γ extends Formulas,
   A extends Prop,
   Δ extends Formulas,
@@ -436,7 +435,7 @@ export const il = <
 >(
   s1: Derivation<Sequent<Γ, [A, ...Δ]>>,
   s2: Derivation<Sequent<[...Σ, B], Π>>,
-): IL<Derivation<Sequent<Γ, [A, ...Δ]>>, Derivation<Sequent<[...Σ, B], Π>>> => {
+): ApplyIL<Derivation<Sequent<Γ, [A, ...Δ]>>, Derivation<Sequent<[...Σ, B], Π>>> => {
   const γ: Γ = s1.result.antecedent
   const ς: Σ = array.init(s2.result.antecedent)
   const a: A = array.head(s1.result.succedent)
@@ -450,7 +449,7 @@ export const il = <
   )
 }
 
-export type IR<S extends AnyDerivation> = Transformation<
+export type ApplyIR<S extends AnyDerivation> = Transformation<
   S extends Derivation<
     Sequent<
       [...infer Γ extends Formulas, infer A extends Prop],
@@ -462,14 +461,14 @@ export type IR<S extends AnyDerivation> = Transformation<
   [S],
   'ir'
 >
-export const ir = <
+export const applyIR = <
   Γ extends Formulas,
   A extends Prop,
   B extends Prop,
   Δ extends Formulas,
 >(
   s: Derivation<Sequent<[...Γ, A], [B, ...Δ]>>,
-): IR<Derivation<Sequent<[...Γ, A], [B, ...Δ]>>> => {
+): ApplyIR<Derivation<Sequent<[...Γ, A], [B, ...Δ]>>> => {
   const γ: Γ = array.init(s.result.antecedent)
   const a: A = array.last(s.result.antecedent)
   const b: B = array.head(s.result.succedent)
@@ -479,7 +478,7 @@ export const ir = <
 
 // Negation
 
-export type NL<S extends AnyDerivation> = Transformation<
+export type ApplyNL<S extends AnyDerivation> = Transformation<
   S extends Derivation<
     Sequent<infer Γ, [infer A extends Prop, ...infer Δ extends Formulas]>
   >
@@ -488,16 +487,16 @@ export type NL<S extends AnyDerivation> = Transformation<
   [S],
   'nl'
 >
-export const nl = <Γ extends Formulas, A extends Prop, Δ extends Formulas>(
+export const applyNL = <Γ extends Formulas, A extends Prop, Δ extends Formulas>(
   s: Derivation<Sequent<Γ, [A, ...Δ]>>,
-): NL<Derivation<Sequent<Γ, [A, ...Δ]>>> => {
+): ApplyNL<Derivation<Sequent<Γ, [A, ...Δ]>>> => {
   const γ: Γ = s.result.antecedent
   const a: A = array.head(s.result.succedent)
   const δ: Δ = array.tail(s.result.succedent)
   return transformation(sequent([...γ, negation(a)], δ), [s], 'nl')
 }
 
-export type NR<S extends AnyDerivation> = Transformation<
+export type ApplyNR<S extends AnyDerivation> = Transformation<
   S extends Derivation<
     Sequent<[...infer Γ extends Formulas, infer A extends Prop], infer Δ>
   >
@@ -506,9 +505,9 @@ export type NR<S extends AnyDerivation> = Transformation<
   [S],
   'nr'
 >
-export const nr = <Γ extends Formulas, A extends Prop, Δ extends Formulas>(
+export const applyNR = <Γ extends Formulas, A extends Prop, Δ extends Formulas>(
   s: Derivation<Sequent<[...Γ, A], Δ>>,
-): NR<Derivation<Sequent<[...Γ, A], Δ>>> => {
+): ApplyNR<Derivation<Sequent<[...Γ, A], Δ>>> => {
   const γ: Γ = array.init(s.result.antecedent)
   const a: A = array.last(s.result.antecedent)
   const δ: Δ = s.result.succedent
@@ -517,33 +516,33 @@ export const nr = <Γ extends Formulas, A extends Prop, Δ extends Formulas>(
 
 // Weakening
 
-export type SWL<A extends Prop, S extends AnyDerivation> = Transformation<
+export type ApplySWL<A extends Prop, S extends AnyDerivation> = Transformation<
   S extends Derivation<Sequent<infer Γ, infer Δ>>
     ? Sequent<[...Γ, A], Δ>
     : never,
   [S],
   'swl'
 >
-export const swl = <A extends Prop, Γ extends Formulas, Δ extends Formulas>(
+export const applySWL = <A extends Prop, Γ extends Formulas, Δ extends Formulas>(
   a: A,
   s: Derivation<Sequent<Γ, Δ>>,
-): SWL<A, Derivation<Sequent<Γ, Δ>>> => {
+): ApplySWL<A, Derivation<Sequent<Γ, Δ>>> => {
   const γ: Γ = s.result.antecedent
   const δ: Δ = s.result.succedent
   return transformation(sequent([...γ, a], δ), [s], 'swl')
 }
 
-export type SWR<A extends Prop, S extends AnyDerivation> = Transformation<
+export type ApplySWR<A extends Prop, S extends AnyDerivation> = Transformation<
   S extends Derivation<Sequent<infer Γ, infer Δ>>
     ? Sequent<Γ, [A, ...Δ]>
     : never,
   [S],
   'swr'
 >
-export const swr = <A extends Prop, Γ extends Formulas, Δ extends Formulas>(
+export const applySWR = <A extends Prop, Γ extends Formulas, Δ extends Formulas>(
   a: A,
   s: Derivation<Sequent<Γ, Δ>>,
-): SWR<A, Derivation<Sequent<Γ, Δ>>> => {
+): ApplySWR<A, Derivation<Sequent<Γ, Δ>>> => {
   const γ: Γ = s.result.antecedent
   const δ: Δ = s.result.succedent
   return transformation(sequent(γ, [a, ...δ]), [s], 'swr')
@@ -551,7 +550,7 @@ export const swr = <A extends Prop, Γ extends Formulas, Δ extends Formulas>(
 
 // Contraction
 
-export type SCL<
+export type ApplySCL<
   S extends Derivation<Sequent<[...Formulas, Prop, Prop], Formulas>>,
 > = Transformation<
   S extends Derivation<
@@ -565,9 +564,9 @@ export type SCL<
   [S],
   'scl'
 >
-export const scl = <Γ extends Formulas, Δ extends Formulas, A extends Prop>(
+export const applySCL = <Γ extends Formulas, Δ extends Formulas, A extends Prop>(
   s: Derivation<Sequent<[...Γ, A, A], Δ>>,
-): SCL<Derivation<Sequent<[...Γ, A, A], Δ>>> => {
+): ApplySCL<Derivation<Sequent<[...Γ, A, A], Δ>>> => {
   const γ: Γ = array.init(array.init(s.result.antecedent))
   const a1: A = array.last(s.result.antecedent)
   const a2: A = array.last(array.init(s.result.antecedent))
@@ -576,7 +575,7 @@ export const scl = <Γ extends Formulas, Δ extends Formulas, A extends Prop>(
   return transformation(sequent([...γ, a], δ), [s], 'scl')
 }
 
-export type SCR<
+export type ApplySCR<
   S extends Derivation<Sequent<Formulas, [Prop, Prop, ...Formulas]>>,
 > = Transformation<
   S extends Derivation<
@@ -590,9 +589,9 @@ export type SCR<
   [S],
   'scr'
 >
-export const scr = <Γ extends Formulas, Δ extends Formulas, A extends Prop>(
+export const applySCR = <Γ extends Formulas, Δ extends Formulas, A extends Prop>(
   s: Derivation<Sequent<Γ, [A, A, ...Δ]>>,
-): SCR<Derivation<Sequent<Γ, [A, A, ...Δ]>>> => {
+): ApplySCR<Derivation<Sequent<Γ, [A, A, ...Δ]>>> => {
   const γ: Γ = s.result.antecedent
   const a1: A = array.head(s.result.succedent)
   const a2: A = array.head(array.tail(s.result.succedent))
@@ -603,7 +602,7 @@ export const scr = <Γ extends Formulas, Δ extends Formulas, A extends Prop>(
 
 // Permutation
 
-export type Srotl<S extends AnyDerivation> = Transformation<
+export type ApplySRotL<S extends AnyDerivation> = Transformation<
   S extends Derivation<
     Sequent<[infer A extends Prop, ...infer Γ extends Formulas], infer Δ>
   >
@@ -612,16 +611,16 @@ export type Srotl<S extends AnyDerivation> = Transformation<
   [S],
   'srotl'
 >
-export const srotl = <A extends Prop, Γ extends Formulas, Δ extends Formulas>(
+export const applySRotL = <A extends Prop, Γ extends Formulas, Δ extends Formulas>(
   s: Derivation<Sequent<[A, ...Γ], Δ>>,
-): Srotl<Derivation<Sequent<[A, ...Γ], Δ>>> => {
+): ApplySRotL<Derivation<Sequent<[A, ...Γ], Δ>>> => {
   const γ: Γ = array.tail(s.result.antecedent)
   const a: A = array.head(s.result.antecedent)
   const δ: Δ = s.result.succedent
   return transformation(sequent([...γ, a], δ), [s], 'srotl')
 }
 
-export type Srotr<S extends AnyDerivation> = Transformation<
+export type ApplySRotR<S extends AnyDerivation> = Transformation<
   S extends Derivation<
     Sequent<infer Γ, [infer A extends Prop, ...infer Δ extends Formulas]>
   >
@@ -630,16 +629,16 @@ export type Srotr<S extends AnyDerivation> = Transformation<
   [S],
   'srotr'
 >
-export const srotr = <Γ extends Formulas, A extends Prop, Δ extends Formulas>(
+export const applySRotR = <Γ extends Formulas, A extends Prop, Δ extends Formulas>(
   s: Derivation<Sequent<Γ, [A, ...Δ]>>,
-): Srotr<Derivation<Sequent<Γ, [A, ...Δ]>>> => {
+): ApplySRotR<Derivation<Sequent<Γ, [A, ...Δ]>>> => {
   const γ: Γ = s.result.antecedent
   const δ: Δ = array.tail(s.result.succedent)
   const a: A = array.head(s.result.succedent)
   return transformation(sequent(γ, [...δ, a]), [s], 'srotr')
 }
 
-export type Sswpl<
+export type ApplySSwpL<
   S extends Derivation<Sequent<[...Formulas, Prop, Prop], Formulas>>,
 > = Transformation<
   S extends Derivation<
@@ -653,14 +652,14 @@ export type Sswpl<
   [S],
   'sswpl'
 >
-export const sswpl = <
+export const applySSwpL = <
   Γ extends Formulas,
   A extends Prop,
   B extends Prop,
   Δ extends Formulas,
 >(
   s: Derivation<Sequent<[...Γ, A, B], Δ>>,
-): Sswpl<Derivation<Sequent<[...Γ, A, B], Δ>>> => {
+): ApplySSwpL<Derivation<Sequent<[...Γ, A, B], Δ>>> => {
   const γ: Γ = array.init(array.init(s.result.antecedent))
   const b: B = array.last(s.result.antecedent)
   const a: A = array.last(array.init(s.result.antecedent))
@@ -668,7 +667,7 @@ export const sswpl = <
   return transformation(sequent([...γ, b, a], δ), [s], 'sswpl')
 }
 
-export type Sswpr<
+export type ApplySSwpR<
   S extends Derivation<Sequent<Formulas, [Prop, Prop, ...Formulas]>>,
 > = Transformation<
   S extends Derivation<
@@ -682,14 +681,14 @@ export type Sswpr<
   [S],
   'sswpr'
 >
-export const sswpr = <
+export const applySSwpR = <
   Γ extends Formulas,
   A extends Prop,
   B extends Prop,
   Δ extends Formulas,
 >(
   s: Derivation<Sequent<Γ, [A, B, ...Δ]>>,
-): Sswpr<Derivation<Sequent<Γ, [A, B, ...Δ]>>> => {
+): ApplySSwpR<Derivation<Sequent<Γ, [A, B, ...Δ]>>> => {
   const γ: Γ = s.result.antecedent
   const b: B = array.head(array.tail(s.result.succedent))
   const a: A = array.head(s.result.succedent)
@@ -712,24 +711,24 @@ const iota = {
 }
 const zeta = {
   cut: applyCut,
-  cl1: applyCl1,
-  dr1,
-  cl2,
-  dr2,
-  dl,
-  cr: applyCr,
-  il,
-  ir,
-  nl,
-  nr,
-  swl,
-  swr,
-  scl,
-  scr,
-  srotl,
-  srotr,
-  sswpl,
-  sswpr,
+  cl1: applyCL1,
+  dr1: applyDR1,
+  cl2: applyCL2,
+  dr2: applyDR2,
+  dl: applyDL,
+  cr: applyCR,
+  il: applyIL,
+  ir: applyIR,
+  nl: applyNL,
+  nr: applyNR,
+  swl: applySWL,
+  swr: applySWR,
+  scl: applySCL,
+  scr: applySCR,
+  srotl: applySRotL,
+  srotr: applySRotR,
+  sswpl: applySSwpL,
+  sswpr: applySSwpR,
 }
 
 export const meta = {
@@ -770,8 +769,8 @@ export const meta = {
       examples: [
         [
           applyCut(
-            premise(judgement([atom('Γ')], [atom('Δ'), atom('A')])),
-            premise(judgement([atom('A'), atom('Γ')], [atom('Δ')])),
+            premise(sequent([atom('Γ')], [atom('Δ'), atom('A')])),
+            premise(sequent([atom('A'), atom('Γ')], [atom('Δ')])),
           ),
         ],
       ],
@@ -780,47 +779,47 @@ export const meta = {
       title: 'Logical Rules',
       examples: [
         [
-          applyCl1(
+          applyCL1(
             atom('B'),
-            premise(judgement([atom('Γ'), atom('A')], [atom('Δ')])),
+            premise(sequent([atom('Γ'), atom('A')], [atom('Δ')])),
           ),
-          dr1(
+          applyDR1(
             atom('B'),
-            premise(judgement([atom('Γ')], [atom('A'), atom('Δ')])),
+            premise(sequent([atom('Γ')], [atom('A'), atom('Δ')])),
           ),
         ],
         [
-          cl2(
+          applyCL2(
             atom('A'),
-            premise(judgement([atom('Γ'), atom('B')], [atom('Δ')])),
+            premise(sequent([atom('Γ'), atom('B')], [atom('Δ')])),
           ),
-          dr2(
+          applyDR2(
             atom('A'),
-            premise(judgement([atom('Γ'), atom('B')], [atom('Δ')])),
+            premise(sequent([atom('Γ'), atom('B')], [atom('Δ')])),
           ),
         ],
         [
-          dl(
-            premise(judgement([atom('Γ'), atom('A')], [atom('Δ')])),
-            premise(judgement([atom('Σ'), atom('B')], [atom('Π')])),
+          applyDL(
+            premise(sequent([atom('Γ'), atom('A')], [atom('Δ')])),
+            premise(sequent([atom('Σ'), atom('B')], [atom('Π')])),
           ),
-          applyCr(
-            premise(judgement([atom('Γ')], [atom('A'), atom('Δ')])),
-            premise(judgement([atom('Γ')], [atom('B'), atom('Δ')])),
-          ),
-        ],
-        [
-          il(
-            premise(judgement([atom('Γ')], [atom('A'), atom('Δ')])),
-            premise(judgement([atom('Σ'), atom('B')], [atom('Π')])),
-          ),
-          ir(
-            premise(judgement([atom('Γ'), atom('A')], [atom('B'), atom('Δ')])),
+          applyCR(
+            premise(sequent([atom('Γ')], [atom('A'), atom('Δ')])),
+            premise(sequent([atom('Γ')], [atom('B'), atom('Δ')])),
           ),
         ],
         [
-          nl(premise(judgement([atom('Γ')], [atom('A'), atom('Δ')]))),
-          nr(premise(judgement([atom('Γ'), atom('A')], [atom('Δ')]))),
+          applyIL(
+            premise(sequent([atom('Γ')], [atom('A'), atom('Δ')])),
+            premise(sequent([atom('Σ'), atom('B')], [atom('Π')])),
+          ),
+          applyIR(
+            premise(sequent([atom('Γ'), atom('A')], [atom('B'), atom('Δ')])),
+          ),
+        ],
+        [
+          applyNL(premise(sequent([atom('Γ')], [atom('A'), atom('Δ')]))),
+          applyNR(premise(sequent([atom('Γ'), atom('A')], [atom('Δ')]))),
         ],
       ],
     },
@@ -828,27 +827,27 @@ export const meta = {
       title: 'Structural Rules',
       examples: [
         [
-          swl(atom('A'), premise(judgement([atom('Γ')], [atom('Δ')]))),
-          swr(atom('A'), premise(judgement([atom('Γ')], [atom('Δ')]))),
+          applySWL(atom('A'), premise(sequent([atom('Γ')], [atom('Δ')]))),
+          applySWR(atom('A'), premise(sequent([atom('Γ')], [atom('Δ')]))),
         ],
         [
-          scl(
-            premise(judgement([atom('Γ'), atom('A'), atom('A')], [atom('Δ')])),
+          applySCL(
+            premise(sequent([atom('Γ'), atom('A'), atom('A')], [atom('Δ')])),
           ),
-          scr(
-            premise(judgement([atom('Γ')], [atom('A'), atom('A'), atom('Δ')])),
+          applySCR(
+            premise(sequent([atom('Γ')], [atom('A'), atom('A'), atom('Δ')])),
           ),
         ],
         [
-          srotl(premise(judgement([atom('Σ'), atom('A')], [atom('Π')]))),
-          srotr(premise(judgement([atom('Σ')], [atom('A'), atom('Π')]))),
+          applySRotL(premise(sequent([atom('Σ'), atom('A')], [atom('Π')]))),
+          applySRotR(premise(sequent([atom('Σ')], [atom('A'), atom('Π')]))),
         ],
         [
-          sswpl(
-            premise(judgement([atom('Σ'), atom('A'), atom('B')], [atom('Π')])),
+          applySSwpL(
+            premise(sequent([atom('Σ'), atom('A'), atom('B')], [atom('Π')])),
           ),
-          sswpr(
-            premise(judgement([atom('Σ')], [atom('A'), atom('B'), atom('Π')])),
+          applySSwpR(
+            premise(sequent([atom('Σ')], [atom('A'), atom('B'), atom('Π')])),
           ),
         ],
       ],
