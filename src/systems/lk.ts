@@ -226,6 +226,7 @@ export type DR1<
   [Derivation<Sequent<Γ, [A, ...Δ]>>],
   'dr1'
 >
+export type AnyDR1 = DR1<Formulas, Prop, Prop, Formulas>
 export const dr1 = <
   Γ extends Formulas,
   A extends Prop,
@@ -268,6 +269,7 @@ export type CL2<
   [Derivation<Sequent<[...Γ, B], Δ>>],
   'cl2'
 >
+export type AnyCL2 = CL2<Formulas, Prop, Prop, Formulas>
 export const cl2 = <
   Γ extends Formulas,
   A extends Prop,
@@ -310,6 +312,7 @@ export type DR2<
   [Derivation<Sequent<Γ, [B, ...Δ]>>],
   'dr2'
 >
+export type AnyDR2 = DR2<Formulas, Prop, Prop, Formulas>
 export const dr2 = <
   Γ extends Formulas,
   A extends Prop,
@@ -352,6 +355,7 @@ export type DL<
   [Derivation<Sequent<[...Γ, A], Δ>>, Derivation<Sequent<[...Γ, B], Δ>>],
   'dl'
 >
+export type AnyDL = DL<Formulas, Prop, Prop, Formulas>
 export const dl = <
   Γ extends Formulas,
   A extends Prop,
@@ -486,6 +490,7 @@ export type IL<
   [Derivation<Sequent<Γ, [A, ...Δ]>>, Derivation<Sequent<[...Γ, B], Δ>>],
   'il'
 >
+export type AnyIL = IL<Formulas, Prop, Prop, Formulas>
 export const il = <
   Γ extends Formulas,
   A extends Prop,
@@ -539,6 +544,7 @@ export type IR<
   [Derivation<Sequent<[...Γ, A], [B, ...Δ]>>],
   'ir'
 >
+export type AnyIR = IR<Formulas, Prop, Prop, Formulas>
 export const ir = <
   Γ extends Formulas,
   A extends Prop,
@@ -585,6 +591,7 @@ export type NL<
   [Derivation<Sequent<Γ, [A, ...Δ]>>],
   'nl'
 >
+export type AnyNL = NL<Formulas, Prop, Formulas>
 export const nl = <Γ extends Formulas, A extends Prop, Δ extends Formulas>(
   result: Sequent<[...Γ, Negation<A>], Δ>,
   deps: [Derivation<Sequent<Γ, [A, ...Δ]>>],
@@ -603,7 +610,7 @@ export const applyNL = <Γ extends Formulas, A extends Prop, Δ extends Formulas
   const γ: Γ = s.result.antecedent
   const a: A = array.head(s.result.succedent)
   const δ: Δ = array.tail(s.result.succedent)
-  return n(sequent([...γ, negation(a)], δ), [s])
+  return nl(sequent([...γ, negation(a)], δ), [s])
 }
 
 export type NR<
@@ -615,6 +622,7 @@ export type NR<
   [Derivation<Sequent<[...Γ, A], Δ>>],
   'nr'
 >
+export type AnyNR = NR<Formulas, Prop, Formulas>
 export const nr = <Γ extends Formulas, A extends Prop, Δ extends Formulas>(
   result: Sequent<Γ, [Negation<A>, ...Δ]>,
   deps: [Derivation<Sequent<[...Γ, A], Δ>>],
@@ -644,6 +652,7 @@ export type SWL<
   A extends Prop,
   Δ extends Formulas,
 > = Transformation<Sequent<[...Γ, A], Δ>, [Derivation<Sequent<Γ, Δ>>], 'swl'>
+export type AnySWL = SWL<Formulas, Prop, Formulas>
 export const swl = <Γ extends Formulas, A extends Prop, Δ extends Formulas>(
   result: Sequent<[...Γ, A], Δ>,
   deps: [Derivation<Sequent<Γ, Δ>>],
@@ -670,6 +679,7 @@ export type SWR<
   A extends Prop,
   Δ extends Formulas,
 > = Transformation<Sequent<Γ, [A, ...Δ]>, [Derivation<Sequent<Γ, Δ>>], 'swr'>
+export type AnySWR = SWR<Formulas, Prop, Formulas>
 export const swr = <Γ extends Formulas, A extends Prop, Δ extends Formulas>(
   result: Sequent<Γ, [A, ...Δ]>,
   deps: [Derivation<Sequent<Γ, Δ>>],
@@ -702,6 +712,7 @@ export type SCL<
   [Derivation<Sequent<[...Γ, A, A], Δ>>],
   'scl'
 >
+export type AnySCL = SCL<Formulas, Prop, Formulas>
 export const scl = <Γ extends Formulas, A extends Prop, Δ extends Formulas>(
   result: Sequent<[...Γ, A], Δ>,
   deps: [Derivation<Sequent<[...Γ, A, A], Δ>>],
@@ -743,6 +754,7 @@ export type SCR<
   [Derivation<Sequent<Γ, [A, A, ...Δ]>>],
   'scr'
 >
+export type AnySCR = SCR<Formulas, Prop, Formulas>
 export const scr = <Γ extends Formulas, A extends Prop, Δ extends Formulas>(
   result: Sequent<Γ, [A, ...Δ]>,
   deps: [Derivation<Sequent<Γ, [A, A, ...Δ]>>],
@@ -786,6 +798,7 @@ export type SRotL<
   [Derivation<Sequent<[A, ...Γ], Δ>>],
   'srotl'
 >
+export type AnySRotL = SRotL<Formulas, Prop, Formulas>
 export const srotl = <Γ extends Formulas, A extends Prop, Δ extends Formulas>(
   result: Sequent<[...Γ, A], Δ>,
   deps: [Derivation<Sequent<[A, ...Γ], Δ>>],
@@ -823,6 +836,7 @@ export type SRotR<
   [Derivation<Sequent<Γ, [A, ...Δ]>>],
   'srotr'
 >
+export type AnySRotR = SRotR<Formulas, Prop, Formulas>
 export const srotr = <Γ extends Formulas, A extends Prop, Δ extends Formulas>(
   result: Sequent<Γ, [...Δ, A]>,
   deps: [Derivation<Sequent<Γ, [A, ...Δ]>>],
@@ -858,6 +872,7 @@ export type SSwpL<
   [Derivation<Sequent<[...Γ, A, B], Δ>>],
   'sswpl'
 >
+export type AnySSwpL = SSwpL<Formulas, Prop, Prop, Formulas>
 export const sswpl = <
   Γ extends Formulas,
   A extends Prop,
@@ -905,6 +920,7 @@ export type SSwpR<
   [Derivation<Sequent<Γ, [A, B, ...Δ]>>],
   'sswpr'
 >
+export type AnySSwpR = SSwpR<Formulas, Prop, Prop, Formulas>
 export const sswpr = <
   Γ extends Formulas,
   A extends Prop,
