@@ -91,7 +91,7 @@ export const refineActiveR =
 
 export type I<A extends Prop> = Introduction<Sequent<[A], [A]>, 'I'>
 export type AnyI = I<Prop>
-export const i = <A extends Prop>(result: Sequent<[NoInfer<A>], [A]>): I<A> =>
+export const i = <A extends Prop>(result: Sequent<[A], [A]>): I<A> =>
   introduction(result, 'I')
 export type AnyIResult = AnyI['result']
 export const isIResult: Refinement<AnySequent, AnyIResult> = (
@@ -153,7 +153,7 @@ export const applyCut = <
   Δ extends Formulas,
   A extends Prop,
 >(
-  s1: Derivation<Sequent<Γ, [...Δ, NoInfer<A>]>>,
+  s1: Derivation<Sequent<Γ, [...Δ, A]>>,
   s2: Derivation<Sequent<[A, ...Γ], Δ>>,
 ): ApplyCut<
   Derivation<Sequent<Γ, [...Δ, A]>>,
@@ -1289,7 +1289,7 @@ const omega = {
   p2: { implication, conjunction, disjunction },
 }
 const iota = {
-  i,
+  i: applyI,
 }
 const zeta = {
   cut: applyCut,
