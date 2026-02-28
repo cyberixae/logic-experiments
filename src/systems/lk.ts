@@ -6,6 +6,7 @@ import {
   Judgement as Sequent,
   judgement as sequent,
   AnyJudgement as AnySequent,
+  conclusion,
 } from '../lib/judgement'
 import {
   AnyDerivation,
@@ -17,6 +18,7 @@ import {
   premise,
   Premise,
   refinePremise,
+  isProof,
 } from '../lib/derivation'
 import { Refinement } from '../lib/generic'
 
@@ -1445,3 +1447,20 @@ export const lk = {
   i: iota,
   z: zeta,
 }
+
+
+const goal = premise(conclusion(
+  lk.o.p2.implication(
+    lk.o.p2.implication(
+      lk.a('p'),
+      lk.o.p2.implication(lk.a('q'), lk.o.p1.negation(lk.a('p'))),
+    ),
+    lk.o.p2.implication(lk.a('p'), lk.a('p')),
+  ),
+))
+
+const step1  = reverseIR(goal)
+const step2 = reverseSWL(step1)
+const step3 = reverseIR(step2)
+const step4 = reverseI(step3)
+console.log(isProof(step4))
