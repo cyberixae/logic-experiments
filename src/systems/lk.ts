@@ -265,6 +265,20 @@ export const applyDR1 = <
   const a: A = array.head(s.result.succedent)
   return dr1(sequent(γ, [disjunction(a, b), ...δ]), [s])
 }
+export const reverseDR1 = <
+  Γ extends Formulas,
+  A extends Prop,
+  B extends Prop,
+  Δ extends Formulas,
+>(
+  p: Premise<DR1<Γ, A, B, Δ>['result']>,
+): DR1<Γ, A, B, Δ> => {
+  const γ: Γ = array.init(p.result.antecedent)
+  const acb: Conjunction<A, B> = array.last(p.result.antecedent)
+  const a: A = acb.leftConjunct
+  const δ: Δ = p.result.succedent
+  return dr1(p.result, [premise(sequent([...γ, a], δ))])
+}
 
 export type CL2<
   Γ extends Formulas,
@@ -315,6 +329,20 @@ export const applyCL2 = <
   const δ: Δ = s.result.succedent
   return cl2(sequent([...γ, conjunction(a, b)], δ), [s])
 }
+export const reverseCL2 = <
+  Γ extends Formulas,
+  A extends Prop,
+  B extends Prop,
+  Δ extends Formulas,
+>(
+  p: Premise<CL2<Γ, A, B, Δ>['result']>,
+): CL2<Γ, A, B, Δ> => {
+  const γ: Γ = array.init(p.result.antecedent)
+  const acb: Conjunction<A, B> = array.last(p.result.antecedent)
+  const a: A = acb.leftConjunct
+  const δ: Δ = p.result.succedent
+  return cl2(p.result, [premise(sequent([...γ, a], δ))])
+}
 
 export type DR2<
   Γ extends Formulas,
@@ -364,6 +392,20 @@ export const applyDR2 = <
   const δ: Δ = array.tail(s.result.succedent)
   const b: B = array.head(s.result.succedent)
   return dr2(sequent(γ, [disjunction(a, b), ...δ]), [s])
+}
+export const reverseDR2 = <
+  Γ extends Formulas,
+  A extends Prop,
+  B extends Prop,
+  Δ extends Formulas,
+>(
+  p: Premise<DR2<Γ, A, B, Δ>['result']>,
+): DR2<Γ, A, B, Δ> => {
+  const γ: Γ = array.init(p.result.antecedent)
+  const acb: Conjunction<A, B> = array.last(p.result.antecedent)
+  const a: A = acb.leftConjunct
+  const δ: Δ = p.result.succedent
+  return dr2(p.result, [premise(sequent([...γ, a], δ))])
 }
 
 export type DL<
@@ -425,6 +467,20 @@ export const applyDL = <
   const b: B = array.last(s2.result.antecedent)
   const δ: Δ = s1.result.succedent
   return dl(sequent([...γ, disjunction(a, b)], δ), [s1, s2])
+}
+export const reverseDL = <
+  Γ extends Formulas,
+  A extends Prop,
+  B extends Prop,
+  Δ extends Formulas,
+>(
+  p: Premise<DL<Γ, A, B, Δ>['result']>,
+): DL<Γ, A, B, Δ> => {
+  const γ: Γ = array.init(p.result.antecedent)
+  const acb: Conjunction<A, B> = array.last(p.result.antecedent)
+  const a: A = acb.leftConjunct
+  const δ: Δ = p.result.succedent
+  return dl(p.result, [premise(sequent([...γ, a], δ))])
 }
 
 export type CR<
@@ -568,6 +624,20 @@ export const applyIL = <
   const δ: Δ = array.tail(s1.result.succedent)
   return il(sequent([...γ, implication(a, b)], δ), [s1, s2])
 }
+export const reverseIL = <
+  Γ extends Formulas,
+  A extends Prop,
+  B extends Prop,
+  Δ extends Formulas,
+>(
+  p: Premise<IL<Γ, A, B, Δ>['result']>,
+): IL<Γ, A, B, Δ> => {
+  const γ: Γ = array.init(p.result.antecedent)
+  const acb: Conjunction<A, B> = array.last(p.result.antecedent)
+  const a: A = acb.leftConjunct
+  const δ: Δ = p.result.succedent
+  return il(p.result, [premise(sequent([...γ, a], δ))])
+}
 
 export type IR<
   Γ extends Formulas,
@@ -621,6 +691,20 @@ export const applyIR = <
   const δ: Δ = array.tail(s.result.succedent)
   return ir(sequent(γ, [implication(a, b), ...δ]), [s])
 }
+export const reverseIR = <
+  Γ extends Formulas,
+  A extends Prop,
+  B extends Prop,
+  Δ extends Formulas,
+>(
+  p: Premise<IR<Γ, A, B, Δ>['result']>,
+): IR<Γ, A, B, Δ> => {
+  const γ: Γ = array.init(p.result.antecedent)
+  const acb: Conjunction<A, B> = array.last(p.result.antecedent)
+  const a: A = acb.leftConjunct
+  const δ: Δ = p.result.succedent
+  return ir(p.result, [premise(sequent([...γ, a], δ))])
+}
 
 // Negation
 
@@ -661,6 +745,19 @@ export const applyNL = <Γ extends Formulas, A extends Prop, Δ extends Formulas
   const δ: Δ = array.tail(s.result.succedent)
   return nl(sequent([...γ, negation(a)], δ), [s])
 }
+export const reverseNL = <
+  Γ extends Formulas,
+  A extends Prop,
+  Δ extends Formulas,
+>(
+  p: Premise<NL<Γ, A, Δ>['result']>,
+): NL<Γ, A, Δ> => {
+  const γ: Γ = array.init(p.result.antecedent)
+  const acb: Conjunction<A, B> = array.last(p.result.antecedent)
+  const a: A = acb.leftConjunct
+  const δ: Δ = p.result.succedent
+  return nl(p.result, [premise(sequent([...γ, a], δ))])
+}
 
 export type NR<
   Γ extends Formulas,
@@ -700,6 +797,19 @@ export const applyNR = <Γ extends Formulas, A extends Prop, Δ extends Formulas
   const δ: Δ = s.result.succedent
   return nr(sequent(γ, [negation(a), ...δ]), [s])
 }
+export const reverseNR = <
+  Γ extends Formulas,
+  A extends Prop,
+  Δ extends Formulas,
+>(
+  p: Premise<NR<Γ, A,  Δ>['result']>,
+): NR<Γ, A, Δ> => {
+  const γ: Γ = array.init(p.result.antecedent)
+  const acb: Conjunction<A, B> = array.last(p.result.antecedent)
+  const a: A = acb.leftConjunct
+  const δ: Δ = p.result.succedent
+  return nr(p.result, [premise(sequent([...γ, a], δ))])
+}
 
 // Weakening
 
@@ -736,6 +846,19 @@ export const applySWL = <
   const δ: Δ = s.result.succedent
   return swl(sequent([...γ, a], δ), [s])
 }
+export const reverseSWL = <
+  Γ extends Formulas,
+  A extends Prop,
+  Δ extends Formulas,
+>(
+  p: Premise<SWL<Γ, A, Δ>['result']>,
+): SWL<Γ, A, Δ> => {
+  const γ: Γ = array.init(p.result.antecedent)
+  const acb: Conjunction<A, B> = array.last(p.result.antecedent)
+  const a: A = acb.leftConjunct
+  const δ: Δ = p.result.succedent
+  return swl(p.result, [premise(sequent([...γ, a], δ))])
+}
 
 export type SWR<
   Γ extends Formulas,
@@ -769,6 +892,19 @@ export const applySWR = <
   const γ: Γ = s.result.antecedent
   const δ: Δ = s.result.succedent
   return swr(sequent(γ, [a, ...δ]), [s])
+}
+export const reverseSWR = <
+  Γ extends Formulas,
+  A extends Prop,
+  Δ extends Formulas,
+>(
+  p: Premise<SWR<Γ, A, Δ>['result']>,
+): SWR<Γ, A, Δ> => {
+  const γ: Γ = array.init(p.result.antecedent)
+  const acb: Conjunction<A, B> = array.last(p.result.antecedent)
+  const a: A = acb.leftConjunct
+  const δ: Δ = p.result.succedent
+  return swr(p.result, [premise(sequent([...γ, a], δ))])
 }
 
 // Contraction
@@ -821,6 +957,19 @@ export const applySCL = <
   const δ: Δ = s.result.succedent
   return scl(sequent([...γ, a], δ), [s])
 }
+export const reverseSCL = <
+  Γ extends Formulas,
+  A extends Prop,
+  Δ extends Formulas,
+>(
+  p: Premise<SCL<Γ, A, Δ>['result']>,
+): SCL<Γ, A, Δ> => {
+  const γ: Γ = array.init(p.result.antecedent)
+  const acb: Conjunction<A, B> = array.last(p.result.antecedent)
+  const a: A = acb.leftConjunct
+  const δ: Δ = p.result.succedent
+  return scl(p.result, [premise(sequent([...γ, a], δ))])
+}
 
 export type SCR<
   Γ extends Formulas,
@@ -870,6 +1019,19 @@ export const applySCR = <
   const δ: Δ = array.tail(array.tail(s.result.succedent))
   return scr(sequent(γ, [a, ...δ]), [s])
 }
+export const reverseSCR = <
+  Γ extends Formulas,
+  A extends Prop,
+  Δ extends Formulas,
+>(
+  p: Premise<SCR<Γ, A, Δ>['result']>,
+): SCR<Γ, A, Δ> => {
+  const γ: Γ = array.init(p.result.antecedent)
+  const acb: Conjunction<A, B> = array.last(p.result.antecedent)
+  const a: A = acb.leftConjunct
+  const δ: Δ = p.result.succedent
+  return scr(p.result, [premise(sequent([...γ, a], δ))])
+}
 
 // Permutation
 
@@ -917,6 +1079,19 @@ export const applySRotL = <
   const δ: Δ = s.result.succedent
   return srotl(sequent([...γ, a], δ), [s])
 }
+export const reverseSRotL = <
+  Γ extends Formulas,
+  A extends Prop,
+  Δ extends Formulas,
+>(
+  p: Premise<SRotL<Γ, A, Δ>['result']>,
+): SRotL<Γ, A, Δ> => {
+  const γ: Γ = array.init(p.result.antecedent)
+  const acb: Conjunction<A, B> = array.last(p.result.antecedent)
+  const a: A = acb.leftConjunct
+  const δ: Δ = p.result.succedent
+  return srotl(p.result, [premise(sequent([...γ, a], δ))])
+}
 
 export type SRotR<
   Γ extends Formulas,
@@ -958,6 +1133,19 @@ export const applySRotR = <
   const δ: Δ = array.tail(s.result.succedent)
   const a: A = array.head(s.result.succedent)
   return srotr(sequent(γ, [...δ, a]), [s])
+}
+export const reverseSRotR = <
+  Γ extends Formulas,
+  A extends Prop,
+  Δ extends Formulas,
+>(
+  p: Premise<SRotR<Γ, A, Δ>['result']>,
+): SRotR<Γ, A, Δ> => {
+  const γ: Γ = array.init(p.result.antecedent)
+  const acb: Conjunction<A, B> = array.last(p.result.antecedent)
+  const a: A = acb.leftConjunct
+  const δ: Δ = p.result.succedent
+  return srotr(p.result, [premise(sequent([...γ, a], δ))])
 }
 
 export type SSwpL<
@@ -1014,6 +1202,20 @@ export const applySSwpL = <
   const δ: Δ = s.result.succedent
   return sswpl(sequent([...γ, b, a], δ), [s])
 }
+export const reverseSSwpL = <
+  Γ extends Formulas,
+  A extends Prop,
+  B extends Prop,
+  Δ extends Formulas,
+>(
+  p: Premise<SSwpL<Γ, A, B, Δ>['result']>,
+): SSwpL<Γ, A, B, Δ> => {
+  const γ: Γ = array.init(p.result.antecedent)
+  const acb: Conjunction<A, B> = array.last(p.result.antecedent)
+  const a: A = acb.leftConjunct
+  const δ: Δ = p.result.succedent
+  return abc(p.result, [premise(sequent([...γ, a], δ))])
+}
 
 export type SSwpR<
   Γ extends Formulas,
@@ -1068,6 +1270,20 @@ export const applySSwpR = <
   const a: A = array.head(s.result.succedent)
   const δ: Δ = array.tail(array.tail(s.result.succedent))
   return sswpr(sequent(γ, [b, a, ...δ]), [s])
+}
+export const reverseSSwpR = <
+  Γ extends Formulas,
+  A extends Prop,
+  B extends Prop,
+  Δ extends Formulas,
+>(
+  p: Premise<SSwpR<Γ, A, B, Δ>['result']>,
+): SSwpR<Γ, A, B, Δ> => {
+  const γ: Γ = array.init(p.result.antecedent)
+  const acb: Conjunction<A, B> = array.last(p.result.antecedent)
+  const a: A = acb.leftConjunct
+  const δ: Δ = p.result.succedent
+  return abc(p.result, [premise(sequent([...γ, a], δ))])
 }
 
 // Language
