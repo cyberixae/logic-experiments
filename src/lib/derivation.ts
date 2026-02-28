@@ -50,6 +50,11 @@ export type Derivation<R extends AnyJudgement> =
   | Premise<R>
   | Transformation<R, Array<AnyNode>, Rule>
 export type AnyDerivation = Derivation<AnyJudgement>
+export const refineDerivation =
+  <A extends AnyJudgement, B extends A>(r: Refinement<A, B>) =>
+  (s: Derivation<A>): s is Derivation<B> => {
+    return r(s.result)
+  }
 
 export type Introduction<
   J extends AnyJudgement,
@@ -105,26 +110,34 @@ export const replaceDep = <
   return { ...parent, deps }
 }
 
-export const replaceBranch = <J extends AnyJudgement>(
+export type Edit = <J extends AnyJudgement>(
+  d: Derivation<J>,
+) => Derivation<J> | null
+
+export const editBranch = <J extends AnyJudgement>(
   root: Derivation<J>,
   path: NonEmptyArray<number>,
-  d: AnyDerivation,
+  edit: Edit,
 ): Derivation<J> | null => {
   if (root.kind === 'premise') {
     return null
   }
   const [index, ...rest] = path
+  const dep = root.deps[index]
+  if (!dep) {
+    return null
+  }
   if (isNonEmptyArray(rest)) {
-    const dep = root.deps[index]
-    if (!dep) {
-      return null
-    }
-    const tmp = replaceBranch(dep, rest, d)
+    const tmp = editBranch(dep, rest, edit)
     if (!tmp) {
       return null
     }
     return replaceDep(root, index, tmp)
   } else {
-    return replaceDep(root, index, d)
+    const update = edit(dep)
+    if (!update) {
+      return null
+    }
+    return replaceDep(root, index, update)
   }
 }

@@ -16,9 +16,9 @@ import {
   introduction,
   Transformation,
   premise,
-  Premise,
-  refinePremise,
+  refineDerivation,
   isProof,
+  editBranch,
 } from '../lib/derivation'
 import { Refinement } from '../lib/generic'
 
@@ -90,12 +90,8 @@ export const refineActiveR =
   }
 
 // Axiom
-
-export type I<A extends Prop> = Introduction<Sequent<[A], [A]>, 'I'>
-export type AnyI = I<Prop>
-export const i = <A extends Prop>(result: Sequent<[A], [A]>): I<A> =>
-  introduction(result, 'I')
-export type AnyIResult = AnyI['result']
+export type IResult<A extends Prop> = Sequent<[A], [A]>
+export type AnyIResult = IResult<Prop>
 export const isIResult: Refinement<AnySequent, AnyIResult> = (
   s,
 ): s is AnyIResult => {
@@ -105,38 +101,51 @@ export const isIResult: Refinement<AnySequent, AnyIResult> = (
     prop.equals(s.antecedent[0], s.succedent[0])
   )
 }
-export const isIResultPremise = refinePremise(isIResult)
+export const isIResultDerivation = refineDerivation(isIResult)
+export type I<A extends Prop> = Introduction<IResult<A>, 'I'>
+export type AnyI = I<Prop>
+export const i = <A extends Prop>(result: IResult<A>): I<A> =>
+  introduction(result, 'I')
 export type ApplyI<A extends Prop> = I<A>
 export const applyI = <A extends Prop>(a: A): ApplyI<A> => i(sequent([a], [a]))
-export const reverseI = <A extends Prop>(p: Premise<I<A>['result']>): I<A> => {
+export const reverseI = <A extends Prop>(
+  p: Derivation<I<A>['result']>,
+): I<A> => {
   return i(p.result)
 }
 
 // Cut
 
-export type Cut<
-  Γ extends Formulas,
-  Δ extends Formulas,
-  A extends Prop,
-> = Transformation<
-  Sequent<Γ, Δ>,
-  [Derivation<Sequent<Γ, [...Δ, A]>>, Derivation<Sequent<[A, ...Γ], Δ>>],
-  'Cut'
->
-export type AnyCut = Cut<Formulas, Formulas, Prop>
-export const cut = <Γ extends Formulas, Δ extends Formulas, A extends Prop>(
-  result: Sequent<Γ, Δ>,
-  deps: [Derivation<Sequent<Γ, [...Δ, A]>>, Derivation<Sequent<[A, ...Γ], Δ>>],
-): Cut<Γ, Δ, A> => {
-  return transformation(result, deps, 'Cut')
-}
-export type AnyCutResult = AnyCut['result']
+export type CutResult<Γ extends Formulas, Δ extends Formulas> = Sequent<Γ, Δ>
+export type AnyCutResult = CutResult<Formulas, Formulas>
 export const isCutResult: Refinement<AnySequent, AnyCutResult> = (
   s,
 ): s is AnyCutResult => {
   return true
 }
-export const isCutResultPremise = refinePremise(isCutResult)
+export const isCutResultDerivation = refineDerivation(isCutResult)
+export type Cut<
+  Γ extends Formulas,
+  Δ extends Formulas,
+  A extends Prop,
+  R extends CutResult<Γ, Δ>,
+> = Transformation<
+  R,
+  [Derivation<Sequent<Γ, [...Δ, A]>>, Derivation<Sequent<[A, ...Γ], Δ>>],
+  'Cut'
+>
+export type AnyCut = Cut<Formulas, Formulas, Prop, AnyCutResult>
+export const cut = <
+  Γ extends Formulas,
+  Δ extends Formulas,
+  A extends Prop,
+  R extends CutResult<Γ, Δ>,
+>(
+  result: R,
+  deps: [Derivation<Sequent<Γ, [...Δ, A]>>, Derivation<Sequent<[A, ...Γ], Δ>>],
+): Cut<Γ, Δ, A, R> => {
+  return transformation(result, deps, 'Cut')
+}
 export type ApplyCut<S1 extends AnyDerivation, S2 extends AnyDerivation> = [
   S1,
   S2,
@@ -148,7 +157,7 @@ export type ApplyCut<S1 extends AnyDerivation, S2 extends AnyDerivation> = [
     Sequent<[infer A extends Prop, ...infer Γ extends Formulas], infer Δ>
   >,
 ]
-  ? Cut<Γ, Δ, A>
+  ? Cut<Γ, Δ, A, CutResult<Γ, Δ>>
   : never
 export const applyCut = <
   Γ extends Formulas,
@@ -169,10 +178,11 @@ export const reverseCut = <
   Γ extends Formulas,
   Δ extends Formulas,
   A extends Prop,
+  R extends CutResult<Γ, Δ>,
 >(
-  p: Premise<Cut<Γ, Δ, A>['result']>,
+  p: Derivation<R>,
   a: A,
-): Cut<Γ, Δ, A> => {
+): Cut<Γ, Δ, A, R> => {
   const γ: Γ = p.result.antecedent
   const δ: Δ = p.result.succedent
   return cut(p.result, [
@@ -183,38 +193,41 @@ export const reverseCut = <
 
 // Conjunction & Disjunction
 
+export type CL1Result<
+  Γ extends Formulas,
+  A extends Prop,
+  B extends Prop,
+  Δ extends Formulas,
+> = Sequent<[...Γ, Conjunction<A, B>], Δ>
+export type AnyCL1Result = CL1Result<Formulas, Prop, Prop, Formulas>
+export const isCL1Result: Refinement<AnySequent, AnyCL1Result> =
+  refineActiveL(isConjunction)
+export const isCL1ResultDerivation = refineDerivation(isCL1Result)
 export type CL1<
   Γ extends Formulas,
   A extends Prop,
   B extends Prop,
   Δ extends Formulas,
-> = Transformation<
-  Sequent<[...Γ, Conjunction<A, B>], Δ>,
-  [Derivation<Sequent<[...Γ, A], Δ>>],
-  'cl1'
->
-export type AnyCL1 = CL1<Formulas, Prop, Prop, Formulas>
+  R extends CL1Result<Γ, A, B, Δ>,
+> = Transformation<R, [Derivation<Sequent<[...Γ, A], Δ>>], 'cl1'>
+export type AnyCL1 = CL1<Formulas, Prop, Prop, Formulas, AnyCL1Result>
 export const cl1 = <
   Γ extends Formulas,
   A extends Prop,
   B extends Prop,
   Δ extends Formulas,
+  R extends CL1Result<Γ, A, B, Δ>,
 >(
-  result: Sequent<[...Γ, Conjunction<A, B>], Δ>,
+  result: R,
   deps: [Derivation<Sequent<[...Γ, A], Δ>>],
-): CL1<Γ, A, B, Δ> => {
+): CL1<Γ, A, B, Δ, R> => {
   return transformation(result, deps, 'cl1')
 }
-
-export type AnyCL1Result = AnyCL1['result']
-export const isCL1Result: Refinement<AnySequent, AnyCL1Result> =
-  refineActiveL(isConjunction)
-export const isCL1ResultPremise = refinePremise(isCL1Result)
 export type ApplyCL1<B extends Prop, S extends AnyDerivation> =
   S extends Derivation<
     Sequent<[...infer Γ extends Formulas, infer A extends Prop], infer Δ>
   >
-    ? CL1<Γ, A, B, Δ>
+    ? CL1<Γ, A, B, Δ, CL1Result<Γ, A, B, Δ>>
     : never
 export const applyCL1 = <
   B extends Prop,
@@ -235,9 +248,10 @@ export const reverseCL1 = <
   A extends Prop,
   B extends Prop,
   Δ extends Formulas,
+  R extends CL1Result<Γ, A, B, Δ>,
 >(
-  p: Premise<CL1<Γ, A, B, Δ>['result']>,
-): CL1<Γ, A, B, Δ> => {
+  p: Derivation<R>,
+): CL1<Γ, A, B, Δ, R> => {
   const γ: Γ = array.init(p.result.antecedent)
   const acb: Conjunction<A, B> = array.last(p.result.antecedent)
   const a: A = acb.leftConjunct
@@ -245,40 +259,44 @@ export const reverseCL1 = <
   return cl1(p.result, [premise(sequent([...γ, a], δ))])
 }
 
-export type DR1<
+export type DR1Result<
   Γ extends Formulas,
   A extends Prop,
   B extends Prop,
   Δ extends Formulas,
-> = Transformation<
-  Sequent<Γ, [Disjunction<A, B>, ...Δ]>,
-  [Derivation<Sequent<Γ, [A, ...Δ]>>],
-  'dr1'
->
-export type AnyDR1 = DR1<Formulas, Prop, Prop, Formulas>
-export const dr1 = <
-  Γ extends Formulas,
-  A extends Prop,
-  B extends Prop,
-  Δ extends Formulas,
->(
-  result: Sequent<Γ, [Disjunction<A, B>, ...Δ]>,
-  deps: [Derivation<Sequent<Γ, [A, ...Δ]>>],
-): DR1<Γ, A, B, Δ> => {
-  return transformation(result, deps, 'dr1')
-}
-export type AnyDR1Result = AnyDR1['result']
+> = Sequent<Γ, [Disjunction<A, B>, ...Δ]>
+export type AnyDR1Result = DR1Result<Formulas, Prop, Prop, Formulas>
 export const isDR1Result: Refinement<AnySequent, AnyDR1Result> = (
   s,
 ): s is AnyDR1Result => {
   return s.succedent.at(0)?.kind === 'disjunction'
 }
-export const isDR1ResultPremise = refinePremise(isDR1Result)
+export const isDR1ResultDerivation = refineDerivation(isDR1Result)
+export type DR1<
+  Γ extends Formulas,
+  A extends Prop,
+  B extends Prop,
+  Δ extends Formulas,
+  R extends DR1Result<Γ, A, B, Δ>,
+> = Transformation<R, [Derivation<Sequent<Γ, [A, ...Δ]>>], 'dr1'>
+export type AnyDR1 = DR1<Formulas, Prop, Prop, Formulas, AnyDR1Result>
+export const dr1 = <
+  Γ extends Formulas,
+  A extends Prop,
+  B extends Prop,
+  Δ extends Formulas,
+  R extends DR1Result<Γ, A, B, Δ>,
+>(
+  result: R,
+  deps: [Derivation<Sequent<Γ, [A, ...Δ]>>],
+): DR1<Γ, A, B, Δ, R> => {
+  return transformation(result, deps, 'dr1')
+}
 export type ApplyDR1<B extends Prop, S extends AnyDerivation> =
   S extends Derivation<
     Sequent<infer Γ, [infer A extends Prop, ...infer Δ extends Formulas]>
   >
-    ? DR1<Γ, A, B, Δ>
+    ? DR1<Γ, A, B, Δ, DR1Result<Γ, A, B, Δ>>
     : never
 export const applyDR1 = <
   B extends Prop,
@@ -299,9 +317,10 @@ export const reverseDR1 = <
   A extends Prop,
   B extends Prop,
   Δ extends Formulas,
+  R extends DR1Result<Γ, A, B, Δ>,
 >(
-  p: Premise<DR1<Γ, A, B, Δ>['result']>,
-): DR1<Γ, A, B, Δ> => {
+  p: Derivation<R>,
+): DR1<Γ, A, B, Δ, R> => {
   const γ: Γ = p.result.antecedent
   const adb: Disjunction<A, B> = array.head(p.result.succedent)
   const a: A = adb.leftDisjunct
@@ -309,37 +328,41 @@ export const reverseDR1 = <
   return dr1(p.result, [premise(sequent(γ, [a, ...δ]))])
 }
 
+export type CL2Result<
+  Γ extends Formulas,
+  A extends Prop,
+  B extends Prop,
+  Δ extends Formulas,
+> = Sequent<[...Γ, Conjunction<A, B>], Δ>
+export type AnyCL2Result = CL2Result<Formulas, Prop, Prop, Formulas>
+export const isCL2Result: Refinement<AnySequent, AnyCL2Result> =
+  refineActiveL(isConjunction)
+export const isCL2ResultDerivation = refineDerivation(isCL2Result)
 export type CL2<
   Γ extends Formulas,
   A extends Prop,
   B extends Prop,
   Δ extends Formulas,
-> = Transformation<
-  Sequent<[...Γ, Conjunction<A, B>], Δ>,
-  [Derivation<Sequent<[...Γ, B], Δ>>],
-  'cl2'
->
-export type AnyCL2 = CL2<Formulas, Prop, Prop, Formulas>
+  R extends CL2Result<Γ, A, B, Δ>,
+> = Transformation<R, [Derivation<Sequent<[...Γ, B], Δ>>], 'cl2'>
+export type AnyCL2 = CL2<Formulas, Prop, Prop, Formulas, AnyCL2Result>
 export const cl2 = <
   Γ extends Formulas,
   A extends Prop,
   B extends Prop,
   Δ extends Formulas,
+  R extends CL2Result<Γ, A, B, Δ>,
 >(
-  result: Sequent<[...Γ, Conjunction<A, B>], Δ>,
+  result: R,
   deps: [Derivation<Sequent<[...Γ, B], Δ>>],
-): CL2<Γ, A, B, Δ> => {
+): CL2<Γ, A, B, Δ, R> => {
   return transformation(result, deps, 'cl2')
 }
-export type AnyCL2Result = AnyCL2['result']
-export const isCL2Result: Refinement<AnySequent, AnyCL2Result> =
-  refineActiveL(isConjunction)
-export const isCL2ResultPremise = refinePremise(isCL2Result)
 export type ApplyCL2<A extends Prop, S extends AnyDerivation> =
   S extends Derivation<
     Sequent<[...infer Γ extends Formulas, infer B extends Prop], infer Δ>
   >
-    ? CL2<Γ, A, B, Δ>
+    ? CL2<Γ, A, B, Δ, CL2Result<Γ, A, B, Δ>>
     : never
 export const applyCL2 = <
   A extends Prop,
@@ -360,9 +383,10 @@ export const reverseCL2 = <
   A extends Prop,
   B extends Prop,
   Δ extends Formulas,
+  R extends CL2Result<Γ, A, B, Δ>,
 >(
-  p: Premise<CL2<Γ, A, B, Δ>['result']>,
-): CL2<Γ, A, B, Δ> => {
+  p: Derivation<R>,
+): CL2<Γ, A, B, Δ, R> => {
   const γ: Γ = array.init(p.result.antecedent)
   const acb: Conjunction<A, B> = array.last(p.result.antecedent)
   const b: B = acb.rightConjunct
@@ -370,40 +394,44 @@ export const reverseCL2 = <
   return cl2(p.result, [premise(sequent([...γ, b], δ))])
 }
 
-export type DR2<
+export type DR2Result<
   Γ extends Formulas,
   A extends Prop,
   B extends Prop,
   Δ extends Formulas,
-> = Transformation<
-  Sequent<Γ, [Disjunction<A, B>, ...Δ]>,
-  [Derivation<Sequent<Γ, [B, ...Δ]>>],
-  'dr2'
->
-export type AnyDR2 = DR2<Formulas, Prop, Prop, Formulas>
-export const dr2 = <
-  Γ extends Formulas,
-  A extends Prop,
-  B extends Prop,
-  Δ extends Formulas,
->(
-  result: Sequent<Γ, [Disjunction<A, B>, ...Δ]>,
-  deps: [Derivation<Sequent<Γ, [B, ...Δ]>>],
-): DR2<Γ, A, B, Δ> => {
-  return transformation(result, deps, 'dr2')
-}
-export type AnyDR2Result = AnyDR2['result']
+> = Sequent<Γ, [Disjunction<A, B>, ...Δ]>
+export type AnyDR2Result = DR2Result<Formulas, Prop, Prop, Formulas>
 export const isDR2Result: Refinement<AnySequent, AnyDR2Result> = (
   s,
 ): s is AnyDR2Result => {
   return s.succedent.at(0)?.kind === 'disjunction'
 }
-export const isDR2ResultPremise = refinePremise(isDR2Result)
+export const isDR2ResultDerivation = refineDerivation(isDR2Result)
+export type DR2<
+  Γ extends Formulas,
+  A extends Prop,
+  B extends Prop,
+  Δ extends Formulas,
+  R extends DR2Result<Γ, A, B, Δ>,
+> = Transformation<R, [Derivation<Sequent<Γ, [B, ...Δ]>>], 'dr2'>
+export type AnyDR2 = DR2<Formulas, Prop, Prop, Formulas, AnyDR2Result>
+export const dr2 = <
+  Γ extends Formulas,
+  A extends Prop,
+  B extends Prop,
+  Δ extends Formulas,
+  R extends DR2Result<Γ, A, B, Δ>,
+>(
+  result: R,
+  deps: [Derivation<Sequent<Γ, [B, ...Δ]>>],
+): DR2<Γ, A, B, Δ, R> => {
+  return transformation(result, deps, 'dr2')
+}
 export type ApplyDR2<A extends Prop, S extends AnyDerivation> =
   S extends Derivation<
     Sequent<infer Γ, [infer B extends Prop, ...infer Δ extends Formulas]>
   >
-    ? DR2<Γ, A, B, Δ>
+    ? DR2<Γ, A, B, Δ, DR2Result<Γ, A, B, Δ>>
     : never
 export const applyDR2 = <
   A extends Prop,
@@ -424,9 +452,10 @@ export const reverseDR2 = <
   A extends Prop,
   B extends Prop,
   Δ extends Formulas,
+  R extends DR2Result<Γ, A, B, Δ>,
 >(
-  p: Premise<DR2<Γ, A, B, Δ>['result']>,
-): DR2<Γ, A, B, Δ> => {
+  p: Derivation<R>,
+): DR2<Γ, A, B, Δ, R> => {
   const γ: Γ = p.result.antecedent
   const adb: Disjunction<A, B> = array.head(p.result.succedent)
   const b: B = adb.rightDisjunct
@@ -434,32 +463,40 @@ export const reverseDR2 = <
   return dr2(p.result, [premise(sequent(γ, [b, ...δ]))])
 }
 
+export type DLResult<
+  Γ extends Formulas,
+  A extends Prop,
+  B extends Prop,
+  Δ extends Formulas,
+> = Sequent<[...Γ, Disjunction<A, B>], Δ>
+export type AnyDLResult = DLResult<Formulas, Prop, Prop, Formulas>
+export const isDLResult: Refinement<AnySequent, AnyDLResult> =
+  refineActiveL(isDisjunction)
+export const isDLResultDerivation = refineDerivation(isDLResult)
 export type DL<
   Γ extends Formulas,
   A extends Prop,
   B extends Prop,
   Δ extends Formulas,
+  R extends DLResult<Γ, A, B, Δ>,
 > = Transformation<
-  Sequent<[...Γ, Disjunction<A, B>], Δ>,
+  R,
   [Derivation<Sequent<[...Γ, A], Δ>>, Derivation<Sequent<[...Γ, B], Δ>>],
   'dl'
 >
-export type AnyDL = DL<Formulas, Prop, Prop, Formulas>
+export type AnyDL = DL<Formulas, Prop, Prop, Formulas, AnyDLResult>
 export const dl = <
   Γ extends Formulas,
   A extends Prop,
   B extends Prop,
   Δ extends Formulas,
+  R extends DLResult<Γ, A, B, Δ>,
 >(
-  result: Sequent<[...Γ, Disjunction<A, B>], Δ>,
+  result: R,
   deps: [Derivation<Sequent<[...Γ, A], Δ>>, Derivation<Sequent<[...Γ, B], Δ>>],
-): DL<Γ, A, B, Δ> => {
+): DL<Γ, A, B, Δ, R> => {
   return transformation(result, deps, 'dl')
 }
-export type AnyDLResult = AnyDL['result']
-export const isDLResult: Refinement<AnySequent, AnyDLResult> =
-  refineActiveL(isDisjunction)
-export const isDLResultPremise = refinePremise(isDLResult)
 export type ApplyDL<S1 extends AnyDerivation, S2 extends AnyDerivation> = [
   S1,
   S2,
@@ -471,7 +508,7 @@ export type ApplyDL<S1 extends AnyDerivation, S2 extends AnyDerivation> = [
     Sequent<[...infer Γ extends Formulas, infer B extends Prop], infer Δ>
   >,
 ]
-  ? DL<Γ, A, B, Δ>
+  ? DL<Γ, A, B, Δ, DLResult<Γ, A, B, Δ>>
   : never
 export const applyDL = <
   Γ extends Formulas,
@@ -496,9 +533,10 @@ export const reverseDL = <
   A extends Prop,
   B extends Prop,
   Δ extends Formulas,
+  R extends DLResult<Γ, A, B, Δ>,
 >(
-  p: Premise<DL<Γ, A, B, Δ>['result']>,
-): DL<Γ, A, B, Δ> => {
+  p: Derivation<R>,
+): DL<Γ, A, B, Δ, R> => {
   const γ: Γ = array.init(p.result.antecedent)
   const adb: Disjunction<A, B> = array.last(p.result.antecedent)
   const a: A = adb.leftDisjunct
@@ -510,32 +548,40 @@ export const reverseDL = <
   ])
 }
 
+export type CRResult<
+  Γ extends Formulas,
+  A extends Prop,
+  B extends Prop,
+  Δ extends Formulas,
+> = Sequent<Γ, [Conjunction<A, B>, ...Δ]>
+export type AnyCRResult = CRResult<Formulas, Prop, Prop, Formulas>
+export const isCRResult: Refinement<AnySequent, AnyCRResult> =
+  refineActiveR(isConjunction)
+export const isCRResultDerivation = refineDerivation(isCRResult)
 export type CR<
   Γ extends Formulas,
   A extends Prop,
   B extends Prop,
   Δ extends Formulas,
+  R extends CRResult<Γ, A, B, Δ>,
 > = Transformation<
-  Sequent<Γ, [Conjunction<A, B>, ...Δ]>,
+  R,
   [Derivation<Sequent<Γ, [A, ...Δ]>>, Derivation<Sequent<Γ, [B, ...Δ]>>],
   'cr'
 >
-export type AnyCR = CR<Formulas, Prop, Prop, Formulas>
+export type AnyCR = CR<Formulas, Prop, Prop, Formulas, AnyCRResult>
 export const cr = <
   Γ extends Formulas,
   A extends Prop,
   B extends Prop,
   Δ extends Formulas,
+  R extends CRResult<Γ, A, B, Δ>,
 >(
-  result: Sequent<Γ, [Conjunction<A, B>, ...Δ]>,
+  result: R,
   deps: [Derivation<Sequent<Γ, [A, ...Δ]>>, Derivation<Sequent<Γ, [B, ...Δ]>>],
-): CR<Γ, A, B, Δ> => {
+): CR<Γ, A, B, Δ, R> => {
   return transformation(result, deps, 'cr')
 }
-export type AnyCRResult = AnyCR['result']
-export const isCRResult: Refinement<AnySequent, AnyCRResult> =
-  refineActiveR(isConjunction)
-export const isCRResultPremise = refinePremise(isCRResult)
 export type ApplyCR<S1 extends AnyDerivation, S2 extends AnyDerivation> = [
   S1,
   S2,
@@ -547,7 +593,7 @@ export type ApplyCR<S1 extends AnyDerivation, S2 extends AnyDerivation> = [
     Sequent<infer Γ, [infer B extends Prop, ...infer Δ extends Formulas]>
   >,
 ]
-  ? CR<Γ, A, B, Δ>
+  ? CR<Γ, A, B, Δ, CRResult<Γ, A, B, Δ>>
   : never
 export const applyCR = <
   Γ extends Formulas,
@@ -572,9 +618,10 @@ export const reverseCR = <
   A extends Prop,
   B extends Prop,
   Δ extends Formulas,
+  R extends CRResult<Γ, A, B, Δ>,
 >(
-  p: Premise<CR<Γ, A, B, Δ>['result']>,
-): CR<Γ, A, B, Δ> => {
+  p: Derivation<R>,
+): CR<Γ, A, B, Δ, R> => {
   const γ: Γ = p.result.antecedent
   const acb: Conjunction<A, B> = array.head(p.result.succedent)
   const a: A = acb.leftConjunct
@@ -588,32 +635,40 @@ export const reverseCR = <
 
 // Implication
 
+export type ILResult<
+  Γ extends Formulas,
+  A extends Prop,
+  B extends Prop,
+  Δ extends Formulas,
+> = Sequent<[...Γ, Implication<A, B>], Δ>
+export type AnyILResult = ILResult<Formulas, Prop, Prop, Formulas>
+export const isILResult: Refinement<AnySequent, AnyILResult> =
+  refineActiveL(isImplication)
+export const isILResultDerivation = refineDerivation(isILResult)
 export type IL<
   Γ extends Formulas,
   A extends Prop,
   B extends Prop,
   Δ extends Formulas,
+  R extends ILResult<Γ, A, B, Δ>,
 > = Transformation<
-  Sequent<[...Γ, Implication<A, B>], Δ>,
+  R,
   [Derivation<Sequent<Γ, [A, ...Δ]>>, Derivation<Sequent<[...Γ, B], Δ>>],
   'il'
 >
-export type AnyIL = IL<Formulas, Prop, Prop, Formulas>
+export type AnyIL = IL<Formulas, Prop, Prop, Formulas, AnyILResult>
 export const il = <
   Γ extends Formulas,
   A extends Prop,
   B extends Prop,
   Δ extends Formulas,
+  R extends ILResult<Γ, A, B, Δ>,
 >(
-  result: Sequent<[...Γ, Implication<A, B>], Δ>,
+  result: R,
   deps: [Derivation<Sequent<Γ, [A, ...Δ]>>, Derivation<Sequent<[...Γ, B], Δ>>],
-): IL<Γ, A, B, Δ> => {
+): IL<Γ, A, B, Δ, R> => {
   return transformation(result, deps, 'il')
 }
-export type AnyILResult = AnyIL['result']
-export const isILResult: Refinement<AnySequent, AnyILResult> =
-  refineActiveL(isImplication)
-export const isILResultPremise = refinePremise(isILResult)
 export type ApplyIL<S1 extends AnyDerivation, S2 extends AnyDerivation> = [
   S1,
   S2,
@@ -625,7 +680,7 @@ export type ApplyIL<S1 extends AnyDerivation, S2 extends AnyDerivation> = [
     Sequent<[...infer Γ extends Formulas, infer B extends Prop], infer Δ>
   >,
 ]
-  ? IL<Γ, A, B, Δ>
+  ? IL<Γ, A, B, Δ, ILResult<Γ, A, B, Δ>>
   : never
 export const applyIL = <
   Γ extends Formulas,
@@ -650,9 +705,10 @@ export const reverseIL = <
   A extends Prop,
   B extends Prop,
   Δ extends Formulas,
+  R extends ILResult<Γ, A, B, Δ>,
 >(
-  p: Premise<IL<Γ, A, B, Δ>['result']>,
-): IL<Γ, A, B, Δ> => {
+  p: Derivation<R>,
+): IL<Γ, A, B, Δ, R> => {
   const γ: Γ = array.init(p.result.antecedent)
   const aib: Implication<A, B> = array.last(p.result.antecedent)
   const a: A = aib.antecedent
@@ -664,32 +720,36 @@ export const reverseIL = <
   ])
 }
 
+export type IRResult<
+  Γ extends Formulas,
+  A extends Prop,
+  B extends Prop,
+  Δ extends Formulas,
+> = Sequent<Γ, [Implication<A, B>, ...Δ]>
+export type AnyIRResult = IRResult<Formulas, Prop, Prop, Formulas>
+export const isIRResult: Refinement<AnySequent, AnyIRResult> =
+  refineActiveR(isImplication)
+export const isIRResultDerivation = refineDerivation(isIRResult)
 export type IR<
   Γ extends Formulas,
   A extends Prop,
   B extends Prop,
   Δ extends Formulas,
-> = Transformation<
-  Sequent<Γ, [Implication<A, B>, ...Δ]>,
-  [Derivation<Sequent<[...Γ, A], [B, ...Δ]>>],
-  'ir'
->
-export type AnyIR = IR<Formulas, Prop, Prop, Formulas>
+  R extends IRResult<Γ, A, B, Δ>,
+> = Transformation<R, [Derivation<Sequent<[...Γ, A], [B, ...Δ]>>], 'ir'>
+export type AnyIR = IR<Formulas, Prop, Prop, Formulas, AnyIRResult>
 export const ir = <
   Γ extends Formulas,
   A extends Prop,
   B extends Prop,
   Δ extends Formulas,
+  R extends IRResult<Γ, A, B, Δ>,
 >(
-  result: Sequent<Γ, [Implication<A, B>, ...Δ]>,
+  result: R,
   deps: [Derivation<Sequent<[...Γ, A], [B, ...Δ]>>],
-): IR<Γ, A, B, Δ> => {
+): IR<Γ, A, B, Δ, R> => {
   return transformation(result, deps, 'ir')
 }
-export type AnyIRResult = AnyIR['result']
-export const isIRResult: Refinement<AnySequent, AnyIRResult> =
-  refineActiveR(isImplication)
-export const isIRResultPremise = refinePremise(isIRResult)
 export type ApplyIR<S extends AnyDerivation> =
   S extends Derivation<
     Sequent<
@@ -697,7 +757,7 @@ export type ApplyIR<S extends AnyDerivation> =
       [infer B extends Prop, ...infer Δ extends Formulas]
     >
   >
-    ? IR<Γ, A, B, Δ>
+    ? IR<Γ, A, B, Δ, IRResult<Γ, A, B, Δ>>
     : never
 export const applyIR = <
   Γ extends Formulas,
@@ -718,9 +778,10 @@ export const reverseIR = <
   A extends Prop,
   B extends Prop,
   Δ extends Formulas,
+  R extends IRResult<Γ, A, B, Δ>,
 >(
-  p: Premise<IR<Γ, A, B, Δ>['result']>,
-): IR<Γ, A, B, Δ> => {
+  p: Derivation<R>,
+): IR<Γ, A, B, Δ, R> => {
   const γ: Γ = p.result.antecedent
   const aib: Implication<A, B> = array.head(p.result.succedent)
   const a: A = aib.antecedent
@@ -731,31 +792,38 @@ export const reverseIR = <
 
 // Negation
 
+export type NLResult<
+  Γ extends Formulas,
+  A extends Prop,
+  Δ extends Formulas,
+> = Sequent<[...Γ, Negation<A>], Δ>
+export type AnyNLResult = NLResult<Formulas, Prop, Formulas>
+export const isNLResult: Refinement<AnySequent, AnyNLResult> =
+  refineActiveL(isNegation)
+export const isNLResultDerivation = refineDerivation(isNLResult)
 export type NL<
   Γ extends Formulas,
   A extends Prop,
   Δ extends Formulas,
-> = Transformation<
-  Sequent<[...Γ, Negation<A>], Δ>,
-  [Derivation<Sequent<Γ, [A, ...Δ]>>],
-  'nl'
->
-export type AnyNL = NL<Formulas, Prop, Formulas>
-export const nl = <Γ extends Formulas, A extends Prop, Δ extends Formulas>(
-  result: Sequent<[...Γ, Negation<A>], Δ>,
+  R extends NLResult<Γ, A, Δ>,
+> = Transformation<R, [Derivation<Sequent<Γ, [A, ...Δ]>>], 'nl'>
+export type AnyNL = NL<Formulas, Prop, Formulas, AnyNLResult>
+export const nl = <
+  Γ extends Formulas,
+  A extends Prop,
+  Δ extends Formulas,
+  R extends NLResult<Γ, A, Δ>,
+>(
+  result: R,
   deps: [Derivation<Sequent<Γ, [A, ...Δ]>>],
-): NL<Γ, A, Δ> => {
+): NL<Γ, A, Δ, R> => {
   return transformation(result, deps, 'nl')
 }
-export type AnyNLResult = AnyNL['result']
-export const isNLResult: Refinement<AnySequent, AnyNLResult> =
-  refineActiveL(isNegation)
-export const isNLResultPremise = refinePremise(isNLResult)
 export type ApplyNL<S extends AnyDerivation> =
   S extends Derivation<
     Sequent<infer Γ, [infer A extends Prop, ...infer Δ extends Formulas]>
   >
-    ? NL<Γ, A, Δ>
+    ? NL<Γ, A, Δ, NLResult<Γ, A, Δ>>
     : never
 export const applyNL = <Γ extends Formulas, A extends Prop, Δ extends Formulas>(
   s: Derivation<Sequent<Γ, [A, ...Δ]>>,
@@ -769,9 +837,10 @@ export const reverseNL = <
   Γ extends Formulas,
   A extends Prop,
   Δ extends Formulas,
+  R extends NLResult<Γ, A, Δ>,
 >(
-  p: Premise<NL<Γ, A, Δ>['result']>,
-): NL<Γ, A, Δ> => {
+  p: Derivation<R>,
+): NL<Γ, A, Δ, R> => {
   const γ: Γ = array.init(p.result.antecedent)
   const na: Negation<A> = array.last(p.result.antecedent)
   const a: A = na.negand
@@ -779,31 +848,38 @@ export const reverseNL = <
   return nl(p.result, [premise(sequent(γ, [a, ...δ]))])
 }
 
+export type NRResult<
+  Γ extends Formulas,
+  A extends Prop,
+  Δ extends Formulas,
+> = Sequent<Γ, [Negation<A>, ...Δ]>
+export type AnyNRResult = NRResult<Formulas, Prop, Formulas>
+export const isNRResult: Refinement<AnySequent, AnyNRResult> =
+  refineActiveR(isNegation)
+export const isNRResultDerivation = refineDerivation(isNRResult)
 export type NR<
   Γ extends Formulas,
   A extends Prop,
   Δ extends Formulas,
-> = Transformation<
-  Sequent<Γ, [Negation<A>, ...Δ]>,
-  [Derivation<Sequent<[...Γ, A], Δ>>],
-  'nr'
->
-export type AnyNR = NR<Formulas, Prop, Formulas>
-export const nr = <Γ extends Formulas, A extends Prop, Δ extends Formulas>(
-  result: Sequent<Γ, [Negation<A>, ...Δ]>,
+  R extends NRResult<Γ, A, Δ>,
+> = Transformation<R, [Derivation<Sequent<[...Γ, A], Δ>>], 'nr'>
+export type AnyNR = NR<Formulas, Prop, Formulas, AnyNRResult>
+export const nr = <
+  Γ extends Formulas,
+  A extends Prop,
+  Δ extends Formulas,
+  R extends NRResult<Γ, A, Δ>,
+>(
+  result: R,
   deps: [Derivation<Sequent<[...Γ, A], Δ>>],
-): NR<Γ, A, Δ> => {
+): NR<Γ, A, Δ, R> => {
   return transformation(result, deps, 'nr')
 }
-export type AnyNRResult = AnyNR['result']
-export const isNRResult: Refinement<AnySequent, AnyNRResult> =
-  refineActiveR(isNegation)
-export const isNRResultPremise = refinePremise(isNRResult)
 export type ApplyNR<S extends AnyDerivation> =
   S extends Derivation<
     Sequent<[...infer Γ extends Formulas, infer A extends Prop], infer Δ>
   >
-    ? NR<Γ, A, Δ>
+    ? NR<Γ, A, Δ, NRResult<Γ, A, Δ>>
     : never
 
 export const applyNR = <Γ extends Formulas, A extends Prop, Δ extends Formulas>(
@@ -818,9 +894,10 @@ export const reverseNR = <
   Γ extends Formulas,
   A extends Prop,
   Δ extends Formulas,
+  R extends NRResult<Γ, A, Δ>,
 >(
-  p: Premise<NR<Γ, A, Δ>['result']>,
-): NR<Γ, A, Δ> => {
+  p: Derivation<R>,
+): NR<Γ, A, Δ, R> => {
   const γ: Γ = p.result.antecedent
   const na: Negation<A> = array.head(p.result.succedent)
   const a: A = na.negand
@@ -830,27 +907,40 @@ export const reverseNR = <
 
 // Weakening
 
-export type SWL<
+export type SWLResult<
   Γ extends Formulas,
   A extends Prop,
   Δ extends Formulas,
-> = Transformation<Sequent<[...Γ, A], Δ>, [Derivation<Sequent<Γ, Δ>>], 'swl'>
-export type AnySWL = SWL<Formulas, Prop, Formulas>
-export const swl = <Γ extends Formulas, A extends Prop, Δ extends Formulas>(
-  result: Sequent<[...Γ, A], Δ>,
-  deps: [Derivation<Sequent<Γ, Δ>>],
-): SWL<Γ, A, Δ> => {
-  return transformation(result, deps, 'swl')
-}
-export type AnySWLResult = AnySWL['result']
+> = Sequent<[...Γ, A], Δ>
+export type AnySWLResult = SWLResult<Formulas, Prop, Formulas>
 export const isSWLResult: Refinement<AnySequent, AnySWLResult> = (
   s,
 ): s is AnySWLResult => {
   return s.antecedent.length > 0
 }
-export const isSWLResultPremise = refinePremise(isSWLResult)
+export const isSWLResultDerivation = refineDerivation(isSWLResult)
+export type SWL<
+  Γ extends Formulas,
+  A extends Prop,
+  Δ extends Formulas,
+  R extends SWLResult<Γ, A, Δ>,
+> = Transformation<R, [Derivation<Sequent<Γ, Δ>>], 'swl'>
+export type AnySWL = SWL<Formulas, Prop, Formulas, AnySWLResult>
+export const swl = <
+  Γ extends Formulas,
+  A extends Prop,
+  Δ extends Formulas,
+  R extends SWLResult<Γ, A, Δ>,
+>(
+  result: R,
+  deps: [Derivation<Sequent<Γ, Δ>>],
+): SWL<Γ, A, Δ, R> => {
+  return transformation(result, deps, 'swl')
+}
 export type ApplySWL<A extends Prop, S extends AnyDerivation> =
-  S extends Derivation<Sequent<infer Γ, infer Δ>> ? SWL<Γ, A, Δ> : never
+  S extends Derivation<Sequent<infer Γ, infer Δ>>
+    ? SWL<Γ, A, Δ, SWLResult<Γ, A, Δ>>
+    : never
 export const applySWL = <
   A extends Prop,
   Γ extends Formulas,
@@ -867,31 +957,50 @@ export const reverseSWL = <
   Γ extends Formulas,
   A extends Prop,
   Δ extends Formulas,
+  R extends SWLResult<Γ, A, Δ>,
 >(
-  p: Premise<SWL<Γ, A, Δ>['result']>,
-): SWL<Γ, A, Δ> => {
+  p: Derivation<R>,
+): SWL<Γ, A, Δ, R> => {
   const γ: Γ = array.init(p.result.antecedent)
   const δ: Δ = p.result.succedent
   return swl(p.result, [premise(sequent(γ, δ))])
 }
+const tryReverseSWL = <J extends AnySequent>(
+  d: Derivation<J>,
+): Derivation<J> | null => {
+  return isSWLResultDerivation(d) ? reverseSWL(d) : null
+}
 
+export type SWRResult<
+  Γ extends Formulas,
+  A extends Prop,
+  Δ extends Formulas,
+> = Sequent<Γ, [A, ...Δ]>
+export type AnySWRResult = SWRResult<Formulas, Prop, Formulas>
+export const isSWRResult: Refinement<AnySequent, AnySWRResult> = isActiveR
+export const isSWRResultDerivation = refineDerivation(isSWRResult)
 export type SWR<
   Γ extends Formulas,
   A extends Prop,
   Δ extends Formulas,
-> = Transformation<Sequent<Γ, [A, ...Δ]>, [Derivation<Sequent<Γ, Δ>>], 'swr'>
-export type AnySWR = SWR<Formulas, Prop, Formulas>
-export const swr = <Γ extends Formulas, A extends Prop, Δ extends Formulas>(
-  result: Sequent<Γ, [A, ...Δ]>,
+  R extends SWRResult<Γ, A, Δ>,
+> = Transformation<R, [Derivation<Sequent<Γ, Δ>>], 'swr'>
+export type AnySWR = SWR<Formulas, Prop, Formulas, AnySWRResult>
+export const swr = <
+  Γ extends Formulas,
+  A extends Prop,
+  Δ extends Formulas,
+  R extends SWRResult<Γ, A, Δ>,
+>(
+  result: R,
   deps: [Derivation<Sequent<Γ, Δ>>],
-): SWR<Γ, A, Δ> => {
+): SWR<Γ, A, Δ, R> => {
   return transformation(result, deps, 'swr')
 }
-export type AnySWRResult = AnySWR['result']
-export const isSWRResult: Refinement<AnySequent, AnySWRResult> = isActiveR
-export const isSWRResultPremise = refinePremise(isSWRResult)
 export type ApplySWR<A extends Prop, S extends AnyDerivation> =
-  S extends Derivation<Sequent<infer Γ, infer Δ>> ? SWR<Γ, A, Δ> : never
+  S extends Derivation<Sequent<infer Γ, infer Δ>>
+    ? SWR<Γ, A, Δ, SWRResult<Γ, A, Δ>>
+    : never
 export const applySWR = <
   A extends Prop,
   Γ extends Formulas,
@@ -908,9 +1017,10 @@ export const reverseSWR = <
   Γ extends Formulas,
   A extends Prop,
   Δ extends Formulas,
+  R extends SWRResult<Γ, A, Δ>,
 >(
-  p: Premise<SWR<Γ, A, Δ>['result']>,
-): SWR<Γ, A, Δ> => {
+  p: Derivation<R>,
+): SWR<Γ, A, Δ, R> => {
   const γ: Γ = p.result.antecedent
   const δ: Δ = array.tail(p.result.succedent)
   return swr(p.result, [premise(sequent(γ, δ))])
@@ -918,29 +1028,36 @@ export const reverseSWR = <
 
 // Contraction
 
-export type SCL<
+export type SCLResult<
   Γ extends Formulas,
   A extends Prop,
   Δ extends Formulas,
-> = Transformation<
-  Sequent<[...Γ, A], Δ>,
-  [Derivation<Sequent<[...Γ, A, A], Δ>>],
-  'scl'
->
-export type AnySCL = SCL<Formulas, Prop, Formulas>
-export const scl = <Γ extends Formulas, A extends Prop, Δ extends Formulas>(
-  result: Sequent<[...Γ, A], Δ>,
-  deps: [Derivation<Sequent<[...Γ, A, A], Δ>>],
-): SCL<Γ, A, Δ> => {
-  return transformation(result, deps, 'scl')
-}
-export type AnySCLResult = AnySCL['result']
+> = Sequent<[...Γ, A], Δ>
+export type AnySCLResult = SCLResult<Formulas, Prop, Formulas>
 export const isSCLResult: Refinement<AnySequent, AnySCLResult> = (
   s,
 ): s is AnySCLResult => {
   return s.antecedent.length > 0
 }
-export const isSCLResultPremise = refinePremise(isSCLResult)
+export const isSCLResultDerivation = refineDerivation(isSCLResult)
+export type SCL<
+  Γ extends Formulas,
+  A extends Prop,
+  Δ extends Formulas,
+  R extends SCLResult<Γ, A, Δ>,
+> = Transformation<R, [Derivation<Sequent<[...Γ, A, A], Δ>>], 'scl'>
+export type AnySCL = SCL<Formulas, Prop, Formulas, AnySCLResult>
+export const scl = <
+  Γ extends Formulas,
+  A extends Prop,
+  Δ extends Formulas,
+  R extends SCLResult<Γ, A, Δ>,
+>(
+  result: R,
+  deps: [Derivation<Sequent<[...Γ, A, A], Δ>>],
+): SCL<Γ, A, Δ, R> => {
+  return transformation(result, deps, 'scl')
+}
 export type ApplySCL<
   S extends Derivation<Sequent<[...Formulas, Prop, Prop], Formulas>>,
 > =
@@ -950,7 +1067,7 @@ export type ApplySCL<
       infer Δ
     >
   >
-    ? SCL<Γ, A, Δ>
+    ? SCL<Γ, A, Δ, SCLResult<Γ, A, Δ>>
     : never
 export const applySCL = <
   Γ extends Formulas,
@@ -968,34 +1085,42 @@ export const reverseSCL = <
   Γ extends Formulas,
   A extends Prop,
   Δ extends Formulas,
+  R extends SCLResult<Γ, A, Δ>,
 >(
-  p: Premise<SCL<Γ, A, Δ>['result']>,
-): SCL<Γ, A, Δ> => {
+  p: Derivation<R>,
+): SCL<Γ, A, Δ, R> => {
   const γ: Γ = array.init(p.result.antecedent)
   const a: A = array.last(p.result.antecedent)
   const δ: Δ = p.result.succedent
   return scl(p.result, [premise(sequent([...γ, a, a], δ))])
 }
 
+export type SCRResult<
+  Γ extends Formulas,
+  A extends Prop,
+  Δ extends Formulas,
+> = Sequent<Γ, [A, ...Δ]>
+export type AnySCRResult = SCRResult<Formulas, Prop, Formulas>
+export const isSCRResult: Refinement<AnySequent, AnySCRResult> = isActiveR
+export const isSCRResultDerivation = refineDerivation(isSCRResult)
 export type SCR<
   Γ extends Formulas,
   A extends Prop,
   Δ extends Formulas,
-> = Transformation<
-  Sequent<Γ, [A, ...Δ]>,
-  [Derivation<Sequent<Γ, [A, A, ...Δ]>>],
-  'scr'
->
-export type AnySCR = SCR<Formulas, Prop, Formulas>
-export const scr = <Γ extends Formulas, A extends Prop, Δ extends Formulas>(
-  result: Sequent<Γ, [A, ...Δ]>,
+  R extends SCRResult<Γ, A, Δ>,
+> = Transformation<R, [Derivation<Sequent<Γ, [A, A, ...Δ]>>], 'scr'>
+export type AnySCR = SCR<Formulas, Prop, Formulas, AnySCRResult>
+export const scr = <
+  Γ extends Formulas,
+  A extends Prop,
+  Δ extends Formulas,
+  R extends SCRResult<Γ, A, Δ>,
+>(
+  result: R,
   deps: [Derivation<Sequent<Γ, [A, A, ...Δ]>>],
-): SCR<Γ, A, Δ> => {
+): SCR<Γ, A, Δ, R> => {
   return transformation(result, deps, 'scr')
 }
-export type AnySCRResult = AnySCR['result']
-export const isSCRResult: Refinement<AnySequent, AnySCRResult> = isActiveR
-export const isSCRResultPremise = refinePremise(isSCRResult)
 export type ApplySCR<
   S extends Derivation<Sequent<Formulas, [Prop, Prop, ...Formulas]>>,
 > =
@@ -1005,7 +1130,7 @@ export type ApplySCR<
       [infer A extends Prop, infer A extends Prop, ...infer Δ extends Formulas]
     >
   >
-    ? SCR<Γ, A, Δ>
+    ? SCR<Γ, A, Δ, SCRResult<Γ, A, Δ>>
     : never
 export const applySCR = <
   Γ extends Formulas,
@@ -1023,9 +1148,10 @@ export const reverseSCR = <
   Γ extends Formulas,
   A extends Prop,
   Δ extends Formulas,
+  R extends SCRResult<Γ, A, Δ>,
 >(
-  p: Premise<SCR<Γ, A, Δ>['result']>,
-): SCR<Γ, A, Δ> => {
+  p: Derivation<R>,
+): SCR<Γ, A, Δ, R> => {
   const γ: Γ = p.result.antecedent
   const a: A = array.head(p.result.succedent)
   const δ: Δ = array.tail(p.result.succedent)
@@ -1034,34 +1160,41 @@ export const reverseSCR = <
 
 // Permutation
 
-export type SRotL<
+export type SRotLResult<
   Γ extends Formulas,
   A extends Prop,
   Δ extends Formulas,
-> = Transformation<
-  Sequent<[...Γ, A], Δ>,
-  [Derivation<Sequent<[A, ...Γ], Δ>>],
-  'srotl'
->
-export type AnySRotL = SRotL<Formulas, Prop, Formulas>
-export const srotl = <Γ extends Formulas, A extends Prop, Δ extends Formulas>(
-  result: Sequent<[...Γ, A], Δ>,
-  deps: [Derivation<Sequent<[A, ...Γ], Δ>>],
-): SRotL<Γ, A, Δ> => {
-  return transformation(result, deps, 'srotl')
-}
-export type AnySRotLResult = AnySRotL['result']
+> = Sequent<[...Γ, A], Δ>
+export type AnySRotLResult = SRotLResult<Formulas, Prop, Formulas>
 export const isSRotLResult: Refinement<AnySequent, AnySRotLResult> = (
   s,
 ): s is AnySRotLResult => {
   return s.antecedent.length > 0
 }
-export const isSRotLResultPremise = refinePremise(isSRotLResult)
+export const isSRotLResultDerivation = refineDerivation(isSRotLResult)
+export type SRotL<
+  Γ extends Formulas,
+  A extends Prop,
+  Δ extends Formulas,
+  R extends SRotLResult<Γ, A, Δ>,
+> = Transformation<R, [Derivation<Sequent<[A, ...Γ], Δ>>], 'srotl'>
+export type AnySRotL = SRotL<Formulas, Prop, Formulas, AnySRotLResult>
+export const srotl = <
+  Γ extends Formulas,
+  A extends Prop,
+  Δ extends Formulas,
+  R extends SRotLResult<Γ, A, Δ>,
+>(
+  result: R,
+  deps: [Derivation<Sequent<[A, ...Γ], Δ>>],
+): SRotL<Γ, A, Δ, R> => {
+  return transformation(result, deps, 'srotl')
+}
 export type ApplySRotL<S extends AnyDerivation> =
   S extends Derivation<
     Sequent<[infer A extends Prop, ...infer Γ extends Formulas], infer Δ>
   >
-    ? SRotL<Γ, A, Δ>
+    ? SRotL<Γ, A, Δ, SRotLResult<Γ, A, Δ>>
     : never
 export const applySRotL = <
   A extends Prop,
@@ -1079,43 +1212,51 @@ export const reverseSRotL = <
   Γ extends Formulas,
   A extends Prop,
   Δ extends Formulas,
+  R extends SRotLResult<Γ, A, Δ>,
 >(
-  p: Premise<SRotL<Γ, A, Δ>['result']>,
-): SRotL<Γ, A, Δ> => {
+  p: Derivation<R>,
+): SRotL<Γ, A, Δ, R> => {
   const γ: Γ = array.init(p.result.antecedent)
   const a: A = array.last(p.result.antecedent)
   const δ: Δ = p.result.succedent
   return srotl(p.result, [premise(sequent([a, ...γ], δ))])
 }
 
-export type SRotR<
+export type SRotRResult<
   Γ extends Formulas,
   A extends Prop,
   Δ extends Formulas,
-> = Transformation<
-  Sequent<Γ, [...Δ, A]>,
-  [Derivation<Sequent<Γ, [A, ...Δ]>>],
-  'srotr'
->
-export type AnySRotR = SRotR<Formulas, Prop, Formulas>
-export const srotr = <Γ extends Formulas, A extends Prop, Δ extends Formulas>(
-  result: Sequent<Γ, [...Δ, A]>,
-  deps: [Derivation<Sequent<Γ, [A, ...Δ]>>],
-): SRotR<Γ, A, Δ> => {
-  return transformation(result, deps, 'srotr')
-}
-export type AnySRotRResult = AnySRotR['result']
+> = Sequent<Γ, [...Δ, A]>
+export type AnySRotRResult = SRotRResult<Formulas, Prop, Formulas>
 export const isSRotRResult: Refinement<AnySequent, AnySRotRResult> = (
   s,
 ): s is AnySRotRResult => {
   return s.succedent.length > 0
 }
-export const isSRotRResultPremise = refinePremise(isSRotRResult)
+export const isSRotRResultDerivation = refineDerivation(isSRotRResult)
+export type SRotR<
+  Γ extends Formulas,
+  A extends Prop,
+  Δ extends Formulas,
+  R extends SRotRResult<Γ, A, Δ>,
+> = Transformation<R, [Derivation<Sequent<Γ, [A, ...Δ]>>], 'srotr'>
+export type AnySRotR = SRotR<Formulas, Prop, Formulas, AnySRotRResult>
+export const srotr = <
+  Γ extends Formulas,
+  A extends Prop,
+  Δ extends Formulas,
+  R extends SRotRResult<Γ, A, Δ>,
+>(
+  result: R,
+  deps: [Derivation<Sequent<Γ, [A, ...Δ]>>],
+): SRotR<Γ, A, Δ, R> => {
+  return transformation(result, deps, 'srotr')
+}
 export type ApplySRotR<S extends AnyDerivation> =
   S extends Derivation<
     Sequent<infer Γ, [infer A extends Prop, ...infer Δ extends Formulas]>
   >
-    ? SRotR<Γ, A, Δ>
+    ? SRotR<Γ, A, Δ, SRotRResult<Γ, A, Δ>>
     : never
 export const applySRotR = <
   Γ extends Formulas,
@@ -1133,9 +1274,10 @@ export const reverseSRotR = <
   Γ extends Formulas,
   A extends Prop,
   Δ extends Formulas,
+  R extends SRotRResult<Γ, A, Δ>,
 >(
-  p: Premise<SRotR<Γ, A, Δ>['result']>,
-): SRotR<Γ, A, Δ> => {
+  p: Derivation<R>,
+): SRotR<Γ, A, Δ, R> => {
   const γ: Γ = p.result.antecedent
   const δ: Δ = array.init(p.result.succedent)
   const a: A = array.last(p.result.succedent)
@@ -1170,7 +1312,7 @@ export const isSSwpLResult: Refinement<AnySequent, AnySSwpLResult> = (
 ): s is AnySSwpLResult => {
   return s.antecedent.length > 1
 }
-export const isSSwpLResultPremise = refinePremise(isSSwpLResult)
+export const isSSwpLResultDerivation = refineDerivation(isSSwpLResult)
 export type ApplySSwpL<
   S extends Derivation<Sequent<[...Formulas, Prop, Prop], Formulas>>,
 > =
@@ -1202,7 +1344,7 @@ export const reverseSSwpL = <
   B extends Prop,
   Δ extends Formulas,
 >(
-  p: Premise<SSwpL<Γ, A, B, Δ>['result']>,
+  p: Derivation<SSwpL<Γ, A, B, Δ>['result']>,
 ): SSwpL<Γ, A, B, Δ> => {
   const γ: Γ = array.init(array.init(p.result.antecedent))
   const b: B = array.last(p.result.antecedent)
@@ -1239,7 +1381,7 @@ export const isSSwpRResult: Refinement<AnySequent, AnySSwpRResult> = (
 ): s is AnySSwpRResult => {
   return s.succedent.length > 1
 }
-export const isSSwpRResultPremise = refinePremise(isSSwpRResult)
+export const isSSwpRResultDerivation = refineDerivation(isSSwpRResult)
 export type ApplySSwpR<
   S extends Derivation<Sequent<Formulas, [Prop, Prop, ...Formulas]>>,
 > =
@@ -1271,7 +1413,7 @@ export const reverseSSwpR = <
   B extends Prop,
   Δ extends Formulas,
 >(
-  p: Premise<SSwpR<Γ, A, B, Δ>['result']>,
+  p: Derivation<SSwpR<Γ, A, B, Δ>['result']>,
 ): SSwpR<Γ, A, B, Δ> => {
   const γ: Γ = p.result.antecedent
   const b: B = array.head(array.tail(p.result.succedent))
@@ -1448,22 +1590,26 @@ export const lk = {
   z: zeta,
 }
 
-
-const goal = premise(conclusion(
-  lk.o.p2.implication(
+const goal = premise(
+  conclusion(
     lk.o.p2.implication(
-      lk.a('p'),
-      lk.o.p2.implication(lk.a('q'), lk.o.p1.negation(lk.a('p'))),
+      lk.o.p2.implication(
+        lk.a('p'),
+        lk.o.p2.implication(lk.a('q'), lk.o.p1.negation(lk.a('p'))),
+      ),
+      lk.o.p2.implication(lk.a('p'), lk.a('p')),
     ),
-    lk.o.p2.implication(lk.a('p'), lk.a('p')),
   ),
-))
+)
 
-const step1  = reverseIR(goal)
-// @ts-expect-error
-const step2 = reverseSWL(step1)
-// @ts-expect-error
-const step3 = reverseIR(step2)
-// @ts-expect-error
-const step4 = reverseI(step3)
-console.log(isProof(step4))
+const step1 = reverseIR(goal)
+const step2 = editBranch(step1, [0], tryReverseSWL)
+/*
+const step3 =
+  step2?.kind === 'transformation' ? editBranch(step2, [0, 0], reverseIR) : null
+const step4 =
+  step3?.kind === 'transformation'
+    ? editBranch(step3, [0, 0, 0], reverseI)
+    : null
+console.log(step4?.kind === 'transformation' ? isProof(step4) : false)
+*/
