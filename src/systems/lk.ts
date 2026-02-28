@@ -102,14 +102,21 @@ export const isIResult: Refinement<AnySequent, AnyIResult> = (
   )
 }
 export const isIResultDerivation = refineDerivation(isIResult)
-export type I<A extends Prop> = Introduction<IResult<A>, 'I'>
-export type AnyI = I<Prop>
-export const i = <A extends Prop>(result: IResult<A>): I<A> =>
+export type I<A extends Prop, R extends IResult<A>> = Introduction<R, 'I'>
+export type AnyI = I<Prop, AnyIResult>
+export const i = <A extends Prop, R extends IResult<A>>(result: R): I<A, R> =>
   introduction(result, 'I')
-export type ApplyI<A extends Prop> = I<A>
+export type ApplyI<A extends Prop> = I<A, IResult<A>>
 export const applyI = <A extends Prop>(a: A): ApplyI<A> => i(sequent([a], [a]))
-export const reverseI = <A extends Prop>(p: Derivation<IResult<A>>): I<A> => {
+export const reverseI = <A extends Prop, R extends IResult<A>>(
+  p: Derivation<R>,
+): I<A, R> => {
   return i(p.result)
+}
+export const tryReverseI = <J extends AnySequent>(
+  d: Derivation<J>,
+): Derivation<J> | null => {
+  return isIResultDerivation(d) ? reverseI(d) : null
 }
 
 // Cut
@@ -188,6 +195,12 @@ export const reverseCut = <
     premise(sequent([a, ...γ], δ)),
   ])
 }
+export const tryReverseCut = <J extends AnySequent, A extends Prop>(
+  d: Derivation<J>,
+  a: A,
+): Derivation<J> | null => {
+  return isCutResultDerivation(d) ? reverseCut(d, a) : null
+}
 
 // Conjunction & Disjunction
 
@@ -255,6 +268,11 @@ export const reverseCL1 = <
   const a: A = acb.leftConjunct
   const δ: Δ = p.result.succedent
   return cl1(p.result, [premise(sequent([...γ, a], δ))])
+}
+export const tryReverseCL1 = <J extends AnySequent>(
+  d: Derivation<J>,
+): Derivation<J> | null => {
+  return isCL1ResultDerivation(d) ? reverseCL1(d) : null
 }
 
 export type DR1Result<
@@ -325,6 +343,11 @@ export const reverseDR1 = <
   const δ: Δ = array.tail(p.result.succedent)
   return dr1(p.result, [premise(sequent(γ, [a, ...δ]))])
 }
+export const tryReverseDR1 = <J extends AnySequent>(
+  d: Derivation<J>,
+): Derivation<J> | null => {
+  return isDR1ResultDerivation(d) ? reverseDR1(d) : null
+}
 
 export type CL2Result<
   Γ extends Formulas,
@@ -390,6 +413,11 @@ export const reverseCL2 = <
   const b: B = acb.rightConjunct
   const δ: Δ = p.result.succedent
   return cl2(p.result, [premise(sequent([...γ, b], δ))])
+}
+export const tryReverseCL2 = <J extends AnySequent>(
+  d: Derivation<J>,
+): Derivation<J> | null => {
+  return isCL2ResultDerivation(d) ? reverseCL2(d) : null
 }
 
 export type DR2Result<
@@ -459,6 +487,11 @@ export const reverseDR2 = <
   const b: B = adb.rightDisjunct
   const δ: Δ = array.tail(p.result.succedent)
   return dr2(p.result, [premise(sequent(γ, [b, ...δ]))])
+}
+export const tryReverseDR2 = <J extends AnySequent>(
+  d: Derivation<J>,
+): Derivation<J> | null => {
+  return isDR2ResultDerivation(d) ? reverseDR2(d) : null
 }
 
 export type DLResult<
@@ -545,6 +578,11 @@ export const reverseDL = <
     premise(sequent([...γ, b], δ)),
   ])
 }
+export const tryReverseDL = <J extends AnySequent>(
+  d: Derivation<J>,
+): Derivation<J> | null => {
+  return isDLResultDerivation(d) ? reverseDL(d) : null
+}
 
 export type CRResult<
   Γ extends Formulas,
@@ -629,6 +667,11 @@ export const reverseCR = <
     premise(sequent(γ, [a, ...δ])),
     premise(sequent(γ, [b, ...δ])),
   ])
+}
+export const tryReverseCR = <J extends AnySequent>(
+  d: Derivation<J>,
+): Derivation<J> | null => {
+  return isCRResultDerivation(d) ? reverseCR(d) : null
 }
 
 // Implication
@@ -717,6 +760,11 @@ export const reverseIL = <
     premise(sequent([...γ, b], δ)),
   ])
 }
+export const tryReverseIL = <J extends AnySequent>(
+  d: Derivation<J>,
+): Derivation<J> | null => {
+  return isILResultDerivation(d) ? reverseIL(d) : null
+}
 
 export type IRResult<
   Γ extends Formulas,
@@ -787,6 +835,11 @@ export const reverseIR = <
   const δ: Δ = array.tail(p.result.succedent)
   return ir(p.result, [premise(sequent([...γ, a], [b, ...δ]))])
 }
+export const tryReverseIR = <J extends AnySequent>(
+  d: Derivation<J>,
+): Derivation<J> | null => {
+  return isIRResultDerivation(d) ? reverseIR(d) : null
+}
 
 // Negation
 
@@ -845,6 +898,11 @@ export const reverseNL = <
   const δ: Δ = p.result.succedent
   return nl(p.result, [premise(sequent(γ, [a, ...δ]))])
 }
+export const tryReverseNL = <J extends AnySequent>(
+  d: Derivation<J>,
+): Derivation<J> | null => {
+  return isNLResultDerivation(d) ? reverseNL(d) : null
+}
 
 export type NRResult<
   Γ extends Formulas,
@@ -901,6 +959,11 @@ export const reverseNR = <
   const a: A = na.negand
   const δ: Δ = array.tail(p.result.succedent)
   return nr(p.result, [premise(sequent([...γ, a], δ))])
+}
+export const tryReverseNR = <J extends AnySequent>(
+  d: Derivation<J>,
+): Derivation<J> | null => {
+  return isNRResultDerivation(d) ? reverseNR(d) : null
 }
 
 // Weakening
@@ -963,7 +1026,7 @@ export const reverseSWL = <
   const δ: Δ = p.result.succedent
   return swl(p.result, [premise(sequent(γ, δ))])
 }
-const tryReverseSWL = <J extends AnySequent>(
+export const tryReverseSWL = <J extends AnySequent>(
   d: Derivation<J>,
 ): Derivation<J> | null => {
   return isSWLResultDerivation(d) ? reverseSWL(d) : null
@@ -1022,6 +1085,11 @@ export const reverseSWR = <
   const γ: Γ = p.result.antecedent
   const δ: Δ = array.tail(p.result.succedent)
   return swr(p.result, [premise(sequent(γ, δ))])
+}
+export const tryReverseSWR = <J extends AnySequent>(
+  d: Derivation<J>,
+): Derivation<J> | null => {
+  return isSWRResultDerivation(d) ? reverseSWR(d) : null
 }
 
 // Contraction
@@ -1092,6 +1160,11 @@ export const reverseSCL = <
   const δ: Δ = p.result.succedent
   return scl(p.result, [premise(sequent([...γ, a, a], δ))])
 }
+export const tryReverseSCL = <J extends AnySequent>(
+  d: Derivation<J>,
+): Derivation<J> | null => {
+  return isSCLResultDerivation(d) ? reverseSCL(d) : null
+}
 
 export type SCRResult<
   Γ extends Formulas,
@@ -1154,6 +1227,11 @@ export const reverseSCR = <
   const a: A = array.head(p.result.succedent)
   const δ: Δ = array.tail(p.result.succedent)
   return scr(p.result, [premise(sequent(γ, [a, a, ...δ]))])
+}
+export const tryReverseSCR = <J extends AnySequent>(
+  d: Derivation<J>,
+): Derivation<J> | null => {
+  return isSCRResultDerivation(d) ? reverseSCR(d) : null
 }
 
 // Permutation
@@ -1219,6 +1297,11 @@ export const reverseSRotL = <
   const δ: Δ = p.result.succedent
   return srotl(p.result, [premise(sequent([a, ...γ], δ))])
 }
+export const tryReverseSRotL = <J extends AnySequent>(
+  d: Derivation<J>,
+): Derivation<J> | null => {
+  return isSRotLResultDerivation(d) ? reverseSRotL(d) : null
+}
 
 export type SRotRResult<
   Γ extends Formulas,
@@ -1280,6 +1363,11 @@ export const reverseSRotR = <
   const δ: Δ = array.init(p.result.succedent)
   const a: A = array.last(p.result.succedent)
   return srotr(p.result, [premise(sequent(γ, [a, ...δ]))])
+}
+export const tryReverseSRotR = <J extends AnySequent>(
+  d: Derivation<J>,
+): Derivation<J> | null => {
+  return isSRotRResultDerivation(d) ? reverseSRotR(d) : null
 }
 
 export type SSwpLResult<
@@ -1355,6 +1443,11 @@ export const reverseSSwpL = <
   const δ: Δ = p.result.succedent
   return sswpl(p.result, [premise(sequent([...γ, a, b], δ))])
 }
+export const tryReverseSSwpL = <J extends AnySequent>(
+  d: Derivation<J>,
+): Derivation<J> | null => {
+  return isSSwpLResultDerivation(d) ? reverseSSwpL(d) : null
+}
 
 export type SSwpRResult<
   Γ extends Formulas,
@@ -1428,6 +1521,11 @@ export const reverseSSwpR = <
   const b: B = array.head(p.result.succedent)
   const δ: Δ = array.tail(array.tail(p.result.succedent))
   return sswpr(p.result, [premise(sequent(γ, [a, b, ...δ]))])
+}
+export const tryReverseSSwpR = <J extends AnySequent>(
+  d: Derivation<J>,
+): Derivation<J> | null => {
+  return isSSwpRResultDerivation(d) ? reverseSSwpR(d) : null
 }
 
 // Language
