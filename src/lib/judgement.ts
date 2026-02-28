@@ -1,7 +1,6 @@
 import type { Prop } from './prop'
 import * as prop from '../lib/prop'
-import { isNonEmptyArray, last, zip } from './array'
-import { Refinement } from './generic'
+import { zip } from './array'
 
 export type Formulas = Array<Prop>
 export const equalFormulas = (aa: Formulas, ab: Formulas): boolean => {
