@@ -1460,7 +1460,10 @@ const goal = premise(conclusion(
 ))
 
 const step1  = reverseIR(goal)
+// @ts-expect-error
 const step2 = reverseSWL(step1)
+// @ts-expect-error
 const step3 = reverseIR(step2)
+// @ts-expect-error
 const step4 = reverseI(step3)
 console.log(isProof(step4))
