@@ -1,6 +1,5 @@
 import * as prop from '../lib/prop'
 import * as array from '../lib/array'
-import * as utils from '../lib/utils'
 import * as print from '../lib/print'
 import {
   Formulas,
@@ -17,17 +16,20 @@ import {
   Transformation,
   premise,
   Premise,
-  Refinement,
   refinePremise,
 } from '../lib/derivation'
+import { Refinement } from '../lib/generic'
 
 // Connectives
 
 export interface Atom<V extends string> extends prop.Atom<V> {}
 export const atom = prop.atom
+export const isAtom = (p: Prop): p is Atom<string> => p.kind === 'atom'
 
 export interface Negation<N extends Prop> extends prop.Negation<N> {}
 export const negation = <N extends Prop>(n: N): Negation<N> => prop.negation(n)
+export const isNegation = (p: Prop): p is Negation<Prop> =>
+  p.kind === 'negation'
 
 export interface Implication<A extends Prop, C extends Prop>
   extends prop.Implication<A, C> {}
@@ -35,6 +37,8 @@ export const implication = <A extends Prop, C extends Prop>(
   a: A,
   c: C,
 ): Implication<A, C> => prop.implication(a, c)
+export const isImplication = (p: Prop): p is Implication<Prop, Prop> =>
+  p.kind === 'implication'
 
 export interface Conjunction<L extends Prop, R extends Prop>
   extends prop.Conjunction<L, R> {}
@@ -42,6 +46,8 @@ export const conjunction = <L extends Prop, R extends Prop>(
   l: L,
   r: R,
 ): Conjunction<L, R> => prop.conjunction(l, r)
+export const isConjunction = (p: Prop): p is Conjunction<Prop, Prop> =>
+  p.kind === 'conjunction'
 
 export interface Disjunction<L extends Prop, R extends Prop>
   extends prop.Disjunction<L, R> {}
@@ -49,6 +55,8 @@ export const disjunction = <L extends Prop, R extends Prop>(
   l: L,
   r: R,
 ): Disjunction<L, R> => prop.disjunction(l, r)
+export const isDisjunction = (p: Prop): p is Disjunction<Prop, Prop> =>
+  p.kind === 'disjunction'
 
 export type Prop =
   | Atom<string>
@@ -56,6 +64,28 @@ export type Prop =
   | Implication<Prop, Prop>
   | Conjunction<Prop, Prop>
   | Disjunction<Prop, Prop>
+
+// TODO: generalize the following for use with LA3
+
+export type ActiveL<B extends Prop> = Sequent<[...Formulas, B], Formulas>
+export const isActiveL = (j: AnySequent): j is ActiveL<Prop> => {
+  return array.isNonEmptyArray(j.antecedent)
+}
+export const refineActiveL =
+  <B extends Prop>(r: Refinement<Prop, B>) =>
+  (j: AnySequent): j is ActiveL<B> => {
+    return isActiveL(j) && r(array.last(j.antecedent))
+  }
+
+export type ActiveR<B extends Prop> = Sequent<Formulas, [B, ...Formulas]>
+export const isActiveR = (j: AnySequent): j is ActiveR<Prop> => {
+  return array.isNonEmptyArray(j.succedent)
+}
+export const refineActiveR =
+  <B extends Prop>(r: Refinement<Prop, B>) =>
+  (j: AnySequent): j is ActiveR<B> => {
+    return isActiveR(j) && r(array.head(j.succedent))
+  }
 
 // Axiom
 
@@ -175,11 +205,8 @@ export const cl1 = <
 }
 
 export type AnyCL1Result = AnyCL1['result']
-export const isCL1Result: Refinement<AnySequent, AnyCL1Result> = (
-  s,
-): s is AnyCL1Result => {
-  return s.antecedent.at(-1)?.kind === 'conjunction'
-}
+export const isCL1Result: Refinement<AnySequent, AnyCL1Result> =
+  refineActiveL(isConjunction)
 export const isCL1ResultPremise = refinePremise(isCL1Result)
 export type ApplyCL1<B extends Prop, S extends AnyDerivation> =
   S extends Derivation<
@@ -303,11 +330,8 @@ export const cl2 = <
   return transformation(result, deps, 'cl2')
 }
 export type AnyCL2Result = AnyCL2['result']
-export const isCL2Result: Refinement<AnySequent, AnyCL2Result> = (
-  s,
-): s is AnyCL2Result => {
-  return s.antecedent.at(-1)?.kind === 'conjunction'
-}
+export const isCL2Result: Refinement<AnySequent, AnyCL2Result> =
+  refineActiveL(isConjunction)
 export const isCL2ResultPremise = refinePremise(isCL2Result)
 export type ApplyCL2<A extends Prop, S extends AnyDerivation> =
   S extends Derivation<
@@ -431,11 +455,8 @@ export const dl = <
   return transformation(result, deps, 'dl')
 }
 export type AnyDLResult = AnyDL['result']
-export const isDLResult: Refinement<AnySequent, AnyDLResult> = (
-  s,
-): s is AnyDLResult => {
-  return s.antecedent.at(-1)?.kind === 'disjunction'
-}
+export const isDLResult: Refinement<AnySequent, AnyDLResult> =
+  refineActiveL(isDisjunction)
 export const isDLResultPremise = refinePremise(isDLResult)
 export type ApplyDL<S1 extends AnyDerivation, S2 extends AnyDerivation> = [
   S1,
@@ -510,11 +531,8 @@ export const cr = <
   return transformation(result, deps, 'cr')
 }
 export type AnyCRResult = AnyCR['result']
-export const isCRResult: Refinement<AnySequent, AnyCRResult> = (
-  s,
-): s is AnyCRResult => {
-  return s.succedent.at(0)?.kind === 'conjunction'
-}
+export const isCRResult: Refinement<AnySequent, AnyCRResult> =
+  refineActiveR(isConjunction)
 export const isCRResultPremise = refinePremise(isCRResult)
 export type ApplyCR<S1 extends AnyDerivation, S2 extends AnyDerivation> = [
   S1,
@@ -591,11 +609,8 @@ export const il = <
   return transformation(result, deps, 'il')
 }
 export type AnyILResult = AnyIL['result']
-export const isILResult: Refinement<AnySequent, AnyILResult> = (
-  s,
-): s is AnyILResult => {
-  return s.antecedent.at(-1)?.kind === 'implication'
-}
+export const isILResult: Refinement<AnySequent, AnyILResult> =
+  refineActiveL(isImplication)
 export const isILResultPremise = refinePremise(isILResult)
 export type ApplyIL<S1 extends AnyDerivation, S2 extends AnyDerivation> = [
   S1,
@@ -670,11 +685,8 @@ export const ir = <
   return transformation(result, deps, 'ir')
 }
 export type AnyIRResult = AnyIR['result']
-export const isIRResult: Refinement<AnySequent, AnyIRResult> = (
-  s,
-): s is AnyIRResult => {
-  return s.succedent.at(0)?.kind === 'implication'
-}
+export const isIRResult: Refinement<AnySequent, AnyIRResult> =
+  refineActiveR(isImplication)
 export const isIRResultPremise = refinePremise(isIRResult)
 export type ApplyIR<S extends AnyDerivation> =
   S extends Derivation<
@@ -734,11 +746,8 @@ export const nl = <Γ extends Formulas, A extends Prop, Δ extends Formulas>(
   return transformation(result, deps, 'nl')
 }
 export type AnyNLResult = AnyNL['result']
-export const isNLResult: Refinement<AnySequent, AnyNLResult> = (
-  s,
-): s is AnyNLResult => {
-  return s.antecedent.at(-1)?.kind === 'negation'
-}
+export const isNLResult: Refinement<AnySequent, AnyNLResult> =
+  refineActiveL(isNegation)
 export const isNLResultPremise = refinePremise(isNLResult)
 export type ApplyNL<S extends AnyDerivation> =
   S extends Derivation<
@@ -785,11 +794,8 @@ export const nr = <Γ extends Formulas, A extends Prop, Δ extends Formulas>(
   return transformation(result, deps, 'nr')
 }
 export type AnyNRResult = AnyNR['result']
-export const isNRResult: Refinement<AnySequent, AnyNRResult> = (
-  s,
-): s is AnyNRResult => {
-  return s.succedent.at(0)?.kind === 'negation'
-}
+export const isNRResult: Refinement<AnySequent, AnyNRResult> =
+  refineActiveR(isNegation)
 export const isNRResultPremise = refinePremise(isNRResult)
 export type ApplyNR<S extends AnyDerivation> =
   S extends Derivation<
@@ -880,11 +886,7 @@ export const swr = <Γ extends Formulas, A extends Prop, Δ extends Formulas>(
   return transformation(result, deps, 'swr')
 }
 export type AnySWRResult = AnySWR['result']
-export const isSWRResult: Refinement<AnySequent, AnySWRResult> = (
-  s,
-): s is AnySWRResult => {
-  return s.succedent.length > 0
-}
+export const isSWRResult: Refinement<AnySequent, AnySWRResult> = isActiveR
 export const isSWRResultPremise = refinePremise(isSWRResult)
 export type ApplySWR<A extends Prop, S extends AnyDerivation> =
   S extends Derivation<Sequent<infer Γ, infer Δ>> ? SWR<Γ, A, Δ> : never
@@ -990,11 +992,7 @@ export const scr = <Γ extends Formulas, A extends Prop, Δ extends Formulas>(
   return transformation(result, deps, 'scr')
 }
 export type AnySCRResult = AnySCR['result']
-export const isSCRResult: Refinement<AnySequent, AnySCRResult> = (
-  s,
-): s is AnySCRResult => {
-  return s.succedent.length > 0
-}
+export const isSCRResult: Refinement<AnySequent, AnySCRResult> = isActiveR
 export const isSCRResultPremise = refinePremise(isSCRResult)
 export type ApplySCR<
   S extends Derivation<Sequent<Formulas, [Prop, Prop, ...Formulas]>>,

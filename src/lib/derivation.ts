@@ -1,7 +1,6 @@
 import { isNonEmptyArray, NonEmptyArray, replaceItem, zip } from './array'
 import { AnyJudgement, equals } from './judgement'
-
-export type Refinement<A, B extends A> = (a: A) => a is B
+import { Refinement } from './generic'
 
 export type Rule = string
 
