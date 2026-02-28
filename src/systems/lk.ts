@@ -1058,15 +1058,12 @@ export const isSRotLResult: Refinement<AnySequent, AnySRotLResult> = (
   return s.antecedent.length > 0
 }
 export const isSRotLResultPremise = refinePremise(isSRotLResult)
-export type ApplySRotL<S extends AnyDerivation> = Transformation<
+export type ApplySRotL<S extends AnyDerivation> = 
   S extends Derivation<
     Sequent<[infer A extends Prop, ...infer Γ extends Formulas], infer Δ>
   >
-    ? Sequent<[...Γ, A], Δ>
-    : never,
-  [S],
-  'srotl'
->
+    ? SRotL<Γ, A, Δ>
+    : never
 export const applySRotL = <
   A extends Prop,
   Γ extends Formulas,
