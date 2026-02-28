@@ -956,9 +956,7 @@ export const applySCL = <
   s: Derivation<Sequent<[...Γ, A, A], Δ>>,
 ): ApplySCL<Derivation<Sequent<[...Γ, A, A], Δ>>> => {
   const γ: Γ = array.init(array.init(s.result.antecedent))
-  const a1: A = array.last(s.result.antecedent)
-  const a2: A = array.last(array.init(s.result.antecedent))
-  const a: A = utils.assertEqual(a1, a2)
+  const a: A = array.last(s.result.antecedent)
   const δ: Δ = s.result.succedent
   return scl(sequent([...γ, a], δ), [s])
 }
@@ -1017,9 +1015,7 @@ export const applySCR = <
   s: Derivation<Sequent<Γ, [A, A, ...Δ]>>,
 ): ApplySCR<Derivation<Sequent<Γ, [A, A, ...Δ]>>> => {
   const γ: Γ = s.result.antecedent
-  const a1: A = array.head(s.result.succedent)
-  const a2: A = array.head(array.tail(s.result.succedent))
-  const a: A = utils.assertEqual(a1, a2)
+  const a: A = array.head(s.result.succedent)
   const δ: Δ = array.tail(array.tail(s.result.succedent))
   return scr(sequent(γ, [a, ...δ]), [s])
 }
