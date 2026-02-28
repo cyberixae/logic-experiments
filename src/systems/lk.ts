@@ -108,9 +108,7 @@ export const i = <A extends Prop>(result: IResult<A>): I<A> =>
   introduction(result, 'I')
 export type ApplyI<A extends Prop> = I<A>
 export const applyI = <A extends Prop>(a: A): ApplyI<A> => i(sequent([a], [a]))
-export const reverseI = <A extends Prop>(
-  p: Derivation<I<A>['result']>,
-): I<A> => {
+export const reverseI = <A extends Prop>(p: Derivation<IResult<A>>): I<A> => {
   return i(p.result)
 }
 
@@ -1284,35 +1282,39 @@ export const reverseSRotR = <
   return srotr(p.result, [premise(sequent(γ, [a, ...δ]))])
 }
 
-export type SSwpL<
+export type SSwpLResult<
   Γ extends Formulas,
   B extends Prop,
   A extends Prop,
   Δ extends Formulas,
-> = Transformation<
-  Sequent<[...Γ, B, A], Δ>,
-  [Derivation<Sequent<[...Γ, A, B], Δ>>],
-  'sswpl'
->
-export type AnySSwpL = SSwpL<Formulas, Prop, Prop, Formulas>
-export const sswpl = <
-  Γ extends Formulas,
-  A extends Prop,
-  B extends Prop,
-  Δ extends Formulas,
->(
-  result: Sequent<[...Γ, B, A], Δ>,
-  deps: [Derivation<Sequent<[...Γ, A, B], Δ>>],
-): SSwpL<Γ, B, A, Δ> => {
-  return transformation(result, deps, 'sswpl')
-}
-export type AnySSwpLResult = AnySSwpL['result']
+> = Sequent<[...Γ, B, A], Δ>
+export type AnySSwpLResult = SSwpLResult<Formulas, Prop, Prop, Formulas>
 export const isSSwpLResult: Refinement<AnySequent, AnySSwpLResult> = (
   s,
 ): s is AnySSwpLResult => {
   return s.antecedent.length > 1
 }
 export const isSSwpLResultDerivation = refineDerivation(isSSwpLResult)
+export type SSwpL<
+  Γ extends Formulas,
+  B extends Prop,
+  A extends Prop,
+  Δ extends Formulas,
+  R extends SSwpLResult<Γ, B, A, Δ>,
+> = Transformation<R, [Derivation<Sequent<[...Γ, A, B], Δ>>], 'sswpl'>
+export type AnySSwpL = SSwpL<Formulas, Prop, Prop, Formulas, AnySSwpLResult>
+export const sswpl = <
+  Γ extends Formulas,
+  A extends Prop,
+  B extends Prop,
+  Δ extends Formulas,
+  R extends SSwpLResult<Γ, B, A, Δ>,
+>(
+  result: R,
+  deps: [Derivation<Sequent<[...Γ, A, B], Δ>>],
+): SSwpL<Γ, B, A, Δ, R> => {
+  return transformation(result, deps, 'sswpl')
+}
 export type ApplySSwpL<
   S extends Derivation<Sequent<[...Formulas, Prop, Prop], Formulas>>,
 > =
@@ -1322,7 +1324,7 @@ export type ApplySSwpL<
       infer Δ
     >
   >
-    ? SSwpL<Γ, B, A, Δ>
+    ? SSwpL<Γ, B, A, Δ, SSwpLResult<Γ, B, A, Δ>>
     : never
 export const applySSwpL = <
   Γ extends Formulas,
@@ -1340,48 +1342,53 @@ export const applySSwpL = <
 }
 export const reverseSSwpL = <
   Γ extends Formulas,
-  A extends Prop,
   B extends Prop,
+  A extends Prop,
   Δ extends Formulas,
+  R extends SSwpLResult<Γ, B, A, Δ>,
 >(
-  p: Derivation<SSwpL<Γ, A, B, Δ>['result']>,
-): SSwpL<Γ, A, B, Δ> => {
+  p: Derivation<R>,
+): SSwpL<Γ, B, A, Δ, R> => {
   const γ: Γ = array.init(array.init(p.result.antecedent))
-  const b: B = array.last(p.result.antecedent)
-  const a: A = array.last(array.init(p.result.antecedent))
+  const a: A = array.last(p.result.antecedent)
+  const b: B = array.last(array.init(p.result.antecedent))
   const δ: Δ = p.result.succedent
-  return sswpl(p.result, [premise(sequent([...γ, b, a], δ))])
+  return sswpl(p.result, [premise(sequent([...γ, a, b], δ))])
 }
 
-export type SSwpR<
+export type SSwpRResult<
   Γ extends Formulas,
   B extends Prop,
   A extends Prop,
   Δ extends Formulas,
-> = Transformation<
-  Sequent<Γ, [B, A, ...Δ]>,
-  [Derivation<Sequent<Γ, [A, B, ...Δ]>>],
-  'sswpr'
->
-export type AnySSwpR = SSwpR<Formulas, Prop, Prop, Formulas>
-export const sswpr = <
-  Γ extends Formulas,
-  A extends Prop,
-  B extends Prop,
-  Δ extends Formulas,
->(
-  result: Sequent<Γ, [B, A, ...Δ]>,
-  deps: [Derivation<Sequent<Γ, [A, B, ...Δ]>>],
-): SSwpR<Γ, B, A, Δ> => {
-  return transformation(result, deps, 'sswpr')
-}
-export type AnySSwpRResult = AnySSwpR['result']
+> = Sequent<Γ, [B, A, ...Δ]>
+export type AnySSwpRResult = SSwpRResult<Formulas, Prop, Prop, Formulas>
 export const isSSwpRResult: Refinement<AnySequent, AnySSwpRResult> = (
   s,
 ): s is AnySSwpRResult => {
   return s.succedent.length > 1
 }
 export const isSSwpRResultDerivation = refineDerivation(isSSwpRResult)
+export type SSwpR<
+  Γ extends Formulas,
+  B extends Prop,
+  A extends Prop,
+  Δ extends Formulas,
+  R extends SSwpRResult<Γ, B, A, Δ>,
+> = Transformation<R, [Derivation<Sequent<Γ, [A, B, ...Δ]>>], 'sswpr'>
+export type AnySSwpR = SSwpR<Formulas, Prop, Prop, Formulas, AnySSwpRResult>
+export const sswpr = <
+  Γ extends Formulas,
+  A extends Prop,
+  B extends Prop,
+  Δ extends Formulas,
+  R extends SSwpRResult<Γ, B, A, Δ>,
+>(
+  result: R,
+  deps: [Derivation<Sequent<Γ, [A, B, ...Δ]>>],
+): SSwpR<Γ, B, A, Δ, R> => {
+  return transformation(result, deps, 'sswpr')
+}
 export type ApplySSwpR<
   S extends Derivation<Sequent<Formulas, [Prop, Prop, ...Formulas]>>,
 > =
@@ -1391,7 +1398,7 @@ export type ApplySSwpR<
       [infer A extends Prop, infer B extends Prop, ...infer Δ extends Formulas]
     >
   >
-    ? SSwpR<Γ, B, A, Δ>
+    ? SSwpR<Γ, B, A, Δ, SSwpRResult<Γ, B, A, Δ>>
     : never
 export const applySSwpR = <
   Γ extends Formulas,
@@ -1409,17 +1416,18 @@ export const applySSwpR = <
 }
 export const reverseSSwpR = <
   Γ extends Formulas,
-  A extends Prop,
   B extends Prop,
+  A extends Prop,
   Δ extends Formulas,
+  R extends SSwpRResult<Γ, B, A, Δ>,
 >(
-  p: Derivation<SSwpR<Γ, A, B, Δ>['result']>,
-): SSwpR<Γ, A, B, Δ> => {
+  p: Derivation<R>,
+): SSwpR<Γ, B, A, Δ, R> => {
   const γ: Γ = p.result.antecedent
-  const b: B = array.head(array.tail(p.result.succedent))
-  const a: A = array.head(p.result.succedent)
+  const a: A = array.head(array.tail(p.result.succedent))
+  const b: B = array.head(p.result.succedent)
   const δ: Δ = array.tail(array.tail(p.result.succedent))
-  return sswpr(p.result, [premise(sequent(γ, [b, a, ...δ]))])
+  return sswpr(p.result, [premise(sequent(γ, [a, b, ...δ]))])
 }
 
 // Language
