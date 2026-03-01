@@ -441,20 +441,17 @@ const goal = premise(
     ),
   ),
 )
-const step1 = reverseMP(goal,
+const step1 = reverseMP(
+  goal,
+  la3.o.p2.implication(
+    la3.a('p'),
     la3.o.p2.implication(
+      la3.o.p2.implication(la3.a('p'), la3.o.p1.negation(la3.a('q'))),
       la3.a('p'),
-      la3.o.p2.implication(
-        la3.o.p2.implication(
-          la3.a('p'),
-          la3.o.p1.negation(la3.a('q'))
-        ),
-        la3.a('p'),
-      )
-    )
+    ),
+  ),
 )
 const step2 = editBranch(step1, [0], tryReverseA2)
-console.log('step2', step2 && print.fromDerivation(step2))
 const step3 = editBranch(step2, [1], tryReverseA1)
 const proof = step3 ? toProof(step3) : null
 if (proof) {
