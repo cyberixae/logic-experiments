@@ -14,10 +14,10 @@ const example = la3.z.mp(
   ),
 )
 
-log(usage)
+//log(usage)
 log()
 log('Sandbox')
 log()
-log(print.fromDerivation(example))
+//log(print.fromDerivation(example))
 log()
 log()

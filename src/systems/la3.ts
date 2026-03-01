@@ -11,6 +11,9 @@ import {
   premise,
   Transformation,
   refineDerivation,
+  editBranch as editBranchG,
+  toProof,
+  Edit,
 } from '../lib/derivation'
 import { Refinement } from '../lib/generic'
 
@@ -419,4 +422,41 @@ export const la3 = {
   o: omega,
   i: iota,
   z: zeta,
+}
+
+export const editBranch = <J extends AnyConclusion>(
+  root: Derivation<J> | null,
+  path: array.NonEmptyArray<number>,
+  edit: <J2 extends AnyConclusion>(d: Derivation<J2>) => Derivation<J2> | null,
+): Derivation<J> | null => editBranchG(root, path, edit as Edit)
+
+const goal = premise(
+  conclusion(
+    la3.o.p2.implication(
+      la3.o.p2.implication(
+        la3.a('p'),
+        la3.o.p2.implication(la3.a('q'), la3.o.p1.negation(la3.a('p'))),
+      ),
+      la3.o.p2.implication(la3.a('p'), la3.a('p')),
+    ),
+  ),
+)
+const step1 = reverseMP(goal,
+    la3.o.p2.implication(
+      la3.a('p'),
+      la3.o.p2.implication(
+        la3.o.p2.implication(
+          la3.a('p'),
+          la3.o.p1.negation(la3.a('q'))
+        ),
+        la3.a('p'),
+      )
+    )
+)
+const step2 = editBranch(step1, [0], tryReverseA2)
+console.log('step2', step2 && print.fromDerivation(step2))
+const step3 = editBranch(step2, [1], tryReverseA1)
+const proof = step3 ? toProof(step3) : null
+if (proof) {
+  console.log(print.fromDerivation(proof))
 }
