@@ -92,6 +92,7 @@ export const refineActiveR =
   }
 
 // Axiom
+
 export type IResult<A extends Prop> = Sequent<[A], [A]>
 export type AnyIResult = IResult<Prop>
 export const isIResult: Refinement<AnySequent, AnyIResult> = (

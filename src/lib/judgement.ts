@@ -27,6 +27,7 @@ export type AnyJudgement = Judgement<Formulas, Formulas>
 export type Conclusion<P extends Prop> = Judgement<[], [P]>
 export const conclusion = <P extends Prop>(proposition: P): Conclusion<P> =>
   judgement([], [proposition])
+export type AnyConclusion = Conclusion<Prop>
 
 export const equals = (a: AnyJudgement, b: AnyJudgement) => {
   return (
