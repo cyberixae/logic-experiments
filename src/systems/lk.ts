@@ -6,7 +6,6 @@ import {
   Judgement as Sequent,
   judgement as sequent,
   AnyJudgement as AnySequent,
-  conclusion,
 } from '../lib/judgement'
 import {
   AnyDerivation,
@@ -18,11 +17,9 @@ import {
   premise,
   refineDerivation,
   isProof,
-  editBranch,
   toProof,
 } from '../lib/derivation'
 import { Refinement } from '../lib/generic'
-import { fromDerivation } from '../lib/print'
 
 // Connectives
 
@@ -1697,24 +1694,4 @@ export const lk = {
   o: omega,
   i: iota,
   z: zeta,
-}
-
-const goal = premise(
-  conclusion(
-    lk.o.p2.implication(
-      lk.o.p2.implication(
-        lk.a('p'),
-        lk.o.p2.implication(lk.a('q'), lk.o.p1.negation(lk.a('p'))),
-      ),
-      lk.o.p2.implication(lk.a('p'), lk.a('p')),
-    ),
-  ),
-)
-const step1 = reverseIR(goal)
-const step2 = editBranch(step1, [0], tryReverseSWL)
-const step3 = editBranch(step2, [0, 0], tryReverseIR)
-const step4 = editBranch(step3, [0, 0, 0], tryReverseI)
-const proof = step4 ? toProof(step4) : null
-if (proof) {
-  console.log(fromDerivation(proof))
 }

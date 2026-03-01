@@ -131,7 +131,7 @@ export const isA2Result: Refinement<AnyConclusion, AnyA2Result> = (
     return false
   }
   const p1 = piqir.antecedent
-  const qir = piqir.antecedent
+  const qir = piqir.consequent
   if (qir.kind !== 'implication') {
     return false
   }
@@ -155,12 +155,19 @@ export const isA2Result: Refinement<AnyConclusion, AnyA2Result> = (
   const p3 = pir.antecedent
   const r2 = pir.consequent
 
-  return (
-    prop.equals(p1, p2) &&
-    prop.equals(p2, p3) &&
-    prop.equals(q1, q2) &&
-    prop.equals(r1, r2)
-  )
+  if (!prop.equals(p1, p2)) {
+    return false
+  }
+  if (!prop.equals(p2, p3)) {
+    return false
+  }
+  if (!prop.equals(q1, q2)) {
+    return false
+  }
+  if (!prop.equals(r1, r2)) {
+    return false
+  }
+  return true
 }
 export const isA2ResultDerivation = refineDerivation(isA2Result)
 export type A2<
@@ -429,31 +436,3 @@ export const editBranch = <J extends AnyConclusion>(
   path: array.NonEmptyArray<number>,
   edit: <J2 extends AnyConclusion>(d: Derivation<J2>) => Derivation<J2> | null,
 ): Derivation<J> | null => editBranchG(root, path, edit as Edit)
-
-const goal = premise(
-  conclusion(
-    la3.o.p2.implication(
-      la3.o.p2.implication(
-        la3.a('p'),
-        la3.o.p2.implication(la3.a('q'), la3.o.p1.negation(la3.a('p'))),
-      ),
-      la3.o.p2.implication(la3.a('p'), la3.a('p')),
-    ),
-  ),
-)
-const step1 = reverseMP(
-  goal,
-  la3.o.p2.implication(
-    la3.a('p'),
-    la3.o.p2.implication(
-      la3.o.p2.implication(la3.a('p'), la3.o.p1.negation(la3.a('q'))),
-      la3.a('p'),
-    ),
-  ),
-)
-const step2 = editBranch(step1, [0], tryReverseA2)
-const step3 = editBranch(step2, [1], tryReverseA1)
-const proof = step3 ? toProof(step3) : null
-if (proof) {
-  console.log(print.fromDerivation(proof))
-}

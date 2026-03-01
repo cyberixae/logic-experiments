@@ -98,24 +98,24 @@ export const equals = (a: Prop, b: Prop): boolean => {
     case 'verum':
       return b.kind === 'verum'
     case 'negation':
-      return b.kind === 'negation' && b.negand === a.negand
+      return b.kind === 'negation' && equals(b.negand, a.negand)
     case 'implication':
       return (
         b.kind === 'implication' &&
-        b.antecedent == a.antecedent &&
-        b.consequent === a.consequent
+        equals(b.antecedent, a.antecedent) &&
+        equals(b.consequent, a.consequent)
       )
     case 'conjunction':
       return (
         b.kind === 'conjunction' &&
-        b.leftConjunct === a.leftConjunct &&
-        b.rightConjunct === a.rightConjunct
+        equals(b.leftConjunct, a.leftConjunct) &&
+        equals(b.rightConjunct, a.rightConjunct)
       )
     case 'disjunction':
       return (
         b.kind === 'disjunction' &&
-        b.leftDisjunct === a.leftDisjunct &&
-        b.rightDisjunct === a.rightDisjunct
+        equals(b.leftDisjunct, a.leftDisjunct) &&
+        equals(b.rightDisjunct, a.rightDisjunct)
       )
   }
 }
