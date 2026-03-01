@@ -33,8 +33,8 @@ export const replaceItem = <T>(
   index: number,
   item: T,
 ): Array<T> | null => {
-  const before = arr.slice(0, index - 1)
-  const after = arr.slice(index)
+  const before = arr.slice(0, index)
+  const after = arr.slice(index + 1)
   const tmp = [...before, item, ...after]
   if (tmp.length !== arr.length) {
     return null

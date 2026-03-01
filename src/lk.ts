@@ -12,10 +12,10 @@ const example = lk.z.ir(
   ),
 )
 
-log(usage)
+//log(usage)
 log()
 log('Sandbox')
 log()
-log(print.fromDerivation(example))
+//log(print.fromDerivation(example))
 log()
 log()

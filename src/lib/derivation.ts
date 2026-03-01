@@ -115,10 +115,13 @@ export type Edit = <J extends AnyJudgement>(
 ) => Derivation<J> | null
 
 export const editBranch = <J extends AnyJudgement>(
-  root: Derivation<J>,
+  root: Derivation<J> | null,
   path: NonEmptyArray<number>,
   edit: Edit,
 ): Derivation<J> | null => {
+  if (!root) {
+    return null
+  }
   if (root.kind === 'premise') {
     return null
   }
@@ -127,17 +130,9 @@ export const editBranch = <J extends AnyJudgement>(
   if (!dep) {
     return null
   }
-  if (isNonEmptyArray(rest)) {
-    const tmp = editBranch(dep, rest, edit)
-    if (!tmp) {
-      return null
-    }
-    return replaceDep(root, index, tmp)
-  } else {
-    const update = edit(dep)
-    if (!update) {
-      return null
-    }
-    return replaceDep(root, index, update)
+  const update = isNonEmptyArray(rest) ? editBranch(dep, rest, edit) : edit(dep)
+  if (!update) {
+    return null
   }
+  return replaceDep(root, index, update)
 }

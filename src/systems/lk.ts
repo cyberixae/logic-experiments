@@ -19,8 +19,10 @@ import {
   refineDerivation,
   isProof,
   editBranch,
+  toProof,
 } from '../lib/derivation'
 import { Refinement } from '../lib/generic'
+import { fromDerivation } from '../lib/print'
 
 // Connectives
 
@@ -1707,15 +1709,11 @@ const goal = premise(
     ),
   ),
 )
-
 const step1 = reverseIR(goal)
 const step2 = editBranch(step1, [0], tryReverseSWL)
-/*
-const step3 =
-  step2?.kind === 'transformation' ? editBranch(step2, [0, 0], reverseIR) : null
-const step4 =
-  step3?.kind === 'transformation'
-    ? editBranch(step3, [0, 0, 0], reverseI)
-    : null
-console.log(step4?.kind === 'transformation' ? isProof(step4) : false)
-*/
+const step3 = editBranch(step2, [0, 0], tryReverseIR)
+const step4 = editBranch(step3, [0, 0, 0], tryReverseI)
+const proof = step4 ? toProof(step4) : null
+if (proof) {
+  console.log(fromDerivation(proof))
+}
