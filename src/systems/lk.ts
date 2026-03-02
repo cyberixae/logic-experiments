@@ -1372,10 +1372,10 @@ export const tryReverseSRLB = <J extends AnySequent>(
 
 export type SRRFResult<
   Γ extends Formulas,
-  A extends Prop,
   Δ extends Formulas,
+  A extends Prop,
 > = Sequent<Γ, [...Δ, A]>
-export type AnySRRFResult = SRRFResult<Formulas, Prop, Formulas>
+export type AnySRRFResult = SRRFResult<Formulas, Formulas, Prop>
 export const isSRRFResult: Refinement<AnySequent, AnySRRFResult> = (
   s,
 ): s is AnySRRFResult => {
@@ -1384,32 +1384,32 @@ export const isSRRFResult: Refinement<AnySequent, AnySRRFResult> = (
 export const isSRRFResultDerivation = refineDerivation(isSRRFResult)
 export type SRRF<
   Γ extends Formulas,
-  A extends Prop,
   Δ extends Formulas,
-  R extends SRRFResult<Γ, A, Δ>,
+  A extends Prop,
+  R extends SRRFResult<Γ, Δ, A>,
 > = Transformation<R, [Derivation<Sequent<Γ, [A, ...Δ]>>], 'srrf'>
-export type AnySRRF = SRRF<Formulas, Prop, Formulas, AnySRRFResult>
+export type AnySRRF = SRRF<Formulas, Formulas, Prop, AnySRRFResult>
 export const srrf = <
   Γ extends Formulas,
-  A extends Prop,
   Δ extends Formulas,
-  R extends SRRFResult<Γ, A, Δ>,
+  A extends Prop,
+  R extends SRRFResult<Γ, Δ, A>,
 >(
   result: R,
   deps: [Derivation<Sequent<Γ, [A, ...Δ]>>],
-): SRRF<Γ, A, Δ, R> => {
+): SRRF<Γ, Δ, A, R> => {
   return transformation(result, deps, 'srrf')
 }
 export type ApplySRRF<S extends AnyDerivation> =
   S extends Derivation<
     Sequent<infer Γ, [infer A extends Prop, ...infer Δ extends Formulas]>
   >
-    ? SRRF<Γ, A, Δ, SRRFResult<Γ, A, Δ>>
+    ? SRRF<Γ, Δ, A, SRRFResult<Γ, Δ, A>>
     : never
 export const applySRRF = <
   Γ extends Formulas,
-  A extends Prop,
   Δ extends Formulas,
+  A extends Prop,
 >(
   s: Derivation<Sequent<Γ, [A, ...Δ]>>,
 ): ApplySRRF<Derivation<Sequent<Γ, [A, ...Δ]>>> => {
@@ -1420,12 +1420,12 @@ export const applySRRF = <
 }
 export const reverseSRRF = <
   Γ extends Formulas,
-  A extends Prop,
   Δ extends Formulas,
-  R extends SRRFResult<Γ, A, Δ>,
+  A extends Prop,
+  R extends SRRFResult<Γ, Δ, A>,
 >(
   p: Derivation<R>,
-): SRRF<Γ, A, Δ, R> => {
+): SRRF<Γ, Δ, A, R> => {
   const γ: Γ = p.result.antecedent
   const δ: Δ = array.init(p.result.succedent)
   const a: A = array.last(p.result.succedent)
