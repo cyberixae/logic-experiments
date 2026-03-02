@@ -300,14 +300,18 @@ export function fromRule(s: string): Printer {
         return 'CL'
       case 'scr':
         return 'CR'
-      case 'srotl':
-        return 'RotL'
-      case 'srotr':
-        return 'RotR'
-      case 'sswpl':
-        return 'PL'
-      case 'sswpr':
-        return 'PR'
+      case 'srlf':
+        return '\u21b7L'
+      case 'srrf':
+        return '\u21B6R'
+      case 'srlb':
+        return '\u21B6L'
+      case 'srrb':
+        return '\u21b7R'
+      case 'sxl':
+        return 'XL'
+      case 'sxr':
+        return 'XR'
     }
     return s
   }
