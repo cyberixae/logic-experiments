@@ -1671,15 +1671,15 @@ export const meta = {
           ),
         ],
         [
-          applySRotL(premise(sequent([atom('Σ'), atom('A')], [atom('Π')]))),
-          applySRotR(premise(sequent([atom('Σ')], [atom('A'), atom('Π')]))),
+          applySRotL(premise(sequent([atom('Γ'), atom('A')], [atom('Δ')]))),
+          applySRotR(premise(sequent([atom('Γ')], [atom('A'), atom('Δ')]))),
         ],
         [
           applySSwpL(
-            premise(sequent([atom('Σ'), atom('A'), atom('B')], [atom('Π')])),
+            premise(sequent([atom('Γ'), atom('A'), atom('B')], [atom('Δ')])),
           ),
           applySSwpR(
-            premise(sequent([atom('Σ')], [atom('A'), atom('B'), atom('Π')])),
+            premise(sequent([atom('Γ')], [atom('A'), atom('B'), atom('Δ')])),
           ),
         ],
       ],
