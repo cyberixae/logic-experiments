@@ -1236,312 +1236,312 @@ export const tryReverseSCR = <J extends AnySequent>(
 
 // Permutation
 
-export type SRLFResult<
+export type SRotLFResult<
   A extends Prop,
   Γ extends Formulas,
   B extends Prop,
   Δ extends Formulas,
 > = Sequent<[A, ...Γ, B], Δ>
-export type AnySRLFResult = SRLFResult<Prop, Formulas, Prop, Formulas>
-export const isSRLFResult: Refinement<AnySequent, AnySRLFResult> = (
+export type AnySRotLFResult = SRotLFResult<Prop, Formulas, Prop, Formulas>
+export const isSRotLFResult: Refinement<AnySequent, AnySRotLFResult> = (
   s,
-): s is AnySRLFResult => {
+): s is AnySRotLFResult => {
   return s.antecedent.length > 1
 }
-export const isSRLFResultDerivation = refineDerivation(isSRLFResult)
-export type SRLF<
+export const isSRotLFResultDerivation = refineDerivation(isSRotLFResult)
+export type SRotLF<
   A extends Prop,
   Γ extends Formulas,
   B extends Prop,
   Δ extends Formulas,
-  R extends SRLFResult<A, Γ, B, Δ>,
-> = Transformation<R, [Derivation<Sequent<[...Γ, B, A], Δ>>], 'srlf'>
-export type AnySRLF = SRLF<Prop, Formulas, Prop, Formulas, AnySRLFResult>
-export const srlf = <
+  R extends SRotLFResult<A, Γ, B, Δ>,
+> = Transformation<R, [Derivation<Sequent<[...Γ, B, A], Δ>>], 'SRotLF'>
+export type AnySRotLF = SRotLF<Prop, Formulas, Prop, Formulas, AnySRotLFResult>
+export const sRotLF = <
   A extends Prop,
   Γ extends Formulas,
   B extends Prop,
   Δ extends Formulas,
-  R extends SRLFResult<A, Γ, B, Δ>,
+  R extends SRotLFResult<A, Γ, B, Δ>,
 >(
   result: R,
   deps: [Derivation<Sequent<[...Γ, B, A], Δ>>],
-): SRLF<A, Γ, B, Δ, R> => {
-  return transformation(result, deps, 'srlf')
+): SRotLF<A, Γ, B, Δ, R> => {
+  return transformation(result, deps, 'SRotLF')
 }
-export type ApplySRLF<S extends AnyDerivation> =
+export type ApplySRotLF<S extends AnyDerivation> =
   S extends Derivation<
     Sequent<
       [...infer Γ extends Formulas, infer B extends Prop, infer A extends Prop],
       infer Δ
     >
   >
-    ? SRLF<A, Γ, B, Δ, SRLFResult<A, Γ, B, Δ>>
+    ? SRotLF<A, Γ, B, Δ, SRotLFResult<A, Γ, B, Δ>>
     : never
-export const applySRLF = <
+export const applySRotLF = <
   A extends Prop,
   Γ extends Formulas,
   B extends Prop,
   Δ extends Formulas,
 >(
   s: Derivation<Sequent<[...Γ, B, A], Δ>>,
-): ApplySRLF<Derivation<Sequent<[...Γ, B, A], Δ>>> => {
+): ApplySRotLF<Derivation<Sequent<[...Γ, B, A], Δ>>> => {
   const γ: Γ = array.init(array.init(s.result.antecedent))
   const a: A = array.last(s.result.antecedent)
   const b: B = array.last(array.init(s.result.antecedent))
   const δ: Δ = s.result.succedent
-  return srlf(sequent([a, ...γ, b], δ), [s])
+  return sRotLF(sequent([a, ...γ, b], δ), [s])
 }
-export const reverseSRLF = <
+export const reverseSRotLF = <
   A extends Prop,
   Γ extends Formulas,
   B extends Prop,
   Δ extends Formulas,
-  R extends SRLFResult<A, Γ, B, Δ>,
+  R extends SRotLFResult<A, Γ, B, Δ>,
 >(
   p: Derivation<R>,
-): SRLF<A, Γ, B, Δ, R> => {
+): SRotLF<A, Γ, B, Δ, R> => {
   const γ: Γ = array.init(array.tail(p.result.antecedent))
   const a: A = array.head(p.result.antecedent)
   const b: B = array.last(p.result.antecedent)
   const δ: Δ = p.result.succedent
-  return srlf(p.result, [premise(sequent([...γ, b, a], δ))])
+  return sRotLF(p.result, [premise(sequent([...γ, b, a], δ))])
 }
-export const tryReverseSRLF = <J extends AnySequent>(
+export const tryReverseSRotLF = <J extends AnySequent>(
   d: Derivation<J>,
 ): Derivation<J> | null => {
-  return isSRLFResultDerivation(d) ? reverseSRLF(d) : null
+  return isSRotLFResultDerivation(d) ? reverseSRotLF(d) : null
 }
 
-export type SRLBResult<
+export type SRotLBResult<
   Γ extends Formulas,
   B extends Prop,
   A extends Prop,
   Δ extends Formulas,
 > = Sequent<[...Γ, B, A], Δ>
-export type AnySRLBResult = SRLBResult<Formulas, Prop, Prop, Formulas>
-export const isSRLBResult: Refinement<AnySequent, AnySRLBResult> = (
+export type AnySRotLBResult = SRotLBResult<Formulas, Prop, Prop, Formulas>
+export const isSRotLBResult: Refinement<AnySequent, AnySRotLBResult> = (
   s,
-): s is AnySRLBResult => {
+): s is AnySRotLBResult => {
   return s.antecedent.length > 1
 }
-export const isSRLBResultDerivation = refineDerivation(isSRLBResult)
-export type SRLB<
+export const isSRotLBResultDerivation = refineDerivation(isSRotLBResult)
+export type SRotLB<
   Γ extends Formulas,
   B extends Prop,
   A extends Prop,
   Δ extends Formulas,
-  R extends SRLBResult<Γ, B, A, Δ>,
-> = Transformation<R, [Derivation<Sequent<[A, ...Γ, B], Δ>>], 'srlb'>
-export type AnySRLB = SRLB<Formulas, Prop, Prop, Formulas, AnySRLBResult>
-export const srlb = <
+  R extends SRotLBResult<Γ, B, A, Δ>,
+> = Transformation<R, [Derivation<Sequent<[A, ...Γ, B], Δ>>], 'SRotLB'>
+export type AnySRotLB = SRotLB<Formulas, Prop, Prop, Formulas, AnySRotLBResult>
+export const sRotLB = <
   Γ extends Formulas,
   B extends Prop,
   A extends Prop,
   Δ extends Formulas,
-  R extends SRLBResult<Γ, B, A, Δ>,
+  R extends SRotLBResult<Γ, B, A, Δ>,
 >(
   result: R,
   deps: [Derivation<Sequent<[A, ...Γ, B], Δ>>],
-): SRLB<Γ, B, A, Δ, R> => {
-  return transformation(result, deps, 'srlb')
+): SRotLB<Γ, B, A, Δ, R> => {
+  return transformation(result, deps, 'SRotLB')
 }
-export type ApplySRLB<S extends AnyDerivation> =
+export type ApplySRotLB<S extends AnyDerivation> =
   S extends Derivation<
     Sequent<
       [infer A extends Prop, ...infer Γ extends Formulas, infer B extends Prop],
       infer Δ
     >
   >
-    ? SRLB<Γ, B, A, Δ, SRLBResult<Γ, B, A, Δ>>
+    ? SRotLB<Γ, B, A, Δ, SRotLBResult<Γ, B, A, Δ>>
     : never
-export const applySRLB = <
+export const applySRotLB = <
   Γ extends Formulas,
   B extends Prop,
   A extends Prop,
   Δ extends Formulas,
 >(
   s: Derivation<Sequent<[A, ...Γ, B], Δ>>,
-): ApplySRLB<Derivation<Sequent<[A, ...Γ, B], Δ>>> => {
+): ApplySRotLB<Derivation<Sequent<[A, ...Γ, B], Δ>>> => {
   const a: A = array.head(s.result.antecedent)
   const γ: Γ = array.init(array.tail(s.result.antecedent))
   const b: B = array.last(s.result.antecedent)
   const δ: Δ = s.result.succedent
-  return srlb(sequent([...γ, b, a], δ), [s])
+  return sRotLB(sequent([...γ, b, a], δ), [s])
 }
-export const reverseSRLB = <
+export const reverseSRotLB = <
   Γ extends Formulas,
   B extends Prop,
   A extends Prop,
   Δ extends Formulas,
-  R extends SRLBResult<Γ, B, A, Δ>,
+  R extends SRotLBResult<Γ, B, A, Δ>,
 >(
   p: Derivation<R>,
-): SRLB<Γ, B, A, Δ, R> => {
+): SRotLB<Γ, B, A, Δ, R> => {
   const γ: Γ = array.init(array.init(p.result.antecedent))
   const a: A = array.last(p.result.antecedent)
   const b: B = array.last(array.init(p.result.antecedent))
   const δ: Δ = p.result.succedent
-  return srlb(p.result, [premise(sequent([a, ...γ, b], δ))])
+  return sRotLB(p.result, [premise(sequent([a, ...γ, b], δ))])
 }
-export const tryReverseSRLB = <J extends AnySequent>(
+export const tryReverseSRotLB = <J extends AnySequent>(
   d: Derivation<J>,
 ): Derivation<J> | null => {
-  return isSRLBResultDerivation(d) ? reverseSRLB(d) : null
+  return isSRotLBResultDerivation(d) ? reverseSRotLB(d) : null
 }
 
-export type SRRFResult<
+export type SRotRFResult<
   Γ extends Formulas,
   B extends Prop,
   Δ extends Formulas,
   A extends Prop,
 > = Sequent<Γ, [B, ...Δ, A]>
-export type AnySRRFResult = SRRFResult<Formulas, Prop, Formulas, Prop>
-export const isSRRFResult: Refinement<AnySequent, AnySRRFResult> = (
+export type AnySRotRFResult = SRotRFResult<Formulas, Prop, Formulas, Prop>
+export const isSRotRFResult: Refinement<AnySequent, AnySRotRFResult> = (
   s,
-): s is AnySRRFResult => {
+): s is AnySRotRFResult => {
   return s.succedent.length > 1
 }
-export const isSRRFResultDerivation = refineDerivation(isSRRFResult)
-export type SRRF<
+export const isSRotRFResultDerivation = refineDerivation(isSRotRFResult)
+export type SRotRF<
   Γ extends Formulas,
   B extends Prop,
   Δ extends Formulas,
   A extends Prop,
-  R extends SRRFResult<Γ, B, Δ, A>,
-> = Transformation<R, [Derivation<Sequent<Γ, [A, B, ...Δ]>>], 'srrf'>
-export type AnySRRF = SRRF<Formulas, Prop, Formulas, Prop, AnySRRFResult>
-export const srrf = <
+  R extends SRotRFResult<Γ, B, Δ, A>,
+> = Transformation<R, [Derivation<Sequent<Γ, [A, B, ...Δ]>>], 'SRotRF'>
+export type AnySRotRF = SRotRF<Formulas, Prop, Formulas, Prop, AnySRotRFResult>
+export const sRotRF = <
   Γ extends Formulas,
   B extends Prop,
   Δ extends Formulas,
   A extends Prop,
-  R extends SRRFResult<Γ, B, Δ, A>,
+  R extends SRotRFResult<Γ, B, Δ, A>,
 >(
   result: R,
   deps: [Derivation<Sequent<Γ, [A, B, ...Δ]>>],
-): SRRF<Γ, B, Δ, A, R> => {
-  return transformation(result, deps, 'srrf')
+): SRotRF<Γ, B, Δ, A, R> => {
+  return transformation(result, deps, 'SRotRF')
 }
-export type ApplySRRF<S extends AnyDerivation> =
+export type ApplySRotRF<S extends AnyDerivation> =
   S extends Derivation<
     Sequent<
       infer Γ,
       [infer A extends Prop, infer B extends Prop, ...infer Δ extends Formulas]
     >
   >
-    ? SRRF<Γ, B, Δ, A, SRRFResult<Γ, B, Δ, A>>
+    ? SRotRF<Γ, B, Δ, A, SRotRFResult<Γ, B, Δ, A>>
     : never
-export const applySRRF = <
+export const applySRotRF = <
   Γ extends Formulas,
   B extends Prop,
   Δ extends Formulas,
   A extends Prop,
 >(
   s: Derivation<Sequent<Γ, [A, B, ...Δ]>>,
-): ApplySRRF<Derivation<Sequent<Γ, [A, B, ...Δ]>>> => {
+): ApplySRotRF<Derivation<Sequent<Γ, [A, B, ...Δ]>>> => {
   const γ: Γ = s.result.antecedent
   const δ: Δ = array.tail(array.tail(s.result.succedent))
   const a: A = array.head(s.result.succedent)
   const b: B = array.head(array.tail(s.result.succedent))
-  return srrf(sequent(γ, [b, ...δ, a]), [s])
+  return sRotRF(sequent(γ, [b, ...δ, a]), [s])
 }
-export const reverseSRRF = <
+export const reverseSRotRF = <
   Γ extends Formulas,
   B extends Prop,
   Δ extends Formulas,
   A extends Prop,
-  R extends SRRFResult<Γ, B, Δ, A>,
+  R extends SRotRFResult<Γ, B, Δ, A>,
 >(
   p: Derivation<R>,
-): SRRF<Γ, B, Δ, A, R> => {
+): SRotRF<Γ, B, Δ, A, R> => {
   const γ: Γ = p.result.antecedent
   const δ: Δ = array.init(array.tail(p.result.succedent))
   const a: A = array.last(p.result.succedent)
   const b: B = array.head(p.result.succedent)
-  return srrf(p.result, [premise(sequent(γ, [a, b, ...δ]))])
+  return sRotRF(p.result, [premise(sequent(γ, [a, b, ...δ]))])
 }
-export const tryReverseSRRF = <J extends AnySequent>(
+export const tryReverseSRotRF = <J extends AnySequent>(
   d: Derivation<J>,
 ): Derivation<J> | null => {
-  return isSRRFResultDerivation(d) ? reverseSRRF(d) : null
+  return isSRotRFResultDerivation(d) ? reverseSRotRF(d) : null
 }
 
-export type SRRBResult<
+export type SRotRBResult<
   Γ extends Formulas,
   A extends Prop,
   B extends Prop,
   Δ extends Formulas,
 > = Sequent<Γ, [A, B, ...Δ]>
-export type AnySRRBResult = SRRBResult<Formulas, Prop, Prop, Formulas>
-export const isSRRBResult: Refinement<AnySequent, AnySRRBResult> = (
+export type AnySRotRBResult = SRotRBResult<Formulas, Prop, Prop, Formulas>
+export const isSRotRBResult: Refinement<AnySequent, AnySRotRBResult> = (
   s,
-): s is AnySRRBResult => {
+): s is AnySRotRBResult => {
   return s.succedent.length > 1
 }
-export const isSRRBResultDerivation = refineDerivation(isSRRBResult)
-export type SRRB<
+export const isSRotRBResultDerivation = refineDerivation(isSRotRBResult)
+export type SRotRB<
   Γ extends Formulas,
   A extends Prop,
   B extends Prop,
   Δ extends Formulas,
-  R extends SRRBResult<Γ, A, B, Δ>,
-> = Transformation<R, [Derivation<Sequent<Γ, [B, ...Δ, A]>>], 'srrb'>
-export type AnySRRB = SRRB<Formulas, Prop, Prop, Formulas, AnySRRBResult>
-export const srrb = <
+  R extends SRotRBResult<Γ, A, B, Δ>,
+> = Transformation<R, [Derivation<Sequent<Γ, [B, ...Δ, A]>>], 'SRotRB'>
+export type AnySRotRB = SRotRB<Formulas, Prop, Prop, Formulas, AnySRotRBResult>
+export const sRotRB = <
   Γ extends Formulas,
   A extends Prop,
   B extends Prop,
   Δ extends Formulas,
-  R extends SRRBResult<Γ, A, B, Δ>,
+  R extends SRotRBResult<Γ, A, B, Δ>,
 >(
   result: R,
   deps: [Derivation<Sequent<Γ, [B, ...Δ, A]>>],
-): SRRB<Γ, A, B, Δ, R> => {
-  return transformation(result, deps, 'srrb')
+): SRotRB<Γ, A, B, Δ, R> => {
+  return transformation(result, deps, 'SRotRB')
 }
-export type ApplySRRB<S extends AnyDerivation> =
+export type ApplySRotRB<S extends AnyDerivation> =
   S extends Derivation<
     Sequent<
       infer Γ,
       [infer B extends Prop, ...infer Δ extends Formulas, infer A extends Prop]
     >
   >
-    ? SRRB<Γ, A, B, Δ, SRRBResult<Γ, A, B, Δ>>
+    ? SRotRB<Γ, A, B, Δ, SRotRBResult<Γ, A, B, Δ>>
     : never
-export const applySRRB = <
+export const applySRotRB = <
   Γ extends Formulas,
   A extends Prop,
   B extends Prop,
   Δ extends Formulas,
 >(
   s: Derivation<Sequent<Γ, [B, ...Δ, A]>>,
-): ApplySRRB<Derivation<Sequent<Γ, [B, ...Δ, A]>>> => {
+): ApplySRotRB<Derivation<Sequent<Γ, [B, ...Δ, A]>>> => {
   const γ: Γ = s.result.antecedent
   const δ: Δ = array.init(array.tail(s.result.succedent))
   const a: A = array.last(s.result.succedent)
   const b: B = array.head(s.result.succedent)
-  return srrb(sequent(γ, [a, b, ...δ]), [s])
+  return sRotRB(sequent(γ, [a, b, ...δ]), [s])
 }
-export const reverseSRRB = <
+export const reverseSRotRB = <
   Γ extends Formulas,
   A extends Prop,
   B extends Prop,
   Δ extends Formulas,
-  R extends SRRBResult<Γ, A, B, Δ>,
+  R extends SRotRBResult<Γ, A, B, Δ>,
 >(
   p: Derivation<R>,
-): SRRB<Γ, A, B, Δ, R> => {
+): SRotRB<Γ, A, B, Δ, R> => {
   const γ: Γ = p.result.antecedent
   const δ: Δ = array.tail(array.tail(p.result.succedent))
   const a: A = array.head(p.result.succedent)
   const b: B = array.head(array.tail(p.result.succedent))
-  return srrb(p.result, [premise(sequent(γ, [b, ...δ, a]))])
+  return sRotRB(p.result, [premise(sequent(γ, [b, ...δ, a]))])
 }
-export const tryReverseSRRB = <J extends AnySequent>(
+export const tryReverseSRotRB = <J extends AnySequent>(
   d: Derivation<J>,
 ): Derivation<J> | null => {
-  return isSRRBResultDerivation(d) ? reverseSRRB(d) : null
+  return isSRotRBResultDerivation(d) ? reverseSRotRB(d) : null
 }
 
 export type SXLResult<
@@ -1731,10 +1731,10 @@ const zeta = {
   swr: applySWR,
   scl: applySCL,
   scr: applySCR,
-  srlf: applySRLF,
-  srlb: applySRLB,
-  srrf: applySRRF,
-  srrb: applySRRB,
+  sRotLF: applySRotLF,
+  sRotLB: applySRotLB,
+  sRotRF: applySRotRF,
+  sRotRB: applySRotRB,
   sxl: applySXL,
   sxr: applySXR,
 }
@@ -1755,10 +1755,10 @@ export const rev = {
   swr: tryReverseSWR,
   scl: tryReverseSCL,
   scr: tryReverseSCR,
-  srlf: tryReverseSRLF,
-  srlb: tryReverseSRLB,
-  srrf: tryReverseSRRF,
-  srrb: tryReverseSRRB,
+  sRotLF: tryReverseSRotLF,
+  sRotLB: tryReverseSRotLB,
+  sRotRF: tryReverseSRotRF,
+  sRotRB: tryReverseSRotRB,
   sxl: tryReverseSXL,
   sxr: tryReverseSXR,
 }
@@ -1871,18 +1871,18 @@ export const meta = {
           ),
         ],
         [
-          applySRLF(
+          applySRotLF(
             premise(sequent([atom('Γ'), atom('B'), atom('A')], [atom('Δ')])),
           ),
-          applySRRF(
+          applySRotRF(
             premise(sequent([atom('Γ')], [atom('A'), atom('B'), atom('Δ')])),
           ),
         ],
         [
-          applySRLB(
+          applySRotLB(
             premise(sequent([atom('A'), atom('Γ'), atom('B')], [atom('Δ')])),
           ),
-          applySRRB(
+          applySRotRB(
             premise(sequent([atom('Γ')], [atom('B'), atom('Δ'), atom('A')])),
           ),
         ],
