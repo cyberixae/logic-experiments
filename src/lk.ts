@@ -1,9 +1,8 @@
 import { NonEmptyArray } from './lib/array'
 import { log } from './lib/block'
-import { premise, editBranch, isProof, AnyDerivation } from './lib/derivation'
+import { premise, editDerivation, isProof, AnyDerivation, lsDerivation } from './lib/derivation'
 import { conclusion } from './lib/judgement'
 import * as print from './lib/print'
-import { fromDerivation } from './lib/print'
 import {
   lk,
   reverseIR,
@@ -14,6 +13,14 @@ import {
   rev,
 } from './systems/lk'
 
+const list = (d: AnyDerivation, p: Array<number>) =>
+  Object.entries(rev).flatMap(([n, r]): [] | [string] => {
+    if (editDerivation(d, p, r)) {
+      return [n]
+    }
+    return []
+  })
+
 const example = lk.z.ir(
   lk.z.swl(
     lk.o.p2.implication(
@@ -23,6 +30,22 @@ const example = lk.z.ir(
     lk.z.ir(lk.i.i(lk.a('p'))),
   ),
 )
+
+const status = (d: AnyDerivation | null) => {
+  if (!d) {
+    return
+  }
+  log()
+  log()
+  log(print.fromDerivation(d))
+  log()
+  lsDerivation(d).forEach((x) => {
+    log(JSON.stringify(x) + ': ' + list(d, x).join(', '))
+  })
+  log()
+  log()
+  log()
+}
 
 const goal = premise(
   conclusion(
@@ -35,31 +58,25 @@ const goal = premise(
     ),
   ),
 )
-
-const all = (d: AnyDerivation, p: NonEmptyArray<number>) =>
-  Object.entries(rev).map(([_, r]) => {
-    const res = editBranch(d, p, r)
-    if (res) {
-      log()
-      log(print.fromDerivation(res))
-    }
-  })
-
-const step1 = reverseIR(goal)
-all(step1, [0])
-const step2 = editBranch(step1, [0], tryReverseSWL)
-const step3 = editBranch(step2, [0, 0], tryReverseIR)
-const step4 = editBranch(step3, [0, 0, 0], tryReverseI)
+status(goal)
+const step1 = editDerivation(goal, [], tryReverseIR)
+status(step1)
+const step2 = editDerivation(step1, [0], tryReverseSWL)
+status(step2)
+const step3 = editDerivation(step2, [0, 0], tryReverseIR)
+status(step3)
+const step4 = editDerivation(step3, [0, 0, 0], tryReverseI)
+status(step4)
 if (!step4 || !isProof(step4)) {
   throw step4
 }
 
-log(usage)
-log()
-log('Sandbox')
-log()
+//log(usage)
+//log()
+//log('Sandbox')
+//log()
 //log(print.fromDerivation(step4))
 //log()
 //log(print.fromDerivation(example))
-log()
-log()
+//log()
+//log()

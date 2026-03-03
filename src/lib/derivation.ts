@@ -114,25 +114,70 @@ export type Edit = <J extends AnyJudgement>(
   d: Derivation<J>,
 ) => Derivation<J> | null
 
-export const editBranch = <J extends AnyJudgement>(
+export type Path = Array<number>
+
+export const editPremise = <J extends AnyJudgement>(
+  root: Premise<J>,
+  path: Path,
+  edit: Edit,
+): Derivation<J> | null => {
+  if (isNonEmptyArray(path)) {
+    // Premises don't have deps
+    return null
+  }
+  return edit(root)
+}
+
+export const editTransformation = <J extends AnyJudgement>(
+  root: Transformation<J, Array<AnyNode>, string>,
+  path: Path,
+  edit: Edit,
+): Derivation<J> | null => {
+  if (isNonEmptyArray(path)) {
+    const [index, ...rest] = path
+    const dep = root.deps[index]
+    if (!dep) {
+      return null
+    }
+    const update = editDerivation(dep, rest, edit)
+    if (!update) {
+      return null
+    }
+    return replaceDep(root, index, update)
+  }
+  return edit(root)
+}
+
+export const editDerivation = <J extends AnyJudgement>(
   root: Derivation<J> | null,
-  path: NonEmptyArray<number>,
+  path: Path,
   edit: Edit,
 ): Derivation<J> | null => {
   if (!root) {
     return null
   }
-  if (root.kind === 'premise') {
-    return null
+  switch (root.kind) {
+    case 'premise':
+      return editPremise(root, path, edit)
+    case 'transformation':
+      return editTransformation(root, path, edit)
   }
-  const [index, ...rest] = path
-  const dep = root.deps[index]
-  if (!dep) {
-    return null
+}
+
+export const lsPremise = (_d: AnyPremise, path: Path): Array<Path> => {
+  return [path]
+}
+export const lsTransformation = (d: AnyTransformation, path: Path): Array<Path> => {
+  if (d.deps.length < 1) {
+    return [path]
   }
-  const update = isNonEmptyArray(rest) ? editBranch(dep, rest, edit) : edit(dep)
-  if (!update) {
-    return null
+  return d.deps.flatMap((dep, i) => lsDerivation(dep, [...path, i] ))
+}
+export const lsDerivation = (root: AnyDerivation, path: Path = []): Array<Path> => {
+  switch (root.kind) {
+    case 'premise':
+      return lsPremise(root, path)
+    case 'transformation':
+      return lsTransformation(root, path)
   }
-  return replaceDep(root, index, update)
 }

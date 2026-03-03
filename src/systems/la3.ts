@@ -11,7 +11,7 @@ import {
   premise,
   Transformation,
   refineDerivation,
-  editBranch as editBranchG,
+  editDerivation as editBranchG,
   toProof,
   Edit,
 } from '../lib/derivation'
