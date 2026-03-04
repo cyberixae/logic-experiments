@@ -1,5 +1,7 @@
 import * as prop from '../lib/prop'
 import * as array from '../lib/array'
+import * as tuple from "../lib/tuple"
+import * as head from "../lib/tuple"
 import * as print from '../lib/print'
 import {
   Formulas,
@@ -75,7 +77,7 @@ export const isActiveL = (j: AnySequent): j is ActiveL<Prop> => {
 export const refineActiveL =
   <B extends Prop>(r: Refinement<Prop, B>) =>
   (j: AnySequent): j is ActiveL<B> => {
-    return isActiveL(j) && r(array.last(j.antecedent))
+    return isActiveL(j) && r(tuple.last(j.antecedent))
   }
 
 export type ActiveR<B extends Prop> = Sequent<Formulas, [B, ...Formulas]>
@@ -85,7 +87,7 @@ export const isActiveR = (j: AnySequent): j is ActiveR<Prop> => {
 export const refineActiveR =
   <B extends Prop>(r: Refinement<Prop, B>) =>
   (j: AnySequent): j is ActiveR<B> => {
-    return isActiveR(j) && r(array.head(j.succedent))
+    return isActiveR(j) && r(head.head(j.succedent))
   }
 
 // Axiom
@@ -96,8 +98,8 @@ export const isIResult: Refinement<AnySequent, AnyIResult> = (
   s,
 ): s is AnyIResult => {
   return (
-    array.isTupleOf1(s.antecedent) &&
-    array.isTupleOf1(s.succedent) &&
+    tuple.isTupleOf1(s.antecedent) &&
+    tuple.isTupleOf1(s.succedent) &&
     prop.equals(s.antecedent[0], s.succedent[0])
   )
 }
@@ -176,7 +178,7 @@ export const applyCut = <
   Derivation<Sequent<[A, ...Γ], Δ>>
 > => {
   const γ: Γ = s1.result.antecedent
-  const δ: Δ = array.init(s1.result.succedent)
+  const δ: Δ = tuple.init(s1.result.succedent)
   return cut(sequent(γ, δ), [s1, s2])
 }
 export const reverseCut = <
@@ -249,8 +251,8 @@ export const applyCL1 = <
   b: B,
   s: Derivation<Sequent<[...Γ, A], Δ>>,
 ): ApplyCL1<B, Derivation<Sequent<[...Γ, A], Δ>>> => {
-  const γ: Γ = array.init(s.result.antecedent)
-  const a: A = array.last(s.result.antecedent)
+  const γ: Γ = tuple.init(s.result.antecedent)
+  const a: A = tuple.last(s.result.antecedent)
   const δ: Δ = s.result.succedent
   return cl1(sequent([...γ, conjunction(a, b)], δ), [s])
 }
@@ -263,8 +265,8 @@ export const reverseCL1 = <
 >(
   p: Derivation<R>,
 ): CL1<Γ, A, B, Δ, R> => {
-  const γ: Γ = array.init(p.result.antecedent)
-  const acb: Conjunction<A, B> = array.last(p.result.antecedent)
+  const γ: Γ = tuple.init(p.result.antecedent)
+  const acb: Conjunction<A, B> = tuple.last(p.result.antecedent)
   const a: A = acb.leftConjunct
   const δ: Δ = p.result.succedent
   return cl1(p.result, [premise(sequent([...γ, a], δ))])
@@ -324,8 +326,8 @@ export const applyDR1 = <
   s: Derivation<Sequent<Γ, [A, ...Δ]>>,
 ): ApplyDR1<B, Derivation<Sequent<Γ, [A, ...Δ]>>> => {
   const γ: Γ = s.result.antecedent
-  const δ: Δ = array.tail(s.result.succedent)
-  const a: A = array.head(s.result.succedent)
+  const δ: Δ = tuple.tail(s.result.succedent)
+  const a: A = head.head(s.result.succedent)
   return dr1(sequent(γ, [disjunction(a, b), ...δ]), [s])
 }
 export const reverseDR1 = <
@@ -338,9 +340,9 @@ export const reverseDR1 = <
   p: Derivation<R>,
 ): DR1<Γ, A, B, Δ, R> => {
   const γ: Γ = p.result.antecedent
-  const adb: Disjunction<A, B> = array.head(p.result.succedent)
+  const adb: Disjunction<A, B> = head.head(p.result.succedent)
   const a: A = adb.leftDisjunct
-  const δ: Δ = array.tail(p.result.succedent)
+  const δ: Δ = tuple.tail(p.result.succedent)
   return dr1(p.result, [premise(sequent(γ, [a, ...δ]))])
 }
 export const tryReverseDR1 = <J extends AnySequent>(
@@ -394,8 +396,8 @@ export const applyCL2 = <
   a: A,
   s: Derivation<Sequent<[...Γ, B], Δ>>,
 ): ApplyCL2<A, Derivation<Sequent<[...Γ, B], Δ>>> => {
-  const γ: Γ = array.init(s.result.antecedent)
-  const b: B = array.last(s.result.antecedent)
+  const γ: Γ = tuple.init(s.result.antecedent)
+  const b: B = tuple.last(s.result.antecedent)
   const δ: Δ = s.result.succedent
   return cl2(sequent([...γ, conjunction(a, b)], δ), [s])
 }
@@ -408,8 +410,8 @@ export const reverseCL2 = <
 >(
   p: Derivation<R>,
 ): CL2<Γ, A, B, Δ, R> => {
-  const γ: Γ = array.init(p.result.antecedent)
-  const acb: Conjunction<A, B> = array.last(p.result.antecedent)
+  const γ: Γ = tuple.init(p.result.antecedent)
+  const acb: Conjunction<A, B> = tuple.last(p.result.antecedent)
   const b: B = acb.rightConjunct
   const δ: Δ = p.result.succedent
   return cl2(p.result, [premise(sequent([...γ, b], δ))])
@@ -469,8 +471,8 @@ export const applyDR2 = <
   s: Derivation<Sequent<Γ, [B, ...Δ]>>,
 ): ApplyDR2<A, Derivation<Sequent<Γ, [B, ...Δ]>>> => {
   const γ: Γ = s.result.antecedent
-  const δ: Δ = array.tail(s.result.succedent)
-  const b: B = array.head(s.result.succedent)
+  const δ: Δ = tuple.tail(s.result.succedent)
+  const b: B = head.head(s.result.succedent)
   return dr2(sequent(γ, [disjunction(a, b), ...δ]), [s])
 }
 export const reverseDR2 = <
@@ -483,9 +485,9 @@ export const reverseDR2 = <
   p: Derivation<R>,
 ): DR2<Γ, A, B, Δ, R> => {
   const γ: Γ = p.result.antecedent
-  const adb: Disjunction<A, B> = array.head(p.result.succedent)
+  const adb: Disjunction<A, B> = head.head(p.result.succedent)
   const b: B = adb.rightDisjunct
-  const δ: Δ = array.tail(p.result.succedent)
+  const δ: Δ = tuple.tail(p.result.succedent)
   return dr2(p.result, [premise(sequent(γ, [b, ...δ]))])
 }
 export const tryReverseDR2 = <J extends AnySequent>(
@@ -553,9 +555,9 @@ export const applyDL = <
   Derivation<Sequent<[...Γ, A], Δ>>,
   Derivation<Sequent<[...Γ, B], Δ>>
 > => {
-  const γ: Γ = array.init(s1.result.antecedent)
-  const a: A = array.last(s1.result.antecedent)
-  const b: B = array.last(s2.result.antecedent)
+  const γ: Γ = tuple.init(s1.result.antecedent)
+  const a: A = tuple.last(s1.result.antecedent)
+  const b: B = tuple.last(s2.result.antecedent)
   const δ: Δ = s1.result.succedent
   return dl(sequent([...γ, disjunction(a, b)], δ), [s1, s2])
 }
@@ -568,8 +570,8 @@ export const reverseDL = <
 >(
   p: Derivation<R>,
 ): DL<Γ, A, B, Δ, R> => {
-  const γ: Γ = array.init(p.result.antecedent)
-  const adb: Disjunction<A, B> = array.last(p.result.antecedent)
+  const γ: Γ = tuple.init(p.result.antecedent)
+  const adb: Disjunction<A, B> = tuple.last(p.result.antecedent)
   const a: A = adb.leftDisjunct
   const b: B = adb.rightDisjunct
   const δ: Δ = p.result.succedent
@@ -644,9 +646,9 @@ export const applyCR = <
   Derivation<Sequent<Γ, [B, ...Δ]>>
 > => {
   const γ: Γ = s1.result.antecedent
-  const a: A = array.head(s1.result.succedent)
-  const b: B = array.head(s2.result.succedent)
-  const δ: Δ = array.tail(s1.result.succedent)
+  const a: A = head.head(s1.result.succedent)
+  const b: B = head.head(s2.result.succedent)
+  const δ: Δ = tuple.tail(s1.result.succedent)
   return cr(sequent(γ, [conjunction(a, b), ...δ]), [s1, s2])
 }
 export const reverseCR = <
@@ -659,10 +661,10 @@ export const reverseCR = <
   p: Derivation<R>,
 ): CR<Γ, A, B, Δ, R> => {
   const γ: Γ = p.result.antecedent
-  const acb: Conjunction<A, B> = array.head(p.result.succedent)
+  const acb: Conjunction<A, B> = head.head(p.result.succedent)
   const a: A = acb.leftConjunct
   const b: B = acb.rightConjunct
-  const δ: Δ = array.tail(p.result.succedent)
+  const δ: Δ = tuple.tail(p.result.succedent)
   return cr(p.result, [
     premise(sequent(γ, [a, ...δ])),
     premise(sequent(γ, [b, ...δ])),
@@ -736,9 +738,9 @@ export const applyIL = <
   Derivation<Sequent<[...Γ, B], Δ>>
 > => {
   const γ: Γ = s1.result.antecedent
-  const a: A = array.head(s1.result.succedent)
-  const b: B = array.last(s2.result.antecedent)
-  const δ: Δ = array.tail(s1.result.succedent)
+  const a: A = head.head(s1.result.succedent)
+  const b: B = tuple.last(s2.result.antecedent)
+  const δ: Δ = tuple.tail(s1.result.succedent)
   return il(sequent([...γ, implication(a, b)], δ), [s1, s2])
 }
 export const reverseIL = <
@@ -750,8 +752,8 @@ export const reverseIL = <
 >(
   p: Derivation<R>,
 ): IL<Γ, A, B, Δ, R> => {
-  const γ: Γ = array.init(p.result.antecedent)
-  const aib: Implication<A, B> = array.last(p.result.antecedent)
+  const γ: Γ = tuple.init(p.result.antecedent)
+  const aib: Implication<A, B> = tuple.last(p.result.antecedent)
   const a: A = aib.antecedent
   const b: B = aib.consequent
   const δ: Δ = p.result.succedent
@@ -813,10 +815,10 @@ export const applyIR = <
 >(
   s: Derivation<Sequent<[...Γ, A], [B, ...Δ]>>,
 ): ApplyIR<Derivation<Sequent<[...Γ, A], [B, ...Δ]>>> => {
-  const γ: Γ = array.init(s.result.antecedent)
-  const a: A = array.last(s.result.antecedent)
-  const b: B = array.head(s.result.succedent)
-  const δ: Δ = array.tail(s.result.succedent)
+  const γ: Γ = tuple.init(s.result.antecedent)
+  const a: A = tuple.last(s.result.antecedent)
+  const b: B = head.head(s.result.succedent)
+  const δ: Δ = tuple.tail(s.result.succedent)
   return ir(sequent(γ, [implication(a, b), ...δ]), [s])
 }
 export const reverseIR = <
@@ -829,10 +831,10 @@ export const reverseIR = <
   p: Derivation<R>,
 ): IR<Γ, A, B, Δ, R> => {
   const γ: Γ = p.result.antecedent
-  const aib: Implication<A, B> = array.head(p.result.succedent)
+  const aib: Implication<A, B> = head.head(p.result.succedent)
   const a: A = aib.antecedent
   const b: B = aib.consequent
-  const δ: Δ = array.tail(p.result.succedent)
+  const δ: Δ = tuple.tail(p.result.succedent)
   return ir(p.result, [premise(sequent([...γ, a], [b, ...δ]))])
 }
 export const tryReverseIR = <J extends AnySequent>(
@@ -880,8 +882,8 @@ export const applyNL = <Γ extends Formulas, A extends Prop, Δ extends Formulas
   s: Derivation<Sequent<Γ, [A, ...Δ]>>,
 ): ApplyNL<Derivation<Sequent<Γ, [A, ...Δ]>>> => {
   const γ: Γ = s.result.antecedent
-  const a: A = array.head(s.result.succedent)
-  const δ: Δ = array.tail(s.result.succedent)
+  const a: A = head.head(s.result.succedent)
+  const δ: Δ = tuple.tail(s.result.succedent)
   return nl(sequent([...γ, negation(a)], δ), [s])
 }
 export const reverseNL = <
@@ -892,8 +894,8 @@ export const reverseNL = <
 >(
   p: Derivation<R>,
 ): NL<Γ, A, Δ, R> => {
-  const γ: Γ = array.init(p.result.antecedent)
-  const na: Negation<A> = array.last(p.result.antecedent)
+  const γ: Γ = tuple.init(p.result.antecedent)
+  const na: Negation<A> = tuple.last(p.result.antecedent)
   const a: A = na.negand
   const δ: Δ = p.result.succedent
   return nl(p.result, [premise(sequent(γ, [a, ...δ]))])
@@ -941,8 +943,8 @@ export type ApplyNR<S extends AnyDerivation> =
 export const applyNR = <Γ extends Formulas, A extends Prop, Δ extends Formulas>(
   s: Derivation<Sequent<[...Γ, A], Δ>>,
 ): ApplyNR<Derivation<Sequent<[...Γ, A], Δ>>> => {
-  const γ: Γ = array.init(s.result.antecedent)
-  const a: A = array.last(s.result.antecedent)
+  const γ: Γ = tuple.init(s.result.antecedent)
+  const a: A = tuple.last(s.result.antecedent)
   const δ: Δ = s.result.succedent
   return nr(sequent(γ, [negation(a), ...δ]), [s])
 }
@@ -955,9 +957,9 @@ export const reverseNR = <
   p: Derivation<R>,
 ): NR<Γ, A, Δ, R> => {
   const γ: Γ = p.result.antecedent
-  const na: Negation<A> = array.head(p.result.succedent)
+  const na: Negation<A> = head.head(p.result.succedent)
   const a: A = na.negand
-  const δ: Δ = array.tail(p.result.succedent)
+  const δ: Δ = tuple.tail(p.result.succedent)
   return nr(p.result, [premise(sequent([...γ, a], δ))])
 }
 export const tryReverseNR = <J extends AnySequent>(
@@ -1022,7 +1024,7 @@ export const reverseSWL = <
 >(
   p: Derivation<R>,
 ): SWL<Γ, A, Δ, R> => {
-  const γ: Γ = array.init(p.result.antecedent)
+  const γ: Γ = tuple.init(p.result.antecedent)
   const δ: Δ = p.result.succedent
   return swl(p.result, [premise(sequent(γ, δ))])
 }
@@ -1083,7 +1085,7 @@ export const reverseSWR = <
   p: Derivation<R>,
 ): SWR<Γ, A, Δ, R> => {
   const γ: Γ = p.result.antecedent
-  const δ: Δ = array.tail(p.result.succedent)
+  const δ: Δ = tuple.tail(p.result.succedent)
   return swr(p.result, [premise(sequent(γ, δ))])
 }
 export const tryReverseSWR = <J extends AnySequent>(
@@ -1142,8 +1144,8 @@ export const applySCL = <
 >(
   s: Derivation<Sequent<[...Γ, A, A], Δ>>,
 ): ApplySCL<Derivation<Sequent<[...Γ, A, A], Δ>>> => {
-  const γ: Γ = array.init(array.init(s.result.antecedent))
-  const a: A = array.last(s.result.antecedent)
+  const γ: Γ = tuple.init(tuple.init(s.result.antecedent))
+  const a: A = tuple.last(s.result.antecedent)
   const δ: Δ = s.result.succedent
   return scl(sequent([...γ, a], δ), [s])
 }
@@ -1155,8 +1157,8 @@ export const reverseSCL = <
 >(
   p: Derivation<R>,
 ): SCL<Γ, A, Δ, R> => {
-  const γ: Γ = array.init(p.result.antecedent)
-  const a: A = array.last(p.result.antecedent)
+  const γ: Γ = tuple.init(p.result.antecedent)
+  const a: A = tuple.last(p.result.antecedent)
   const δ: Δ = p.result.succedent
   return scl(p.result, [premise(sequent([...γ, a, a], δ))])
 }
@@ -1211,8 +1213,8 @@ export const applySCR = <
   s: Derivation<Sequent<Γ, [A, A, ...Δ]>>,
 ): ApplySCR<Derivation<Sequent<Γ, [A, A, ...Δ]>>> => {
   const γ: Γ = s.result.antecedent
-  const a: A = array.head(s.result.succedent)
-  const δ: Δ = array.tail(array.tail(s.result.succedent))
+  const a: A = head.head(s.result.succedent)
+  const δ: Δ = tuple.tail(tuple.tail(s.result.succedent))
   return scr(sequent(γ, [a, ...δ]), [s])
 }
 export const reverseSCR = <
@@ -1224,8 +1226,8 @@ export const reverseSCR = <
   p: Derivation<R>,
 ): SCR<Γ, A, Δ, R> => {
   const γ: Γ = p.result.antecedent
-  const a: A = array.head(p.result.succedent)
-  const δ: Δ = array.tail(p.result.succedent)
+  const a: A = head.head(p.result.succedent)
+  const δ: Δ = tuple.tail(p.result.succedent)
   return scr(p.result, [premise(sequent(γ, [a, a, ...δ]))])
 }
 export const tryReverseSCR = <J extends AnySequent>(
@@ -1286,9 +1288,9 @@ export const applySRotLF = <
 >(
   s: Derivation<Sequent<[...Γ, B, A], Δ>>,
 ): ApplySRotLF<Derivation<Sequent<[...Γ, B, A], Δ>>> => {
-  const γ: Γ = array.init(array.init(s.result.antecedent))
-  const a: A = array.last(s.result.antecedent)
-  const b: B = array.last(array.init(s.result.antecedent))
+  const γ: Γ = tuple.init(tuple.init(s.result.antecedent))
+  const a: A = tuple.last(s.result.antecedent)
+  const b: B = tuple.last(tuple.init(s.result.antecedent))
   const δ: Δ = s.result.succedent
   return sRotLF(sequent([a, ...γ, b], δ), [s])
 }
@@ -1301,9 +1303,9 @@ export const reverseSRotLF = <
 >(
   p: Derivation<R>,
 ): SRotLF<A, Γ, B, Δ, R> => {
-  const γ: Γ = array.init(array.tail(p.result.antecedent))
-  const a: A = array.head(p.result.antecedent)
-  const b: B = array.last(p.result.antecedent)
+  const γ: Γ = tuple.init(tuple.tail(p.result.antecedent))
+  const a: A = head.head(p.result.antecedent)
+  const b: B = tuple.last(p.result.antecedent)
   const δ: Δ = p.result.succedent
   return sRotLF(p.result, [premise(sequent([...γ, b, a], δ))])
 }
@@ -1363,9 +1365,9 @@ export const applySRotLB = <
 >(
   s: Derivation<Sequent<[A, ...Γ, B], Δ>>,
 ): ApplySRotLB<Derivation<Sequent<[A, ...Γ, B], Δ>>> => {
-  const a: A = array.head(s.result.antecedent)
-  const γ: Γ = array.init(array.tail(s.result.antecedent))
-  const b: B = array.last(s.result.antecedent)
+  const a: A = head.head(s.result.antecedent)
+  const γ: Γ = tuple.init(tuple.tail(s.result.antecedent))
+  const b: B = tuple.last(s.result.antecedent)
   const δ: Δ = s.result.succedent
   return sRotLB(sequent([...γ, b, a], δ), [s])
 }
@@ -1378,9 +1380,9 @@ export const reverseSRotLB = <
 >(
   p: Derivation<R>,
 ): SRotLB<Γ, B, A, Δ, R> => {
-  const γ: Γ = array.init(array.init(p.result.antecedent))
-  const a: A = array.last(p.result.antecedent)
-  const b: B = array.last(array.init(p.result.antecedent))
+  const γ: Γ = tuple.init(tuple.init(p.result.antecedent))
+  const a: A = tuple.last(p.result.antecedent)
+  const b: B = tuple.last(tuple.init(p.result.antecedent))
   const δ: Δ = p.result.succedent
   return sRotLB(p.result, [premise(sequent([a, ...γ, b], δ))])
 }
@@ -1441,9 +1443,9 @@ export const applySRotRF = <
   s: Derivation<Sequent<Γ, [A, B, ...Δ]>>,
 ): ApplySRotRF<Derivation<Sequent<Γ, [A, B, ...Δ]>>> => {
   const γ: Γ = s.result.antecedent
-  const δ: Δ = array.tail(array.tail(s.result.succedent))
-  const a: A = array.head(s.result.succedent)
-  const b: B = array.head(array.tail(s.result.succedent))
+  const δ: Δ = tuple.tail(tuple.tail(s.result.succedent))
+  const a: A = head.head(s.result.succedent)
+  const b: B = head.head(tuple.tail(s.result.succedent))
   return sRotRF(sequent(γ, [b, ...δ, a]), [s])
 }
 export const reverseSRotRF = <
@@ -1456,9 +1458,9 @@ export const reverseSRotRF = <
   p: Derivation<R>,
 ): SRotRF<Γ, B, Δ, A, R> => {
   const γ: Γ = p.result.antecedent
-  const δ: Δ = array.init(array.tail(p.result.succedent))
-  const a: A = array.last(p.result.succedent)
-  const b: B = array.head(p.result.succedent)
+  const δ: Δ = tuple.init(tuple.tail(p.result.succedent))
+  const a: A = tuple.last(p.result.succedent)
+  const b: B = head.head(p.result.succedent)
   return sRotRF(p.result, [premise(sequent(γ, [a, b, ...δ]))])
 }
 export const tryReverseSRotRF = <J extends AnySequent>(
@@ -1518,9 +1520,9 @@ export const applySRotRB = <
   s: Derivation<Sequent<Γ, [B, ...Δ, A]>>,
 ): ApplySRotRB<Derivation<Sequent<Γ, [B, ...Δ, A]>>> => {
   const γ: Γ = s.result.antecedent
-  const δ: Δ = array.init(array.tail(s.result.succedent))
-  const a: A = array.last(s.result.succedent)
-  const b: B = array.head(s.result.succedent)
+  const δ: Δ = tuple.init(tuple.tail(s.result.succedent))
+  const a: A = tuple.last(s.result.succedent)
+  const b: B = head.head(s.result.succedent)
   return sRotRB(sequent(γ, [a, b, ...δ]), [s])
 }
 export const reverseSRotRB = <
@@ -1533,9 +1535,9 @@ export const reverseSRotRB = <
   p: Derivation<R>,
 ): SRotRB<Γ, A, B, Δ, R> => {
   const γ: Γ = p.result.antecedent
-  const δ: Δ = array.tail(array.tail(p.result.succedent))
-  const a: A = array.head(p.result.succedent)
-  const b: B = array.head(array.tail(p.result.succedent))
+  const δ: Δ = tuple.tail(tuple.tail(p.result.succedent))
+  const a: A = head.head(p.result.succedent)
+  const b: B = head.head(tuple.tail(p.result.succedent))
   return sRotRB(p.result, [premise(sequent(γ, [b, ...δ, a]))])
 }
 export const tryReverseSRotRB = <J extends AnySequent>(
@@ -1596,9 +1598,9 @@ export const applySXL = <
 >(
   s: Derivation<Sequent<[...Γ, A, B], Δ>>,
 ): ApplySXL<Derivation<Sequent<[...Γ, A, B], Δ>>> => {
-  const γ: Γ = array.init(array.init(s.result.antecedent))
-  const b: B = array.last(s.result.antecedent)
-  const a: A = array.last(array.init(s.result.antecedent))
+  const γ: Γ = tuple.init(tuple.init(s.result.antecedent))
+  const b: B = tuple.last(s.result.antecedent)
+  const a: A = tuple.last(tuple.init(s.result.antecedent))
   const δ: Δ = s.result.succedent
   return sxl(sequent([...γ, b, a], δ), [s])
 }
@@ -1611,9 +1613,9 @@ export const reverseSXL = <
 >(
   p: Derivation<R>,
 ): SXL<Γ, B, A, Δ, R> => {
-  const γ: Γ = array.init(array.init(p.result.antecedent))
-  const a: A = array.last(p.result.antecedent)
-  const b: B = array.last(array.init(p.result.antecedent))
+  const γ: Γ = tuple.init(tuple.init(p.result.antecedent))
+  const a: A = tuple.last(p.result.antecedent)
+  const b: B = tuple.last(tuple.init(p.result.antecedent))
   const δ: Δ = p.result.succedent
   return sxl(p.result, [premise(sequent([...γ, a, b], δ))])
 }
@@ -1676,9 +1678,9 @@ export const applySXR = <
   s: Derivation<Sequent<Γ, [A, B, ...Δ]>>,
 ): ApplySXR<Derivation<Sequent<Γ, [A, B, ...Δ]>>> => {
   const γ: Γ = s.result.antecedent
-  const b: B = array.head(array.tail(s.result.succedent))
-  const a: A = array.head(s.result.succedent)
-  const δ: Δ = array.tail(array.tail(s.result.succedent))
+  const b: B = head.head(tuple.tail(s.result.succedent))
+  const a: A = head.head(s.result.succedent)
+  const δ: Δ = tuple.tail(tuple.tail(s.result.succedent))
   return sxr(sequent(γ, [b, a, ...δ]), [s])
 }
 export const reverseSXR = <
@@ -1691,9 +1693,9 @@ export const reverseSXR = <
   p: Derivation<R>,
 ): SXR<Γ, B, A, Δ, R> => {
   const γ: Γ = p.result.antecedent
-  const a: A = array.head(array.tail(p.result.succedent))
-  const b: B = array.head(p.result.succedent)
-  const δ: Δ = array.tail(array.tail(p.result.succedent))
+  const a: A = head.head(tuple.tail(p.result.succedent))
+  const b: B = head.head(p.result.succedent)
+  const δ: Δ = tuple.tail(tuple.tail(p.result.succedent))
   return sxr(p.result, [premise(sequent(γ, [a, b, ...δ]))])
 }
 export const tryReverseSXR = <J extends AnySequent>(

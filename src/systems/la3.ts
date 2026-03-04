@@ -1,5 +1,6 @@
 import * as prop from '../lib/prop'
 import * as array from '../lib/array'
+import * as head from "../lib/tuple"
 import * as utils from '../lib/utils'
 import { AnyConclusion, Conclusion, conclusion } from '../lib/judgement'
 import * as print from '../lib/print'
@@ -62,7 +63,7 @@ export type AnyA1Result = A1Result<Prop, Prop>
 export const isA1Result: Refinement<AnyConclusion, AnyA1Result> = (
   c,
 ): c is AnyA1Result => {
-  const piqip = array.head(c.succedent)
+  const piqip = head.head(c.succedent)
   if (piqip.kind !== 'implication') {
     return false
   }
@@ -122,7 +123,7 @@ export type AnyA2Result = A2Result<Prop, Prop, Prop>
 export const isA2Result: Refinement<AnyConclusion, AnyA2Result> = (
   c,
 ): c is AnyA2Result => {
-  const piqiripiqipir = array.head(c.succedent)
+  const piqiripiqipir = head.head(c.succedent)
   if (piqiripiqipir.kind !== 'implication') {
     return false
   }
@@ -229,7 +230,7 @@ export type AnyA3Result = A3Result<Prop, Prop>
 export const isA3Result: Refinement<AnyConclusion, AnyA3Result> = (
   c,
 ): c is AnyA3Result => {
-  const npinqiqip = array.head(c.succedent)
+  const npinqiqip = head.head(c.succedent)
   if (npinqiqip.kind !== 'implication') {
     return false
   }
@@ -346,7 +347,7 @@ export const reverseMP = <
   d: Derivation<C>,
   p: P,
 ): MP<Q, P, C> => {
-  const q: Q = array.head(d.result.succedent)
+  const q: Q = head.head(d.result.succedent)
   const piq: Implication<P, Q> = implication(p, q)
   return mp(d.result, [premise(conclusion(piq)), premise(conclusion(p))])
 }

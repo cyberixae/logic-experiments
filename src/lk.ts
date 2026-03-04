@@ -1,7 +1,6 @@
-import { NonEmptyArray } from './lib/array'
 import { log } from './lib/block'
-import { premise, editDerivation, isProof, AnyDerivation, lsDerivation } from './lib/derivation'
-import { conclusion } from './lib/judgement'
+import { editDerivation, isProof, AnyDerivation, premise } from './lib/derivation'
+import { AnyJudgement, conclusion } from './lib/judgement'
 import * as print from './lib/print'
 import {
   lk,
@@ -12,6 +11,7 @@ import {
   usage,
   rev,
 } from './systems/lk'
+import { activePath, apply, focus, Focus, undo } from './lib/focus'
 
 const list = (d: AnyDerivation, p: Array<number>) =>
   Object.entries(rev).flatMap(([n, r]): [] | [string] => {
@@ -31,23 +31,24 @@ const example = lk.z.ir(
   ),
 )
 
-const status = (d: AnyDerivation | null) => {
-  if (!d) {
-    return
-  }
+const status = (s: Focus<AnyJudgement>) => {
   log()
   log()
-  log(print.fromDerivation(d))
+  log(print.fromDerivation(s.derivation))
   log()
-  lsDerivation(d).forEach((x) => {
-    log(JSON.stringify(x) + ': ' + list(d, x).join(', '))
-  })
+  log(String(s.branch))
+  const path = activePath(s)
+  log(JSON.stringify(path))
+  log()
+  log(list(s.derivation, path).join(', '))
   log()
   log()
   log()
 }
 
-const goal = premise(
+export const setGoal = <J extends AnyJudgement>(j: J): Focus<J> => focus(premise(j));
+
+const step0 = setGoal(
   conclusion(
     lk.o.p2.implication(
       lk.o.p2.implication(
@@ -58,18 +59,20 @@ const goal = premise(
     ),
   ),
 )
-status(goal)
-const step1 = editDerivation(goal, [], tryReverseIR)
+status(step0)
+const step1 = apply(step0, tryReverseIR)
 status(step1)
-const step2 = editDerivation(step1, [0], tryReverseSWL)
+const step2 = apply(step1, tryReverseSWL)
 status(step2)
-const step3 = editDerivation(step2, [0, 0], tryReverseIR)
+const step3 = apply(step2, tryReverseIR)
 status(step3)
-const step4 = editDerivation(step3, [0, 0, 0], tryReverseI)
+const step4 = apply(step3, tryReverseI)
 status(step4)
-if (!step4 || !isProof(step4)) {
+if (!step4 || !isProof(step4.derivation)) {
   throw step4
 }
+const bob = undo(step0)
+status(bob)
 
 //log(usage)
 //log()
