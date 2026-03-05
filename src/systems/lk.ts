@@ -1,7 +1,7 @@
 import * as prop from '../lib/prop'
 import * as array from '../lib/array'
-import * as tuple from "../lib/tuple"
-import * as head from "../lib/tuple"
+import * as tuple from '../lib/tuple'
+import * as head from '../lib/tuple'
 import * as print from '../lib/print'
 import {
   Formulas,

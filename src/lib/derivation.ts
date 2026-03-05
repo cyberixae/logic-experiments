@@ -167,14 +167,20 @@ export const editDerivation = <J extends AnyJudgement>(
 export const lsPremise = (_d: AnyPremise, path: Path): NonEmptyArray<Path> => {
   return [path]
 }
-export const lsTransformation = (d: AnyTransformation, path: Path): NonEmptyArray<Path> => {
-  const paths = d.deps.flatMap((dep, i) => lsDerivation(dep, [...path, i] ))
+export const lsTransformation = (
+  d: AnyTransformation,
+  path: Path,
+): NonEmptyArray<Path> => {
+  const paths = d.deps.flatMap((dep, i) => lsDerivation(dep, [...path, i]))
   if (isNonEmptyArray(paths)) {
     return paths
   }
   return [path]
 }
-export const lsDerivation = (root: AnyDerivation, path: Path = []): NonEmptyArray<Path> => {
+export const lsDerivation = (
+  root: AnyDerivation,
+  path: Path = [],
+): NonEmptyArray<Path> => {
   switch (root.kind) {
     case 'premise':
       return lsPremise(root, path)

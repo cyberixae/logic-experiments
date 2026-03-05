@@ -4,6 +4,8 @@ import * as judge from './judgement'
 import * as block from './block'
 import { NonEmptyArray, isNonEmptyArray } from './array'
 import { AnyDerivation, AnyPremise, AnyTransformation } from './derivation'
+import { Focus, activePath } from './focus'
+import { AnyJudgement } from './judgement'
 
 export type NullaryTemplate = [string]
 export const NullaryTemplateId = {
@@ -380,3 +382,10 @@ export function fromMeta(meta: any) {
     ]),
   )
 }
+export const fromFocus = (s: Focus<AnyJudgement>) =>
+  fromDerivation(s.derivation) +
+  '\n' +
+  '\n' +
+  String(s.branch) +
+  ': ' +
+  JSON.stringify(activePath(s))

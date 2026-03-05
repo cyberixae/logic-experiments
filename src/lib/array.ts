@@ -4,7 +4,8 @@ export const isNonEmptyArray = <A>(a: Array<A>): a is NonEmptyArray<A> => {
   return a.hasOwnProperty(0)
 }
 
-export const init = <T>(arr: NonEmptyArray<T>): Array<T> => arr.slice(0, -1) as Array<T>
+export const init = <T>(arr: NonEmptyArray<T>): Array<T> =>
+  arr.slice(0, -1) as Array<T>
 
 export const zip = <A, B>(a: Array<A>, b: Array<B>): Array<[A, B]> => {
   return Array.from({ length: Math.min(a.length, b.length) }).map(

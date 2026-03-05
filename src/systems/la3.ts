@@ -1,6 +1,6 @@
 import * as prop from '../lib/prop'
 import * as array from '../lib/array'
-import * as head from "../lib/tuple"
+import * as head from '../lib/tuple'
 import * as utils from '../lib/utils'
 import { AnyConclusion, Conclusion, conclusion } from '../lib/judgement'
 import * as print from '../lib/print'
