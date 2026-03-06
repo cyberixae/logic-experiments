@@ -1,7 +1,7 @@
-import { log } from './lib/block'
-import { isProof, premise } from './lib/derivation'
-import { conclusion } from './lib/judgement'
-import * as print from './lib/print'
+import { log } from './render/block'
+import { isProof, premise } from './model/derivation'
+import { conclusion } from './model/judgement'
+import * as print from './render/print'
 import {
   editBranch,
   la3,

@@ -1,11 +1,11 @@
-import * as utils from './utils'
-import * as prop from './prop'
-import * as judge from './judgement'
+import * as utils from '../utils/utils'
+import * as prop from '../model/prop'
+import * as judge from '../model/judgement'
 import * as block from './block'
-import { NonEmptyArray, isNonEmptyArray } from './array'
-import { AnyDerivation, AnyPremise, AnyTransformation } from './derivation'
-import { Focus, activePath } from './focus'
-import { AnyJudgement } from './judgement'
+import { NonEmptyArray, isNonEmptyArray } from '../utils/array'
+import { AnyDerivation, AnyPremise, AnyTransformation } from '../model/derivation'
+import { Focus, activePath } from '../interactive/focus'
+import { AnyJudgement } from '../model/judgement'
 
 export type NullaryTemplate = [string]
 export const NullaryTemplateId = {

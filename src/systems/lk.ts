@@ -1,14 +1,14 @@
-import * as prop from '../lib/prop'
-import * as array from '../lib/array'
-import * as tuple from '../lib/tuple'
-import * as head from '../lib/tuple'
-import * as print from '../lib/print'
+import * as prop from '../model/prop'
+import * as array from '../utils/array'
+import * as tuple from '../utils/tuple'
+import * as head from '../utils/tuple'
+import * as print from '../render/print'
 import {
   Formulas,
   Judgement as Sequent,
   judgement as sequent,
   AnyJudgement as AnySequent,
-} from '../lib/judgement'
+} from '../model/judgement'
 import {
   AnyDerivation,
   Derivation,
@@ -20,8 +20,8 @@ import {
   refineDerivation,
   isProof,
   toProof,
-} from '../lib/derivation'
-import { Refinement } from '../lib/generic'
+} from '../model/derivation'
+import { Refinement } from '../utils/generic'
 
 // Connectives
 

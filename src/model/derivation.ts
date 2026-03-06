@@ -1,6 +1,6 @@
-import { isNonEmptyArray, NonEmptyArray, replaceItem, zip } from './array'
+import { isNonEmptyArray, NonEmptyArray, replaceItem, zip } from '../utils/array'
 import { AnyJudgement, equals } from './judgement'
-import { Refinement } from './generic'
+import { Refinement } from '../utils/generic'
 
 export type Rule = string
 

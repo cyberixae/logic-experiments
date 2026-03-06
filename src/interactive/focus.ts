@@ -1,4 +1,4 @@
-import * as array from './array'
+import * as array from '../utils/array'
 import {
   Derivation,
   Edit,
@@ -6,8 +6,8 @@ import {
   lsDerivation,
   Path,
   premise,
-} from './derivation'
-import { AnyJudgement } from './judgement'
+} from '../model/derivation'
+import { AnyJudgement } from '../model/judgement'
 
 export type Focus<J extends AnyJudgement> = {
   derivation: Derivation<J>

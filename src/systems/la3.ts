@@ -1,9 +1,9 @@
-import * as prop from '../lib/prop'
-import * as array from '../lib/array'
-import * as head from '../lib/tuple'
-import * as utils from '../lib/utils'
-import { AnyConclusion, Conclusion, conclusion } from '../lib/judgement'
-import * as print from '../lib/print'
+import * as prop from '../model/prop'
+import * as array from '../utils/array'
+import * as head from '../utils/tuple'
+import * as utils from '../utils/utils'
+import { AnyConclusion, Conclusion, conclusion } from '../model/judgement'
+import * as print from '../render/print'
 import {
   introduction,
   Introduction,
@@ -15,8 +15,8 @@ import {
   editDerivation as editBranchG,
   toProof,
   Edit,
-} from '../lib/derivation'
-import { Refinement } from '../lib/generic'
+} from '../model/derivation'
+import { Refinement } from '../utils/generic'
 
 // Connectives
 

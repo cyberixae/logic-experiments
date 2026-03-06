@@ -1,18 +1,14 @@
-import { log } from './lib/block'
-import {
-  editDerivation,
-  isProof,
-  AnyDerivation,
-  premise,
-  Proof,
-  Path,
-} from './lib/derivation'
-import { AnyJudgement, conclusion } from './lib/judgement'
-import { lk, rev } from './systems/lk'
-import { activePath, apply, focus, Focus, undo } from './lib/focus'
-import { fromFocus } from './lib/print'
+import { log } from './render/block'
+import { editDerivation, AnyDerivation, Path } from './model/derivation'
+import { AnyJudgement } from './model/judgement'
+import { rev } from './systems/lk'
+import { activePath, Focus } from './interactive/focus'
+import { fromFocus } from './render/print'
+import { level1 } from './Level'
+import { search } from './interactive/search'
+import * as event from './interactive/event'
 
-type Rev = keyof typeof rev
+export type Rev = keyof typeof rev
 
 const list = (d: AnyDerivation, p: Path): Array<Rev> =>
   Object.entries(rev).flatMap(([n, r]): [] | [keyof typeof rev] => {
@@ -22,34 +18,6 @@ const list = (d: AnyDerivation, p: Path): Array<Rev> =>
     return []
   })
 
-type Level<J extends AnyJudgement> = {
-  rules: Array<Rev>
-  goal: J
-  solution: Proof<J>
-}
-
-const level1: Level<AnyJudgement> = {
-  rules: Object.keys(rev),
-  goal: conclusion(
-    lk.o.p2.implication(
-      lk.o.p2.implication(
-        lk.a('p'),
-        lk.o.p2.implication(lk.a('q'), lk.o.p1.negation(lk.a('p'))),
-      ),
-      lk.o.p2.implication(lk.a('p'), lk.a('p')),
-    ),
-  ),
-  solution: lk.z.ir(
-    lk.z.swl(
-      lk.o.p2.implication(
-        lk.a('p'),
-        lk.o.p2.implication(lk.a('q'), lk.o.p1.negation(lk.a('p'))),
-      ),
-      lk.z.ir(lk.i.i(lk.a('p'))),
-    ),
-  ),
-} as any
-
 const status = (s: Focus<AnyJudgement>): string =>
   '\n\n' +
   fromFocus(s) +
@@ -57,24 +25,42 @@ const status = (s: Focus<AnyJudgement>): string =>
   list(s.derivation, activePath(s)).join(', ') +
   '\n'
 
-export const setGoal = <J extends AnyJudgement>(j: J): Focus<J> =>
-  focus(premise(j))
-
 const isRev = (u: unknown): u is Rev => typeof u === 'string' && u in rev
 
-function* repl(l: Level<AnyJudgement>): Generator<string, void, string> {
-  let state = setGoal(l.goal)
-  while (!isProof(state.derivation)) {
-    const cmd = yield status(state)
-    const edit = isRev(cmd) ? rev[cmd] : null
-    if (!edit) {
+const parseCommand = (cmd: string): event.Event | null => {
+  switch (cmd) {
+    case 'next':
+      return event.next()
+    case 'prev':
+      return event.prev()
+    case 'undo':
+      return event.undo()
+    default:
+      if (isRev(cmd)) {
+        return event.reverse(cmd)
+      }
+  }
+  return null
+}
+
+function* repl(goal: AnyJudgement): Generator<string, void, string> {
+  const init = search(goal)
+  let g = init()
+  let state = g.next()
+  while (!state.done) {
+    const cmd = yield status(state.value)
+    if (cmd === 'quit') {
+      return
+    }
+    const parsed = parseCommand(cmd)
+    if (!parsed) {
       continue
     }
-    state = apply(state, edit)
+    state = g.next(parsed)
   }
-  yield status(state)
 }
-const x = repl(level1)
+
+const x = repl(level1.goal)
 
 const test = () =>
   ['', 'ir', 'swl', 'ir', 'i'].map((c) => {

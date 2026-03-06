@@ -1,4 +1,4 @@
-import { NonEmptyArray, isNonEmptyArray } from './array'
+import { NonEmptyArray, isNonEmptyArray } from '../utils/array'
 
 const space = ' '
 
