@@ -16,6 +16,7 @@
     "build": "yarn tsc",
     "lk": "yarn build && node ./lib/lk.js",
     "la3": "yarn build && node ./lib/la3.js",
+    "main": "yarn build && node ./lib/main.js",
     "prettify": "prettier . --write"
   }
 }
