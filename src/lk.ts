@@ -5,16 +5,16 @@ import { applyEvent, focus } from './interactive/focus'
 import { reverse } from './interactive/event'
 import * as print from './render/print'
 
-import {  lk,  usage,} from './systems/lk'
+import { lk, usage } from './systems/lk'
 
 const goal = conclusion(
+  lk.o.p2.implication(
     lk.o.p2.implication(
-      lk.o.p2.implication(
-        lk.a('p'),
-        lk.o.p2.implication(lk.a('q'), lk.o.p1.negation(lk.a('p'))),
-      ),
-      lk.o.p2.implication(lk.a('p'), lk.a('p')),
+      lk.a('p'),
+      lk.o.p2.implication(lk.a('q'), lk.o.p1.negation(lk.a('p'))),
     ),
+    lk.o.p2.implication(lk.a('p'), lk.a('p')),
+  ),
 )
 
 const proof = lk.z.ir(
@@ -27,12 +27,16 @@ const proof = lk.z.ir(
   ),
 )
 
-let state = focus(premise(goal));
+let state = focus(premise(goal))
 state = applyEvent(state, reverse('ir'))
 state = applyEvent(state, reverse('swl'))
 state = applyEvent(state, reverse('ir'))
 state = applyEvent(state, reverse('i'))
-if (!state || !isProof(state.derivation) || !equalsDerivation(state.derivation, proof)) {
+if (
+  !state ||
+  !isProof(state.derivation) ||
+  !equalsDerivation(state.derivation, proof)
+) {
   throw state
 }
 

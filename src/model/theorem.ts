@@ -8,6 +8,4 @@ export type Conjecture<J extends AnyJudgement> = {
 }
 export interface Theorem<J extends AnyJudgement> extends Conjecture<J> {
   solution: Proof<J>
-} 
-
-
+}

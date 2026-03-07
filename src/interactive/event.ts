@@ -1,4 +1,4 @@
-import { isRev, Rev } from '../systems/lk';
+import { isRev, Rev } from '../systems/lk'
 
 export type Reverse<R extends Rev> = { kind: 'reverse'; rev: R }
 export const reverse = <R extends Rev>(rev: R): Reverse<R> => ({
@@ -32,4 +32,3 @@ export const parseEvent = (str: string): Event | null => {
   }
   return null
 }
-

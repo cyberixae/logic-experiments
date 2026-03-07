@@ -61,7 +61,10 @@ export const undo = <J extends AnyJudgement>(s: Focus<J>): Focus<J> => {
   return s
 }
 
-export const applyEvent = <J extends AnyJudgement>(state: Focus<J>, ev: Event): Focus<J> => {
+export const applyEvent = <J extends AnyJudgement>(
+  state: Focus<J>,
+  ev: Event,
+): Focus<J> => {
   switch (ev.kind) {
     case 'reverse':
       const edit = rev[ev.rev]
@@ -82,4 +85,3 @@ export const applyEvent = <J extends AnyJudgement>(state: Focus<J>, ev: Event): 
   }
   return state
 }
-

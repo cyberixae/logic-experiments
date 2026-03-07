@@ -1,1 +1,1 @@
-export type Option<T> = [T] | [];
+export type Option<T> = [T] | []

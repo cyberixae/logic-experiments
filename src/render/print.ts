@@ -3,7 +3,11 @@ import * as prop from '../model/prop'
 import * as judge from '../model/judgement'
 import * as block from './block'
 import { NonEmptyArray, isNonEmptyArray } from '../utils/array'
-import { AnyDerivation, AnyPremise, AnyTransformation } from '../model/derivation'
+import {
+  AnyDerivation,
+  AnyPremise,
+  AnyTransformation,
+} from '../model/derivation'
 import { Focus, activePath } from '../interactive/focus'
 import { AnyJudgement } from '../model/judgement'
 

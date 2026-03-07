@@ -1,5 +1,10 @@
-import { isNonEmptyArray, NonEmptyArray, replaceItem, zip } from '../utils/array'
-import { AnyJudgement, equals} from './judgement'
+import {
+  isNonEmptyArray,
+  NonEmptyArray,
+  replaceItem,
+  zip,
+} from '../utils/array'
+import { AnyJudgement, equals } from './judgement'
 import { Refinement } from '../utils/generic'
 
 export type Rule = string
@@ -196,7 +201,10 @@ export const equalsTransformation = (
   a: AnyTransformation,
   b: AnyTransformation,
 ): boolean => {
-  return isEquivalent(a, b) && zip(a.deps, b.deps).every(([aDep, bDep]) => equalsDerivation(aDep, bDep))
+  return (
+    isEquivalent(a, b) &&
+    zip(a.deps, b.deps).every(([aDep, bDep]) => equalsDerivation(aDep, bDep))
+  )
 }
 
 export const equalsDerivation = (
