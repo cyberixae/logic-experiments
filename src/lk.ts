@@ -36,7 +36,7 @@ if (!state || !isProof(state.derivation) || !equalsDerivation(state.derivation, 
   throw state
 }
 
-log(usage)
+log(usage())
 log()
 log('Sandbox')
 log()

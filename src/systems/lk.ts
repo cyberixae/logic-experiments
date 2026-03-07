@@ -1905,7 +1905,7 @@ export const meta = {
   ],
 } as const
 
-export const usage = print.fromMeta(meta)
+export const usage = () => print.fromMeta(meta)
 
 export const lk = {
   a: alpha,
