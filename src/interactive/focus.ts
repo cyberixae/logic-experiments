@@ -8,6 +8,8 @@ import {
   premise,
 } from '../model/derivation'
 import { AnyJudgement } from '../model/judgement'
+import { rev } from '../systems/lk'
+import { Event } from './event'
 
 export type Focus<J extends AnyJudgement> = {
   derivation: Derivation<J>
@@ -58,3 +60,26 @@ export const undo = <J extends AnyJudgement>(s: Focus<J>): Focus<J> => {
   }
   return s
 }
+
+export const applyEvent = <J extends AnyJudgement>(state: Focus<J>, ev: Event): Focus<J> => {
+  switch (ev.kind) {
+    case 'reverse':
+      const edit = rev[ev.rev]
+      if (!edit) {
+        break
+      }
+      state = apply(state, edit)
+      break
+    case 'undo':
+      state = undo(state)
+      break
+    case 'next':
+      state = next(state)
+      break
+    case 'prev':
+      state = prev(state)
+      break
+  }
+  return state
+}
+

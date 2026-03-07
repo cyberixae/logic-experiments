@@ -20,8 +20,12 @@ import {
   refineDerivation,
   isProof,
   toProof,
+  editDerivation,
+  Path,
 } from '../model/derivation'
 import { Refinement } from '../utils/generic'
+import { Option } from '../utils/option'
+import { entries } from '../utils/record'
 
 // Connectives
 
@@ -1909,3 +1913,15 @@ export const lk = {
   i: iota,
   z: zeta,
 }
+
+export type Rev = keyof typeof rev
+export const isRev = (u: unknown): u is Rev => typeof u === 'string' && u in rev;
+
+export const revs = <J extends AnySequent>(d: Derivation<J>, p: Path): Array<[Rev, Derivation<J>]> => entries(rev).flatMap(([rev, ed]): Option<[Rev, Derivation<J>]> => {
+  const result = editDerivation(d, p, ed)
+  if (result) {
+    return [[rev, result]]
+  }
+  return []
+})
+
