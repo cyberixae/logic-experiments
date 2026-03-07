@@ -1,5 +1,5 @@
 import { isNonEmptyArray, NonEmptyArray, replaceItem, zip } from '../utils/array'
-import { AnyJudgement, equals } from './judgement'
+import { AnyJudgement, equals} from './judgement'
 import { Refinement } from '../utils/generic'
 
 export type Rule = string
@@ -186,5 +186,33 @@ export const lsDerivation = (
       return lsPremise(root, path)
     case 'transformation':
       return lsTransformation(root, path)
+  }
+}
+
+export const equalsPremise = (a: AnyPremise, b: AnyPremise): boolean => {
+  return isEquivalent(a, b)
+}
+export const equalsTransformation = (
+  a: AnyTransformation,
+  b: AnyTransformation,
+): boolean => {
+  return isEquivalent(a, b) && zip(a.deps, b.deps).every(([aDep, bDep]) => equalsDerivation(aDep, bDep))
+}
+
+export const equalsDerivation = (
+  a: AnyDerivation,
+  b: AnyDerivation,
+): boolean => {
+  switch (a.kind) {
+    case 'premise':
+      if (b.kind !== 'premise') {
+        return false
+      }
+      return equalsPremise(a, b)
+    case 'transformation':
+      if (b.kind !== 'transformation') {
+        return false
+      }
+      return equalsTransformation(a, b)
   }
 }
