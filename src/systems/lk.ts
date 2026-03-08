@@ -124,6 +124,7 @@ export const tryReverseI = <J extends AnySequent>(
 ): Derivation<J> | null => {
   return isIResultDerivation(d) ? reverseI(d) : null
 }
+export const exampleI = applyI(atom('A'))
 
 // Cut
 
@@ -207,6 +208,10 @@ export const tryReverseCut = <J extends AnySequent, A extends Prop>(
 ): Derivation<J> | null => {
   return isCutResultDerivation(d) ? reverseCut(d, a) : null
 }
+export const exampleCut = applyCut(
+  premise(sequent([atom('Γ')], [atom('Δ'), atom('A')])),
+  premise(sequent([atom('A'), atom('Γ')], [atom('Δ')])),
+)
 
 // Conjunction & Disjunction
 
@@ -280,6 +285,10 @@ export const tryReverseCL1 = <J extends AnySequent>(
 ): Derivation<J> | null => {
   return isCL1ResultDerivation(d) ? reverseCL1(d) : null
 }
+export const exampleCL1 = applyCL1(
+  atom('B'),
+  premise(sequent([atom('Γ'), atom('A')], [atom('Δ')])),
+)
 
 export type DR1Result<
   Γ extends Formulas,
@@ -354,6 +363,10 @@ export const tryReverseDR1 = <J extends AnySequent>(
 ): Derivation<J> | null => {
   return isDR1ResultDerivation(d) ? reverseDR1(d) : null
 }
+export const exampleDR1 = applyDR1(
+  atom('B'),
+  premise(sequent([atom('Γ')], [atom('A'), atom('Δ')])),
+)
 
 export type CL2Result<
   Γ extends Formulas,
@@ -425,6 +438,10 @@ export const tryReverseCL2 = <J extends AnySequent>(
 ): Derivation<J> | null => {
   return isCL2ResultDerivation(d) ? reverseCL2(d) : null
 }
+export const exampleCL2 = applyCL2(
+  atom('A'),
+  premise(sequent([atom('Γ'), atom('B')], [atom('Δ')])),
+)
 
 export type DR2Result<
   Γ extends Formulas,
@@ -499,6 +516,10 @@ export const tryReverseDR2 = <J extends AnySequent>(
 ): Derivation<J> | null => {
   return isDR2ResultDerivation(d) ? reverseDR2(d) : null
 }
+export const exampleDR2 = applyDR2(
+  atom('A'),
+  premise(sequent([atom('Γ'), atom('B')], [atom('Δ')])),
+)
 
 export type DLResult<
   Γ extends Formulas,
@@ -589,6 +610,10 @@ export const tryReverseDL = <J extends AnySequent>(
 ): Derivation<J> | null => {
   return isDLResultDerivation(d) ? reverseDL(d) : null
 }
+export const exampleDL = applyDL(
+  premise(sequent([atom('Γ'), atom('A')], [atom('Δ')])),
+  premise(sequent([atom('Γ'), atom('B')], [atom('Δ')])),
+)
 
 export type CRResult<
   Γ extends Formulas,
@@ -679,6 +704,10 @@ export const tryReverseCR = <J extends AnySequent>(
 ): Derivation<J> | null => {
   return isCRResultDerivation(d) ? reverseCR(d) : null
 }
+export const exampleCR = applyCR(
+  premise(sequent([atom('Γ')], [atom('A'), atom('Δ')])),
+  premise(sequent([atom('Γ')], [atom('B'), atom('Δ')])),
+)
 
 // Implication
 
@@ -771,6 +800,10 @@ export const tryReverseIL = <J extends AnySequent>(
 ): Derivation<J> | null => {
   return isILResultDerivation(d) ? reverseIL(d) : null
 }
+export const exampleIL = applyIL(
+  premise(sequent([atom('Γ')], [atom('A'), atom('Δ')])),
+  premise(sequent([atom('Γ'), atom('B')], [atom('Δ')])),
+)
 
 export type IRResult<
   Γ extends Formulas,
@@ -846,6 +879,9 @@ export const tryReverseIR = <J extends AnySequent>(
 ): Derivation<J> | null => {
   return isIRResultDerivation(d) ? reverseIR(d) : null
 }
+export const exampleIR = applyIR(
+  premise(sequent([atom('Γ'), atom('A')], [atom('B'), atom('Δ')])),
+)
 
 // Negation
 
@@ -909,6 +945,9 @@ export const tryReverseNL = <J extends AnySequent>(
 ): Derivation<J> | null => {
   return isNLResultDerivation(d) ? reverseNL(d) : null
 }
+export const exampleNL = applyNL(
+  premise(sequent([atom('Γ')], [atom('A'), atom('Δ')])),
+)
 
 export type NRResult<
   Γ extends Formulas,
@@ -971,6 +1010,9 @@ export const tryReverseNR = <J extends AnySequent>(
 ): Derivation<J> | null => {
   return isNRResultDerivation(d) ? reverseNR(d) : null
 }
+export const exampleNR = applyNR(
+  premise(sequent([atom('Γ'), atom('A')], [atom('Δ')])),
+)
 
 // Weakening
 
@@ -1037,6 +1079,10 @@ export const tryReverseSWL = <J extends AnySequent>(
 ): Derivation<J> | null => {
   return isSWLResultDerivation(d) ? reverseSWL(d) : null
 }
+export const exampleSWL = applySWL(
+  atom('A'),
+  premise(sequent([atom('Γ')], [atom('Δ')])),
+)
 
 export type SWRResult<
   Γ extends Formulas,
@@ -1097,6 +1143,10 @@ export const tryReverseSWR = <J extends AnySequent>(
 ): Derivation<J> | null => {
   return isSWRResultDerivation(d) ? reverseSWR(d) : null
 }
+export const exampleSWR = applySWR(
+  atom('A'),
+  premise(sequent([atom('Γ')], [atom('Δ')])),
+)
 
 // Contraction
 
@@ -1171,6 +1221,9 @@ export const tryReverseSCL = <J extends AnySequent>(
 ): Derivation<J> | null => {
   return isSCLResultDerivation(d) ? reverseSCL(d) : null
 }
+export const exampleSCL = applySCL(
+  premise(sequent([atom('Γ'), atom('A'), atom('A')], [atom('Δ')])),
+)
 
 export type SCRResult<
   Γ extends Formulas,
@@ -1239,6 +1292,9 @@ export const tryReverseSCR = <J extends AnySequent>(
 ): Derivation<J> | null => {
   return isSCRResultDerivation(d) ? reverseSCR(d) : null
 }
+export const exampleSCR = applySCR(
+  premise(sequent([atom('Γ')], [atom('A'), atom('A'), atom('Δ')])),
+)
 
 // Permutation
 
@@ -1318,6 +1374,9 @@ export const tryReverseSRotLF = <J extends AnySequent>(
 ): Derivation<J> | null => {
   return isSRotLFResultDerivation(d) ? reverseSRotLF(d) : null
 }
+export const exampleSRotLF = applySRotLF(
+  premise(sequent([atom('Γ'), atom('B'), atom('A')], [atom('Δ')])),
+)
 
 export type SRotLBResult<
   Γ extends Formulas,
@@ -1395,6 +1454,9 @@ export const tryReverseSRotLB = <J extends AnySequent>(
 ): Derivation<J> | null => {
   return isSRotLBResultDerivation(d) ? reverseSRotLB(d) : null
 }
+export const exampleSRotLB = applySRotLB(
+  premise(sequent([atom('A'), atom('Γ'), atom('B')], [atom('Δ')])),
+)
 
 export type SRotRFResult<
   Γ extends Formulas,
@@ -1472,6 +1534,9 @@ export const tryReverseSRotRF = <J extends AnySequent>(
 ): Derivation<J> | null => {
   return isSRotRFResultDerivation(d) ? reverseSRotRF(d) : null
 }
+export const exampleSRotRF = applySRotRF(
+  premise(sequent([atom('Γ')], [atom('A'), atom('B'), atom('Δ')])),
+)
 
 export type SRotRBResult<
   Γ extends Formulas,
@@ -1549,6 +1614,9 @@ export const tryReverseSRotRB = <J extends AnySequent>(
 ): Derivation<J> | null => {
   return isSRotRBResultDerivation(d) ? reverseSRotRB(d) : null
 }
+export const exampleSRotRB = applySRotRB(
+  premise(sequent([atom('Γ')], [atom('B'), atom('Δ'), atom('A')])),
+)
 
 export type SXLResult<
   Γ extends Formulas,
@@ -1628,6 +1696,9 @@ export const tryReverseSXL = <J extends AnySequent>(
 ): Derivation<J> | null => {
   return isSXLResultDerivation(d) ? reverseSXL(d) : null
 }
+export const exampleSXL = applySXL(
+  premise(sequent([atom('Γ'), atom('A'), atom('B')], [atom('Δ')])),
+)
 
 export type SXRResult<
   Γ extends Formulas,
@@ -1707,6 +1778,9 @@ export const tryReverseSXR = <J extends AnySequent>(
 ): Derivation<J> | null => {
   return isSXRResultDerivation(d) ? reverseSXR(d) : null
 }
+export const exampleSXR = applySXR(
+  premise(sequent([atom('Γ')], [atom('A'), atom('B'), atom('Δ')])),
+)
 
 // Language
 
@@ -1800,106 +1874,30 @@ export const meta = {
   rules: [
     {
       title: 'Axiom',
-      examples: [[applyI(atom('A'))]],
+      examples: [exampleI],
     },
     {
       title: 'Cut',
-      examples: [
-        [
-          applyCut(
-            premise(sequent([atom('Γ')], [atom('Δ'), atom('A')])),
-            premise(sequent([atom('A'), atom('Γ')], [atom('Δ')])),
-          ),
-        ],
-      ],
+      examples: [[exampleCut]],
     },
     {
       title: 'Logical Rules',
       examples: [
-        [
-          applyCL1(
-            atom('B'),
-            premise(sequent([atom('Γ'), atom('A')], [atom('Δ')])),
-          ),
-          applyDR1(
-            atom('B'),
-            premise(sequent([atom('Γ')], [atom('A'), atom('Δ')])),
-          ),
-        ],
-        [
-          applyCL2(
-            atom('A'),
-            premise(sequent([atom('Γ'), atom('B')], [atom('Δ')])),
-          ),
-          applyDR2(
-            atom('A'),
-            premise(sequent([atom('Γ'), atom('B')], [atom('Δ')])),
-          ),
-        ],
-        [
-          applyDL(
-            premise(sequent([atom('Γ'), atom('A')], [atom('Δ')])),
-            premise(sequent([atom('Γ'), atom('B')], [atom('Δ')])),
-          ),
-          applyCR(
-            premise(sequent([atom('Γ')], [atom('A'), atom('Δ')])),
-            premise(sequent([atom('Γ')], [atom('B'), atom('Δ')])),
-          ),
-        ],
-        [
-          applyIL(
-            premise(sequent([atom('Γ')], [atom('A'), atom('Δ')])),
-            premise(sequent([atom('Γ'), atom('B')], [atom('Δ')])),
-          ),
-          applyIR(
-            premise(sequent([atom('Γ'), atom('A')], [atom('B'), atom('Δ')])),
-          ),
-        ],
-        [
-          applyNL(premise(sequent([atom('Γ')], [atom('A'), atom('Δ')]))),
-          applyNR(premise(sequent([atom('Γ'), atom('A')], [atom('Δ')]))),
-        ],
+        [exampleCL1, exampleDR1],
+        [exampleCL2, exampleDR2],
+        [exampleDL, exampleCR],
+        [exampleIL, exampleIR],
+        [exampleNL, exampleNR],
       ],
     },
     {
       title: 'Structural Rules',
       examples: [
-        [
-          applySWL(atom('A'), premise(sequent([atom('Γ')], [atom('Δ')]))),
-          applySWR(atom('A'), premise(sequent([atom('Γ')], [atom('Δ')]))),
-        ],
-        [
-          applySCL(
-            premise(sequent([atom('Γ'), atom('A'), atom('A')], [atom('Δ')])),
-          ),
-          applySCR(
-            premise(sequent([atom('Γ')], [atom('A'), atom('A'), atom('Δ')])),
-          ),
-        ],
-        [
-          applySRotLF(
-            premise(sequent([atom('Γ'), atom('B'), atom('A')], [atom('Δ')])),
-          ),
-          applySRotRF(
-            premise(sequent([atom('Γ')], [atom('A'), atom('B'), atom('Δ')])),
-          ),
-        ],
-        [
-          applySRotLB(
-            premise(sequent([atom('A'), atom('Γ'), atom('B')], [atom('Δ')])),
-          ),
-          applySRotRB(
-            premise(sequent([atom('Γ')], [atom('B'), atom('Δ'), atom('A')])),
-          ),
-        ],
-        [
-          applySXL(
-            premise(sequent([atom('Γ'), atom('A'), atom('B')], [atom('Δ')])),
-          ),
-          applySXR(
-            premise(sequent([atom('Γ')], [atom('A'), atom('B'), atom('Δ')])),
-          ),
-        ],
+        [exampleSWL, exampleSWR],
+        [exampleSCL, exampleSCR],
+        [exampleSRotLF, exampleSRotRF],
+        [exampleSRotLB, exampleSRotRB],
+        [exampleSXL, exampleSXR],
       ],
     },
   ],
