@@ -1,3 +1,4 @@
+
 export type NonEmptyArray<A> = Array<A> & { 0: A }
 
 export const isNonEmptyArray = <A>(a: Array<A>): a is NonEmptyArray<A> => {
@@ -30,3 +31,6 @@ export const replaceItem = <T>(
   }
   return tmp
 }
+
+export const ensureNonEmpty = <T>(arr: Array<T>, fallback: T): NonEmptyArray<T> => isNonEmptyArray(arr) ? arr : [fallback]
+

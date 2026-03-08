@@ -9,13 +9,16 @@ export const reverse = <R extends Rev>(rev: R): Reverse<R> => ({
 export type Undo = { kind: 'undo' }
 export const undo = (): Undo => ({ kind: 'undo' })
 
+export type Reset = { kind: 'reset' }
+export const reset = (): Reset => ({ kind: 'reset' })
+
 export type Next = { kind: 'next' }
 export const next = (): Next => ({ kind: 'next' })
 
 export type Prev = { kind: 'prev' }
 export const prev = (): Prev => ({ kind: 'prev' })
 
-export type Event = Reverse<Rev> | Undo | Next | Prev
+export type Event = Reverse<Rev> | Undo | Reset | Next | Prev
 
 export const parseEvent = (str: string): Event | null => {
   switch (str) {
@@ -25,6 +28,8 @@ export const parseEvent = (str: string): Event | null => {
       return prev()
     case 'undo':
       return undo()
+    case 'reset':
+      return reset()
     default:
       if (isRev(str)) {
         return reverse(str)

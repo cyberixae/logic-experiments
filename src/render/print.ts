@@ -386,10 +386,12 @@ export function fromMeta(meta: any) {
     ]),
   )
 }
-export const fromFocus = (s: Focus<AnyJudgement>) =>
-  fromDerivation(s.derivation) +
+export const fromFocus = (s: Focus<AnyJudgement>) => {
+  const path = activePath(s)
+  return fromDerivation(s.derivation) +
   '\n' +
-  '\n' +
+  '\nSelected: Branch ' +
   String(s.branch) +
-  ': ' +
-  JSON.stringify(activePath(s))
+  '\nPath: ' + ['*', ...path].join('-')
+}
+  

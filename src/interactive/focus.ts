@@ -61,6 +61,10 @@ export const undo = <J extends AnyJudgement>(s: Focus<J>): Focus<J> => {
   return s
 }
 
+export const reset = <J extends AnyJudgement>(s: Focus<J>): Focus<J> => {
+  return focus(premise(s.derivation.result))
+}
+
 export const applyEvent = <J extends AnyJudgement>(
   state: Focus<J>,
   ev: Event,
@@ -75,6 +79,9 @@ export const applyEvent = <J extends AnyJudgement>(
       break
     case 'undo':
       state = undo(state)
+      break
+    case 'reset':
+      state = reset(state)
       break
     case 'next':
       state = next(state)
