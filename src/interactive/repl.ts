@@ -2,8 +2,32 @@ import { parseEvent } from './event'
 import { focus, applyEvent, Focus, activePath } from './focus'
 import { premise, isProof } from '../model/derivation'
 import { AnyJudgement } from '../model/judgement'
-import { fromFocus } from '../render/print'
-import { isRev, revs } from '../systems/lk'
+import { fromDerivation, fromFocus } from '../render/print'
+import {
+  exampleCL1,
+  exampleCL2,
+  exampleCR,
+  exampleDL,
+  exampleDR1,
+  exampleDR2,
+  exampleI,
+  exampleIL,
+  exampleIR,
+  exampleNL,
+  exampleNR,
+  exampleSCL,
+  exampleSCR,
+  exampleSRotLB,
+  exampleSRotLF,
+  exampleSRotRB,
+  exampleSRotRF,
+  exampleSWL,
+  exampleSWR,
+  exampleSXL,
+  exampleSXR,
+  isRev,
+  revs,
+} from '../systems/lk'
 import { head } from '../utils/tuple'
 import { split } from '../utils/string'
 import { Theorems, isTheoremKey } from '../theorems'
@@ -37,7 +61,76 @@ export function* repl(theorems: Theorems): Generator<string, string, string> {
           break
         }
         if (isRev(rule)) {
-          output = '\nRule "' + rule + '":' + 'ok'
+          output = '\nRule "' + rule + '":' + '\n' + '\n'
+          switch (rule) {
+            case 'cl1':
+              output += fromDerivation(exampleCL1)
+              break
+            case 'cl2':
+              output += fromDerivation(exampleCL2)
+              break
+            case 'cr':
+              output += fromDerivation(exampleCR)
+              break
+            case 'dl':
+              output += fromDerivation(exampleDL)
+              break
+            case 'dr1':
+              output += fromDerivation(exampleDR1)
+              break
+            case 'dr2':
+              output += fromDerivation(exampleDR2)
+              break
+            case 'i':
+              output += fromDerivation(exampleI)
+              break
+            case 'il':
+              output += fromDerivation(exampleIL)
+              break
+            case 'ir':
+              output += fromDerivation(exampleIR)
+              break
+            case 'nl':
+              output += fromDerivation(exampleNL)
+              break
+            case 'nl':
+              output += fromDerivation(exampleNL)
+              break
+            case 'nr':
+              output += fromDerivation(exampleNR)
+              break
+            case 'sRotLB':
+              output += fromDerivation(exampleSRotLB)
+              break
+            case 'sRotLF':
+              output += fromDerivation(exampleSRotLF)
+              break
+            case 'sRotRB':
+              output += fromDerivation(exampleSRotRB)
+              break
+            case 'sRotRF':
+              output += fromDerivation(exampleSRotRF)
+              break
+            case 'scl':
+              output += fromDerivation(exampleSCL)
+              break
+            case 'scr':
+              output += fromDerivation(exampleSCR)
+              break
+            case 'swl':
+              output += fromDerivation(exampleSWL)
+              break
+            case 'swr':
+              output += fromDerivation(exampleSWR)
+              break
+            case 'sxl':
+              output += fromDerivation(exampleSXL)
+              break
+            case 'sxr':
+              output += fromDerivation(exampleSXR)
+              break
+          }
+          break
         }
         break
       case 'list':
