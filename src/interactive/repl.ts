@@ -93,9 +93,6 @@ export function* repl(theorems: Theorems): Generator<string, string, string> {
             case 'nl':
               output += fromDerivation(exampleNL)
               break
-            case 'nl':
-              output += fromDerivation(exampleNL)
-              break
             case 'nr':
               output += fromDerivation(exampleNR)
               break
