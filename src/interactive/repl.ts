@@ -22,9 +22,13 @@ export function* repl(theorems: Theorems): Generator<string, string, string> {
       case 'quit':
         return '\nExiting...\n'
       case 'list':
-        output = '\nConjectures:' +
-        '\n' + Object.keys(theorems).map((id) => (id === selected ? '*' : ' ') + ' ' + id).join('\n') +
-        '\n'
+        output =
+          '\nConjectures:' +
+          '\n' +
+          Object.keys(theorems)
+            .map((id) => (id === selected ? '*' : ' ') + ' ' + id)
+            .join('\n') +
+          '\n'
         break
       case 'select':
         const [conjectureId] = args
@@ -70,8 +74,11 @@ export function* repl(theorems: Theorems): Generator<string, string, string> {
   }
 }
 const status = (s: Focus<AnyJudgement>): string =>
-  '\n' + fromFocus(s) +
-  '\nReversals: ' + revs(s.derivation, activePath(s)).map(head).join(', ') +
+  '\n' +
+  fromFocus(s) +
+  '\nReversals: ' +
+  revs(s.derivation, activePath(s)).map(head).join(', ') +
   '\nNavigation: prev, next, undo' +
   '\nSystem: quit, list, select' +
-  '\n' + (isProof(s.derivation) ? '\nConglaturations!\n' : '')
+  '\n' +
+  (isProof(s.derivation) ? '\nConglaturations!\n' : '')
