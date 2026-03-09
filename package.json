@@ -17,6 +17,7 @@
     "lk": "yarn build && node ./lib/lk.js",
     "la3": "yarn build && node ./lib/la3.js",
     "main": "yarn build && node ./lib/main.js",
+    "namegen": "node scripts/namegen.ts",
     "prettify": "prettier . --write"
   }
 }

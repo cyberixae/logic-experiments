@@ -1,4 +1,3 @@
-
 const colors = [
   'harmaa',
   'keltainen',
@@ -65,4 +64,9 @@ const animals = [
 const pick = (arr) => arr[Math.floor(Math.random() * arr.length)]
 const gen = () => [colors, greens, animals].map(pick).join('-')
 
-console.log(Array(10).fill(0).map(() => gen()).join('\n'))
+console.log(
+  Array(10)
+    .fill(0)
+    .map(() => gen())
+    .join('\n'),
+)
