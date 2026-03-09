@@ -1,9 +1,8 @@
-import { rev, lk } from '../systems/lk'
+import { rev, lk, Rev } from '../systems/lk'
 import { AnyJudgement, conclusion } from '../model/judgement'
-import { Theorem } from '../model/theorem'
+import { Conjecture } from '../model/theorem'
 
-export const violettiLuumuBiisoni: Theorem<AnyJudgement> = {
-  rules: Object.keys(rev),
+export const violettiLuumuBiisoni: Conjecture<AnyJudgement> = {
+  rules: Object.keys(rev) as Array<Rev>,
   goal: conclusion(lk.o.p2.implication(lk.a('p'), lk.a('p'))),
-  solution: lk.z.ir(lk.i.i(lk.a('p'))),
-} as any
+}
