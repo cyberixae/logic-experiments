@@ -3,7 +3,7 @@ import { AnyJudgement, conclusion } from '../model/judgement'
 import { Theorem } from '../model/theorem'
 
 export const harmaaPuolukkaTiikeri: Theorem<AnyJudgement> = {
-  rules: Object.keys(rev),
+  rules: Object.keys(rev).filter((r) => ['ir', 'swl', 'i'].includes(r)),
   goal: conclusion(
     lk.o.p2.implication(
       lk.o.p2.implication(

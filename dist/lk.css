@@ -1,3 +1,76 @@
 #body {
   background-color: #ffeedd;
+  font-family: sans-serif;
+  font-size: 1.2em;
+  height: 100%;
+  overflow: hidden;
+}
+.bench {
+  width: 100vw;
+  height: 100vh;
+  display: grid;
+  grid-template-rows: 140px auto 100px;
+  grid-template-columns: auto auto auto;
+  grid-template-areas:
+    "left main right"
+    "left status right"
+    "left controls right";
+}
+.levels {
+  display: none;
+}
+.controls {
+  grid-area: controls;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.main {
+  grid-area: main;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.left {
+  grid-area: left;
+  padding: 1em 0;
+  text-align: center;
+  overflow: auto;
+}
+.right {
+  grid-area: right;
+  padding: 1em 0;
+  text-align: center;
+  overflow: auto;
+}
+.status {
+  grid-area: status;
+  font-size: 2em;
+  display: flex;
+  align-items:start;
+  justify-content: center;
+}
+.rule {
+  min-width: 260px;
+}
+.button {
+  user-select: none;
+  cursor: pointer;
+  background-color: #fffc;
+  border: 3px solid #000;
+  border-radius: 10px;
+  display: inline-block;
+  text-align: center;
+  font-size: 1.2em;
+  padding: 0.6em;
+  margin: 2%;
+  opacity: 0.8
+}
+.button:hover {
+  background-color: #fff;
+  opacity: 1
+
+}
+.button.disabled {
+  opacity: 0.5
 }
