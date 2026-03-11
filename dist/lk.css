@@ -72,5 +72,6 @@
 
 }
 .button.disabled {
-  opacity: 0.5
+  cursor: default;
+  opacity: 0.5;
 }
