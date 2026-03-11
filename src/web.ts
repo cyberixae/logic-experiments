@@ -84,6 +84,10 @@ const status = (s: Focus<AnyJudgement>): string =>
   (isDone ? '\n\n\u{1F389} Conglaturations! \u{1F389}\n' : '')
 
 const listing = () => {
+  const shroud = document.createElement('div')
+  shroud.setAttribute('class', 'shroud')
+  shroud.setAttribute('style', 'display: none;')
+  shroud.setAttribute('id', 'levelmenu')
   const panel = document.createElement('div')
   panel.setAttribute('class', 'levels')
   Object.keys(theorems).forEach((id) => {
@@ -91,11 +95,15 @@ const listing = () => {
     const link = document.createElement('a')
     link.setAttribute('class', (id === selected ? 'active' : ''))
     link.setAttribute('href', '#')
+    link.onclick = () => {
+      selectLevel(id as keyof Workspace)
+    }
     link.innerHTML = id
     item.appendChild(link)
     panel.appendChild(item)
   })
-  return panel
+  shroud.appendChild(panel)
+  return shroud
 }
 const level = <J extends AnyJudgement>(s: Focus<J>) => {
   const pre = document.createElement('pre')
@@ -168,9 +176,9 @@ const resetHandler = (_ev?: Reset) => () => {
   render()
 }
 const levelHandler = (_ev?: Reset) => () => {
-  alert('Tämä ei vielä toimi.')
+  const menu = document.getElementById('levelmenu')
+  menu?.removeAttribute('style')
 }
-
 
 const mainPanel = (ls: Array<Rev>, rules: Array<Rev>) => {
   const panel = document.createElement('div')
