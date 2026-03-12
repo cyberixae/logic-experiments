@@ -327,18 +327,20 @@ const selectLevel = (conjectureId: keyof Theorems) => {
   selected = conjectureId
   render()
 }
-const nextLevelId = () => {
+const first: keyof Theorems = 'ch1weakening9'
+
+const nextLevelId = (): keyof Theorems => {
   if (!selected) {
-    return 'ch0identity1'
+    return first
   }
   const theoremKeys: Array<keyof Theorems> = Object.keys(theorems) as Array<
     keyof Theorems
   >
   const index = theoremKeys.findIndex((x) => x === selected)
   if (index < 0) {
-    return 'ch0identity1'
+    return first
   }
-  return theoremKeys[index + 1] ?? 'ch0identity1'
+  return theoremKeys[index + 1] ?? first
 }
 const nextLevel = () => {
   selectLevel(nextLevelId())
