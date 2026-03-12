@@ -7,14 +7,14 @@ export const ch0identity8: Conjecture<AnyJudgement> = {
   goal: judgement(
     [
       lk.o.p2.implication(
-        lk.o.p2.disjunction(lk.a('p'), lk.o.p1.negation(lk.a('q'))),
-        lk.o.p1.negation(lk.o.p2.conjunction(lk.a('r'), lk.a('s'))),
+        lk.o.p2.disjunction(lk.a('p'), lk.a('q')),
+        lk.o.p2.conjunction(lk.a('p'), lk.a('q')),
       ),
     ],
     [
       lk.o.p2.implication(
-        lk.o.p2.disjunction(lk.a('p'), lk.o.p1.negation(lk.a('q'))),
-        lk.o.p1.negation(lk.o.p2.conjunction(lk.a('r'), lk.a('s'))),
+        lk.o.p2.disjunction(lk.a('p'), lk.a('q')),
+        lk.o.p2.conjunction(lk.a('p'), lk.a('q')),
       ),
     ],
   ),

@@ -142,7 +142,20 @@ export function printArray<K extends BinaryTemplateId>(
 }
 
 export function fromAtom({ value }: prop.Atom<string>): Printer {
-  return print('atom')(printString(value))
+  let chr = value
+  if (value === 'p') {
+    chr = '\u{1f427}'
+  }
+  if (value === 'q') {
+    chr = '\u{1f99c}'
+  }
+  if (value === 'r') {
+    chr = '\u{1f9a2}'
+  }
+  if (value === 's') {
+    chr = '\u{1f986}'
+  }
+  return print('atom')(printString(chr))
 }
 
 export function fromFalsum(_falsum: prop.Falsum): Printer {

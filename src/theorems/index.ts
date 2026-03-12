@@ -9,6 +9,7 @@ import { ch0identity5 } from './ch0-identity-5'
 import { ch0identity6 } from './ch0-identity-6'
 import { ch0identity7 } from './ch0-identity-7'
 import { ch0identity8 } from './ch0-identity-8'
+import { ch0identity9 } from './ch0-identity-9'
 
 export const theorems = {
   ch0identity1,
@@ -19,6 +20,7 @@ export const theorems = {
   ch0identity6,
   ch0identity7,
   ch0identity8,
+  ch0identity9,
   harmaaPuolukkaTiikeri,
   violettiLuumuBiisoni,
   syaaniPaprikaKettu,
