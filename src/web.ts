@@ -92,17 +92,35 @@ const status = (s: Focus<AnyJudgement>): string => '\n' + fromFocus(s) + '\n'
 
 const listing = () => {
   const shroud = document.createElement('div')
+  shroud.onclick = (click) => {
+    click.preventDefault()
+    shroud.setAttribute('style', 'display: none;')
+  }
   shroud.setAttribute('class', 'shroud')
   shroud.setAttribute('style', 'display: none;')
   shroud.setAttribute('id', 'levelmenu')
   const panel = document.createElement('div')
+  panel.onclick = (click) => {
+    // prevent shroud click
+    click.preventDefault()
+    return false
+  }
+  const close = document.createElement('a')
+  close.setAttribute('class', 'close')
+  close.innerHTML = '\u2716'
+  close.onclick = (click) => {
+    click.preventDefault()
+    shroud.setAttribute('style', 'display: none;')
+  }
+  panel.appendChild(close)
   panel.setAttribute('class', 'levels')
   Object.keys(theorems).forEach((id) => {
     const item = document.createElement('div')
     const link = document.createElement('a')
     link.setAttribute('class', id === selected ? 'active' : '')
     link.setAttribute('href', '#')
-    link.onclick = () => {
+    link.onclick = (click) => {
+      click.preventDefault()
       selectLevel(id as keyof Workspace)
     }
     link.innerHTML = id
@@ -114,25 +132,28 @@ const listing = () => {
 }
 const level = <J extends AnyJudgement>(s: Focus<J>) => {
   const panel = document.createElement('div')
-  panel.setAttribute('class', 'done')
+  panel.setAttribute('class', 'playarea')
   if (isDone) {
     const congrats = document.createElement('div')
     congrats.setAttribute('class', 'congrats')
-    congrats.innerHTML = '\n\n\u{1F389} Conglaturations! \u{1F389}\n'
-    panel.appendChild(congrats)
-    panel.appendChild(document.createElement('br'))
+    const hurray = document.createElement('div')
+    hurray.setAttribute('class', 'hurray')
+    hurray.innerHTML = '\n\n\u{1F389} Conglaturations! \u{1F389}\n'
+    congrats.appendChild(hurray)
+    const congratsButtons = document.createElement('div')
+    congratsButtons.setAttribute('class', 'congrabuttons')
     const againbutton = document.createElement('div')
     againbutton.setAttribute('class', 'button')
     againbutton.innerHTML = 'Play Again'
     againbutton.onclick = resetHandler()
-    congrats.appendChild(againbutton)
-    panel.appendChild(againbutton)
+    congratsButtons.appendChild(againbutton)
     const continueButton = document.createElement('div')
     continueButton.setAttribute('class', 'button')
     continueButton.innerHTML = 'Next Level'
     continueButton.onclick = () => nextLevel()
-    congrats.appendChild(continueButton)
-    panel.appendChild(continueButton)
+    congratsButtons.appendChild(continueButton)
+    panel.appendChild(congrats)
+    panel.appendChild(congratsButtons)
   }
   const pre = document.createElement('pre')
   pre.setAttribute('class', 'status')
@@ -331,6 +352,7 @@ const selectLevel = (conjectureId: keyof Theorems) => {
     workspace[conjectureId] = focus(premise(theorems[conjectureId].goal))
   }
   selected = conjectureId
+  history.pushState({ selected }, '', `?level=${selected}`)
   render()
 }
 const first: keyof Theorems = 'ch0identity1'
@@ -353,7 +375,21 @@ const nextLevel = () => {
 }
 
 const init = () => {
-  nextLevel()
+  const params = new URLSearchParams(window.location.search)
+  const level = params.get('level')
+  if (level && isTheoremKey(level)) {
+    selectLevel(level)
+  } else {
+    nextLevel()
+  }
 }
 
 document.addEventListener('DOMContentLoaded', init)
+
+window.addEventListener('popstate', (event) => {
+  const level = event.state?.selected
+  if (level && isTheoremKey(level)) {
+    selectLevel(level)
+  }
+  render()
+})

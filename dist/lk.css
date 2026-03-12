@@ -40,13 +40,13 @@
   text-align: center;
   overflow: auto;
 }
-.status {
+.playarea {
   grid-area: status;
-  font-size: 2em;
   display: flex;
-  align-items: start;
-  justify-content: center;
+  flex-direction: column;
   overflow: auto;
+  align-items: center;
+  justify-content: start;
 }
 .rule {
   min-width: 260px;
@@ -63,6 +63,7 @@
   padding: 0.6em;
   margin: 2%;
   opacity: 0.8;
+  text-wrap: nowrap;
 }
 .button:hover {
   background-color: #fff;
@@ -92,7 +93,8 @@
   border: 4px solid #f80;
   border-radius: 40px;
   text-align: center;
-  padding-top: 2em;
+  padding: 2em;
+  overflow: auto;
 }
 .levels a {
   color: #fff;
@@ -100,14 +102,28 @@
   text-decoration: none;
   font-size: 2em;
   line-height: 1.8em;
+  cursor: pointer;
 }
 .levels a:hover {
   color: #fa8;
 }
-.done {
-  text-align: center;
-}
 .congrats {
+  display: flex;
+  flex-direction: column;
   padding: 0.3em;
+}
+.hurray {
   font-size: 2em;
+}
+.close {
+  position: absolute;
+  top: 0.4em;
+  right: 0.6em;
+}
+.status {
+  font-size: 2em;
+}
+.congrabuttons {
+  display: flex;
+  padding-top: 2em;
 }
