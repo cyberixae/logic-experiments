@@ -42,9 +42,9 @@ export const theorems = {
   ch1weakening8,
   ch1weakening9,
 
-  harmaaPuolukkaTiikeri,
-  violettiLuumuBiisoni,
-  syaaniPaprikaKettu,
+  // harmaaPuolukkaTiikeri,
+  // violettiLuumuBiisoni,
+  // syaaniPaprikaKettu,
 }
 export type Theorems = typeof theorems
 export const isTheoremKey = (k: string): k is keyof Theorems => k in theorems
