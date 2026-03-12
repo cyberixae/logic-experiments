@@ -21,6 +21,16 @@ import { ch1weakening7 } from './ch1-weakening-7'
 import { ch1weakening8 } from './ch1-weakening-8'
 import { ch1weakening9 } from './ch1-weakening-9'
 
+import { ch2permutation1 } from './ch2-permutation-1'
+import { ch2permutation2 } from './ch2-permutation-2'
+import { ch2permutation3 } from './ch2-permutation-3'
+import { ch2permutation4 } from './ch2-permutation-4'
+import { ch2permutation5 } from './ch2-permutation-5'
+import { ch2permutation6 } from './ch2-permutation-6'
+import { ch2permutation7 } from './ch2-permutation-7'
+import { ch2permutation8 } from './ch2-permutation-8'
+import { ch2permutation9 } from './ch2-permutation-9'
+
 export const theorems = {
   ch0identity1,
   ch0identity2,
@@ -41,6 +51,16 @@ export const theorems = {
   ch1weakening7,
   ch1weakening8,
   ch1weakening9,
+
+  ch2permutation1,
+  ch2permutation2,
+  ch2permutation3,
+  ch2permutation4,
+  ch2permutation5,
+  ch2permutation6,
+  ch2permutation7,
+  ch2permutation8,
+  ch2permutation9,
 
   // harmaaPuolukkaTiikeri,
   // violettiLuumuBiisoni,

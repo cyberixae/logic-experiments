@@ -63,8 +63,8 @@ const left = {
   nl: fromDerivation(exampleNL),
   scl: fromDerivation(exampleSCL),
   swl: fromDerivation(exampleSWL),
-  //sxl: fromDerivation(exampleSXL),
-  //sRotLB: fromDerivation(exampleSRotLB),
+  //sxl: fromDerivation(exampleSXL), not relevant for reverse
+  sRotLB: fromDerivation(exampleSRotLB),
   sRotLF: fromDerivation(exampleSRotLF),
 }
 
@@ -76,8 +76,8 @@ const right = {
   nr: fromDerivation(exampleNR),
   scr: fromDerivation(exampleSCR),
   swr: fromDerivation(exampleSWR),
-  //sxr: fromDerivation(exampleSXR),
-  //sRotRB: fromDerivation(exampleSRotRB),
+  //sxr: fromDerivation(exampleSXR), not relevant for reverse
+  sRotRB: fromDerivation(exampleSRotRB),
   sRotRF: fromDerivation(exampleSRotRF),
 }
 
@@ -121,12 +121,18 @@ const level = <J extends AnyJudgement>(s: Focus<J>) => {
     congrats.innerHTML = '\n\n\u{1F389} Conglaturations! \u{1F389}\n'
     panel.appendChild(congrats)
     panel.appendChild(document.createElement('br'))
-    const button = document.createElement('div')
-    button.setAttribute('class', 'button')
-    button.innerHTML = 'Next Level'
-    button.onclick = () => nextLevel()
-    congrats.appendChild(button)
-    panel.appendChild(button)
+    const againbutton = document.createElement('div')
+    againbutton.setAttribute('class', 'button')
+    againbutton.innerHTML = 'Play Again'
+    againbutton.onclick = resetHandler()
+    congrats.appendChild(againbutton)
+    panel.appendChild(againbutton)
+    const continueButton = document.createElement('div')
+    continueButton.setAttribute('class', 'button')
+    continueButton.innerHTML = 'Next Level'
+    continueButton.onclick = () => nextLevel()
+    congrats.appendChild(continueButton)
+    panel.appendChild(continueButton)
   }
   const pre = document.createElement('pre')
   pre.setAttribute('class', 'status')
@@ -327,7 +333,7 @@ const selectLevel = (conjectureId: keyof Theorems) => {
   selected = conjectureId
   render()
 }
-const first: keyof Theorems = 'ch1weakening9'
+const first: keyof Theorems = 'ch0identity1'
 
 const nextLevelId = (): keyof Theorems => {
   if (!selected) {

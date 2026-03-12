@@ -320,13 +320,13 @@ export function fromRule(s: string): Printer {
       case 'scr':
         return 'CR'
       case 'SRotLF':
-        return '\u21b7L'
-      case 'SRotRF':
-        return '\u21B6R'
-      case 'SRotLB':
         return '\u21B6L'
-      case 'SRotRB':
+      case 'SRotRF':
         return '\u21b7R'
+      case 'SRotLB':
+        return '\u21b7L'
+      case 'SRotRB':
+        return '\u21B6R'
       case 'sxl':
         return 'XL'
       case 'sxr':
