@@ -12,9 +12,9 @@
   grid-template-rows: 140px auto 100px;
   grid-template-columns: auto auto auto;
   grid-template-areas:
-    "left main right"
-    "left status right"
-    "left controls right";
+    'left main right'
+    'left status right'
+    'left controls right';
 }
 .controls {
   grid-area: controls;
@@ -44,7 +44,7 @@
   grid-area: status;
   font-size: 2em;
   display: flex;
-  align-items:start;
+  align-items: start;
   justify-content: center;
   overflow: auto;
 }
@@ -62,12 +62,11 @@
   font-size: 1.2em;
   padding: 0.6em;
   margin: 2%;
-  opacity: 0.8
+  opacity: 0.8;
 }
 .button:hover {
   background-color: #fff;
-  opacity: 1
-
+  opacity: 1;
 }
 .button.disabled {
   cursor: default;
@@ -104,4 +103,11 @@
 }
 .levels a:hover {
   color: #fa8;
+}
+.done {
+  text-align: center;
+}
+.congrats {
+  padding: 0.3em;
+  font-size: 2em;
 }

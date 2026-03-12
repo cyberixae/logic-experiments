@@ -6,7 +6,7 @@ import {
   lsDerivation,
   Path,
   premise,
-  equalsDerivation
+  equalsDerivation,
 } from '../model/derivation'
 import { AnyJudgement } from '../model/judgement'
 import { rev } from '../systems/lk'
