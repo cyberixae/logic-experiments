@@ -31,6 +31,16 @@ import { ch2permutation7 } from './ch2-permutation-7'
 import { ch2permutation8 } from './ch2-permutation-8'
 import { ch2permutation9 } from './ch2-permutation-9'
 
+import { ch3negation1 } from './ch3-negation-1'
+import { ch3negation2 } from './ch3-negation-2'
+import { ch3negation3 } from './ch3-negation-3'
+import { ch3negation4 } from './ch3-negation-4'
+import { ch3negation5 } from './ch3-negation-5'
+import { ch3negation6 } from './ch3-negation-6'
+import { ch3negation7 } from './ch3-negation-7'
+import { ch3negation8 } from './ch3-negation-8'
+import { ch3negation9 } from './ch3-negation-9'
+
 export const theorems = {
   ch0identity1,
   ch0identity2,
@@ -61,6 +71,16 @@ export const theorems = {
   ch2permutation7,
   ch2permutation8,
   ch2permutation9,
+
+  ch3negation1,
+  ch3negation2,
+  ch3negation3,
+  ch3negation4,
+  ch3negation5,
+  ch3negation6,
+  ch3negation7,
+  ch3negation8,
+  ch3negation9,
 
   // harmaaPuolukkaTiikeri,
   // violettiLuumuBiisoni,

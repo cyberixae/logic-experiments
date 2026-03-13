@@ -150,7 +150,7 @@ export function fromAtom({ value }: prop.Atom<string>): Printer {
     chr = '\u{1f99c}'
   }
   if (value === 'r') {
-    chr = '\u{1f9a2}'
+    chr = '\u{1f983}'
   }
   if (value === 's') {
     chr = '\u{1f986}'
