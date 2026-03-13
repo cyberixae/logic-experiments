@@ -4,13 +4,16 @@
   font-size: 1.2em;
   height: 100%;
   overflow: hidden;
+  margin: 0;
 }
 .bench {
   width: 100vw;
   height: 100vh;
+  box-sizing: border-box;
+  padding: 1em;
   display: grid;
-  grid-template-rows: 140px auto 100px;
-  grid-template-columns: auto auto auto;
+  grid-template-rows: min-content 1fr min-content;
+  grid-template-columns: min-content 1fr min-content;
   grid-template-areas:
     'left main right'
     'left status right'
@@ -21,24 +24,33 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  display: flex;
+  flex-direction: row;
+  gap: 1em;
 }
 .main {
   grid-area: main;
-  display: flex;
   justify-content: center;
   align-items: center;
+  display: flex;
+  flex-direction: row;
+  gap: 1em;
 }
 .left {
   grid-area: left;
-  padding: 1em 0;
   text-align: center;
   overflow: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
 }
 .right {
   grid-area: right;
-  padding: 1em 0;
   text-align: center;
   overflow: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
 }
 .playarea {
   grid-area: status;
@@ -61,9 +73,9 @@
   text-align: center;
   font-size: 1.2em;
   padding: 0.6em;
-  margin: 2%;
   opacity: 0.8;
   text-wrap: nowrap;
+  margin: 0;
 }
 .button:hover {
   background-color: #fff;
@@ -114,16 +126,17 @@
 }
 .hurray {
   font-size: 2em;
+  padding: 1.3em;
 }
 .close {
-  position: absolute;
+  position: fixed;
   top: 0.4em;
-  right: 0.6em;
+  right: 1em;
 }
 .status {
   font-size: 2em;
 }
 .congrabuttons {
   display: flex;
-  padding-top: 2em;
+  gap: 1em;
 }
