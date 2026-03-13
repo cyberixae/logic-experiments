@@ -1,0 +1,11 @@
+import { rev, lk, Rev } from '../systems/lk'
+import { AnyJudgement, conclusion, judgement } from '../model/judgement'
+import { Configuration } from '../model/theorem'
+
+export const ch0identity4: Configuration<AnyJudgement> = {
+  rules: ['i'],
+  goal: judgement(
+    [lk.o.p2.conjunction(lk.a('p'), lk.a('q'))],
+    [lk.o.p2.conjunction(lk.a('p'), lk.a('q'))],
+  ),
+}

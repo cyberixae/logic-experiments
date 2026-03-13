@@ -30,7 +30,7 @@ import {
 } from '../systems/lk'
 import { head } from '../utils/tuple'
 import { split } from '../utils/string'
-import { Theorems, isTheoremKey } from '../theorems'
+import { Theorems, isTheoremKey } from '../challenges'
 
 type Workspace = Partial<{ [K in keyof Theorems]: Focus<Theorems[K]['goal']> }>
 

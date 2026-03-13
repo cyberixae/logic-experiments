@@ -1,6 +1,6 @@
 import * as readline from 'readline'
 import { repl } from './interactive/repl'
-import { theorems } from './theorems'
+import { theorems } from './challenges'
 
 const main = () => {
   const rl = readline.createInterface({ input: process.stdin })

@@ -49,7 +49,7 @@ import {
 } from './systems/lk'
 import { head } from './utils/tuple'
 import { split } from './utils/string'
-import { Theorems, theorems, isTheoremKey } from './theorems'
+import { Theorems, theorems, isTheoremKey } from './challenges'
 
 const main = {
   i: fromDerivation(exampleI),
