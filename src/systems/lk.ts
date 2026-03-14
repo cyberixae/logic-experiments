@@ -127,7 +127,7 @@ export const meta = {
   rules: [
     {
       title: 'Axiom',
-      examples: [ruleI.example],
+      examples: [[ruleI.example]],
     },
     {
       title: 'Cut',
