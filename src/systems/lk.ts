@@ -19,6 +19,8 @@ import { Option } from '../utils/option'
 import { entries } from '../utils/record'
 import { ruleI } from '../rules/i'
 import { ruleCut } from '../rules/cut'
+import { ruleCL } from '../rules/cl'
+import { ruleDR } from '../rules/dr'
 import { ruleCL1 } from '../rules/cl1'
 import { ruleDR1 } from '../rules/dr1'
 import { ruleCL2 } from '../rules/cl2'
@@ -79,6 +81,8 @@ const zeta = {
 
 export const rev = {
   i: ruleI.tryReverse,
+  cl: ruleCL.tryReverse,
+  dr: ruleDR.tryReverse,
   cl1: ruleCL1.tryReverse,
   dr1: ruleDR1.tryReverse,
   cl2: ruleCL2.tryReverse,

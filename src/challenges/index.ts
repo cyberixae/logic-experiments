@@ -51,6 +51,14 @@ import { ch4theorem7 } from './ch4-theorem-7'
 import { ch4theorem8 } from './ch4-theorem-8'
 import { ch4theorem9 } from './ch4-theorem-9'
 
+import { ch5composition1 } from './ch5-composition-1'
+import { ch5composition2 } from './ch5-composition-2'
+import { ch5composition3 } from './ch5-composition-3'
+import { ch5composition4 } from './ch5-composition-4'
+import { ch5composition5 } from './ch5-composition-5'
+import { ch5composition6 } from './ch5-composition-6'
+import { ch5composition9 } from './ch5-composition-9'
+
 export const theorems = {
   ch0identity1,
   ch0identity2,
@@ -101,6 +109,14 @@ export const theorems = {
   ch4theorem7,
   ch4theorem8,
   ch4theorem9,
+
+  ch5composition1,
+  ch5composition2,
+  ch5composition3,
+  ch5composition4,
+  ch5composition5,
+  ch5composition6,
+  ch5composition9,
 
   // harmaaPuolukkaTiikeri,
   // violettiLuumuBiisoni,

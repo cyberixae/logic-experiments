@@ -293,6 +293,10 @@ export function fromRule(s: string): Printer {
     switch (s) {
       case 'i':
         return 'I'
+      case 'cl':
+        return t.conjunction.join(empty) + left()
+      case 'dr':
+        return t.disjunction.join(empty) + right()
       case 'cl1':
         return t.conjunction.join(empty) + left('\u2081')
       case 'dr1':

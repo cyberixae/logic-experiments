@@ -52,6 +52,8 @@ import { exampleI } from './rules/i'
 import { head } from './utils/tuple'
 import { split } from './utils/string'
 import { Theorems, theorems, isTheoremKey } from './challenges'
+import { exampleDR } from './rules/dr'
+import { exampleCL } from './rules/cl'
 
 const main = {
   i: fromDerivation(exampleI),
@@ -65,6 +67,7 @@ const left = {
   //sxl: fromDerivation(exampleSXL), not relevant for reverse
   nl: fromDerivation(exampleNL),
   il: fromDerivation(exampleIL),
+  cl: fromDerivation(exampleCL),
   cl1: fromDerivation(exampleCL1),
   cl2: fromDerivation(exampleCL2),
   dl: fromDerivation(exampleDL),
@@ -78,6 +81,7 @@ const right = {
   //sxr: fromDerivation(exampleSXR), not relevant for reverse
   nr: fromDerivation(exampleNR),
   ir: fromDerivation(exampleIR),
+  dr: fromDerivation(exampleDR),
   dr1: fromDerivation(exampleDR1),
   dr2: fromDerivation(exampleDR2),
   cr: fromDerivation(exampleCR),
@@ -395,14 +399,14 @@ const currentLevelIndex = (): number => {
 
 const prevLevelId = (): keyof Theorems => {
   const index = currentLevelIndex()
-  return theoremKeys[index - 1] ?? last
+  return theoremKeys[index - 1] ?? first
 }
 const prevLevel = () => {
   selectLevel(prevLevelId())
 }
 const nextLevelId = (): keyof Theorems => {
   const index = currentLevelIndex()
-  return theoremKeys[index + 1] ?? first
+  return theoremKeys[index + 1] ?? last
 }
 const nextLevel = () => {
   selectLevel(nextLevelId())
