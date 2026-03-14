@@ -41,6 +41,16 @@ import { ch3negation7 } from './ch3-negation-7'
 import { ch3negation8 } from './ch3-negation-8'
 import { ch3negation9 } from './ch3-negation-9'
 
+import { ch4theorem1 } from './ch4-theorem-1'
+import { ch4theorem2 } from './ch4-theorem-2'
+import { ch4theorem3 } from './ch4-theorem-3'
+import { ch4theorem4 } from './ch4-theorem-4'
+import { ch4theorem5 } from './ch4-theorem-5'
+import { ch4theorem6 } from './ch4-theorem-6'
+import { ch4theorem7 } from './ch4-theorem-7'
+import { ch4theorem8 } from './ch4-theorem-8'
+import { ch4theorem9 } from './ch4-theorem-9'
+
 export const theorems = {
   ch0identity1,
   ch0identity2,
@@ -81,6 +91,16 @@ export const theorems = {
   ch3negation7,
   ch3negation8,
   ch3negation9,
+
+  ch4theorem1,
+  ch4theorem2,
+  ch4theorem3,
+  ch4theorem4,
+  ch4theorem5,
+  ch4theorem6,
+  ch4theorem7,
+  ch4theorem8,
+  ch4theorem9,
 
   // harmaaPuolukkaTiikeri,
   // violettiLuumuBiisoni,

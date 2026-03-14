@@ -142,6 +142,11 @@ const level = <J extends AnyJudgement>(s: Focus<J>) => {
     congrats.appendChild(hurray)
     const congratsButtons = document.createElement('div')
     congratsButtons.setAttribute('class', 'congrabuttons')
+    const previousButton = document.createElement('div')
+    previousButton.setAttribute('class', 'button')
+    previousButton.innerHTML = 'Prev Level'
+    previousButton.onclick = () => prevLevel()
+    congratsButtons.appendChild(previousButton)
     const againbutton = document.createElement('div')
     againbutton.setAttribute('class', 'button')
     againbutton.innerHTML = 'Play Again'
@@ -355,19 +360,35 @@ const selectLevel = (conjectureId: keyof Theorems) => {
   history.pushState({ selected }, '', `?level=${selected}`)
   render()
 }
-const first: keyof Theorems = 'ch0identity1'
 
-const nextLevelId = (): keyof Theorems => {
+type TKey = keyof Theorems
+
+const theoremKeys: Array<TKey> = Object.keys(theorems) as Array<
+  TKey
+>
+const first: TKey = theoremKeys.at(0) as TKey
+const last: TKey = theoremKeys.at(-1) as TKey
+
+const currentLevelIndex = (): number => {
   if (!selected) {
-    return first
+    return 0
   }
-  const theoremKeys: Array<keyof Theorems> = Object.keys(theorems) as Array<
-    keyof Theorems
-  >
   const index = theoremKeys.findIndex((x) => x === selected)
   if (index < 0) {
-    return first
+    return 0
   }
+  return index
+}
+
+const prevLevelId = (): keyof Theorems => {
+  const index = currentLevelIndex()
+  return theoremKeys[index - 1] ?? last
+}
+const prevLevel = () => {
+  selectLevel(prevLevelId())
+}
+const nextLevelId = (): keyof Theorems => {
+  const index = currentLevelIndex()
   return theoremKeys[index + 1] ?? first
 }
 const nextLevel = () => {
