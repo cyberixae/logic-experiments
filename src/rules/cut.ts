@@ -4,8 +4,6 @@ import { Formulas, Sequent, AnySequent, sequent } from '../model/sequent';
 import { Refinement } from '../utils/generic';
 import * as tuple from '../utils/tuple';
 
-// Cut
-
 export type CutResult<Γ extends Formulas, Δ extends Formulas> = Sequent<Γ, Δ>;
 export type AnyCutResult = CutResult<Formulas, Formulas>;
 export const isCutResult: Refinement<AnySequent, AnyCutResult> = (

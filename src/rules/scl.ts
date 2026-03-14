@@ -4,8 +4,6 @@ import { Formulas, Sequent, AnySequent, sequent } from '../model/sequent';
 import { Refinement } from '../utils/generic';
 import * as tuple from '../utils/tuple';
 
-// Contraction
-
 export type SCLResult<
   Γ extends Formulas,
   A extends Prop,

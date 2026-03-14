@@ -4,8 +4,6 @@ import { Formulas, Sequent, AnySequent, refineActiveL, sequent } from '../model/
 import { Refinement } from '../utils/generic';
 import * as tuple from '../utils/tuple';
 
-// Implication
-
 export type ILResult<
   Γ extends Formulas,
   A extends Prop,

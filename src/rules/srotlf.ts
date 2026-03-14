@@ -4,8 +4,6 @@ import { Formulas, Sequent, AnySequent, sequent } from '../model/sequent';
 import { Refinement } from '../utils/generic';
 import * as tuple from '../utils/tuple';
 
-// Permutation
-
 export type SRotLFResult<
   A extends Prop,
   Γ extends Formulas,

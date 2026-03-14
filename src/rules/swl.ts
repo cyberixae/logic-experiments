@@ -4,8 +4,6 @@ import { Formulas, Sequent, AnySequent, sequent } from '../model/sequent';
 import { Refinement } from '../utils/generic';
 import * as tuple from '../utils/tuple';
 
-// Weakening
-
 export type SWLResult<
   Γ extends Formulas,
   A extends Prop,

@@ -4,8 +4,6 @@ import { Formulas, Sequent, AnySequent, refineActiveL, sequent } from '../model/
 import { Refinement } from '../utils/generic';
 import * as tuple from '../utils/tuple';
 
-// Negation
-
 export type NLResult<
   Γ extends Formulas,
   A extends Prop,
