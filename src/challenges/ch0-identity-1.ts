@@ -1,8 +1,8 @@
 import { rev, lk, Rev } from '../systems/lk'
-import { AnyJudgement, conclusion, judgement } from '../model/judgement'
+import { AnySequent, conclusion, sequent } from '../model/sequent'
 import { Configuration } from '../model/theorem'
 
-export const ch0identity1: Configuration<AnyJudgement> = {
+export const ch0identity1: Configuration<AnySequent> = {
   rules: ['i'],
-  goal: judgement([lk.a('p')], [lk.a('p')]),
+  goal: sequent([lk.a('p')], [lk.a('p')]),
 }

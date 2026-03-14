@@ -1,10 +1,10 @@
 import { rev, lk, Rev } from '../systems/lk'
-import { AnyJudgement, conclusion, judgement } from '../model/judgement'
+import { AnySequent, conclusion, sequent } from '../model/sequent'
 import { Configuration } from '../model/theorem'
 
-export const ch1weakening4: Configuration<AnyJudgement> = {
+export const ch1weakening4: Configuration<AnySequent> = {
   rules: ['i', 'swl', 'swr'],
-  goal: judgement(
+  goal: sequent(
     [lk.a('q'), lk.o.p2.conjunction(lk.a('p'), lk.a('q'))],
     [lk.o.p2.conjunction(lk.a('q'), lk.a('p')), lk.a('q')],
   ),

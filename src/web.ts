@@ -19,34 +19,34 @@ import {
   reset,
 } from './interactive/focus'
 import { premise, isProof, lsDerivation } from './model/derivation'
-import { AnyJudgement } from './model/judgement'
+import { AnySequent } from './model/sequent'
 import { fromDerivation, fromFocus } from './render/print'
 import {
-  exampleCL1,
-  exampleCL2,
-  exampleCR,
-  exampleDL,
-  exampleDR1,
-  exampleDR2,
-  exampleI,
-  exampleIL,
-  exampleIR,
-  exampleNL,
-  exampleNR,
-  exampleSCL,
-  exampleSCR,
-  exampleSRotLB,
-  exampleSRotLF,
-  exampleSRotRB,
-  exampleSRotRF,
-  exampleSWL,
-  exampleSWR,
-  exampleSXL,
-  exampleSXR,
   isRev,
   Rev,
   revs,
 } from './systems/lk'
+import { exampleSXR } from './rules/sxr'
+import { exampleSXL } from './rules/sxl'
+import { exampleSRotRB } from './rules/srotrb'
+import { exampleSRotRF } from './rules/srotrf'
+import { exampleSRotLB } from './rules/srotlb'
+import { exampleSRotLF } from './rules/srotlf'
+import { exampleSCR } from './rules/scr'
+import { exampleSCL } from './rules/scl'
+import { exampleSWR } from './rules/swr'
+import { exampleSWL } from './rules/swl'
+import { exampleNR } from './rules/nr'
+import { exampleNL } from './rules/nl'
+import { exampleIR } from './rules/ir'
+import { exampleIL } from './rules/il'
+import { exampleCR } from './rules/cr'
+import { exampleDL } from './rules/dl'
+import { exampleDR2 } from './rules/dr2'
+import { exampleCL2 } from './rules/cl2'
+import { exampleDR1 } from './rules/dr1'
+import { exampleCL1 } from './rules/cl1'
+import { exampleI } from './rules/i'
 import { head } from './utils/tuple'
 import { split } from './utils/string'
 import { Theorems, theorems, isTheoremKey } from './challenges'
@@ -88,7 +88,7 @@ const workspace: Workspace = {}
 let selected: keyof Workspace | null = null
 let isDone = false
 
-const status = (s: Focus<AnyJudgement>): string => '\n' + fromFocus(s) + '\n'
+const status = (s: Focus<AnySequent>): string => '\n' + fromFocus(s) + '\n'
 
 const listing = () => {
   const shroud = document.createElement('div')
@@ -130,7 +130,7 @@ const listing = () => {
   shroud.appendChild(panel)
   return shroud
 }
-const level = <J extends AnyJudgement>(s: Focus<J>) => {
+const level = <J extends AnySequent>(s: Focus<J>) => {
   const panel = document.createElement('div')
   panel.setAttribute('class', 'playarea')
   if (isDone) {
@@ -286,7 +286,7 @@ const rightPanel = (ls: Array<Rev>, rules: Array<Rev>) => {
   })
   return panel
 }
-const control = <J extends AnyJudgement>(s: Focus<J>) => {
+const control = <J extends AnySequent>(s: Focus<J>) => {
   const path = activePath(s)
   const panel = document.createElement('div')
   panel.setAttribute('class', 'controls')
@@ -322,7 +322,7 @@ const control = <J extends AnyJudgement>(s: Focus<J>) => {
   })
   return panel
 }
-const bench = <J extends AnyJudgement>(s: Focus<J>, rules: Array<Rev>) => {
+const bench = <J extends AnySequent>(s: Focus<J>, rules: Array<Rev>) => {
   const ls = revs(s.derivation, activePath(s)).map(head)
   const panel = document.createElement('div')
   panel.setAttribute('class', 'bench')

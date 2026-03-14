@@ -1,33 +1,33 @@
 import { parseEvent } from './event'
 import { focus, applyEvent, Focus, activePath } from './focus'
 import { premise, isProof } from '../model/derivation'
-import { AnyJudgement } from '../model/judgement'
+import { AnySequent } from '../model/sequent'
 import { fromDerivation, fromFocus } from '../render/print'
 import {
-  exampleCL1,
-  exampleCL2,
-  exampleCR,
-  exampleDL,
-  exampleDR1,
-  exampleDR2,
-  exampleI,
-  exampleIL,
-  exampleIR,
-  exampleNL,
-  exampleNR,
-  exampleSCL,
-  exampleSCR,
-  exampleSRotLB,
-  exampleSRotLF,
-  exampleSRotRB,
-  exampleSRotRF,
-  exampleSWL,
-  exampleSWR,
-  exampleSXL,
-  exampleSXR,
   isRev,
   revs,
 } from '../systems/lk'
+import { exampleSXR } from '../rules/sxr'
+import { exampleSXL } from '../rules/sxl'
+import { exampleSRotRB } from '../rules/srotrb'
+import { exampleSRotRF } from '../rules/srotrf'
+import { exampleSRotLB } from '../rules/srotlb'
+import { exampleSRotLF } from '../rules/srotlf'
+import { exampleSCR } from '../rules/scr'
+import { exampleSCL } from '../rules/scl'
+import { exampleSWR } from '../rules/swr'
+import { exampleSWL } from '../rules/swl'
+import { exampleNR } from '../rules/nr'
+import { exampleNL } from '../rules/nl'
+import { exampleIR } from '../rules/ir'
+import { exampleIL } from '../rules/il'
+import { exampleCR } from '../rules/cr'
+import { exampleDL } from '../rules/dl'
+import { exampleDR2 } from '../rules/dr2'
+import { exampleCL2 } from '../rules/cl2'
+import { exampleDR1 } from '../rules/dr1'
+import { exampleCL1 } from '../rules/cl1'
+import { exampleI } from '../rules/i'
 import { head } from '../utils/tuple'
 import { split } from '../utils/string'
 import { Theorems, isTheoremKey } from '../challenges'
@@ -181,7 +181,7 @@ export function* repl(theorems: Theorems): Generator<string, string, string> {
     }
   }
 }
-const status = (s: Focus<AnyJudgement>): string =>
+const status = (s: Focus<AnySequent>): string =>
   '\n' +
   fromFocus(s) +
   '\nRules: ' +

@@ -1,6 +1,6 @@
 import { log } from './render/block'
 import { premise, isProof, equalsDerivation } from './model/derivation'
-import { conclusion } from './model/judgement'
+import { conclusion } from './model/sequent'
 import { applyEvent, focus } from './interactive/focus'
 import { reverse } from './interactive/event'
 import * as print from './render/print'

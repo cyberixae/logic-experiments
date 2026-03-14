@@ -1,8 +1,8 @@
 import { rev, lk } from '../systems/lk'
-import { AnyJudgement, conclusion } from '../model/judgement'
+import { AnySequent, conclusion } from '../model/sequent'
 import { Challenge } from '../model/theorem'
 
-export const harmaaPuolukkaTiikeri: Challenge<AnyJudgement> = {
+export const harmaaPuolukkaTiikeri: Challenge<AnySequent> = {
   rules: Object.keys(rev).filter((r) => ['ir', 'swl', 'i'].includes(r)),
   goal: conclusion(
     lk.o.p2.implication(

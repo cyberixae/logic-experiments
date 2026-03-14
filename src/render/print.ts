@@ -1,6 +1,6 @@
 import * as utils from '../utils/utils'
 import * as prop from '../model/prop'
-import * as judge from '../model/judgement'
+import * as judge from '../model/sequent'
 import * as block from './block'
 import { NonEmptyArray, isNonEmptyArray } from '../utils/array'
 import {
@@ -9,7 +9,7 @@ import {
   AnyTransformation,
 } from '../model/derivation'
 import { Focus, activePath } from '../interactive/focus'
-import { AnyJudgement } from '../model/judgement'
+import { AnySequent } from '../model/sequent'
 
 export type NullaryTemplate = [string]
 export const NullaryTemplateId = {
@@ -270,7 +270,7 @@ export function fromFormulas(formulas: judge.Formulas): Printer {
   return printArray('formulas')(formulas.map(fromProp))
 }
 
-export function fromSequent(judgement: judge.AnyJudgement): Printer {
+export function fromSequent(judgement: judge.AnySequent): Printer {
   const { antecedent, succedent } = judgement
   return (t) =>
     print('sequent')(
@@ -399,7 +399,7 @@ export function fromMeta(meta: any) {
     ]),
   )
 }
-export const fromFocus = (s: Focus<AnyJudgement>) => {
+export const fromFocus = (s: Focus<AnySequent>) => {
   const path = activePath(s)
   return fromDerivation(s.derivation)
   /* +

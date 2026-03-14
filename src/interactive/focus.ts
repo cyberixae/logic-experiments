@@ -8,15 +8,15 @@ import {
   premise,
   equalsDerivation,
 } from '../model/derivation'
-import { AnyJudgement } from '../model/judgement'
+import { AnySequent } from '../model/sequent'
 import { rev } from '../systems/lk'
 import { Event } from './event'
 
-export type Focus<J extends AnyJudgement> = {
+export type Focus<J extends AnySequent> = {
   derivation: Derivation<J>
   branch: number
 }
-export const focus = <J extends AnyJudgement>(
+export const focus = <J extends AnySequent>(
   derivation: Derivation<J>,
   branch: number = 0,
 ): Focus<J> => ({
@@ -24,18 +24,18 @@ export const focus = <J extends AnyJudgement>(
   branch,
 })
 
-export const next = <J extends AnyJudgement>(s: Focus<J>): Focus<J> =>
+export const next = <J extends AnySequent>(s: Focus<J>): Focus<J> =>
   focus(s.derivation, s.branch + 1)
 
-export const prev = <J extends AnyJudgement>(s: Focus<J>): Focus<J> =>
+export const prev = <J extends AnySequent>(s: Focus<J>): Focus<J> =>
   focus(s.derivation, s.branch - 1)
 
-export const activePath = <J extends AnyJudgement>(s: Focus<J>): Path => {
+export const activePath = <J extends AnySequent>(s: Focus<J>): Path => {
   const paths = lsDerivation(s.derivation)
   return array.mod(paths, s.branch)
 }
 
-export const apply = <J extends AnyJudgement>(
+export const apply = <J extends AnySequent>(
   s: Focus<J>,
   edit: Edit,
 ): Focus<J> => {
@@ -47,7 +47,7 @@ export const apply = <J extends AnyJudgement>(
   return focus(derivation, s.branch)
 }
 
-export const undo = <J extends AnyJudgement>(s: Focus<J>): Focus<J> => {
+export const undo = <J extends AnySequent>(s: Focus<J>): Focus<J> => {
   const path = activePath(s)
   if (array.isNonEmptyArray(path)) {
     const parentPath = array.init(path)
@@ -62,11 +62,11 @@ export const undo = <J extends AnyJudgement>(s: Focus<J>): Focus<J> => {
   return s
 }
 
-export const reset = <J extends AnyJudgement>(s: Focus<J>): Focus<J> => {
+export const reset = <J extends AnySequent>(s: Focus<J>): Focus<J> => {
   return focus(premise(s.derivation.result))
 }
 
-export const applyEvent = <J extends AnyJudgement>(
+export const applyEvent = <J extends AnySequent>(
   state: Focus<J>,
   ev: Event,
 ): Focus<J> => {

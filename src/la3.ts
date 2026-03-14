@@ -1,15 +1,15 @@
 import { log } from './render/block'
 import { equalsDerivation, isProof, premise } from './model/derivation'
-import { conclusion } from './model/judgement'
+import { conclusion } from './model/sequent'
 import * as print from './render/print'
 import { apply, focus, next } from './interactive/focus'
 import {
   la3,
-  tryReverseA1,
-  tryReverseA2,
-  tryReverseMP,
   usage,
 } from './systems/la3'
+import { tryReverseMP } from './rules/mp'
+import { tryReverseA2 } from './rules/a2'
+import { tryReverseA1 } from './rules/a1'
 
 const goal = conclusion(
   la3.o.p2.implication(

@@ -1,8 +1,8 @@
 import { rev, lk, Rev } from '../systems/lk'
-import { AnyJudgement, conclusion } from '../model/judgement'
+import { AnySequent, conclusion } from '../model/sequent'
 import { Configuration } from '../model/theorem'
 
-export const syaaniPaprikaKettu: Configuration<AnyJudgement> = {
+export const syaaniPaprikaKettu: Configuration<AnySequent> = {
   rules: Object.keys(rev) as Array<Rev>,
   goal: conclusion(
     lk.o.p2.implication(
