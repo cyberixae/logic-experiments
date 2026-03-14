@@ -3,6 +3,7 @@ import { Prop, atom } from '../model/prop';
 import { Formulas, Sequent, AnySequent, sequent } from '../model/sequent';
 import { Refinement } from '../utils/generic';
 import * as tuple from '../utils/tuple';
+import { Rule } from '../model/rule';
 
 
 export type SRotRBResult<
@@ -80,3 +81,13 @@ export const tryReverseSRotRB = <J extends AnySequent>(
 export const exampleSRotRB = applySRotRB(
   premise(sequent([atom('Γ')], [atom('B'), atom('Δ'), atom('A')]))
 );
+
+export const ruleSRotRB = {
+  isResult: isSRotRBResult,
+  isResultDerivation: isSRotRBResultDerivation,
+  make: sRotRB,
+  apply: applySRotRB,
+  reverse: reverseSRotRB,
+  tryReverse: tryReverseSRotRB,
+  example: exampleSRotRB,
+} satisfies Rule<AnySRotRBResult>

@@ -3,6 +3,7 @@ import { Prop, Implication, isImplication, implication, atom } from '../model/pr
 import { Formulas, Sequent, AnySequent, refineActiveL, sequent } from '../model/sequent';
 import { Refinement } from '../utils/generic';
 import * as tuple from '../utils/tuple';
+import { Rule } from '../model/rule';
 
 export type ILResult<
   Γ extends Formulas,
@@ -91,3 +92,13 @@ export const exampleIL = applyIL(
   premise(sequent([atom('Γ')], [atom('A'), atom('Δ')])),
   premise(sequent([atom('Γ'), atom('B')], [atom('Δ')]))
 );
+
+export const ruleIL = {
+  isResult: isILResult,
+  isResultDerivation: isILResultDerivation,
+  make: il,
+  apply: applyIL,
+  reverse: reverseIL,
+  tryReverse: tryReverseIL,
+  example: exampleIL,
+} satisfies Rule<AnyILResult>

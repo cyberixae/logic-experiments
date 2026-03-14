@@ -3,6 +3,7 @@ import { Prop, atom } from '../model/prop';
 import { Formulas, Sequent, AnySequent, sequent } from '../model/sequent';
 import { Refinement } from '../utils/generic';
 import * as tuple from '../utils/tuple';
+import { Rule } from '../model/rule';
 
 export type SWLResult<
   Γ extends Formulas,
@@ -68,3 +69,13 @@ export const exampleSWL = applySWL(
   atom('A'),
   premise(sequent([atom('Γ')], [atom('Δ')]))
 );
+
+export const ruleSWL = {
+  isResult: isSWLResult,
+  isResultDerivation: isSWLResultDerivation,
+  make: swl,
+  apply: applySWL,
+  reverse: reverseSWL,
+  tryReverse: tryReverseSWL,
+  example: exampleSWL,
+} satisfies Rule<AnySWLResult>

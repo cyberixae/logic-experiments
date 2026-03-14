@@ -3,6 +3,8 @@ import { Prop, Implication, isImplication, implication, atom } from '../model/pr
 import { Formulas, Sequent, AnySequent, refineActiveR, sequent } from '../model/sequent';
 import { Refinement } from '../utils/generic';
 import * as tuple from '../utils/tuple';
+import { IResult } from './i';
+import { Rule } from '../model/rule';
 
 
 export type IRResult<
@@ -77,3 +79,13 @@ export const tryReverseIR = <J extends AnySequent>(
 export const exampleIR = applyIR(
   premise(sequent([atom('Γ'), atom('A')], [atom('B'), atom('Δ')]))
 );
+
+export const ruleIR = {
+  isResult: isIRResult,
+  isResultDerivation: isIRResultDerivation,
+  make: ir,
+  apply: applyIR,
+  reverse: reverseIR,
+  tryReverse: tryReverseIR,
+  example: exampleIR,
+} satisfies Rule<AnyIRResult>

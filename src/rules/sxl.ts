@@ -3,6 +3,7 @@ import { Prop, atom } from '../model/prop';
 import { Formulas, Sequent, AnySequent, sequent } from '../model/sequent';
 import { Refinement } from '../utils/generic';
 import * as tuple from '../utils/tuple';
+import { Rule } from '../model/rule';
 
 
 export type SXLResult<
@@ -82,3 +83,13 @@ export const tryReverseSXL = <J extends AnySequent>(
 export const exampleSXL = applySXL(
   premise(sequent([atom('Γ'), atom('A'), atom('B')], [atom('Δ')]))
 );
+
+export const ruleSXL = {
+  isResult: isSXLResult,
+  isResultDerivation: isSXLResultDerivation,
+  make: sxl,
+  apply: applySXL,
+  reverse: reverseSXL,
+  tryReverse: tryReverseSXL,
+  example: exampleSXL,
+} satisfies Rule<AnySXLResult>

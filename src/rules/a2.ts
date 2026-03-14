@@ -1,7 +1,8 @@
 import { refineDerivation, Introduction, introduction, Derivation } from '../model/derivation';
-import { Prop, Implication, equals, implication } from '../model/prop';
-import { Conclusion, AnyConclusion, refineConclusion, conclusion } from '../model/sequent';
+import { Prop, Implication, equals, implication, atom } from '../model/prop';
+import { Conclusion, AnyConclusion, refineConclusion, conclusion, AnySequent, isConclusion } from '../model/sequent';
 import { Refinement } from '../utils/generic';
+import { Rule } from '../model/rule';
 
 
 export type Axiom2<
@@ -68,7 +69,9 @@ export type A2Result<
   R extends Prop
 > = Conclusion<Axiom2<P, Q, R>>;
 export type AnyA2Result = A2Result<Prop, Prop, Prop>;
-export const isA2Result: Refinement<AnyConclusion, AnyA2Result> = refineConclusion(isAxiom2);
+export const isA2Result: Refinement<AnySequent, AnyA2Result> = (s: AnySequent): s is AnyA2Result => {
+  return isConclusion(s) && isAxiom2(s.succedent[0])
+};
 export const isA2ResultDerivation = refineDerivation(isA2Result);
 export type A2<
   P extends Prop,
@@ -112,8 +115,19 @@ export const reverseA2 = <
 ): A2<P, Q, R, C> => {
   return a2(p.result);
 };
-export const tryReverseA2 = <C extends AnyConclusion>(
-  d: Derivation<C>
-): Derivation<C> | null => {
+export const tryReverseA2 = <J extends AnySequent>(
+  d: Derivation<J>
+): Derivation<J> | null => {
   return isA2ResultDerivation(d) ? reverseA2(d) : null;
 };
+export const exampleA2 = applyA2(atom('A'), atom('B'), atom('C'));
+
+export const ruleA2 = {
+  isResult: isA2Result,
+  isResultDerivation: isA2ResultDerivation,
+  make: a2,
+  apply: applyA2,
+  reverse: reverseA2,
+  tryReverse: tryReverseA2,
+  example: exampleA2,
+} //satisfies Rule<AnyA2Result>

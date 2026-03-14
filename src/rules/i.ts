@@ -3,6 +3,7 @@ import { Prop, equals, atom } from '../model/prop';
 import { Sequent, AnySequent, sequent } from '../model/sequent';
 import { Refinement } from '../utils/generic';
 import * as tuple from '../utils/tuple';
+import { Rule } from '../model/rule';
 
 export type IResult<A extends Prop> = Sequent<[A], [A]>;
 export type AnyIResult = IResult<Prop>;
@@ -32,3 +33,13 @@ export const tryReverseI = <J extends AnySequent>(
   return isIResultDerivation(d) ? reverseI(d) : null;
 };
 export const exampleI = applyI(atom('A'));
+
+export const ruleI = {
+  isResult: isIResult,
+  isResultDerivation: isIResultDerivation,
+  make: i,
+  apply: applyI,
+  reverse: reverseI,
+  tryReverse: tryReverseI,
+  example: exampleI,
+} satisfies Rule<AnyIResult>

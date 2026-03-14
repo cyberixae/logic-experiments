@@ -3,6 +3,7 @@ import { Prop, Conjunction, isConjunction, conjunction, atom } from '../model/pr
 import { Formulas, Sequent, AnySequent, refineActiveL, sequent } from '../model/sequent';
 import { Refinement } from '../utils/generic';
 import * as tuple from '../utils/tuple';
+import { Rule } from '../model/rule';
 
 export type CLResult<
   Γ extends Formulas,
@@ -74,3 +75,13 @@ export const tryReverseCL = <J extends AnySequent>(
 export const exampleCL = applyCL(
   premise(sequent([atom('Γ'), atom('A'), atom('B')], [atom('Δ')]))
 );
+
+export const ruleCL = {
+  isResult: isCLResult,
+  isResultDerivation: isCLResultDerivation,
+  make: cl,
+  apply: applyCL,
+  reverse: reverseCL,
+  tryReverse: tryReverseCL,
+  example: exampleCL,
+} satisfies Rule<AnyCLResult>

@@ -3,6 +3,7 @@ import { Prop, atom } from '../model/prop';
 import { Formulas, Sequent, AnySequent, isActiveR, sequent } from '../model/sequent';
 import { Refinement } from '../utils/generic';
 import * as tuple from '../utils/tuple';
+import { Rule } from '../model/rule';
 
 
 export type SWRResult<
@@ -65,3 +66,13 @@ export const exampleSWR = applySWR(
   atom('A'),
   premise(sequent([atom('Γ')], [atom('Δ')]))
 );
+
+export const ruleSWR = {
+  isResult: isSWRResult,
+  isResultDerivation: isSWRResultDerivation,
+  make: swr,
+  apply: applySWR,
+  reverse: reverseSWR,
+  tryReverse: tryReverseSWR,
+  example: exampleSWR,
+} satisfies Rule<AnySWRResult>

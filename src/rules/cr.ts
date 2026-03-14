@@ -3,6 +3,7 @@ import { Prop, Conjunction, isConjunction, conjunction, atom } from '../model/pr
 import { Formulas, Sequent, AnySequent, refineActiveR, sequent } from '../model/sequent';
 import { Refinement } from '../utils/generic';
 import * as tuple from '../utils/tuple';
+import { Rule } from '../model/rule';
 
 
 export type CRResult<
@@ -92,3 +93,13 @@ export const exampleCR = applyCR(
   premise(sequent([atom('Γ')], [atom('A'), atom('Δ')])),
   premise(sequent([atom('Γ')], [atom('B'), atom('Δ')]))
 );
+
+export const ruleCR = {
+  isResult: isCRResult,
+  isResultDerivation: isCRResultDerivation,
+  make: cr,
+  apply: applyCR,
+  reverse: reverseCR,
+  tryReverse: tryReverseCR,
+  example: exampleCR,
+} satisfies Rule<AnyCRResult>

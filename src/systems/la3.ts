@@ -9,10 +9,10 @@ import {
   toProof,
   Edit,
 } from '../model/derivation'
-import { applyA1 } from '../rules/a1'
-import { applyA2 } from '../rules/a2'
-import { applyA3 } from '../rules/a3'
-import { applyMP } from '../rules/mp'
+import { ruleA1 } from '../rules/a1'
+import { ruleA2 } from '../rules/a2'
+import { ruleA3 } from '../rules/a3'
+import { ruleMP } from '../rules/mp'
 
 // Abbreviations
 
@@ -44,12 +44,12 @@ const omega = {
   p2: { implication },
 }
 const iota = {
-  a1: applyA1,
-  a2: applyA2,
-  a3: applyA3,
+  a1: ruleA1.apply,
+  a2: ruleA2.apply,
+  a3: ruleA3.apply,
 }
 const zeta = {
-  mp: applyMP,
+  mp: ruleMP.apply,
 }
 
 export const meta = {
@@ -78,9 +78,9 @@ export const meta = {
       title: 'Axioms',
       examples: [
         [
-          applyA1(atom('A'), atom('B')),
-          applyA2(atom('A'), atom('B'), atom('C')),
-          applyA3(atom('A'), atom('B')),
+          ruleA1.example,
+          ruleA2.example,
+          ruleA3.example,
         ],
       ],
     },
@@ -88,10 +88,7 @@ export const meta = {
       title: 'Rule',
       examples: [
         [
-          applyMP(
-            premise(conclusion(implication(atom('A'), atom('B')))),
-            premise(conclusion(atom('A'))),
-          ),
+          ruleMP.example,
         ],
       ],
     },

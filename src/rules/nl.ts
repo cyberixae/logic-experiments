@@ -3,6 +3,7 @@ import { Prop, Negation, isNegation, negation, atom } from '../model/prop';
 import { Formulas, Sequent, AnySequent, refineActiveL, sequent } from '../model/sequent';
 import { Refinement } from '../utils/generic';
 import * as tuple from '../utils/tuple';
+import { Rule } from '../model/rule';
 
 export type NLResult<
   Γ extends Formulas,
@@ -63,3 +64,13 @@ export const tryReverseNL = <J extends AnySequent>(
 export const exampleNL = applyNL(
   premise(sequent([atom('Γ')], [atom('A'), atom('Δ')]))
 );
+
+export const ruleNL = {
+  isResult: isNLResult,
+  isResultDerivation: isNLResultDerivation,
+  make: nl,
+  apply: applyNL,
+  reverse: reverseNL,
+  tryReverse: tryReverseNL,
+  example: exampleNL,
+} satisfies Rule<AnyNLResult>

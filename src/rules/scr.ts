@@ -3,6 +3,7 @@ import { Prop, atom } from '../model/prop';
 import { Formulas, Sequent, AnySequent, isActiveR, sequent } from '../model/sequent';
 import { Refinement } from '../utils/generic';
 import * as tuple from '../utils/tuple';
+import { Rule } from '../model/rule';
 
 
 export type SCRResult<
@@ -71,3 +72,13 @@ export const tryReverseSCR = <J extends AnySequent>(
 export const exampleSCR = applySCR(
   premise(sequent([atom('Γ')], [atom('A'), atom('A'), atom('Δ')]))
 );
+
+export const ruleSCR = {
+  isResult: isSCRResult,
+  isResultDerivation: isSCRResultDerivation,
+  make: scr,
+  apply: applySCR,
+  reverse: reverseSCR,
+  tryReverse: tryReverseSCR,
+  example: exampleSCR,
+} satisfies Rule<AnySCRResult>

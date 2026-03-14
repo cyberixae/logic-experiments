@@ -3,6 +3,7 @@ import { Prop, atom } from '../model/prop';
 import { Formulas, Sequent, AnySequent, sequent } from '../model/sequent';
 import { Refinement } from '../utils/generic';
 import * as tuple from '../utils/tuple';
+import { Rule } from '../model/rule';
 
 export type SCLResult<
   Γ extends Formulas,
@@ -74,3 +75,13 @@ export const tryReverseSCL = <J extends AnySequent>(
 export const exampleSCL = applySCL(
   premise(sequent([atom('Γ'), atom('A'), atom('A')], [atom('Δ')]))
 );
+
+export const ruleSCL = {
+  isResult: isSCLResult,
+  isResultDerivation: isSCLResultDerivation,
+  make: scl,
+  apply: applySCL,
+  reverse: reverseSCL,
+  tryReverse: tryReverseSCL,
+  example: exampleSCL,
+} satisfies Rule<AnySCLResult>

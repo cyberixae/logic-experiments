@@ -12,28 +12,28 @@ import {
 } from '../model/derivation'
 import { Option } from '../utils/option'
 import { entries } from '../utils/record'
-import { applyI, tryReverseI, exampleI } from '../rules/i'
-import { applyCut, exampleCut } from '../rules/cut'
-import { applyCL1, tryReverseCL1, exampleCL1 } from '../rules/cl1'
-import { applyDR1, tryReverseDR1, exampleDR1 } from '../rules/dr1'
-import { applyCL2, tryReverseCL2, exampleCL2 } from '../rules/cl2'
-import { applyDR2, tryReverseDR2, exampleDR2 } from '../rules/dr2'
-import { applyDL, tryReverseDL, exampleDL } from '../rules/dl'
-import { applyCR, tryReverseCR, exampleCR } from '../rules/cr'
-import { applyIL, tryReverseIL, exampleIL } from '../rules/il'
-import { applyIR, tryReverseIR, exampleIR } from '../rules/ir'
-import { applyNL, tryReverseNL, exampleNL } from '../rules/nl'
-import { applyNR, tryReverseNR, exampleNR } from '../rules/nr'
-import { applySWL, tryReverseSWL, exampleSWL } from '../rules/swl'
-import { applySWR, tryReverseSWR, exampleSWR } from '../rules/swr'
-import { applySCL, tryReverseSCL, exampleSCL } from '../rules/scl'
-import { applySCR, tryReverseSCR, exampleSCR } from '../rules/scr'
-import { applySRotLF, tryReverseSRotLF, exampleSRotLF } from '../rules/srotlf'
-import { applySRotLB, tryReverseSRotLB, exampleSRotLB } from '../rules/srotlb'
-import { applySRotRF, tryReverseSRotRF, exampleSRotRF } from '../rules/srotrf'
-import { applySRotRB, tryReverseSRotRB, exampleSRotRB } from '../rules/srotrb'
-import { applySXL, tryReverseSXL, exampleSXL } from '../rules/sxl'
-import { applySXR, tryReverseSXR, exampleSXR } from '../rules/sxr'
+import { ruleI, } from '../rules/i'
+import { ruleCut, } from '../rules/cut'
+import { ruleCL1, } from '../rules/cl1'
+import { ruleDR1, } from '../rules/dr1'
+import { ruleCL2, } from '../rules/cl2'
+import { ruleDR2, } from '../rules/dr2'
+import { ruleDL, } from '../rules/dl'
+import { ruleCR, } from '../rules/cr'
+import { ruleIL, } from '../rules/il'
+import { ruleIR, } from '../rules/ir'
+import { ruleNL, } from '../rules/nl'
+import { ruleNR, } from '../rules/nr'
+import { ruleSWL, } from '../rules/swl'
+import { ruleSWR, } from '../rules/swr'
+import { ruleSCL, } from '../rules/scl'
+import { ruleSCR, } from '../rules/scr'
+import { ruleSRotLF, } from '../rules/srotlf'
+import { ruleSRotLB, } from '../rules/srotlb'
+import { ruleSRotRF, } from '../rules/srotrf'
+import { ruleSRotRB, } from '../rules/srotrb'
+import { ruleSXL, } from '../rules/sxl'
+import { ruleSXR, } from '../rules/sxr'
 
 // Language
 
@@ -46,54 +46,54 @@ const omega = {
   p2: { implication, conjunction, disjunction },
 }
 const iota = {
-  i: applyI,
+  i: ruleI.apply,
 }
 const zeta = {
-  cut: applyCut,
-  cl1: applyCL1,
-  dr1: applyDR1,
-  cl2: applyCL2,
-  dr2: applyDR2,
-  dl: applyDL,
-  cr: applyCR,
-  il: applyIL,
-  ir: applyIR,
-  nl: applyNL,
-  nr: applyNR,
-  swl: applySWL,
-  swr: applySWR,
-  scl: applySCL,
-  scr: applySCR,
-  sRotLF: applySRotLF,
-  sRotLB: applySRotLB,
-  sRotRF: applySRotRF,
-  sRotRB: applySRotRB,
-  sxl: applySXL,
-  sxr: applySXR,
+  cut: ruleCut.apply,
+  cl1: ruleCL1.apply,
+  dr1: ruleDR1.apply,
+  cl2: ruleCL2.apply,
+  dr2: ruleDR2.apply,
+  dl: ruleDL.apply,
+  cr: ruleCR.apply,
+  il: ruleIL.apply,
+  ir: ruleIR.apply,
+  nl: ruleNL.apply,
+  nr: ruleNR.apply,
+  swl: ruleSWL.apply,
+  swr: ruleSWR.apply,
+  scl: ruleSCL.apply,
+  scr: ruleSCR.apply,
+  sRotLF: ruleSRotLF.apply,
+  sRotLB: ruleSRotLB.apply,
+  sRotRF: ruleSRotRF.apply,
+  sRotRB: ruleSRotRB.apply,
+  sxl: ruleSXL.apply,
+  sxr: ruleSXR.apply,
 }
 
 export const rev = {
-  i: tryReverseI,
-  cl1: tryReverseCL1,
-  dr1: tryReverseDR1,
-  cl2: tryReverseCL2,
-  dr2: tryReverseDR2,
-  dl: tryReverseDL,
-  cr: tryReverseCR,
-  il: tryReverseIL,
-  ir: tryReverseIR,
-  nl: tryReverseNL,
-  nr: tryReverseNR,
-  swl: tryReverseSWL,
-  swr: tryReverseSWR,
-  scl: tryReverseSCL,
-  scr: tryReverseSCR,
-  sRotLF: tryReverseSRotLF,
-  sRotLB: tryReverseSRotLB,
-  sRotRF: tryReverseSRotRF,
-  sRotRB: tryReverseSRotRB,
-  sxl: tryReverseSXL,
-  sxr: tryReverseSXR,
+  i: ruleI.tryReverse,
+  cl1: ruleCL1.tryReverse,
+  dr1: ruleDR1.tryReverse,
+  cl2: ruleCL2.tryReverse,
+  dr2: ruleDR2.tryReverse,
+  dl: ruleDL.tryReverse,
+  cr: ruleCR.tryReverse,
+  il: ruleIL.tryReverse,
+  ir: ruleIR.tryReverse,
+  nl: ruleNL.tryReverse,
+  nr: ruleNR.tryReverse,
+  swl: ruleSWL.tryReverse,
+  swr: ruleSWR.tryReverse,
+  scl: ruleSCL.tryReverse,
+  scr: ruleSCR.tryReverse,
+  sRotLF: ruleSRotLF.tryReverse,
+  sRotLB: ruleSRotLB.tryReverse,
+  sRotRF: ruleSRotRF.tryReverse,
+  sRotRB: ruleSRotRB.tryReverse,
+  sxl: ruleSXL.tryReverse,
+  sxr: ruleSXR.tryReverse,
 }
 
 export const meta = {
@@ -127,30 +127,30 @@ export const meta = {
   rules: [
     {
       title: 'Axiom',
-      examples: [exampleI],
+      examples: [ruleI.example],
     },
     {
       title: 'Cut',
-      examples: [[exampleCut]],
+      examples: [[ruleCut.example]],
     },
     {
       title: 'Logical Rules',
       examples: [
-        [exampleCL1, exampleDR1],
-        [exampleCL2, exampleDR2],
-        [exampleDL, exampleCR],
-        [exampleIL, exampleIR],
-        [exampleNL, exampleNR],
+        [ruleCL1.example, ruleDR1.example],
+        [ruleCL2.example, ruleDR2.example],
+        [ruleDL.example, ruleCR.example],
+        [ruleIL.example, ruleIR.example],
+        [ruleNL.example, ruleNR.example],
       ],
     },
     {
       title: 'Structural Rules',
       examples: [
-        [exampleSWL, exampleSWR],
-        [exampleSCL, exampleSCR],
-        [exampleSRotLF, exampleSRotRF],
-        [exampleSRotLB, exampleSRotRB],
-        [exampleSXL, exampleSXR],
+        [ruleSWL.example,    ruleSWR.example],
+        [ruleSCL.example,    ruleSCR.example],
+        [ruleSRotLF.example, ruleSRotRF.example],
+        [ruleSRotLB.example, ruleSRotRB.example],
+        [ruleSXL.example,    ruleSXR.example],
       ],
     },
   ],

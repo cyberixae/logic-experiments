@@ -3,6 +3,7 @@ import { Prop, atom } from '../model/prop';
 import { Formulas, Sequent, AnySequent, sequent } from '../model/sequent';
 import { Refinement } from '../utils/generic';
 import * as tuple from '../utils/tuple';
+import { Rule } from '../model/rule';
 
 export type SRotLFResult<
   A extends Prop,
@@ -79,3 +80,13 @@ export const tryReverseSRotLF = <J extends AnySequent>(
 export const exampleSRotLF = applySRotLF(
   premise(sequent([atom('Γ'), atom('B'), atom('A')], [atom('Δ')]))
 );
+
+export const ruleSRotLF = {
+  isResult: isSRotLFResult,
+  isResultDerivation: isSRotLFResultDerivation,
+  make: sRotLF,
+  apply: applySRotLF,
+  reverse: reverseSRotLF,
+  tryReverse: tryReverseSRotLF,
+  example: exampleSRotLF,
+} satisfies Rule<AnySRotLFResult>

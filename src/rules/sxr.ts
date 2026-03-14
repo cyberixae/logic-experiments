@@ -3,6 +3,7 @@ import { Prop, atom } from '../model/prop';
 import { Formulas, Sequent, AnySequent, sequent } from '../model/sequent';
 import { Refinement } from '../utils/generic';
 import * as tuple from '../utils/tuple';
+import { Rule } from '../model/rule';
 
 
 export type SXRResult<
@@ -82,3 +83,13 @@ export const tryReverseSXR = <J extends AnySequent>(
 export const exampleSXR = applySXR(
   premise(sequent([atom('Γ')], [atom('A'), atom('B'), atom('Δ')]))
 );
+
+export const ruleSXR = {
+  isResult: isSXRResult,
+  isResultDerivation: isSXRResultDerivation,
+  make: sxr,
+  apply: applySXR,
+  reverse: reverseSXR,
+  tryReverse: tryReverseSXR,
+  example: exampleSXR,
+} satisfies Rule<AnySXRResult>

@@ -3,6 +3,7 @@ import { Prop, Disjunction, disjunction, atom } from '../model/prop';
 import { Formulas, Sequent, AnySequent, sequent } from '../model/sequent';
 import { Refinement } from '../utils/generic';
 import * as tuple from '../utils/tuple';
+import { Rule } from '../model/rule';
 
 
 export type DR2Result<
@@ -79,3 +80,13 @@ export const exampleDR2 = applyDR2(
   atom('A'),
   premise(sequent([atom('Γ'), atom('B')], [atom('Δ')]))
 );
+
+export const ruleDR2 = {
+  isResult: isDR2Result,
+  isResultDerivation: isDR2ResultDerivation,
+  make: dr2,
+  apply: applyDR2,
+  reverse: reverseDR2,
+  tryReverse: tryReverseDR2,
+  example: exampleDR2,
+} satisfies Rule<AnyDR2Result>
