@@ -1,8 +1,13 @@
-import { Atom, atom, negation, conjunction, disjunction, implication } from '../model/prop'
-import * as print from '../render/print'
 import {
-  AnySequent as AnySequent,
-} from '../model/sequent'
+  Atom,
+  atom,
+  negation,
+  conjunction,
+  disjunction,
+  implication,
+} from '../model/prop'
+import * as print from '../render/print'
+import { AnySequent as AnySequent } from '../model/sequent'
 import {
   Derivation,
   isProof,
@@ -12,28 +17,28 @@ import {
 } from '../model/derivation'
 import { Option } from '../utils/option'
 import { entries } from '../utils/record'
-import { ruleI, } from '../rules/i'
-import { ruleCut, } from '../rules/cut'
-import { ruleCL1, } from '../rules/cl1'
-import { ruleDR1, } from '../rules/dr1'
-import { ruleCL2, } from '../rules/cl2'
-import { ruleDR2, } from '../rules/dr2'
-import { ruleDL, } from '../rules/dl'
-import { ruleCR, } from '../rules/cr'
-import { ruleIL, } from '../rules/il'
-import { ruleIR, } from '../rules/ir'
-import { ruleNL, } from '../rules/nl'
-import { ruleNR, } from '../rules/nr'
-import { ruleSWL, } from '../rules/swl'
-import { ruleSWR, } from '../rules/swr'
-import { ruleSCL, } from '../rules/scl'
-import { ruleSCR, } from '../rules/scr'
-import { ruleSRotLF, } from '../rules/srotlf'
-import { ruleSRotLB, } from '../rules/srotlb'
-import { ruleSRotRF, } from '../rules/srotrf'
-import { ruleSRotRB, } from '../rules/srotrb'
-import { ruleSXL, } from '../rules/sxl'
-import { ruleSXR, } from '../rules/sxr'
+import { ruleI } from '../rules/i'
+import { ruleCut } from '../rules/cut'
+import { ruleCL1 } from '../rules/cl1'
+import { ruleDR1 } from '../rules/dr1'
+import { ruleCL2 } from '../rules/cl2'
+import { ruleDR2 } from '../rules/dr2'
+import { ruleDL } from '../rules/dl'
+import { ruleCR } from '../rules/cr'
+import { ruleIL } from '../rules/il'
+import { ruleIR } from '../rules/ir'
+import { ruleNL } from '../rules/nl'
+import { ruleNR } from '../rules/nr'
+import { ruleSWL } from '../rules/swl'
+import { ruleSWR } from '../rules/swr'
+import { ruleSCL } from '../rules/scl'
+import { ruleSCR } from '../rules/scr'
+import { ruleSRotLF } from '../rules/srotlf'
+import { ruleSRotLB } from '../rules/srotlb'
+import { ruleSRotRF } from '../rules/srotrf'
+import { ruleSRotRB } from '../rules/srotrb'
+import { ruleSXL } from '../rules/sxl'
+import { ruleSXR } from '../rules/sxr'
 
 // Language
 
@@ -146,11 +151,11 @@ export const meta = {
     {
       title: 'Structural Rules',
       examples: [
-        [ruleSWL.example,    ruleSWR.example],
-        [ruleSCL.example,    ruleSCR.example],
+        [ruleSWL.example, ruleSWR.example],
+        [ruleSCL.example, ruleSCR.example],
         [ruleSRotLF.example, ruleSRotRF.example],
         [ruleSRotLB.example, ruleSRotRB.example],
-        [ruleSXL.example,    ruleSXR.example],
+        [ruleSXL.example, ruleSXR.example],
       ],
     },
   ],

@@ -1,4 +1,12 @@
-import { Prop, Atom, Negation, Implication, atom, negation, implication } from '../model/prop'
+import {
+  Prop,
+  Atom,
+  Negation,
+  Implication,
+  atom,
+  negation,
+  implication,
+} from '../model/prop'
 import * as array from '../utils/array'
 import { AnyConclusion, conclusion, isActiveR } from '../model/sequent'
 import * as print from '../render/print'
@@ -76,21 +84,11 @@ export const meta = {
   rules: [
     {
       title: 'Axioms',
-      examples: [
-        [
-          ruleA1.example,
-          ruleA2.example,
-          ruleA3.example,
-        ],
-      ],
+      examples: [[ruleA1.example, ruleA2.example, ruleA3.example]],
     },
     {
       title: 'Rule',
-      examples: [
-        [
-          ruleMP.example,
-        ],
-      ],
+      examples: [[ruleMP.example]],
     },
   ],
 } as const

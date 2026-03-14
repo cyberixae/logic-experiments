@@ -20,12 +20,14 @@ import {
 } from './interactive/focus'
 import { premise, isProof, lsDerivation } from './model/derivation'
 import { AnySequent } from './model/sequent'
-import { basic, fromDerivation, fromFocus, fromRule, fromSequent } from './render/print'
 import {
-  isRev,
-  Rev,
-  revs,
-} from './systems/lk'
+  basic,
+  fromDerivation,
+  fromFocus,
+  fromRule,
+  fromSequent,
+} from './render/print'
+import { isRev, Rev, revs } from './systems/lk'
 import { exampleSXR } from './rules/sxr'
 import { exampleSXL } from './rules/sxl'
 import { exampleSRotRB } from './rules/srotrb'
@@ -129,7 +131,9 @@ const listing = () => {
     item.appendChild(title)
     const rules = document.createElement('div')
     rules.setAttribute('class', 'rules')
-    rules.innerHTML = challenge.rules.map(rule => fromRule(rule)(basic)).join(', ')
+    rules.innerHTML = challenge.rules
+      .map((rule) => fromRule(rule)(basic))
+      .join(', ')
     item.appendChild(rules)
     const goal = document.createElement('div')
     goal.setAttribute('class', 'goal')
@@ -374,9 +378,7 @@ const selectLevel = (conjectureId: keyof Theorems) => {
 
 type TKey = keyof Theorems
 
-const theoremKeys: Array<TKey> = Object.keys(theorems) as Array<
-  TKey
->
+const theoremKeys: Array<TKey> = Object.keys(theorems) as Array<TKey>
 const first: TKey = theoremKeys.at(0) as TKey
 const last: TKey = theoremKeys.at(-1) as TKey
 

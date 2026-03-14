@@ -43,11 +43,7 @@ export function transformation<
 >(result: J, deps: D, rule: R): Transformation<J, D, R> {
   return { kind: 'transformation', result, deps, rule }
 }
-export type AnyTransformation = Transformation<
-  AnySequent,
-  Array<AnyNode>,
-  Rule
->
+export type AnyTransformation = Transformation<AnySequent, Array<AnyNode>, Rule>
 
 export type AnyNode = AnyPremise | AnyTransformation
 
@@ -61,10 +57,11 @@ export const refineDerivation =
     return r(s.result)
   }
 
-export type Introduction<
-  J extends AnySequent,
-  R extends Rule,
-> = Transformation<J, [], R>
+export type Introduction<J extends AnySequent, R extends Rule> = Transformation<
+  J,
+  [],
+  R
+>
 export function introduction<J extends AnySequent, R extends Rule>(
   result: J,
   rule: R,

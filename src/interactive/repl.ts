@@ -3,10 +3,7 @@ import { focus, applyEvent, Focus, activePath } from './focus'
 import { premise, isProof } from '../model/derivation'
 import { AnySequent } from '../model/sequent'
 import { fromDerivation, fromFocus } from '../render/print'
-import {
-  isRev,
-  revs,
-} from '../systems/lk'
+import { isRev, revs } from '../systems/lk'
 import { exampleSXR } from '../rules/sxr'
 import { exampleSXL } from '../rules/sxl'
 import { exampleSRotRB } from '../rules/srotrb'

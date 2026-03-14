@@ -31,17 +31,21 @@ export type ActiveL<B extends Prop> = Sequent<[...Formulas, B], Formulas>
 export const isActiveL = (j: AnySequent): j is ActiveL<Prop> => {
   return array.isNonEmptyArray(j.antecedent)
 }
-export const refineActiveL = <B extends Prop>(r: Refinement<Prop, B>) => (j: AnySequent): j is ActiveL<B> => {
-  return isActiveL(j) && r(tuple.last(j.antecedent))
-}
+export const refineActiveL =
+  <B extends Prop>(r: Refinement<Prop, B>) =>
+  (j: AnySequent): j is ActiveL<B> => {
+    return isActiveL(j) && r(tuple.last(j.antecedent))
+  }
 
 export type ActiveR<B extends Prop> = Sequent<Formulas, [B, ...Formulas]>
 export const isActiveR = (j: AnySequent): j is ActiveR<Prop> => {
   return array.isNonEmptyArray(j.succedent)
 }
-export const refineActiveR = <B extends Prop>(r: Refinement<Prop, B>) => (j: AnySequent): j is ActiveR<B> => {
-  return isActiveR(j) && r(tuple.head(j.succedent))
-}
+export const refineActiveR =
+  <B extends Prop>(r: Refinement<Prop, B>) =>
+  (j: AnySequent): j is ActiveR<B> => {
+    return isActiveR(j) && r(tuple.head(j.succedent))
+  }
 
 export type Conclusion<P extends Prop> = Sequent<[], [P]>
 export const conclusion = <P extends Prop>(proposition: P): Conclusion<P> =>
@@ -50,9 +54,11 @@ export type AnyConclusion = Conclusion<Prop>
 export const isConclusion = (j: AnySequent): j is AnyConclusion => {
   return j.antecedent.length === 0 && j.succedent.length === 1
 }
-export const refineConclusion = <B extends Prop>(r: Refinement<Prop, B>) => (j: AnySequent): j is Conclusion<B> => {
-  return refineActiveR(r)(j)
-}
+export const refineConclusion =
+  <B extends Prop>(r: Refinement<Prop, B>) =>
+  (j: AnySequent): j is Conclusion<B> => {
+    return refineActiveR(r)(j)
+  }
 
 export const equals = (a: AnySequent, b: AnySequent) => {
   return (
@@ -60,4 +66,3 @@ export const equals = (a: AnySequent, b: AnySequent) => {
     equalFormulas(a.succedent, b.succedent)
   )
 }
-
