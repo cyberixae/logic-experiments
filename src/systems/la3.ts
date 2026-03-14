@@ -1,4 +1,4 @@
-import * as prop from '../model/prop'
+import { Prop, Atom, Negation, Implication, atom, negation, implication, equals } from '../model/prop'
 import * as array from '../utils/array'
 import * as head from '../utils/tuple'
 import * as utils from '../utils/utils'
@@ -17,23 +17,6 @@ import {
   Edit,
 } from '../model/derivation'
 import { Refinement } from '../utils/generic'
-
-// Connectives
-
-export interface Atom<V extends string> extends prop.Atom<V> {}
-export const atom = prop.atom
-
-export interface Negation<N extends Prop> extends prop.Negation<N> {}
-export const negation = <N extends Prop>(n: N): Negation<N> => prop.negation(n)
-
-export interface Implication<A extends Prop, C extends Prop>
-  extends prop.Implication<A, C> {}
-export const implication = <A extends Prop, C extends Prop>(
-  a: A,
-  c: C,
-): Implication<A, C> => prop.implication(a, c)
-
-export type Prop = Atom<string> | Negation<Prop> | Implication<Prop, Prop>
 
 // Abbreviations
 
@@ -73,7 +56,7 @@ export const isA1Result: Refinement<AnyConclusion, AnyA1Result> = (
     return false
   }
   const p2 = qip.consequent
-  return prop.equals(p1, p2)
+  return equals(p1, p2)
 }
 export const isA1ResultDerivation = refineDerivation(isA1Result)
 export type A1<
@@ -156,16 +139,16 @@ export const isA2Result: Refinement<AnyConclusion, AnyA2Result> = (
   const p3 = pir.antecedent
   const r2 = pir.consequent
 
-  if (!prop.equals(p1, p2)) {
+  if (!equals(p1, p2)) {
     return false
   }
-  if (!prop.equals(p2, p3)) {
+  if (!equals(p2, p3)) {
     return false
   }
-  if (!prop.equals(q1, q2)) {
+  if (!equals(q1, q2)) {
     return false
   }
-  if (!prop.equals(r1, r2)) {
+  if (!equals(r1, r2)) {
     return false
   }
   return true
@@ -254,7 +237,7 @@ export const isA3Result: Refinement<AnyConclusion, AnyA3Result> = (
   }
   const q2 = qip.antecedent
   const p2 = qip.consequent
-  return prop.equals(p1, p2) && prop.equals(q1, q2)
+  return equals(p1, p2) && equals(q1, q2)
 }
 export const isA3ResultDerivation = refineDerivation(isA3Result)
 export type A3<

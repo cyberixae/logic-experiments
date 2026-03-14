@@ -18,6 +18,7 @@ export const atom = <V extends string>(value: V): Atom<V> => ({
   kind: 'atom',
   value,
 })
+export const isAtom = (p: Prop): p is Atom<string> => p.kind === 'atom'
 
 export interface Falsum extends PropG<'falsum'> {}
 export const falsum = {
@@ -36,6 +37,8 @@ export const negation = <N extends Prop>(negand: N): Negation<N> => ({
   kind: 'negation',
   negand,
 })
+export const isNegation = (p: Prop): p is Negation<Prop> =>
+  p.kind === 'negation'
 
 export interface Implication<A extends Prop, C extends Prop>
   extends PropG<'implication'> {
@@ -50,6 +53,8 @@ export const implication = <A extends Prop, C extends Prop>(
   antecedent,
   consequent,
 })
+export const isImplication = (p: Prop): p is Implication<Prop, Prop> =>
+  p.kind === 'implication'
 
 export interface Conjunction<L extends Prop, R extends Prop>
   extends PropG<'conjunction'> {
@@ -64,6 +69,8 @@ export const conjunction = <L extends Prop, R extends Prop>(
   leftConjunct,
   rightConjunct,
 })
+export const isConjunction = (p: Prop): p is Conjunction<Prop, Prop> =>
+  p.kind === 'conjunction'
 
 export interface Disjunction<L extends Prop, R extends Prop>
   extends PropG<'disjunction'> {
@@ -79,6 +86,8 @@ export const disjunction = <L extends Prop, R extends Prop>(
   leftDisjunct,
   rightDisjunct,
 })
+export const isDisjunction = (p: Prop): p is Disjunction<Prop, Prop> =>
+  p.kind === 'disjunction'
 
 export type Prop =
   | Atom<string>

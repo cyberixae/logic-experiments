@@ -1,4 +1,4 @@
-import * as prop from '../model/prop'
+import { Prop, Atom, atom, Negation, negation, Conjunction, conjunction, Disjunction, disjunction, Implication, implication, equals, isNegation, isConjunction, isDisjunction, isImplication } from '../model/prop'
 import * as array from '../utils/array'
 import * as tuple from '../utils/tuple'
 import * as head from '../utils/tuple'
@@ -26,51 +26,6 @@ import {
 import { Refinement } from '../utils/generic'
 import { Option } from '../utils/option'
 import { entries } from '../utils/record'
-
-// Connectives
-
-export interface Atom<V extends string> extends prop.Atom<V> {}
-export const atom = prop.atom
-export const isAtom = (p: Prop): p is Atom<string> => p.kind === 'atom'
-
-export interface Negation<N extends Prop> extends prop.Negation<N> {}
-export const negation = <N extends Prop>(n: N): Negation<N> => prop.negation(n)
-export const isNegation = (p: Prop): p is Negation<Prop> =>
-  p.kind === 'negation'
-
-export interface Implication<A extends Prop, C extends Prop>
-  extends prop.Implication<A, C> {}
-export const implication = <A extends Prop, C extends Prop>(
-  a: A,
-  c: C,
-): Implication<A, C> => prop.implication(a, c)
-export const isImplication = (p: Prop): p is Implication<Prop, Prop> =>
-  p.kind === 'implication'
-
-export interface Conjunction<L extends Prop, R extends Prop>
-  extends prop.Conjunction<L, R> {}
-export const conjunction = <L extends Prop, R extends Prop>(
-  l: L,
-  r: R,
-): Conjunction<L, R> => prop.conjunction(l, r)
-export const isConjunction = (p: Prop): p is Conjunction<Prop, Prop> =>
-  p.kind === 'conjunction'
-
-export interface Disjunction<L extends Prop, R extends Prop>
-  extends prop.Disjunction<L, R> {}
-export const disjunction = <L extends Prop, R extends Prop>(
-  l: L,
-  r: R,
-): Disjunction<L, R> => prop.disjunction(l, r)
-export const isDisjunction = (p: Prop): p is Disjunction<Prop, Prop> =>
-  p.kind === 'disjunction'
-
-export type Prop =
-  | Atom<string>
-  | Negation<Prop>
-  | Implication<Prop, Prop>
-  | Conjunction<Prop, Prop>
-  | Disjunction<Prop, Prop>
 
 // TODO: generalize the following for use with LA3
 
@@ -104,7 +59,7 @@ export const isIResult: Refinement<AnySequent, AnyIResult> = (
   return (
     tuple.isTupleOf1(s.antecedent) &&
     tuple.isTupleOf1(s.succedent) &&
-    prop.equals(s.antecedent[0], s.succedent[0])
+    equals(s.antecedent[0], s.succedent[0])
   )
 }
 export const isIResultDerivation = refineDerivation(isIResult)
