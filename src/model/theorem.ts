@@ -1,11 +1,11 @@
 import { Proof } from './derivation'
-import { AnyJudgement } from './judgement'
+import { AnySequent } from './sequent'
 import { Rev } from '../systems/lk'
 
-export type Configuration<J extends AnyJudgement> = {
+export type Configuration<J extends AnySequent> = {
   goal: J
   rules: Array<Rev>
 }
-export interface Challenge<J extends AnyJudgement> extends Configuration<J> {
+export interface Challenge<J extends AnySequent> extends Configuration<J> {
   solution: Proof<J>
 }

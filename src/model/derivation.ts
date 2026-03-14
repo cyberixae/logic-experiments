@@ -4,30 +4,30 @@ import {
   replaceItem,
   zip,
 } from '../utils/array'
-import { AnyJudgement, equals } from './judgement'
+import { AnySequent, equals } from './sequent'
 import { Refinement } from '../utils/generic'
 
 export type Rule = string
 
-export interface Premise<J extends AnyJudgement> {
+export interface Premise<J extends AnySequent> {
   kind: 'premise'
   result: J
 }
-export function premise<J extends AnyJudgement>(result: J): Premise<J> {
+export function premise<J extends AnySequent>(result: J): Premise<J> {
   return {
     kind: 'premise',
     result,
   }
 }
-export type AnyPremise = Premise<AnyJudgement>
+export type AnyPremise = Premise<AnySequent>
 export const refinePremise =
-  <A extends AnyJudgement, B extends A>(r: Refinement<A, B>) =>
+  <A extends AnySequent, B extends A>(r: Refinement<A, B>) =>
   (s: Premise<A>): s is Premise<B> => {
     return r(s.result)
   }
 
 export interface Transformation<
-  J extends AnyJudgement,
+  J extends AnySequent,
   D extends Array<AnyNode>,
   R extends Rule,
 > {
@@ -37,68 +37,68 @@ export interface Transformation<
   deps: D
 }
 export function transformation<
-  J extends AnyJudgement,
+  J extends AnySequent,
   D extends Array<AnyNode>,
   R extends Rule,
 >(result: J, deps: D, rule: R): Transformation<J, D, R> {
   return { kind: 'transformation', result, deps, rule }
 }
 export type AnyTransformation = Transformation<
-  AnyJudgement,
+  AnySequent,
   Array<AnyNode>,
   Rule
 >
 
 export type AnyNode = AnyPremise | AnyTransformation
 
-export type Derivation<R extends AnyJudgement> =
+export type Derivation<R extends AnySequent> =
   | Premise<R>
   | Transformation<R, Array<AnyNode>, Rule>
-export type AnyDerivation = Derivation<AnyJudgement>
+export type AnyDerivation = Derivation<AnySequent>
 export const refineDerivation =
-  <A extends AnyJudgement, B extends A>(r: Refinement<A, B>) =>
+  <A extends AnySequent, B extends A>(r: Refinement<A, B>) =>
   (s: Derivation<A>): s is Derivation<B> => {
     return r(s.result)
   }
 
 export type Introduction<
-  J extends AnyJudgement,
+  J extends AnySequent,
   R extends Rule,
 > = Transformation<J, [], R>
-export function introduction<J extends AnyJudgement, R extends Rule>(
+export function introduction<J extends AnySequent, R extends Rule>(
   result: J,
   rule: R,
 ): Introduction<J, R> {
   return transformation(result, [], rule)
 }
-export type AnyIntroduction = Introduction<AnyJudgement, Rule>
+export type AnyIntroduction = Introduction<AnySequent, Rule>
 
 export interface Proof<
-  J extends AnyJudgement,
+  J extends AnySequent,
   D extends Array<AnyProof> = Array<AnyProof>,
   R extends Rule = Rule,
 > extends Transformation<J, D, R> {}
-export type AnyProof = Proof<AnyJudgement, Array<AnyProof>, Rule>
+export type AnyProof = Proof<AnySequent, Array<AnyProof>, Rule>
 
-export const isProof = <J extends AnyJudgement>(
+export const isProof = <J extends AnySequent>(
   d: Derivation<J>,
 ): d is Proof<J> => {
   return d.kind === 'transformation' && d.deps.every((dep) => isProof(dep))
 }
 
-export const toProof = <J extends AnyJudgement>(
+export const toProof = <J extends AnySequent>(
   d: Derivation<J>,
 ): Proof<J> | null => {
   return isProof(d) ? d : null
 }
 
-export const isEquivalent = <J extends AnyJudgement>(
+export const isEquivalent = <J extends AnySequent>(
   a: Derivation<J>,
   b: Derivation<J>,
 ) => equals(a.result, b.result)
 
 export const replaceDep = <
-  P extends Transformation<AnyJudgement, Array<AnyNode>, Rule>,
+  P extends Transformation<AnySequent, Array<AnyNode>, Rule>,
   I extends number,
 >(
   parent: P,
@@ -115,13 +115,13 @@ export const replaceDep = <
   return { ...parent, deps }
 }
 
-export type Edit = <J extends AnyJudgement>(
+export type Edit = <J extends AnySequent>(
   d: Derivation<J>,
 ) => Derivation<J> | null
 
 export type Path = Array<number>
 
-export const editPremise = <J extends AnyJudgement>(
+export const editPremise = <J extends AnySequent>(
   root: Premise<J>,
   path: Path,
   edit: Edit,
@@ -133,7 +133,7 @@ export const editPremise = <J extends AnyJudgement>(
   return edit(root)
 }
 
-export const editTransformation = <J extends AnyJudgement>(
+export const editTransformation = <J extends AnySequent>(
   root: Transformation<J, Array<AnyNode>, string>,
   path: Path,
   edit: Edit,
@@ -153,7 +153,7 @@ export const editTransformation = <J extends AnyJudgement>(
   return edit(root)
 }
 
-export const editDerivation = <J extends AnyJudgement>(
+export const editDerivation = <J extends AnySequent>(
   root: Derivation<J> | null,
   path: Path,
   edit: Edit,
