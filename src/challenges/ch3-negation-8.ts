@@ -3,7 +3,7 @@ import { AnySequent, conclusion, sequent } from '../model/sequent'
 import { Configuration } from '../model/theorem'
 
 export const ch3negation8: Configuration<AnySequent> = {
-  rules: ['i','nl','nr', 'swl', 'sRotLB', 'sRotLF', 'swr', 'sRotRB', 'sRotRF'],
+  rules: ['i', 'swl', 'swr', 'sRotLF', 'sRotRF', 'sRotLB', 'sRotRB', 'nl', 'nr'],
   goal: sequent([
 
     lk.o.p1.negation(

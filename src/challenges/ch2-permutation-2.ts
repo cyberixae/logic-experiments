@@ -3,7 +3,7 @@ import { AnySequent, conclusion, sequent } from '../model/sequent'
 import { Configuration } from '../model/theorem'
 
 export const ch2permutation2: Configuration<AnySequent> = {
-  rules: ['i', 'swr', 'sRotRB', 'sRotRF'],
+  rules: ['i', 'swl', 'swr', 'sRotLF', 'sRotRF', 'sRotLB', 'sRotRB'],
   goal: sequent(
     [lk.a('q')],
     [lk.a('p'), lk.a('p'), lk.a('p'), lk.a('q'), lk.a('p'), lk.a('p')],

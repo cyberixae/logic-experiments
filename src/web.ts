@@ -20,7 +20,7 @@ import {
 } from './interactive/focus'
 import { premise, isProof, lsDerivation } from './model/derivation'
 import { AnySequent } from './model/sequent'
-import { fromDerivation, fromFocus } from './render/print'
+import { basic, fromDerivation, fromFocus, fromRule, fromSequent } from './render/print'
 import {
   isRev,
   Rev,
@@ -56,29 +56,29 @@ const main = {
 }
 
 const left = {
+  scl: fromDerivation(exampleSCL),
+  swl: fromDerivation(exampleSWL),
+  sRotLB: fromDerivation(exampleSRotLB),
+  sRotLF: fromDerivation(exampleSRotLF),
+  //sxl: fromDerivation(exampleSXL), not relevant for reverse
+  nl: fromDerivation(exampleNL),
+  il: fromDerivation(exampleIL),
   cl1: fromDerivation(exampleCL1),
   cl2: fromDerivation(exampleCL2),
   dl: fromDerivation(exampleDL),
-  il: fromDerivation(exampleIL),
-  nl: fromDerivation(exampleNL),
-  scl: fromDerivation(exampleSCL),
-  swl: fromDerivation(exampleSWL),
-  //sxl: fromDerivation(exampleSXL), not relevant for reverse
-  sRotLB: fromDerivation(exampleSRotLB),
-  sRotLF: fromDerivation(exampleSRotLF),
 }
 
 const right = {
+  scr: fromDerivation(exampleSCR),
+  swr: fromDerivation(exampleSWR),
+  sRotRB: fromDerivation(exampleSRotRB),
+  sRotRF: fromDerivation(exampleSRotRF),
+  //sxr: fromDerivation(exampleSXR), not relevant for reverse
+  nr: fromDerivation(exampleNR),
+  ir: fromDerivation(exampleIR),
   dr1: fromDerivation(exampleDR1),
   dr2: fromDerivation(exampleDR2),
   cr: fromDerivation(exampleCR),
-  ir: fromDerivation(exampleIR),
-  nr: fromDerivation(exampleNR),
-  scr: fromDerivation(exampleSCR),
-  swr: fromDerivation(exampleSWR),
-  //sxr: fromDerivation(exampleSXR), not relevant for reverse
-  sRotRB: fromDerivation(exampleSRotRB),
-  sRotRF: fromDerivation(exampleSRotRF),
 }
 
 const controls = ['prev', 'undo', 'reset', 'level', 'next']
@@ -100,6 +100,7 @@ const listing = () => {
   shroud.setAttribute('style', 'display: none;')
   shroud.setAttribute('id', 'levelmenu')
   const panel = document.createElement('div')
+  panel.setAttribute('class', 'level-select')
   panel.onclick = (click) => {
     // prevent shroud click
     click.preventDefault()
@@ -113,20 +114,30 @@ const listing = () => {
     shroud.setAttribute('style', 'display: none;')
   }
   panel.appendChild(close)
-  panel.setAttribute('class', 'levels')
-  Object.keys(theorems).forEach((id) => {
+  const levels = document.createElement('div')
+  levels.setAttribute('class', 'levels')
+  Object.entries(theorems).forEach(([id, challenge]) => {
     const item = document.createElement('div')
-    const link = document.createElement('a')
-    link.setAttribute('class', id === selected ? 'active' : '')
-    link.setAttribute('href', '#')
-    link.onclick = (click) => {
+    item.setAttribute('class', 'level' + (id === selected ? ' active' : ''))
+    item.onclick = (click) => {
       click.preventDefault()
       selectLevel(id as keyof Workspace)
     }
-    link.innerHTML = id
-    item.appendChild(link)
-    panel.appendChild(item)
+    const title = document.createElement('div')
+    title.setAttribute('class', 'title')
+    title.innerHTML = id
+    item.appendChild(title)
+    const rules = document.createElement('div')
+    rules.setAttribute('class', 'rules')
+    rules.innerHTML = challenge.rules.map(rule => fromRule(rule)(basic)).join(', ')
+    item.appendChild(rules)
+    const goal = document.createElement('div')
+    goal.setAttribute('class', 'goal')
+    goal.innerHTML = fromSequent(challenge.goal)(basic)
+    item.appendChild(goal)
+    levels.appendChild(item)
   })
+  panel.appendChild(levels)
   shroud.appendChild(panel)
   return shroud
 }

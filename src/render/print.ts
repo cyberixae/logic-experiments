@@ -291,6 +291,8 @@ export function right(n: string | null = null): string {
 export function fromRule(s: string): Printer {
   return (t) => {
     switch (s) {
+      case 'i':
+        return 'I'
       case 'cl1':
         return t.conjunction.join(empty) + left('\u2081')
       case 'dr1':
@@ -319,13 +321,13 @@ export function fromRule(s: string): Printer {
         return 'CL'
       case 'scr':
         return 'CR'
-      case 'SRotLF':
+      case 'sRotLF':
         return '\u21B6L'
-      case 'SRotRF':
+      case 'sRotRF':
         return '\u21b7R'
-      case 'SRotLB':
+      case 'sRotLB':
         return '\u21b7L'
-      case 'SRotRB':
+      case 'sRotRB':
         return '\u21B6R'
       case 'sxl':
         return 'XL'

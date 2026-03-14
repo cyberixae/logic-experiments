@@ -25,7 +25,7 @@ export type SRotLB<
   A extends Prop,
   Δ extends Formulas,
   R extends SRotLBResult<Γ, B, A, Δ>
-> = Transformation<R, [Derivation<Sequent<[A, ...Γ, B], Δ>>], 'SRotLB'>;
+> = Transformation<R, [Derivation<Sequent<[A, ...Γ, B], Δ>>], 'sRotLB'>;
 export type AnySRotLB = SRotLB<Formulas, Prop, Prop, Formulas, AnySRotLBResult>;
 export const sRotLB = <
   Γ extends Formulas,
@@ -37,7 +37,7 @@ export const sRotLB = <
   result: R,
   deps: [Derivation<Sequent<[A, ...Γ, B], Δ>>]
 ): SRotLB<Γ, B, A, Δ, R> => {
-  return transformation(result, deps, 'SRotLB');
+  return transformation(result, deps, 'sRotLB');
 };
 export type ApplySRotLB<S extends AnyDerivation> = S extends Derivation<
   Sequent<

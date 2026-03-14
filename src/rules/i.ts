@@ -17,9 +17,9 @@ export const isIResult: Refinement<AnySequent, AnyIResult> = (
   );
 };
 export const isIResultDerivation = refineDerivation(isIResult);
-export type I<A extends Prop, R extends IResult<A>> = Introduction<R, 'I'>;
+export type I<A extends Prop, R extends IResult<A>> = Introduction<R, 'i'>;
 export type AnyI = I<Prop, AnyIResult>;
-export const i = <A extends Prop, R extends IResult<A>>(result: R): I<A, R> => introduction(result, 'I');
+export const i = <A extends Prop, R extends IResult<A>>(result: R): I<A, R> => introduction(result, 'i');
 export type ApplyI<A extends Prop> = I<A, IResult<A>>;
 export const applyI = <A extends Prop>(a: A): ApplyI<A> => i(sequent([a], [a]));
 export const reverseI = <A extends Prop, R extends IResult<A>>(

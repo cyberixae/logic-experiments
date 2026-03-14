@@ -4,5 +4,10 @@ import { Configuration } from '../model/theorem'
 
 export const ch4theorem4: Configuration<AnySequent> = {
   rules: ['i','ir'],
-  goal: sequent([lk.a('r'), lk.o.p1.negation(lk.a('r'))], []),
+  goal: conclusion(
+    lk.o.p2.implication(
+      lk.o.p2.implication(lk.a('q'), lk.o.p2.implication(lk.a('r'), lk.a('q'))),
+      lk.o.p2.implication(lk.a('q'), lk.o.p2.implication(lk.a('r'), lk.a('q'))),
+    ),
+  ),
 }
