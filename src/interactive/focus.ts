@@ -7,8 +7,9 @@ import {
   Path,
   premise,
   equalsDerivation,
+  subDerivation,
 } from '../model/derivation'
-import { AnySequent } from '../model/sequent'
+import { AnySequent, Sequent } from '../model/sequent'
 import { rev } from '../systems/lk'
 import { Event } from './event'
 
@@ -23,6 +24,7 @@ export const focus = <J extends AnySequent>(
   derivation,
   branch,
 })
+export type AnyFocus = Focus<AnySequent>
 
 export const next = <J extends AnySequent>(s: Focus<J>): Focus<J> =>
   focus(s.derivation, s.branch + 1)
@@ -33,6 +35,12 @@ export const prev = <J extends AnySequent>(s: Focus<J>): Focus<J> =>
 export const activePath = <J extends AnySequent>(s: Focus<J>): Path => {
   const paths = lsDerivation(s.derivation)
   return array.mod(paths, s.branch)
+}
+
+export const activeSequent = (s: AnyFocus): AnySequent => {
+  const path = activePath(s)
+  const derivation = subDerivation(s.derivation, path)
+  return (derivation ?? s.derivation).result
 }
 
 export const apply = <J extends AnySequent>(

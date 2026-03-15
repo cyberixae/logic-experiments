@@ -17,6 +17,7 @@ import {
   undo,
   prev,
   reset,
+  activeSequent,
 } from './interactive/focus'
 import { premise, isProof, lsDerivation } from './model/derivation'
 import { AnySequent } from './model/sequent'
@@ -94,7 +95,14 @@ const workspace: Workspace = {}
 let selected: keyof Workspace | null = null
 let isDone = false
 
-const status = (s: Focus<AnySequent>): string => '\n' + fromFocus(s) + '\n'
+const proof = (s: Focus<AnySequent>) => {
+  const pre = document.createElement('pre')
+  pre.setAttribute('class', 'proof')
+  if (s.derivation.kind === 'transformation') {
+    pre.innerHTML =  '\n' + fromFocus(s) + '\n'
+  }
+  return pre
+}
 
 const listing = () => {
   const shroud = document.createElement('div')
@@ -149,10 +157,9 @@ const listing = () => {
   shroud.appendChild(panel)
   return shroud
 }
-const level = <J extends AnySequent>(s: Focus<J>) => {
+
+const congrats = () => {
   const panel = document.createElement('div')
-  panel.setAttribute('class', 'playarea')
-  if (isDone) {
     const congrats = document.createElement('div')
     congrats.setAttribute('class', 'congrats')
     const hurray = document.createElement('div')
@@ -178,11 +185,25 @@ const level = <J extends AnySequent>(s: Focus<J>) => {
     congratsButtons.appendChild(continueButton)
     panel.appendChild(congrats)
     panel.appendChild(congratsButtons)
+  return panel
+}
+
+const current = <J extends AnySequent>(s: Focus<J>) => {
+  if (isDone) {
+    return congrats()
   }
-  const pre = document.createElement('pre')
-  pre.setAttribute('class', 'status')
-  pre.innerHTML = status(s)
-  panel.appendChild(pre)
+  const active = document.createElement('div')
+  active.setAttribute('class', 'current')
+  const sequent = activeSequent(s)
+  active.innerHTML = fromSequent(sequent)(basic)
+  return active
+}
+
+const playArea = <J extends AnySequent>(s: Focus<J>) => {
+  const panel = document.createElement('div')
+  panel.setAttribute('class', 'playarea')
+  panel.appendChild(current(s))
+  panel.appendChild(proof(s))
   return panel
 }
 
@@ -348,7 +369,7 @@ const bench = <J extends AnySequent>(s: Focus<J>, rules: Array<Rev>) => {
   panel.appendChild(leftPanel(ls, rules))
   panel.appendChild(mainPanel(ls, rules))
   panel.appendChild(rightPanel(ls, rules))
-  panel.appendChild(level(s))
+  panel.appendChild(playArea(s))
   panel.appendChild(control(s))
   return panel
 }

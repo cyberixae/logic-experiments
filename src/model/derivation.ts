@@ -166,6 +166,47 @@ export const editDerivation = <J extends AnySequent>(
   }
 }
 
+export const subDerivationFromPremise = <J extends AnySequent>(
+  root: Premise<J>,
+  path: Path,
+): AnyDerivation | null => {
+  if (isNonEmptyArray(path)) {
+    // Premises don't have deps
+    return null
+  }
+  return root
+}
+
+export const subDerivationFromTransformation = <J extends AnySequent>(
+  root: Transformation<J, Array<AnyNode>, string>,
+  path: Path,
+): AnyDerivation | null => {
+  if (isNonEmptyArray(path)) {
+    const [index, ...rest] = path
+    const dep = root.deps[index]
+    if (!dep) {
+      return null
+    }
+    return subDerivation(dep, rest)
+  }
+  return root
+}
+
+export const subDerivation = <J extends AnySequent>(
+  root: Derivation<J> | null,
+  path: Path,
+): AnyDerivation | null => {
+  if (!root) {
+    return null
+  }
+  switch (root.kind) {
+    case 'premise':
+      return subDerivationFromPremise(root, path)
+    case 'transformation':
+      return subDerivationFromTransformation(root, path)
+  }
+}
+
 export const lsPremise = (_d: AnyPremise, path: Path): NonEmptyArray<Path> => {
   return [path]
 }
