@@ -439,7 +439,7 @@ const init = () => {
   if (level && isTheoremKey(level)) {
     selectLevel(level)
   } else {
-    nextLevel()
+    selectLevel(first)
   }
 }
 
