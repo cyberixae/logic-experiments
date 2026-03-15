@@ -57,7 +57,12 @@ import { ch5composition3 } from './ch5-composition-3'
 import { ch5composition4 } from './ch5-composition-4'
 import { ch5composition5 } from './ch5-composition-5'
 import { ch5composition6 } from './ch5-composition-6'
-import { ch5composition9 } from './ch5-composition-9'
+import { ch5composition7 } from './ch5-composition-7'
+import { ch5composition8 } from './ch5-composition-8'
+import { ch5compositionC } from './ch5-composition-c'
+import { ch5compositionE } from './ch5-composition-e'
+
+import { ch6branching1 } from './ch6-branching-1'
 
 export const theorems = {
   ch0identity1,
@@ -116,8 +121,13 @@ export const theorems = {
   ch5composition4,
   ch5composition5,
   ch5composition6,
-  ch5composition9,
+  ch5composition7,
+  ch5composition8,
 
+  //ch6branching1,
+
+  // ch5compositionC,
+  // ch5compositionE,
   // harmaaPuolukkaTiikeri,
   // violettiLuumuBiisoni,
   // syaaniPaprikaKettu,
