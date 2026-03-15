@@ -19,7 +19,7 @@ import {
   reset,
   activeSequent,
 } from './interactive/focus'
-import { premise, isProof, lsDerivation } from './model/derivation'
+import { premise, isProof, branches } from './model/derivation'
 import { AnySequent } from './model/sequent'
 import {
   basic,
@@ -335,7 +335,7 @@ const control = <J extends AnySequent>(s: Focus<J>) => {
     const disabled = !(
       key === 'level' ||
       (['undo', 'reset'].includes(key) && path.length > 0) ||
-      (['next', 'prev'].includes(key) && lsDerivation(s.derivation).length > 1)
+      (['next', 'prev'].includes(key) && branches(s.derivation).length > 1)
     )
     const pre = document.createElement('pre')
     pre.setAttribute('class', 'button' + (disabled ? ' disabled' : ''))

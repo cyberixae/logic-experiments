@@ -124,7 +124,7 @@ export const theorems = {
   ch5composition7,
   ch5composition8,
 
-  //ch6branching1,
+  ch6branching1,
 
   // ch5compositionC,
   // ch5compositionE,

@@ -77,18 +77,6 @@ export interface Proof<
 > extends Transformation<J, D, R> {}
 export type AnyProof = Proof<AnySequent, Array<AnyProof>, Rule>
 
-export const isProof = <J extends AnySequent>(
-  d: Derivation<J>,
-): d is Proof<J> => {
-  return d.kind === 'transformation' && d.deps.every((dep) => isProof(dep))
-}
-
-export const toProof = <J extends AnySequent>(
-  d: Derivation<J>,
-): Proof<J> | null => {
-  return isProof(d) ? d : null
-}
-
 export const isEquivalent = <J extends AnySequent>(
   a: Derivation<J>,
   b: Derivation<J>,
@@ -166,7 +154,7 @@ export const editDerivation = <J extends AnySequent>(
   }
 }
 
-export const subDerivationFromPremise = <J extends AnySequent>(
+const subDerivationPremise = <J extends AnySequent>(
   root: Premise<J>,
   path: Path,
 ): AnyDerivation | null => {
@@ -177,7 +165,7 @@ export const subDerivationFromPremise = <J extends AnySequent>(
   return root
 }
 
-export const subDerivationFromTransformation = <J extends AnySequent>(
+const subDerivationTransformation = <J extends AnySequent>(
   root: Transformation<J, Array<AnyNode>, string>,
   path: Path,
 ): AnyDerivation | null => {
@@ -191,7 +179,6 @@ export const subDerivationFromTransformation = <J extends AnySequent>(
   }
   return root
 }
-
 export const subDerivation = <J extends AnySequent>(
   root: Derivation<J> | null,
   path: Path,
@@ -201,41 +188,78 @@ export const subDerivation = <J extends AnySequent>(
   }
   switch (root.kind) {
     case 'premise':
-      return subDerivationFromPremise(root, path)
+      return subDerivationPremise(root, path)
     case 'transformation':
-      return subDerivationFromTransformation(root, path)
+      return subDerivationTransformation(root, path)
   }
 }
 
-export const lsPremise = (_d: AnyPremise, path: Path): NonEmptyArray<Path> => {
+const branchesPremise = (_d: AnyPremise, path: Path): NonEmptyArray<Path> => {
   return [path]
 }
-export const lsTransformation = (
+const branchesTransformation = (
   d: AnyTransformation,
   path: Path,
 ): NonEmptyArray<Path> => {
-  const paths = d.deps.flatMap((dep, i) => lsDerivation(dep, [...path, i]))
+  const paths = d.deps.flatMap((dep, i) => branches(dep, [...path, i]))
   if (isNonEmptyArray(paths)) {
     return paths
   }
   return [path]
 }
-export const lsDerivation = (
+export const branches = (
   root: AnyDerivation,
   path: Path = [],
 ): NonEmptyArray<Path> => {
   switch (root.kind) {
     case 'premise':
-      return lsPremise(root, path)
+      return branchesPremise(root, path)
     case 'transformation':
-      return lsTransformation(root, path)
+      return branchesTransformation(root, path)
   }
 }
 
-export const equalsPremise = (a: AnyPremise, b: AnyPremise): boolean => {
+const openBranchesPremise = (_d: AnyPremise, path: Path): NonEmptyArray<Path> => {
+  return [path]
+}
+const openBranchesTransformation = (
+  d: AnyTransformation,
+  path: Path,
+): Array<Path> => {
+  const paths = d.deps.flatMap((dep, i) => openBranches(dep, [...path, i]))
+  if (isNonEmptyArray(paths)) {
+    return paths
+  }
+  return []
+}
+export const openBranches = (
+  root: AnyDerivation,
+  path: Path = [],
+): Array<Path> => {
+  switch (root.kind) {
+    case 'premise':
+      return openBranchesPremise(root, path)
+    case 'transformation':
+      return openBranchesTransformation(root, path)
+  }
+}
+
+export const isProof = <J extends AnySequent>(
+  d: Derivation<J>,
+): d is Proof<J> => {
+  return openBranches(d).length < 1
+}
+
+export const toProof = <J extends AnySequent>(
+  d: Derivation<J>,
+): Proof<J> | null => {
+  return isProof(d) ? d : null
+}
+
+const equalsPremise = (a: AnyPremise, b: AnyPremise): boolean => {
   return isEquivalent(a, b)
 }
-export const equalsTransformation = (
+const equalsTransformation = (
   a: AnyTransformation,
   b: AnyTransformation,
 ): boolean => {
@@ -244,7 +268,6 @@ export const equalsTransformation = (
     zip(a.deps, b.deps).every(([aDep, bDep]) => equalsDerivation(aDep, bDep))
   )
 }
-
 export const equalsDerivation = (
   a: AnyDerivation,
   b: AnyDerivation,

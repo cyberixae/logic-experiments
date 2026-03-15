@@ -3,11 +3,12 @@ import {
   Derivation,
   Edit,
   editDerivation,
-  lsDerivation,
+  branches,
   Path,
   premise,
   equalsDerivation,
   subDerivation,
+  openBranches,
 } from '../model/derivation'
 import { AnySequent, Sequent } from '../model/sequent'
 import { rev } from '../systems/lk'
@@ -33,7 +34,7 @@ export const prev = <J extends AnySequent>(s: Focus<J>): Focus<J> =>
   focus(s.derivation, s.branch - 1)
 
 export const activePath = <J extends AnySequent>(s: Focus<J>): Path => {
-  const paths = lsDerivation(s.derivation)
+  const paths = branches(s.derivation)
   return array.mod(paths, s.branch)
 }
 
@@ -52,7 +53,13 @@ export const apply = <J extends AnySequent>(
   if (!derivation) {
     return s
   }
-  return focus(derivation, s.branch)
+  const cursor = focus(derivation, s.branch)
+  const openBefore = openBranches(s.derivation).length
+  const openAfter = openBranches(derivation).length
+  if (openAfter < openBefore) {
+    return next(cursor)
+  }
+  return cursor
 }
 
 export const undo = <J extends AnySequent>(s: Focus<J>): Focus<J> => {
