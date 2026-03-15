@@ -88,7 +88,8 @@ const right = {
   cr: fromDerivation(exampleCR),
 }
 
-const controls = ['prev', 'undo', 'reset', 'level', 'next']
+//const controls = ['prev', 'undo', 'reset', 'level', 'next']
+const controls = ['undo', 'reset', 'level']
 
 type Workspace = Partial<{ [K in keyof Theorems]: Focus<Theorems[K]['goal']> }>
 const workspace: Workspace = {}
