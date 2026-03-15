@@ -72,6 +72,16 @@ import { ch6branching7 } from './ch6-branching-7'
 import { ch6branching8 } from './ch6-branching-8'
 import { ch6branching9 } from './ch6-branching-9'
 
+import { ch7completeness1 } from './ch7-completeness-1'
+import { ch7completeness2 } from './ch7-completeness-2'
+import { ch7completeness3 } from './ch7-completeness-3'
+import { ch7completeness4 } from './ch7-completeness-4'
+import { ch7completeness5 } from './ch7-completeness-5'
+import { ch7completeness6 } from './ch7-completeness-6'
+import { ch7completeness7 } from './ch7-completeness-7'
+import { ch7completeness8 } from './ch7-completeness-8'
+import { ch7completeness9 } from './ch7-completeness-9'
+
 export const theorems = {
   ch0identity1,
   ch0identity2,
@@ -141,6 +151,16 @@ export const theorems = {
   ch6branching7,
   ch6branching8,
   ch6branching9,
+
+  ch7completeness1,
+  ch7completeness2,
+  ch7completeness3,
+  ch7completeness4,
+  ch7completeness5,
+  ch7completeness6,
+  ch7completeness7,
+  ch7completeness8,
+  ch7completeness9,
 
   // ch5compositionC,
   // ch5compositionE,
