@@ -63,6 +63,14 @@ import { ch5compositionC } from './ch5-composition-c'
 import { ch5compositionE } from './ch5-composition-e'
 
 import { ch6branching1 } from './ch6-branching-1'
+import { ch6branching2 } from './ch6-branching-2'
+import { ch6branching3 } from './ch6-branching-3'
+import { ch6branching4 } from './ch6-branching-4'
+import { ch6branching5 } from './ch6-branching-5'
+import { ch6branching6 } from './ch6-branching-6'
+import { ch6branching7 } from './ch6-branching-7'
+import { ch6branching8 } from './ch6-branching-8'
+import { ch6branching9 } from './ch6-branching-9'
 
 export const theorems = {
   ch0identity1,
@@ -125,6 +133,14 @@ export const theorems = {
   ch5composition8,
 
   ch6branching1,
+  ch6branching2,
+  ch6branching3,
+  ch6branching4,
+  ch6branching5,
+  ch6branching6,
+  ch6branching7,
+  ch6branching8,
+  ch6branching9,
 
   // ch5compositionC,
   // ch5compositionE,
