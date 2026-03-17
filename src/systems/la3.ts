@@ -101,9 +101,3 @@ export const la3 = {
   i: iota,
   z: zeta,
 }
-
-export const editBranch = <J extends AnyConclusion>(
-  root: Derivation<J> | null,
-  path: array.NonEmptyArray<number>,
-  edit: <J2 extends AnyConclusion>(d: Derivation<J2>) => Derivation<J2> | null,
-): Derivation<J> | null => editBranchG(root, path, edit as Edit)
