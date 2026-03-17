@@ -57,6 +57,15 @@ Template-based pretty-printer (`print.ts`) with customizable themes; block-based
 - `src/lk.ts` / `src/la3.ts` — Sandbox demos
 - `src/web.ts` — Web interface (bundled by esbuild into `dist/lk.js`)
 
+## Typing approach
+
+The codebase has two layers of typing:
+
+- **Static layer**: The `apply` functions on rules (`lk.z.*`, `lk.i.*`) carry precise generic types that encode the logical structure of each inference step. Challenge solutions are built using these functions so TypeScript verifies their correctness at compile time. `any` and `is` are avoided here.
+- **Runtime layer**: The interactive proof system works backwards from the goal using `tryReverse`, operating on erased types (`AnySequent`, `AnyDerivation`). Runtime `is` refinements and `| null` returns are accepted here since the player's moves are not known statically.
+
+The utilities in `src/utils/` exist to give standard TypeScript/JavaScript operations more precise types — positional tuple access, structural non-emptiness, composable refinements, typed `Object.entries` — in support of the static layer's goal of avoiding `any` and `is`.
+
 ## Conventions
 
 - Strict TypeScript; all types use discriminated unions with type guards/refinements
