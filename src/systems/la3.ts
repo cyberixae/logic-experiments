@@ -9,7 +9,6 @@ import {
 } from '../model/prop'
 import * as array from '../utils/array'
 import { AnyConclusion, conclusion, isActiveR } from '../model/sequent'
-import * as print from '../render/print'
 import {
   Derivation,
   premise,
@@ -43,7 +42,7 @@ export const conjunction = <A extends Prop, B extends Prop>(
 
 // Language
 
-const alpha = <S extends `${'p' | 'q' | 'r' | 's' | 't' | 'u'}${number | ''}`>(
+export const alpha = <S extends `${'p' | 'q' | 'r' | 's' | 't' | 'u'}${number | ''}`>(
   s: S,
 ): Atom<S> => atom(s)
 const omega = {
@@ -60,40 +59,7 @@ const zeta = {
   mp: ruleMP.apply,
 }
 
-export const meta = {
-  name: 'Łukasiewicz Axioms 3',
-  propositions: [
-    {
-      title: 'Variables',
-      examples: [
-        [
-          alpha('p'),
-          alpha('q'),
-          alpha('r'),
-          alpha('s'),
-          alpha('t'),
-          alpha('u'),
-        ],
-      ],
-    },
-    {
-      title: 'Connectives',
-      examples: [[negation(atom('A')), implication(atom('A'), atom('B'))]],
-    },
-  ],
-  rules: [
-    {
-      title: 'Axioms',
-      examples: [[ruleA1.example, ruleA2.example, ruleA3.example]],
-    },
-    {
-      title: 'Rule',
-      examples: [[ruleMP.example]],
-    },
-  ],
-} as const
-
-export const usage = () => print.fromMeta(meta)
+export const name = 'Łukasiewicz Axioms 3'
 
 export const la3 = {
   a: alpha,

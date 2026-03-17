@@ -1,12 +1,11 @@
 import {
   Atom,
   atom,
-  negation,
   conjunction,
   disjunction,
   implication,
+  negation,
 } from '../model/prop'
-import * as print from '../render/print'
 import { AnySequent as AnySequent } from '../model/sequent'
 import {
   Derivation,
@@ -44,7 +43,7 @@ import { ruleSXR } from '../rules/sxr'
 
 // Language
 
-const alpha = <S extends `${'p' | 'q' | 'r' | 's' | 't' | 'u'}${number | ''}`>(
+export const alpha = <S extends `${'p' | 'q' | 'r' | 's' | 't' | 'u'}${number | ''}`>(
   s: S,
 ): Atom<S> => atom(s)
 const omega = {
@@ -105,67 +104,7 @@ export const rev = {
   sxr: ruleSXR.tryReverse,
 }
 
-export const meta = {
-  name: 'Gentzen LK',
-  propositions: [
-    {
-      title: 'Variables',
-      examples: [
-        [
-          alpha('p'),
-          alpha('q'),
-          alpha('r'),
-          alpha('s'),
-          alpha('t'),
-          alpha('u'),
-        ],
-      ],
-    },
-    {
-      title: 'Connectives',
-      examples: [
-        [
-          negation(atom('A')),
-          implication(atom('A'), atom('B')),
-          conjunction(atom('A'), atom('B')),
-          disjunction(atom('A'), atom('B')),
-        ],
-      ],
-    },
-  ],
-  rules: [
-    {
-      title: 'Axiom',
-      examples: [[ruleI.example]],
-    },
-    {
-      title: 'Cut',
-      examples: [[ruleCut.example]],
-    },
-    {
-      title: 'Logical Rules',
-      examples: [
-        [ruleCL1.example, ruleDR1.example],
-        [ruleCL2.example, ruleDR2.example],
-        [ruleDL.example, ruleCR.example],
-        [ruleIL.example, ruleIR.example],
-        [ruleNL.example, ruleNR.example],
-      ],
-    },
-    {
-      title: 'Structural Rules',
-      examples: [
-        [ruleSWL.example, ruleSWR.example],
-        [ruleSCL.example, ruleSCR.example],
-        [ruleSRotLF.example, ruleSRotRF.example],
-        [ruleSRotLB.example, ruleSRotRB.example],
-        [ruleSXL.example, ruleSXR.example],
-      ],
-    },
-  ],
-} as const
-
-export const usage = () => print.fromMeta(meta)
+export const name = 'Gentzen LK'
 
 export const lk = {
   a: alpha,
