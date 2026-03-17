@@ -4,7 +4,6 @@
   "description": "Propositional logic stuff",
   "main": "index.js",
   "author": "Toni Ruottu <toni.ruottu@iki.fi>",
-  "license": "MIT",
   "devDependencies": {
     "@types/jest": "^29.5.12",
     "esbuild": "^0.27.3",
