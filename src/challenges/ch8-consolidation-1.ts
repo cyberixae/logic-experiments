@@ -2,7 +2,7 @@ import { rev, lk, Rev } from '../systems/lk'
 import { AnySequent, conclusion, sequent } from '../model/sequent'
 import { Configuration } from '../model/theorem'
 
-export const ch5compositionC: Configuration<AnySequent> = {
+export const ch8consolidation1: Configuration<AnySequent> = {
   rules: ['i', 'swl', 'swr', 'ir', 'cl', 'dr'],
   goal: conclusion(
     lk.o.p2.disjunction(

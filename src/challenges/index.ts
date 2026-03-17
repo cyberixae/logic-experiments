@@ -59,8 +59,6 @@ import { ch5composition5 } from './ch5-composition-5'
 import { ch5composition6 } from './ch5-composition-6'
 import { ch5composition7 } from './ch5-composition-7'
 import { ch5composition8 } from './ch5-composition-8'
-import { ch5compositionC } from './ch5-composition-c'
-import { ch5compositionE } from './ch5-composition-e'
 
 import { ch6branching1 } from './ch6-branching-1'
 import { ch6branching2 } from './ch6-branching-2'
@@ -81,6 +79,9 @@ import { ch7completeness6 } from './ch7-completeness-6'
 import { ch7completeness7 } from './ch7-completeness-7'
 import { ch7completeness8 } from './ch7-completeness-8'
 import { ch7completeness9 } from './ch7-completeness-9'
+
+import { ch8consolidation1 } from './ch8-consolidation-1'
+import { ch8consolidation2 } from './ch8-consolidation-2'
 
 export const theorems = {
   ch0identity1,
@@ -161,6 +162,9 @@ export const theorems = {
   ch7completeness7,
   ch7completeness8,
   ch7completeness9,
+
+  ch8consolidation1,
+  ch8consolidation2
 
   // ch5compositionC,
   // ch5compositionE,
