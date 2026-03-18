@@ -70,11 +70,11 @@ export function introduction<J extends AnySequent, R extends Rule>(
 }
 export type AnyIntroduction = Introduction<AnySequent, Rule>
 
-export interface Proof<
+export type Proof<
   J extends AnySequent,
   D extends Array<AnyProof> = Array<AnyProof>,
   R extends Rule = Rule,
-> extends Transformation<J, D, R> {}
+> = Transformation<J, D, R>
 export type AnyProof = Proof<AnySequent, Array<AnyProof>, Rule>
 
 export const isEquivalent = <J extends AnySequent>(

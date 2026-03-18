@@ -6,9 +6,6 @@ import {
   implication,
   negation,
 } from '../model/prop'
-import { isProof, toProof, editDerivation } from '../model/derivation'
-import { Option } from '../utils/option'
-import { entries } from '../utils/record'
 import { ruleI } from '../rules/i'
 import { ruleCut } from '../rules/cut'
 import { ruleCL } from '../rules/cl'
@@ -34,7 +31,6 @@ import { ruleSRotRB } from '../rules/srotrb'
 import { ruleSXL } from '../rules/sxl'
 import { ruleSXR } from '../rules/sxr'
 import { RuleId, TryReverse0, TryReverse1 } from '../model/rule'
-import { rules } from '../rules'
 
 // Language
 
@@ -105,7 +101,7 @@ export const rev0 = {
   sxr: ruleSXR.tryReverse,
 } satisfies Partial<Record<RuleId, TryReverse0>>
 
-const revses = {
+export const revses = {
   rev0,
   rev1,
 }

@@ -1,5 +1,5 @@
 import { parseEvent } from './event'
-import { focus, applyEvent, Focus, activePath } from './focus'
+import { focus, applyEvent, Focus } from './focus'
 import { premise, isProof } from '../model/derivation'
 import { AnySequent } from '../model/sequent'
 import { fromDerivation, fromFocus } from '../render/print'
@@ -26,7 +26,6 @@ import { exampleCL2 } from '../rules/cl2'
 import { exampleDR1 } from '../rules/dr1'
 import { exampleCL1 } from '../rules/cl1'
 import { exampleI } from '../rules/i'
-import { head } from '../utils/tuple'
 import { split } from '../utils/string'
 import { Theorems, isTheoremKey } from '../challenges'
 
@@ -43,7 +42,7 @@ export function* repl(theorems: Theorems): Generator<string, string, string> {
     switch (cmd) {
       case 'quit':
         return '\nExiting...'
-      case 'help':
+      case 'help': {
         const [rule] = args
         if (!rule) {
           output =
@@ -128,6 +127,7 @@ export function* repl(theorems: Theorems): Generator<string, string, string> {
           break
         }
         break
+      }
       case 'list':
         output =
           '\nConjectures:' +
@@ -136,7 +136,7 @@ export function* repl(theorems: Theorems): Generator<string, string, string> {
             .map((id) => (id === selected ? '*' : ' ') + ' ' + id)
             .join('\n')
         break
-      case 'select':
+      case 'select': {
         const [conjectureId] = args
         if (!conjectureId) {
           break
@@ -158,7 +158,8 @@ export function* repl(theorems: Theorems): Generator<string, string, string> {
         selected = conjectureId
         output = status(fresh)
         break
-      default:
+      }
+      default: {
         const ev = parseEvent(cmd)
         if (!ev) {
           break
@@ -176,6 +177,7 @@ export function* repl(theorems: Theorems): Generator<string, string, string> {
         const update = applyEvent(cursor, ev)
         workspace[selected] = update
         output = status(update)
+      }
     }
   }
 }

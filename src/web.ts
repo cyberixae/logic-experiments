@@ -1,13 +1,4 @@
-import {
-  Event,
-  Next,
-  parseEvent,
-  Prev,
-  Reset,
-  Reverse,
-  reverse,
-  Undo,
-} from './interactive/event'
+import { Next, Prev, Reset, Reverse, reverse, Undo } from './interactive/event'
 import {
   focus,
   applyEvent,
@@ -29,9 +20,7 @@ import {
   fromSequent,
 } from './render/print'
 import { applicableRules } from './interactive/focus'
-import { isRuleId, RuleId } from './model/rule'
-import { exampleSXR } from './rules/sxr'
-import { exampleSXL } from './rules/sxl'
+import { RuleId } from './model/rule'
 import { exampleSRotRB } from './rules/srotrb'
 import { exampleSRotRF } from './rules/srotrf'
 import { exampleSRotLB } from './rules/srotlb'
@@ -51,8 +40,6 @@ import { exampleCL2 } from './rules/cl2'
 import { exampleDR1 } from './rules/dr1'
 import { exampleCL1 } from './rules/cl1'
 import { exampleI } from './rules/i'
-import { head } from './utils/tuple'
-import { split } from './utils/string'
 import { Theorems, challenges, isTheoremKey } from './challenges'
 import { exampleDR } from './rules/dr'
 import { exampleCL } from './rules/cl'

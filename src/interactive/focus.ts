@@ -6,14 +6,12 @@ import {
   branches,
   Path,
   premise,
-  equalsDerivation,
   subDerivation,
   openBranches,
 } from '../model/derivation'
 import {
   AnySequent,
   applicableRules as applicableRulesSequent,
-  Sequent,
 } from '../model/sequent'
 import { rev0 } from '../systems/lk'
 import { Event } from './event'
@@ -91,7 +89,7 @@ export const applyEvent = <J extends AnySequent>(
   ev: Event,
 ): Focus<J> => {
   switch (ev.kind) {
-    case 'reverse':
+    case 'reverse': {
       if (ev.rev === 'a1') {
         break
       }
@@ -113,6 +111,7 @@ export const applyEvent = <J extends AnySequent>(
       }
       state = apply(state, edit)
       break
+    }
     case 'undo':
       state = undo(state)
       break
