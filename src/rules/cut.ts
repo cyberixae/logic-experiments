@@ -86,9 +86,8 @@ export const reverseCut = <
     premise(sequent([a, ...γ], δ)),
   ])
 }
-export const tryReverseCut = <J extends AnySequent, A extends Prop>(
+export const tryReverseCut = (a: Prop) => <J extends AnySequent>(
   d: Derivation<J>,
-  a: A,
 ): Derivation<J> | null => {
   return isCutResultDerivation(d) ? reverseCut(d, a) : null
 }
@@ -105,4 +104,4 @@ export const ruleCut = {
   reverse: reverseCut,
   tryReverse: tryReverseCut,
   example: exampleCut,
-} //satisfies Rule<AnyCutResult>
+} satisfies Rule<AnyCutResult>

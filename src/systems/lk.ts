@@ -80,6 +80,7 @@ const zeta = {
 
 export const rev = {
   i: ruleI.tryReverse,
+  cut: ruleCut.tryReverse,
   cl: ruleCL.tryReverse,
   dr: ruleDR.tryReverse,
   cl1: ruleCL1.tryReverse,
