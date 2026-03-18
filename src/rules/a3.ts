@@ -15,7 +15,7 @@ import {
 } from '../model/prop'
 import {
   Conclusion,
-  AnyConclusion as AnySequent,
+  AnySequent,
   refineConclusion,
   conclusion,
   isConclusion,
