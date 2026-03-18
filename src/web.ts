@@ -28,7 +28,7 @@ import {
   fromRule,
   fromSequent,
 } from './render/print'
-import { applicableRules } from './systems/lk'
+import { applicableRules } from './interactive/focus'
 import { isRuleId, RuleId } from './model/rule'
 import { exampleSXR } from './rules/sxr'
 import { exampleSXL } from './rules/sxl'
@@ -101,7 +101,7 @@ const proof = (s: Focus<AnySequent>) => {
   const pre = document.createElement('pre')
   pre.setAttribute('class', 'proof')
   if (s.derivation.kind === 'transformation') {
-    pre.innerHTML =  '\n' + fromFocus(s) + '\n'
+    pre.innerHTML = '\n' + fromFocus(s) + '\n'
   }
   return pre
 }
@@ -162,31 +162,31 @@ const listing = () => {
 
 const congrats = () => {
   const panel = document.createElement('div')
-    const congrats = document.createElement('div')
-    congrats.setAttribute('class', 'congrats')
-    const hurray = document.createElement('div')
-    hurray.setAttribute('class', 'hurray')
-    hurray.innerHTML = '\n\n\u{1F389} Conglaturations! \u{1F389}\n'
-    congrats.appendChild(hurray)
-    const congratsButtons = document.createElement('div')
-    congratsButtons.setAttribute('class', 'congrabuttons')
-    const previousButton = document.createElement('div')
-    previousButton.setAttribute('class', 'button')
-    previousButton.innerHTML = 'Prev Level'
-    previousButton.onclick = () => prevLevel()
-    congratsButtons.appendChild(previousButton)
-    const againbutton = document.createElement('div')
-    againbutton.setAttribute('class', 'button')
-    againbutton.innerHTML = 'Play Again'
-    againbutton.onclick = resetHandler()
-    congratsButtons.appendChild(againbutton)
-    const continueButton = document.createElement('div')
-    continueButton.setAttribute('class', 'button')
-    continueButton.innerHTML = 'Next Level'
-    continueButton.onclick = () => nextLevel()
-    congratsButtons.appendChild(continueButton)
-    panel.appendChild(congrats)
-    panel.appendChild(congratsButtons)
+  const congrats = document.createElement('div')
+  congrats.setAttribute('class', 'congrats')
+  const hurray = document.createElement('div')
+  hurray.setAttribute('class', 'hurray')
+  hurray.innerHTML = '\n\n\u{1F389} Conglaturations! \u{1F389}\n'
+  congrats.appendChild(hurray)
+  const congratsButtons = document.createElement('div')
+  congratsButtons.setAttribute('class', 'congrabuttons')
+  const previousButton = document.createElement('div')
+  previousButton.setAttribute('class', 'button')
+  previousButton.innerHTML = 'Prev Level'
+  previousButton.onclick = () => prevLevel()
+  congratsButtons.appendChild(previousButton)
+  const againbutton = document.createElement('div')
+  againbutton.setAttribute('class', 'button')
+  againbutton.innerHTML = 'Play Again'
+  againbutton.onclick = resetHandler()
+  congratsButtons.appendChild(againbutton)
+  const continueButton = document.createElement('div')
+  continueButton.setAttribute('class', 'button')
+  continueButton.innerHTML = 'Next Level'
+  continueButton.onclick = () => nextLevel()
+  congratsButtons.appendChild(continueButton)
+  panel.appendChild(congrats)
+  panel.appendChild(congratsButtons)
   return panel
 }
 
@@ -365,7 +365,7 @@ const control = <J extends AnySequent>(s: Focus<J>) => {
   return panel
 }
 const bench = <J extends AnySequent>(s: Focus<J>, rules: Array<RuleId>) => {
-  const ls = applicableRules(s.derivation, activePath(s))
+  const ls = applicableRules(s)
   const panel = document.createElement('div')
   panel.setAttribute('class', 'bench')
   panel.appendChild(leftPanel(ls, rules))

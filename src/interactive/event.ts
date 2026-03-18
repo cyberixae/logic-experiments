@@ -1,5 +1,4 @@
-import { RuleId } from '../systems/lk'
-import { isRuleId } from '../model/rule';
+import { isRuleId, RuleId } from '../model/rule'
 
 export type Reverse<R extends RuleId> = { kind: 'reverse'; rev: R }
 export const reverse = <R extends RuleId>(rev: R): Reverse<R> => ({

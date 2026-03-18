@@ -5,10 +5,9 @@ import { Configuration } from '../model/theorem'
 export const ch7completeness8: Configuration<AnySequent> = {
   rules: ['i', 'swl', 'swr', 'sRotLF', 'sRotRF', 'il', 'ir'],
   goal: conclusion(
- lk.o.p2.implication(
-    lk.o.p2.implication(lk.o.p2.implication(lk.a('p'), lk.a('q')), lk.a('q')),
-    lk.o.p2.implication(lk.o.p2.implication(lk.a('q'), lk.a('p')), lk.a('p')),
-    
-)
+    lk.o.p2.implication(
+      lk.o.p2.implication(lk.o.p2.implication(lk.a('p'), lk.a('q')), lk.a('q')),
+      lk.o.p2.implication(lk.o.p2.implication(lk.a('q'), lk.a('p')), lk.a('p')),
+    ),
   ),
 }

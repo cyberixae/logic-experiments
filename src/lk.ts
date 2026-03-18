@@ -5,7 +5,13 @@ import { applyEvent, focus } from './interactive/focus'
 import { reverse } from './interactive/event'
 
 import { alpha, lk, name } from './systems/lk'
-import { negation, atom, implication, conjunction, disjunction } from './model/prop'
+import {
+  negation,
+  atom,
+  implication,
+  conjunction,
+  disjunction,
+} from './model/prop'
 import * as print from './render/print'
 import { ruleCL1 } from './rules/cl1'
 import { ruleCL2 } from './rules/cl2'
@@ -29,7 +35,6 @@ import { ruleSWL } from './rules/swl'
 import { ruleSWR } from './rules/swr'
 import { ruleSXL } from './rules/sxl'
 import { ruleSXR } from './rules/sxr'
-
 
 const meta = {
   name,

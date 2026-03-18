@@ -42,7 +42,9 @@ export const conjunction = <A extends Prop, B extends Prop>(
 
 // Language
 
-export const alpha = <S extends `${'p' | 'q' | 'r' | 's' | 't' | 'u'}${number | ''}`>(
+export const alpha = <
+  S extends `${'p' | 'q' | 'r' | 's' | 't' | 'u'}${number | ''}`,
+>(
   s: S,
 ): Atom<S> => atom(s)
 const omega = {

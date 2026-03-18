@@ -219,7 +219,10 @@ export const branches = (
   }
 }
 
-const openBranchesPremise = (_d: AnyPremise, path: Path): NonEmptyArray<Path> => {
+const openBranchesPremise = (
+  _d: AnyPremise,
+  path: Path,
+): NonEmptyArray<Path> => {
   return [path]
 }
 const openBranchesTransformation = (

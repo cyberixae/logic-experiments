@@ -74,11 +74,11 @@ export const reverseMP = <
   const piq: Implication<P, Q> = implication(p, q)
   return mp(d.result, [premise(conclusion(piq)), premise(conclusion(p))])
 }
-export const tryReverseMP = (p: Prop) => <C extends AnySequent>(
-  d: Derivation<C>,
-): Derivation<C> | null => {
-  return isMPResultDerivation(d) ? reverseMP(d, p) : null
-}
+export const tryReverseMP =
+  (p: Prop) =>
+  <C extends AnySequent>(d: Derivation<C>): Derivation<C> | null => {
+    return isMPResultDerivation(d) ? reverseMP(d, p) : null
+  }
 export const exampleMP = applyMP(
   premise(conclusion(implication(atom('A'), atom('B')))),
   premise(conclusion(atom('A'))),

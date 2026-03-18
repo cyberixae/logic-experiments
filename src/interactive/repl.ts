@@ -3,7 +3,7 @@ import { focus, applyEvent, Focus, activePath } from './focus'
 import { premise, isProof } from '../model/derivation'
 import { AnySequent } from '../model/sequent'
 import { fromDerivation, fromFocus } from '../render/print'
-import { applicableRules } from '../systems/lk'
+import { applicableRules } from './focus'
 import { isRuleId } from '../model/rule'
 import { exampleSXR } from '../rules/sxr'
 import { exampleSXL } from '../rules/sxl'
@@ -183,7 +183,7 @@ const status = (s: Focus<AnySequent>): string =>
   '\n' +
   fromFocus(s) +
   '\nRules: ' +
-  applicableRules(s.derivation, activePath(s)).join(', ') +
+  applicableRules(s).join(', ') +
   '\nNavigation: prev, next, undo' +
   '\nSystem: quit, list, select' +
   '\n' +

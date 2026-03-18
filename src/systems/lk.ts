@@ -6,14 +6,7 @@ import {
   implication,
   negation,
 } from '../model/prop'
-import { AnySequent as AnySequent } from '../model/sequent'
-import {
-  Derivation,
-  isProof,
-  toProof,
-  editDerivation,
-  Path,
-} from '../model/derivation'
+import { isProof, toProof, editDerivation } from '../model/derivation'
 import { Option } from '../utils/option'
 import { entries } from '../utils/record'
 import { ruleI } from '../rules/i'
@@ -41,10 +34,13 @@ import { ruleSRotRB } from '../rules/srotrb'
 import { ruleSXL } from '../rules/sxl'
 import { ruleSXR } from '../rules/sxr'
 import { RuleId, TryReverse0, TryReverse1 } from '../model/rule'
+import { rules } from '../rules'
 
 // Language
 
-export const alpha = <S extends `${'p' | 'q' | 'r' | 's' | 't' | 'u'}${number | ''}`>(
+export const alpha = <
+  S extends `${'p' | 'q' | 'r' | 's' | 't' | 'u'}${number | ''}`,
+>(
   s: S,
 ): Atom<S> => atom(s)
 const omega = {
@@ -79,7 +75,7 @@ const zeta = {
   sxr: ruleSXR.apply,
 }
 
-export const rev1  = {
+export const rev1 = {
   cut: ruleCut.tryReverse,
 } satisfies Partial<Record<RuleId, TryReverse1>>
 
@@ -121,20 +117,4 @@ export const lk = {
   o: omega,
   i: iota,
   z: zeta,
-}
-
-export const applicableRules = <J extends AnySequent>(
-  d: Derivation<J>,
-  p: Path,
-): Array<RuleId> => {
-  const foo0: Array<[RuleId, TryReverse0]> = entries(rev0)
-  const foo1: Array<[RuleId, TryReverse0]> = entries(rev1).map(([k,v]: [RuleId, TryReverse1]): [RuleId, TryReverse0] => [k, v(atom('test'))])
-  const foo: Array<[RuleId, TryReverse0]> = foo0.concat(foo1)
-  return foo.flatMap(([rev, ed]): Option<RuleId> => {
-    const result = editDerivation(d, p, ed)
-    if (result) {
-      return [rev]
-    }
-    return []
-  })
 }

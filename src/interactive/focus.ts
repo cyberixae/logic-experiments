@@ -10,9 +10,14 @@ import {
   subDerivation,
   openBranches,
 } from '../model/derivation'
-import { AnySequent, Sequent } from '../model/sequent'
-import { rev } from '../systems/lk'
+import {
+  AnySequent,
+  applicableRules as applicableRulesSequent,
+  Sequent,
+} from '../model/sequent'
+import { rev0 } from '../systems/lk'
 import { Event } from './event'
+import { RuleId } from '../model/rule'
 
 export type Focus<J extends AnySequent> = {
   derivation: Derivation<J>
@@ -87,7 +92,22 @@ export const applyEvent = <J extends AnySequent>(
 ): Focus<J> => {
   switch (ev.kind) {
     case 'reverse':
-      const edit = rev[ev.rev]
+      if (ev.rev === 'a1') {
+        break
+      }
+      if (ev.rev === 'a2') {
+        break
+      }
+      if (ev.rev === 'a3') {
+        break
+      }
+      if (ev.rev === 'mp') {
+        break
+      }
+      if (ev.rev === 'cut') {
+        break
+      }
+      const edit = rev0[ev.rev]
       if (!edit) {
         break
       }
@@ -107,4 +127,14 @@ export const applyEvent = <J extends AnySequent>(
       break
   }
   return state
+}
+export const applicableRules = <J extends AnySequent>(
+  state: Focus<J>,
+): Array<RuleId> => {
+  const p = activePath(state)
+  const d = subDerivation(state.derivation, p)
+  if (!d) {
+    return []
+  }
+  return applicableRulesSequent(d.result)
 }

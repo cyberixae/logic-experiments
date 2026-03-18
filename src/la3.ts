@@ -45,7 +45,6 @@ const meta = {
 
 const usage = () => print.fromMeta(meta)
 
-
 const goal = conclusion(
   la3.o.p2.implication(
     la3.o.p2.implication(
@@ -69,19 +68,17 @@ const proof = la3.z.mp(
 )
 
 let cursor = focus(premise(goal))
-cursor = apply(
-  cursor,
-  (d) =>
-    tryReverseMP(
-      d,
+cursor = apply(cursor, (d) =>
+  tryReverseMP(
+    d,
+    la3.o.p2.implication(
+      la3.a('p'),
       la3.o.p2.implication(
+        la3.o.p2.implication(la3.a('q'), la3.o.p1.negation(la3.a('p'))),
         la3.a('p'),
-        la3.o.p2.implication(
-          la3.o.p2.implication(la3.a('q'), la3.o.p1.negation(la3.a('p'))),
-          la3.a('p'),
-        ),
       ),
     ),
+  ),
 )
 cursor = apply(cursor, tryReverseA2)
 cursor = next(cursor)

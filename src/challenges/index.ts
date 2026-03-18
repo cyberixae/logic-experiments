@@ -164,7 +164,7 @@ export const challenges = {
   ch7completeness9,
 
   ch8consolidation1,
-  ch8consolidation2
+  ch8consolidation2,
 
   // ch5compositionC,
   // ch5compositionE,
