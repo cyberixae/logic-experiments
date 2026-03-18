@@ -1,6 +1,6 @@
 import { Proof } from './derivation'
+import { RuleId } from './rule'
 import { AnySequent } from './sequent'
-import { RuleId } from '../systems/lk'
 
 export type Configuration<J extends AnySequent> = {
   goal: J
