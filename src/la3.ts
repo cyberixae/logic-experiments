@@ -68,9 +68,9 @@ const proof = la3.z.mp(
 )
 
 let cursor = focus(premise(goal))
-cursor = apply(cursor, (d) =>
+cursor = apply(
+  cursor,
   tryReverseMP(
-    d,
     la3.o.p2.implication(
       la3.a('p'),
       la3.o.p2.implication(
