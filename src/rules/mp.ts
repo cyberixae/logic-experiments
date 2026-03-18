@@ -86,6 +86,7 @@ export const exampleMP = applyMP(
 )
 
 export const ruleMP = {
+  id: 'mp',
   isResult: isMPResult,
   isResultDerivation: isMPResultDerivation,
   make: mp,

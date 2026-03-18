@@ -94,6 +94,7 @@ export const exampleSXL = applySXL(
 )
 
 export const ruleSXL = {
+  id: 'sxl',
   isResult: isSXLResult,
   isResultDerivation: isSXLResultDerivation,
   make: sxl,

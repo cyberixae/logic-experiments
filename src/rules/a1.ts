@@ -79,6 +79,7 @@ export const tryReverseA1 = <J extends AnySequent>(
 export const exampleA1 = applyA1(atom('A'), atom('B'))
 
 export const ruleA1 = {
+  id: 'a1',
   isResult: isA1Result,
   isResultDerivation: isA1ResultDerivation,
   make: a1,
@@ -86,4 +87,4 @@ export const ruleA1 = {
   reverse: reverseA1,
   tryReverse: tryReverseA1,
   example: exampleA1,
-} //satisfies Rule<AnyA1Result>
+} satisfies Rule<AnyA1Result>

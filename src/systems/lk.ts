@@ -40,6 +40,8 @@ import { ruleSRotRF } from '../rules/srotrf'
 import { ruleSRotRB } from '../rules/srotrb'
 import { ruleSXL } from '../rules/sxl'
 import { ruleSXR } from '../rules/sxr'
+import { RuleId, TryReverse0, TryReverse1 } from '../model/rule'
+import { head } from '../utils/tuple'
 
 // Language
 
@@ -78,9 +80,12 @@ const zeta = {
   sxr: ruleSXR.apply,
 }
 
-export const rev = {
-  i: ruleI.tryReverse,
+export const rev1  = {
   cut: ruleCut.tryReverse,
+} satisfies Partial<Record<RuleId, TryReverse1>>
+
+export const rev0 = {
+  i: ruleI.tryReverse,
   cl: ruleCL.tryReverse,
   dr: ruleDR.tryReverse,
   cl1: ruleCL1.tryReverse,
@@ -103,6 +108,11 @@ export const rev = {
   sRotRB: ruleSRotRB.tryReverse,
   sxl: ruleSXL.tryReverse,
   sxr: ruleSXR.tryReverse,
+} satisfies Partial<Record<RuleId, TryReverse0>>
+
+const revses = {
+  rev0,
+  rev1,
 }
 
 export const name = 'Gentzen LK'
@@ -114,17 +124,18 @@ export const lk = {
   z: zeta,
 }
 
-export type Rev = keyof typeof rev
-export const isRev = (u: unknown): u is Rev => typeof u === 'string' && u in rev
-
-export const revs = <J extends AnySequent>(
+export const applicableRules = <J extends AnySequent>(
   d: Derivation<J>,
   p: Path,
-): Array<[Rev, Derivation<J>]> =>
-  entries(rev).flatMap(([rev, ed]): Option<[Rev, Derivation<J>]> => {
+): Array<RuleId> => {
+  const foo0: Array<[RuleId, TryReverse0]> = entries(rev0)
+  const foo1: Array<[RuleId, TryReverse0]> = entries(rev1).map(([k,v]: [RuleId, TryReverse1]): [RuleId, TryReverse0] => [k, v(atom('test'))])
+  const foo: Array<[RuleId, TryReverse0]> = foo0.concat(foo1)
+  return foo.flatMap(([rev, ed]): Option<RuleId> => {
     const result = editDerivation(d, p, ed)
     if (result) {
-      return [[rev, result]]
+      return [rev]
     }
     return []
   })
+}

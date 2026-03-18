@@ -41,6 +41,7 @@ export const tryReverseI = <J extends AnySequent>(
 export const exampleI = applyI(atom('A'))
 
 export const ruleI = {
+  id: 'i',
   isResult: isIResult,
   isResultDerivation: isIResultDerivation,
   make: i,

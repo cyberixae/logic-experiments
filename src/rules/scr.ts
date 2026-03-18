@@ -89,6 +89,7 @@ export const exampleSCR = applySCR(
 )
 
 export const ruleSCR = {
+  id: 'scr',
   isResult: isSCRResult,
   isResultDerivation: isSCRResultDerivation,
   make: scr,

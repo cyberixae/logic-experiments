@@ -93,6 +93,7 @@ export const exampleSRotRF = applySRotRF(
 )
 
 export const ruleSRotRF = {
+  id: 'sRotRF',
   isResult: isSRotRFResult,
   isResultDerivation: isSRotRFResultDerivation,
   make: sRotRF,

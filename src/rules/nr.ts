@@ -84,6 +84,7 @@ export const exampleNR = applyNR(
 )
 
 export const ruleNR = {
+  id: 'nr',
   isResult: isNRResult,
   isResultDerivation: isNRResultDerivation,
   make: nr,

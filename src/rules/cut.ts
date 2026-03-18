@@ -97,6 +97,7 @@ export const exampleCut = applyCut(
 )
 
 export const ruleCut = {
+  id: 'cut',
   isResult: isCutResult,
   isResultDerivation: isCutResultDerivation,
   make: cut,

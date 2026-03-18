@@ -3,7 +3,8 @@ import { focus, applyEvent, Focus, activePath } from './focus'
 import { premise, isProof } from '../model/derivation'
 import { AnySequent } from '../model/sequent'
 import { fromDerivation, fromFocus } from '../render/print'
-import { isRev, revs } from '../systems/lk'
+import { applicableRules } from '../systems/lk'
+import { isRuleId } from '../model/rule'
 import { exampleSXR } from '../rules/sxr'
 import { exampleSXL } from '../rules/sxl'
 import { exampleSRotRB } from '../rules/srotrb'
@@ -57,7 +58,7 @@ export function* repl(theorems: Theorems): Generator<string, string, string> {
             '\n  select <conjecture> - select active conjecture'
           break
         }
-        if (isRev(rule)) {
+        if (isRuleId(rule)) {
           output = '\nRule "' + rule + '":' + '\n' + '\n'
           switch (rule) {
             case 'cl1':
@@ -182,7 +183,7 @@ const status = (s: Focus<AnySequent>): string =>
   '\n' +
   fromFocus(s) +
   '\nRules: ' +
-  revs(s.derivation, activePath(s)).map(head).join(', ') +
+  applicableRules(s.derivation, activePath(s)).join(', ') +
   '\nNavigation: prev, next, undo' +
   '\nSystem: quit, list, select' +
   '\n' +

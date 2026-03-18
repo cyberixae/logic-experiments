@@ -28,7 +28,8 @@ import {
   fromRule,
   fromSequent,
 } from './render/print'
-import { isRev, Rev, revs } from './systems/lk'
+import { applicableRules } from './systems/lk'
+import { isRuleId, RuleId } from './model/rule'
 import { exampleSXR } from './rules/sxr'
 import { exampleSXL } from './rules/sxl'
 import { exampleSRotRB } from './rules/srotrb'
@@ -208,7 +209,7 @@ const playArea = <J extends AnySequent>(s: Focus<J>) => {
   return panel
 }
 
-const ruleHandler = (ev: Reverse<Rev>) => () => {
+const ruleHandler = (ev: Reverse<RuleId>) => () => {
   if (!selected) {
     return
   }
@@ -276,16 +277,16 @@ const levelHandler = (_ev?: Reset) => () => {
   menu?.removeAttribute('style')
 }
 
-const mainPanel = (ls: Array<Rev>, rules: Array<Rev>) => {
+const mainPanel = (ls: Array<RuleId>, rules: Array<RuleId>) => {
   const panel = document.createElement('div')
   panel.setAttribute('class', 'main')
   Object.entries(main).forEach(([key, schem]) => {
-    if (rules.includes(key as Rev)) {
+    if (rules.includes(key as RuleId)) {
       const pre = document.createElement('pre')
-      const disabled = isDone || !ls.includes(key as Rev)
+      const disabled = isDone || !ls.includes(key as RuleId)
       pre.setAttribute('class', 'rule button' + (disabled ? ' disabled' : ''))
       if (!disabled) {
-        pre.onclick = ruleHandler(reverse(key as Rev))
+        pre.onclick = ruleHandler(reverse(key as RuleId))
       }
       pre.innerHTML = schem
       panel.appendChild(pre)
@@ -293,16 +294,16 @@ const mainPanel = (ls: Array<Rev>, rules: Array<Rev>) => {
   })
   return panel
 }
-const leftPanel = (ls: Array<Rev>, rules: Array<Rev>) => {
+const leftPanel = (ls: Array<RuleId>, rules: Array<RuleId>) => {
   const panel = document.createElement('div')
   panel.setAttribute('class', 'left')
   Object.entries(left).forEach(([key, schem]) => {
-    if (rules.includes(key as Rev)) {
+    if (rules.includes(key as RuleId)) {
       const pre = document.createElement('pre')
-      const disabled = isDone || !ls.includes(key as Rev)
+      const disabled = isDone || !ls.includes(key as RuleId)
       pre.setAttribute('class', 'rule button' + (disabled ? ' disabled' : ''))
       if (!disabled) {
-        pre.onclick = ruleHandler(reverse(key as Rev))
+        pre.onclick = ruleHandler(reverse(key as RuleId))
       }
       pre.innerHTML = schem
       panel.appendChild(pre)
@@ -310,15 +311,15 @@ const leftPanel = (ls: Array<Rev>, rules: Array<Rev>) => {
   })
   return panel
 }
-const rightPanel = (ls: Array<Rev>, rules: Array<Rev>) => {
+const rightPanel = (ls: Array<RuleId>, rules: Array<RuleId>) => {
   const panel = document.createElement('div')
   panel.setAttribute('class', 'right')
   Object.entries(right).forEach(([key, schem]) => {
-    if (rules.includes(key as Rev)) {
+    if (rules.includes(key as RuleId)) {
       const pre = document.createElement('pre')
-      const disabled = isDone || !ls.includes(key as Rev)
+      const disabled = isDone || !ls.includes(key as RuleId)
       if (!disabled) {
-        pre.onclick = ruleHandler(reverse(key as Rev))
+        pre.onclick = ruleHandler(reverse(key as RuleId))
       }
       pre.setAttribute('class', 'rule button' + (disabled ? ' disabled' : ''))
       pre.innerHTML = schem
@@ -363,8 +364,8 @@ const control = <J extends AnySequent>(s: Focus<J>) => {
   })
   return panel
 }
-const bench = <J extends AnySequent>(s: Focus<J>, rules: Array<Rev>) => {
-  const ls = revs(s.derivation, activePath(s)).map(head)
+const bench = <J extends AnySequent>(s: Focus<J>, rules: Array<RuleId>) => {
+  const ls = applicableRules(s.derivation, activePath(s))
   const panel = document.createElement('div')
   panel.setAttribute('class', 'bench')
   panel.appendChild(leftPanel(ls, rules))

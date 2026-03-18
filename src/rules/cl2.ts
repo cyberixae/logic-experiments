@@ -100,6 +100,7 @@ export const exampleCL2 = applyCL2(
 )
 
 export const ruleCL2 = {
+  id: 'cl2',
   isResult: isCL2Result,
   isResultDerivation: isCL2ResultDerivation,
   make: cl2,

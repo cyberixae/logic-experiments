@@ -119,6 +119,7 @@ export const exampleIL = applyIL(
 )
 
 export const ruleIL = {
+  id: 'il',
   isResult: isILResult,
   isResultDerivation: isILResultDerivation,
   make: il,

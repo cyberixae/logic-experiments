@@ -1,4 +1,4 @@
-import { rev, lk, Rev } from '../systems/lk'
+import { rev, lk, RuleId } from '../systems/lk'
 import { AnySequent, conclusion, sequent } from '../model/sequent'
 import { Configuration } from '../model/theorem'
 

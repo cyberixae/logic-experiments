@@ -1,7 +1,8 @@
-import { isRev, Rev } from '../systems/lk'
+import { RuleId } from '../systems/lk'
+import { isRuleId } from '../model/rule';
 
-export type Reverse<R extends Rev> = { kind: 'reverse'; rev: R }
-export const reverse = <R extends Rev>(rev: R): Reverse<R> => ({
+export type Reverse<R extends RuleId> = { kind: 'reverse'; rev: R }
+export const reverse = <R extends RuleId>(rev: R): Reverse<R> => ({
   kind: 'reverse',
   rev,
 })
@@ -18,7 +19,7 @@ export const next = (): Next => ({ kind: 'next' })
 export type Prev = { kind: 'prev' }
 export const prev = (): Prev => ({ kind: 'prev' })
 
-export type Event = Reverse<Rev> | Undo | Reset | Next | Prev
+export type Event = Reverse<RuleId> | Undo | Reset | Next | Prev
 
 export const parseEvent = (str: string): Event | null => {
   switch (str) {
@@ -31,7 +32,7 @@ export const parseEvent = (str: string): Event | null => {
     case 'reset':
       return reset()
     default:
-      if (isRev(str)) {
+      if (isRuleId(str)) {
         return reverse(str)
       }
   }

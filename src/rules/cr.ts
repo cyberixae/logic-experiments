@@ -119,6 +119,7 @@ export const exampleCR = applyCR(
 )
 
 export const ruleCR = {
+  id: 'cr',
   isResult: isCRResult,
   isResultDerivation: isCRResultDerivation,
   make: cr,

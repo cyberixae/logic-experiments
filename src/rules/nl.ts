@@ -83,6 +83,7 @@ export const exampleNL = applyNL(
 )
 
 export const ruleNL = {
+  id: 'nl',
   isResult: isNLResult,
   isResultDerivation: isNLResultDerivation,
   make: nl,

@@ -119,6 +119,7 @@ export const exampleDL = applyDL(
 )
 
 export const ruleDL = {
+  id: 'dl',
   isResult: isDLResult,
   isResultDerivation: isDLResultDerivation,
   make: dl,

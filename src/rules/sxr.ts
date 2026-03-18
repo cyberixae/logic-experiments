@@ -94,6 +94,7 @@ export const exampleSXR = applySXR(
 )
 
 export const ruleSXR = {
+  id: 'sxr',
   isResult: isSXRResult,
   isResultDerivation: isSXRResultDerivation,
   make: sxr,

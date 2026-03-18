@@ -83,6 +83,7 @@ export const exampleSWR = applySWR(
 )
 
 export const ruleSWR = {
+  id: 'swr',
   isResult: isSWRResult,
   isResultDerivation: isSWRResultDerivation,
   make: swr,
