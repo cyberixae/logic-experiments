@@ -41,7 +41,6 @@ import { ruleSRotRB } from '../rules/srotrb'
 import { ruleSXL } from '../rules/sxl'
 import { ruleSXR } from '../rules/sxr'
 import { RuleId, TryReverse0, TryReverse1 } from '../model/rule'
-import { head } from '../utils/tuple'
 
 // Language
 

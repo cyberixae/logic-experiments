@@ -109,4 +109,4 @@ export const ruleA3 = {
   reverse: reverseA3,
   tryReverse: tryReverseA3,
   example: exampleA3,
-} //satisfies Rule<AnyA3Result>
+} satisfies Rule<AnyA3Result>

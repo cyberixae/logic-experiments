@@ -53,7 +53,7 @@ import { exampleCL1 } from './rules/cl1'
 import { exampleI } from './rules/i'
 import { head } from './utils/tuple'
 import { split } from './utils/string'
-import { Theorems, theorems, isTheoremKey } from './challenges'
+import { Theorems, challenges, isTheoremKey } from './challenges'
 import { exampleDR } from './rules/dr'
 import { exampleCL } from './rules/cl'
 
@@ -132,7 +132,7 @@ const listing = () => {
   panel.appendChild(close)
   const levels = document.createElement('div')
   levels.setAttribute('class', 'levels')
-  Object.entries(theorems).forEach(([id, challenge]) => {
+  Object.entries(challenges).forEach(([id, challenge]) => {
     const item = document.createElement('div')
     item.setAttribute('class', 'level' + (id === selected ? ' active' : ''))
     item.onclick = (click) => {
@@ -391,12 +391,12 @@ const render = () => {
   body.innerHTML = ''
   isDone = isProof(current.derivation)
   body.appendChild(listing())
-  body.appendChild(bench(current, theorems[selected].rules))
+  body.appendChild(bench(current, challenges[selected].rules))
 }
 
 const selectLevel = (conjectureId: keyof Theorems) => {
   if (!(conjectureId in workspace)) {
-    workspace[conjectureId] = focus(premise(theorems[conjectureId].goal))
+    workspace[conjectureId] = focus(premise(challenges[conjectureId].goal))
   }
   selected = conjectureId
   history.pushState({ selected }, '', `?level=${selected}`)
@@ -405,7 +405,7 @@ const selectLevel = (conjectureId: keyof Theorems) => {
 
 type TKey = keyof Theorems
 
-const theoremKeys: Array<TKey> = Object.keys(theorems) as Array<TKey>
+const theoremKeys: Array<TKey> = Object.keys(challenges) as Array<TKey>
 const first: TKey = theoremKeys.at(0) as TKey
 const last: TKey = theoremKeys.at(-1) as TKey
 

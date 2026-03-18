@@ -1,10 +1,10 @@
 import * as readline from 'readline'
 import { repl } from './interactive/repl'
-import { theorems } from './challenges'
+import { challenges } from './challenges'
 
 const main = () => {
   const rl = readline.createInterface({ input: process.stdin })
-  const gen = repl(theorems)
+  const gen = repl(challenges)
   process.stdout.write(gen.next('').value ?? '')
   process.stdout.write('\n> ')
   rl.on('line', (line) => {

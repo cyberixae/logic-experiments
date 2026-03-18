@@ -43,8 +43,8 @@ export type TryReverse0 = <J extends AnySequent>(d: Derivation<J>) => Derivation
 export type TryReverse1 = (p: Prop) => TryReverse0
 export type TryReverse = TryReverse0 | TryReverse1
 
-export interface Rule<R extends AnySequent> {
-  id: RuleId
+export interface Rule<R extends AnySequent, I extends RuleId = RuleId> {
+  id: I
   isResult: Refinement<AnySequent, R>
   isResultDerivation: Refinement<AnyDerivation, Derivation<R>>
   make: unknown

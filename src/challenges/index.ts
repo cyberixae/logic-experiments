@@ -83,7 +83,7 @@ import { ch7completeness9 } from './ch7-completeness-9'
 import { ch8consolidation1 } from './ch8-consolidation-1'
 import { ch8consolidation2 } from './ch8-consolidation-2'
 
-export const theorems = {
+export const challenges = {
   ch0identity1,
   ch0identity2,
   ch0identity3,
@@ -172,5 +172,5 @@ export const theorems = {
   // violettiLuumuBiisoni,
   // syaaniPaprikaKettu,
 }
-export type Theorems = typeof theorems
-export const isTheoremKey = (k: string): k is keyof Theorems => k in theorems
+export type Theorems = typeof challenges
+export const isTheoremKey = (k: string): k is keyof Theorems => k in challenges
