@@ -1,9 +1,9 @@
-import { rev, lk, RuleId } from '../systems/lk'
+import { rev0, lk, } from '../systems/lk'
 import { AnySequent, conclusion } from '../model/sequent'
 import { Configuration } from '../model/theorem'
 
 export const syaaniPaprikaKettu: Configuration<AnySequent> = {
-  rules: Object.keys(rev) as Array<RuleId>,
+  rules: Object.keys(rev0),
   goal: conclusion(
     lk.o.p2.implication(
       lk.o.p2.conjunction(

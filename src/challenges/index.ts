@@ -1,6 +1,3 @@
-import { harmaaPuolukkaTiikeri } from './harmaa-puolukka-tiikeri'
-import { violettiLuumuBiisoni } from './violetti-luumu-biisoni'
-import { syaaniPaprikaKettu } from './syaani-paprika-kettu'
 import { ch0identity1 } from './ch0-identity-1'
 import { ch0identity2 } from './ch0-identity-2'
 import { ch0identity3 } from './ch0-identity-3'
@@ -168,9 +165,6 @@ export const challenges = {
 
   // ch5compositionC,
   // ch5compositionE,
-  // harmaaPuolukkaTiikeri,
-  // violettiLuumuBiisoni,
-  // syaaniPaprikaKettu,
 }
 export type Theorems = typeof challenges
 export const isTheoremKey = (k: string): k is keyof Theorems => k in challenges

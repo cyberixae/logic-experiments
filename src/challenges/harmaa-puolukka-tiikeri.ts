@@ -1,9 +1,9 @@
-import { rev, lk } from '../systems/lk'
+import { rev0, lk } from '../systems/lk'
 import { AnySequent, conclusion } from '../model/sequent'
 import { Challenge } from '../model/theorem'
 
 export const harmaaPuolukkaTiikeri: Challenge<AnySequent> = {
-  rules: Object.keys(rev).filter((r) => ['ir', 'swl', 'i'].includes(r)),
+  rules: Object.keys(rev0).filter((r) => ['ir', 'swl', 'i'].includes(r)),
   goal: conclusion(
     lk.o.p2.implication(
       lk.o.p2.implication(
@@ -22,4 +22,4 @@ export const harmaaPuolukkaTiikeri: Challenge<AnySequent> = {
       lk.z.ir(lk.i.i(lk.a('p'))),
     ),
   ),
-} as any
+}
