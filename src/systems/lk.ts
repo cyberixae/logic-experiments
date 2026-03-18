@@ -8,8 +8,6 @@ import {
 } from '../model/prop'
 import { ruleI } from '../rules/i'
 import { ruleCut } from '../rules/cut'
-import { ruleCL } from '../rules/cl'
-import { ruleDR } from '../rules/dr'
 import { ruleCL1 } from '../rules/cl1'
 import { ruleDR1 } from '../rules/dr1'
 import { ruleCL2 } from '../rules/cl2'
@@ -30,7 +28,6 @@ import { ruleSRotRF } from '../rules/srotrf'
 import { ruleSRotRB } from '../rules/srotrb'
 import { ruleSXL } from '../rules/sxl'
 import { ruleSXR } from '../rules/sxr'
-import { RuleId, TryReverse0, TryReverse1 } from '../model/rule'
 
 // Language
 
@@ -69,41 +66,6 @@ const zeta = {
   sRotRB: ruleSRotRB.apply,
   sxl: ruleSXL.apply,
   sxr: ruleSXR.apply,
-}
-
-export const rev1 = {
-  cut: ruleCut.tryReverse,
-} satisfies Partial<Record<RuleId, TryReverse1>>
-
-export const rev0 = {
-  i: ruleI.tryReverse,
-  cl: ruleCL.tryReverse,
-  dr: ruleDR.tryReverse,
-  cl1: ruleCL1.tryReverse,
-  dr1: ruleDR1.tryReverse,
-  cl2: ruleCL2.tryReverse,
-  dr2: ruleDR2.tryReverse,
-  dl: ruleDL.tryReverse,
-  cr: ruleCR.tryReverse,
-  il: ruleIL.tryReverse,
-  ir: ruleIR.tryReverse,
-  nl: ruleNL.tryReverse,
-  nr: ruleNR.tryReverse,
-  swl: ruleSWL.tryReverse,
-  swr: ruleSWR.tryReverse,
-  scl: ruleSCL.tryReverse,
-  scr: ruleSCR.tryReverse,
-  sRotLF: ruleSRotLF.tryReverse,
-  sRotLB: ruleSRotLB.tryReverse,
-  sRotRF: ruleSRotRF.tryReverse,
-  sRotRB: ruleSRotRB.tryReverse,
-  sxl: ruleSXL.tryReverse,
-  sxr: ruleSXR.tryReverse,
-} satisfies Partial<Record<RuleId, TryReverse0>>
-
-export const revses = {
-  rev0,
-  rev1,
 }
 
 export const name = 'Gentzen LK'
