@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import * as utils from '../utils/utils'
 import * as prop from '../model/prop'
 import * as judge from '../model/sequent'
@@ -368,21 +367,28 @@ const unit = 16
 const half = block.center(2 * unit)
 const full = block.center(4 * unit)
 
-export function fromMeta(meta: any) {
+type MetaSection<T> = { title: string; examples: Array<Array<T>> }
+type Meta = {
+  name: string
+  propositions: Array<MetaSection<prop.Prop>>
+  rules: Array<MetaSection<AnyDerivation>>
+}
+
+export function fromMeta(meta: Meta) {
   return block.leftify(
     block.br,
     block.br,
     full(block.underline('*')(meta.name)),
     block.br,
-    ...meta.propositions.flatMap(({ title, examples }: any) => [
+    ...meta.propositions.flatMap(({ title, examples }) => [
       block.br,
       title,
       block.br,
       block.br,
-      ...examples.flatMap((line: any) => [
+      ...examples.flatMap((line) => [
         half(
           block.spaced(
-            line.map((x: any) => fromProp(x)(basic)),
+            line.map((x) => fromProp(x)(basic)),
             1,
           ),
         ),
@@ -390,14 +396,14 @@ export function fromMeta(meta: any) {
       ]),
     ]),
     block.br,
-    ...meta.rules.flatMap(({ title, examples }: any) => [
+    ...meta.rules.flatMap(({ title, examples }) => [
       block.br,
       title,
       block.br,
       block.br,
-      ...examples.flatMap((line: any) => [
+      ...examples.flatMap((line) => [
         block.spaced(
-          line.map((x: any) => half(fromDerivation(x))),
+          line.map((x) => half(fromDerivation(x))),
           0,
         ),
         block.br,
