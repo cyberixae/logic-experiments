@@ -367,11 +367,11 @@ const unit = 16
 const half = block.center(2 * unit)
 const full = block.center(4 * unit)
 
-type MetaSection<T> = { title: string; examples: Array<Array<T>> }
+type MetaSection<T> = { readonly title: string; readonly examples: ReadonlyArray<ReadonlyArray<T>> }
 type Meta = {
-  name: string
-  propositions: Array<MetaSection<prop.Prop>>
-  rules: Array<MetaSection<AnyDerivation>>
+  readonly name: string
+  readonly propositions: ReadonlyArray<MetaSection<prop.Prop>>
+  readonly rules: ReadonlyArray<MetaSection<AnyDerivation>>
 }
 
 export function fromMeta(meta: Meta) {
