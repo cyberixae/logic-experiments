@@ -2,7 +2,7 @@ import { log } from './render/block'
 import { equalsDerivation, isProof, premise } from './model/derivation'
 import { conclusion } from './model/sequent'
 import * as print from './render/print'
-import { apply, focus, next } from './interactive/focus'
+import { apply, focus } from './interactive/focus'
 import { alpha, la3, name } from './systems/la3'
 import { ruleMP, tryReverseMP } from './rules/mp'
 import { ruleA2, tryReverseA2 } from './rules/a2'
@@ -81,7 +81,6 @@ cursor = apply(
   ),
 )
 cursor = apply(cursor, tryReverseA2)
-cursor = next(cursor)
 cursor = apply(cursor, tryReverseA1)
 if (
   !cursor ||

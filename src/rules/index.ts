@@ -1,5 +1,7 @@
 import { RuleId, Rule } from '../model/rule'
 import { AnySequent } from '../model/sequent'
+import { Option } from '../utils/option'
+import { entries } from '../utils/record'
 import { ruleA1 } from './a1'
 import { ruleA2 } from './a2'
 import { ruleA3 } from './a3'
@@ -61,3 +63,6 @@ export const rules: {
   a3: ruleA3,
   mp: ruleMP,
 }
+
+export const applicableRules = (j: AnySequent): Array<RuleId> =>
+  entries(rules).flatMap(([k, v]): Option<RuleId> => (v.isResult(j) ? [k] : []))

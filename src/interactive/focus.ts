@@ -9,10 +9,8 @@ import {
   subDerivation,
   openBranches,
 } from '../model/derivation'
-import {
-  AnySequent,
-  applicableRules as applicableRulesSequent,
-} from '../model/sequent'
+import { AnySequent } from '../model/sequent'
+import { applicableRules as applicableRulesSequent } from '../rules'
 import { Event } from './event'
 import { RuleId, TryReverse0, TryReverse1 } from '../model/rule'
 import { ruleCL } from '../rules/cl'

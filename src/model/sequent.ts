@@ -4,10 +4,6 @@ import { zip } from '../utils/array'
 import * as array from '../utils/array'
 import { Refinement } from '../utils/generic'
 import * as tuple from '../utils/tuple'
-import { rules } from '../rules'
-import { Option } from '../utils/option'
-import { entries } from '../utils/record'
-import { RuleId } from './rule'
 
 export type Formulas = Array<Prop>
 export const equalFormulas = (aa: Formulas, ab: Formulas): boolean => {
@@ -71,8 +67,3 @@ export const equals = (a: AnySequent, b: AnySequent) => {
   )
 }
 
-export const applicableRules = (j: AnySequent): Array<RuleId> => {
-  return entries(rules).flatMap(
-    ([k, v]): Option<RuleId> => (v.isResult(j) ? [k] : []),
-  )
-}
