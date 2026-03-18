@@ -7,15 +7,6 @@ import {
   negation,
   implication,
 } from '../model/prop'
-import * as array from '../utils/array'
-import { AnyConclusion, conclusion, isActiveR } from '../model/sequent'
-import {
-  Derivation,
-  premise,
-  editDerivation as editBranchG,
-  toProof,
-  Edit,
-} from '../model/derivation'
 import { ruleA1 } from '../rules/a1'
 import { ruleA2 } from '../rules/a2'
 import { ruleA3 } from '../rules/a3'

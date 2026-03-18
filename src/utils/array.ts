@@ -1,7 +1,7 @@
 export type NonEmptyArray<A> = Array<A> & { 0: A }
 
 export const isNonEmptyArray = <A>(a: Array<A>): a is NonEmptyArray<A> => {
-  return a.hasOwnProperty(0)
+  return a.length > 0
 }
 
 export const init = <T>(arr: NonEmptyArray<T>): Array<T> =>

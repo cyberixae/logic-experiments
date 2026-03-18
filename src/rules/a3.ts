@@ -16,7 +16,6 @@ import {
 import {
   Conclusion,
   AnySequent,
-  refineConclusion,
   conclusion,
   isConclusion,
 } from '../model/sequent'

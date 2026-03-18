@@ -8,7 +8,6 @@ import {
 import { Prop, Implication, implication, atom } from '../model/prop'
 import {
   Conclusion,
-  AnyConclusion,
   conclusion,
   AnySequent,
   isConclusion,

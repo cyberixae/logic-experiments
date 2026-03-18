@@ -22,7 +22,6 @@ import {
 } from '../model/sequent'
 import { Refinement } from '../utils/generic'
 import * as tuple from '../utils/tuple'
-import { IResult } from './i'
 import { Rule } from '../model/rule'
 
 export type IRResult<

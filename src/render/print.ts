@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import * as utils from '../utils/utils'
 import * as prop from '../model/prop'
 import * as judge from '../model/sequent'
@@ -8,7 +9,7 @@ import {
   AnyPremise,
   AnyTransformation,
 } from '../model/derivation'
-import { Focus, activePath } from '../interactive/focus'
+import { Focus } from '../interactive/focus'
 import { AnySequent } from '../model/sequent'
 
 export type NullaryTemplate = [string]
@@ -18,7 +19,7 @@ export const NullaryTemplateId = {
 }
 export type NullaryTemplateId = keyof typeof NullaryTemplateId
 export const isNullaryTemplateId = (s: string): s is NullaryTemplateId =>
-  NullaryTemplateId.hasOwnProperty(s)
+  s in NullaryTemplateId
 export type NullaryTemplates = Record<NullaryTemplateId, NullaryTemplate>
 
 export type UnaryTemplate = [string, string]
@@ -30,7 +31,7 @@ export const UnaryTemplateId = {
 }
 export type UnaryTemplateId = keyof typeof UnaryTemplateId
 export const isUnaryTemplateId = (s: string): s is UnaryTemplateId =>
-  UnaryTemplateId.hasOwnProperty(s)
+  s in UnaryTemplateId
 export type UnaryTemplates = Record<UnaryTemplateId, UnaryTemplate>
 
 export type BinaryTemplate = [string, string, string]
@@ -43,7 +44,7 @@ export const BinaryTemplateId = {
 }
 export type BinaryTemplateId = keyof typeof BinaryTemplateId
 export const isBinaryTemplateId = (s: string): s is BinaryTemplateId =>
-  BinaryTemplateId.hasOwnProperty(s)
+  s in BinaryTemplateId
 export type BinaryTemplates = Record<BinaryTemplateId, BinaryTemplate>
 
 export type TemplateId = keyof Templates
@@ -406,13 +407,5 @@ export function fromMeta(meta: any) {
   )
 }
 export const fromFocus = (s: Focus<AnySequent>) => {
-  const path = activePath(s)
   return fromDerivation(s.derivation)
-  /* +
-    '\n' +
-    '\nSelected: Branch ' +
-    String(s.branch) +
-    '\nPath: ' +
-    ['*', ...path].join('-')
-    */
 }
