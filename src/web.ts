@@ -1,4 +1,4 @@
-import { Reset, reverse0, undo, reset } from './interactive/event'
+import { reverse0, undo, reset } from './interactive/event'
 import { Focus, activePath, activeSequent } from './interactive/focus'
 
 import { AnySequent } from './model/sequent'
@@ -16,7 +16,7 @@ import { center, isReverseId0, left, right } from './rules'
 import { entries } from './utils/record'
 import { Workspace } from './interactive/workspace'
 
-const controls = ['undo', 'reset', 'level']
+const controls = ['undo', 'reset', 'level'] as const
 
 const workspace = new Workspace(challenges)
 
@@ -88,20 +88,19 @@ const listing = () => {
 
 const congrats = () => {
   const panel = document.createElement('div')
-  const congrats = document.createElement('div')
-  congrats.setAttribute('class', 'congrats')
+  const banner = document.createElement('div')
+  banner.setAttribute('class', 'congrats')
   const hurray = document.createElement('div')
   hurray.setAttribute('class', 'hurray')
   hurray.innerHTML = '\n\n\u{1F389} Conglaturations! \u{1F389}\n'
-  congrats.appendChild(hurray)
+  banner.appendChild(hurray)
   const congratsButtons = document.createElement('div')
   congratsButtons.setAttribute('class', 'congrabuttons')
   const previousButton = document.createElement('div')
   previousButton.setAttribute('class', 'button')
   previousButton.innerHTML = 'Prev Level'
   previousButton.onclick = () => {
-    workspace.selectConjecture(workspace.previousConjectureId())
-    render()
+    selectLevel(workspace.previousConjectureId())
   }
   congratsButtons.appendChild(previousButton)
   const againbutton = document.createElement('div')
@@ -116,11 +115,10 @@ const congrats = () => {
   continueButton.setAttribute('class', 'button')
   continueButton.innerHTML = 'Next Level'
   continueButton.onclick = () => {
-    workspace.selectConjecture(workspace.nextConjectureId())
-    render()
+    selectLevel(workspace.nextConjectureId())
   }
   congratsButtons.appendChild(continueButton)
-  panel.appendChild(congrats)
+  panel.appendChild(banner)
   panel.appendChild(congratsButtons)
   return panel
 }
@@ -144,7 +142,7 @@ const playArea = <J extends AnySequent>(s: Focus<J>) => {
   return panel
 }
 
-const levelHandler = (_ev?: Reset) => () => {
+const levelHandler = () => {
   const menu = document.getElementById('levelmenu')
   menu?.removeAttribute('style')
 }
@@ -156,7 +154,7 @@ const mainPanel = (ls: Array<RuleId>, rules: Array<RuleId>) => {
   entries(center).forEach(([key, rule]) => {
     if (rules.includes(key)) {
       const pre = document.createElement('pre')
-      const disabled = workspace.isSolved() || !ls.includes(key as RuleId)
+      const disabled = workspace.isSolved() || !ls.includes(key)
       pre.setAttribute('class', 'rule button' + (disabled ? ' disabled' : ''))
       if (!disabled) {
         pre.onclick = () => {
@@ -238,7 +236,7 @@ const control = <J extends AnySequent>(s: Focus<J>) => {
           }
           break
         case 'level':
-          pre.onclick = levelHandler()
+          pre.onclick = levelHandler
           break
       }
     }
@@ -282,7 +280,11 @@ const selectLevel = (selected: string) => {
 const init = () => {
   const params = new URLSearchParams(window.location.search)
   const level = params.get('level') ?? ''
-  selectLevel(level)
+  if (workspace.isConjectureId(level)) {
+    workspace.selectConjecture(level)
+    history.replaceState({ selected: level }, '', `?level=${level}`)
+  }
+  render()
 }
 
 document.addEventListener('DOMContentLoaded', init)
@@ -290,7 +292,7 @@ document.addEventListener('DOMContentLoaded', init)
 window.addEventListener('popstate', (event) => {
   const level = event.state?.selected
   if (level && isTheoremKey(level)) {
-    selectLevel(level)
+    workspace.selectConjecture(level)
   }
   render()
 })
