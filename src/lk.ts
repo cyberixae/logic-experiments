@@ -2,7 +2,7 @@ import { log } from './render/block'
 import { premise, isProof, equalsDerivation } from './model/derivation'
 import { conclusion } from './model/sequent'
 import { applyEvent, focus } from './interactive/focus'
-import { reverse } from './interactive/event'
+import { reverse0 } from './interactive/event'
 
 import { alpha, lk, name } from './systems/lk'
 import {
@@ -119,10 +119,10 @@ const proof = lk.z.ir(
 )
 
 let state = focus(premise(goal))
-state = applyEvent(state, reverse('ir'))
-state = applyEvent(state, reverse('swl'))
-state = applyEvent(state, reverse('ir'))
-state = applyEvent(state, reverse('i'))
+state = applyEvent(state, reverse0('ir'))
+state = applyEvent(state, reverse0('swl'))
+state = applyEvent(state, reverse0('ir'))
+state = applyEvent(state, reverse0('i'))
 if (
   !state ||
   !isProof(state.derivation) ||

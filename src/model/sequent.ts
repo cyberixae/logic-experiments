@@ -66,4 +66,3 @@ export const equals = (a: AnySequent, b: AnySequent) => {
     equalFormulas(a.succedent, b.succedent)
   )
 }
-

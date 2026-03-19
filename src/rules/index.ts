@@ -1,4 +1,4 @@
-import { RuleId, Rule } from '../model/rule'
+import { RuleId, Rule, TryReverse0, TryReverse1 } from '../model/rule'
 import { AnySequent } from '../model/sequent'
 import { Option } from '../utils/option'
 import { entries } from '../utils/record'
@@ -66,3 +66,51 @@ export const rules: {
 
 export const applicableRules = (j: AnySequent): Array<RuleId> =>
   entries(rules).flatMap(([k, v]): Option<RuleId> => (v.isResult(j) ? [k] : []))
+
+export const reverse0 = {
+  a1: ruleA1,
+  a2: ruleA2,
+  a3: ruleA3,
+  i: ruleI,
+  cl: ruleCL,
+  dr: ruleDR,
+  cl1: ruleCL1,
+  dr1: ruleDR1,
+  cl2: ruleCL2,
+  dr2: ruleDR2,
+  dl: ruleDL,
+  cr: ruleCR,
+  il: ruleIL,
+  ir: ruleIR,
+  nl: ruleNL,
+  nr: ruleNR,
+  swl: ruleSWL,
+  swr: ruleSWR,
+  scl: ruleSCL,
+  scr: ruleSCR,
+  sRotLF: ruleSRotLF,
+  sRotLB: ruleSRotLB,
+  sRotRF: ruleSRotRF,
+  sRotRB: ruleSRotRB,
+  sxl: ruleSXL,
+  sxr: ruleSXR,
+} satisfies Partial<{
+  [K in RuleId]: Rule<AnySequent, K> & { tryReverse: TryReverse0 }
+}>
+export type ReverseId0 = keyof typeof reverse0
+export const isReverseId0 = (s: string): s is ReverseId0 => s in reverse0
+
+export const reverse1 = {
+  cut: ruleCut,
+  mp: ruleMP,
+} satisfies Partial<
+  Record<RuleId, Rule<AnySequent> & { tryReverse: TryReverse1 }>
+>
+export type ReverseId1 = keyof typeof reverse1
+export const isReverseId1 = (s: string): s is ReverseId1 => s in reverse1
+
+// Exhaustiveness check
+const _reverse: { [K in RuleId]: Rule<AnySequent, K> } = {
+  ...reverse0,
+  ...reverse1,
+}

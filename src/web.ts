@@ -1,4 +1,11 @@
-import { Next, Prev, Reset, Reverse, reverse, Undo } from './interactive/event'
+import {
+  Next,
+  Prev,
+  Reset,
+  Reverse0,
+  reverse0,
+  Undo,
+} from './interactive/event'
 import {
   focus,
   applyEvent,
@@ -43,6 +50,7 @@ import { exampleI } from './rules/i'
 import { Theorems, challenges, isTheoremKey } from './challenges'
 import { exampleDR } from './rules/dr'
 import { exampleCL } from './rules/cl'
+import { ReverseId0 } from './rules'
 
 const main = {
   i: fromDerivation(exampleI),
@@ -196,7 +204,7 @@ const playArea = <J extends AnySequent>(s: Focus<J>) => {
   return panel
 }
 
-const ruleHandler = (ev: Reverse<RuleId>) => () => {
+const ruleHandler = (ev: Reverse0<ReverseId0>) => () => {
   if (!selected) {
     return
   }
@@ -273,7 +281,7 @@ const mainPanel = (ls: Array<RuleId>, rules: Array<RuleId>) => {
       const disabled = isDone || !ls.includes(key as RuleId)
       pre.setAttribute('class', 'rule button' + (disabled ? ' disabled' : ''))
       if (!disabled) {
-        pre.onclick = ruleHandler(reverse(key as RuleId))
+        pre.onclick = ruleHandler(reverse0(key as ReverseId0))
       }
       pre.innerHTML = schem
       panel.appendChild(pre)
@@ -290,7 +298,7 @@ const leftPanel = (ls: Array<RuleId>, rules: Array<RuleId>) => {
       const disabled = isDone || !ls.includes(key as RuleId)
       pre.setAttribute('class', 'rule button' + (disabled ? ' disabled' : ''))
       if (!disabled) {
-        pre.onclick = ruleHandler(reverse(key as RuleId))
+        pre.onclick = ruleHandler(reverse0(key as ReverseId0))
       }
       pre.innerHTML = schem
       panel.appendChild(pre)
@@ -306,7 +314,7 @@ const rightPanel = (ls: Array<RuleId>, rules: Array<RuleId>) => {
       const pre = document.createElement('pre')
       const disabled = isDone || !ls.includes(key as RuleId)
       if (!disabled) {
-        pre.onclick = ruleHandler(reverse(key as RuleId))
+        pre.onclick = ruleHandler(reverse0(key as ReverseId0))
       }
       pre.setAttribute('class', 'rule button' + (disabled ? ' disabled' : ''))
       pre.innerHTML = schem

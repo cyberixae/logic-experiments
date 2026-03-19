@@ -1,9 +1,25 @@
-import { isRuleId, RuleId } from '../model/rule'
+import { Prop } from '../model/prop'
+import { isReverseId0, isReverseId1, ReverseId0, ReverseId1 } from '../rules'
+import { split } from '../utils/string'
 
-export type Reverse<R extends RuleId> = { kind: 'reverse'; rev: R }
-export const reverse = <R extends RuleId>(rev: R): Reverse<R> => ({
-  kind: 'reverse',
+export type Reverse0<R extends ReverseId0> = { kind: 'reverse0'; rev: R }
+export const reverse0 = <R extends ReverseId0>(rev: R): Reverse0<R> => ({
+  kind: 'reverse0',
   rev,
+})
+
+export type Reverse1<R extends ReverseId1> = {
+  kind: 'reverse1'
+  rev: R
+  a: Prop
+}
+export const reverse1 = <R extends ReverseId1>(
+  rev: R,
+  a: Prop,
+): Reverse1<R> => ({
+  kind: 'reverse1',
+  rev,
+  a,
 })
 
 export type Undo = { kind: 'undo' }
@@ -18,7 +34,13 @@ export const next = (): Next => ({ kind: 'next' })
 export type Prev = { kind: 'prev' }
 export const prev = (): Prev => ({ kind: 'prev' })
 
-export type Event = Reverse<RuleId> | Undo | Reset | Next | Prev
+export type Event =
+  | Reverse0<ReverseId0>
+  | Reverse1<ReverseId1>
+  | Undo
+  | Reset
+  | Next
+  | Prev
 
 export const parseEvent = (str: string): Event | null => {
   switch (str) {
@@ -30,10 +52,14 @@ export const parseEvent = (str: string): Event | null => {
       return undo()
     case 'reset':
       return reset()
-    default:
-      if (isRuleId(str)) {
-        return reverse(str)
-      }
+  }
+  if (isReverseId0(str)) {
+    return reverse0(str)
+  }
+  const [cmd, ...args] = split(str, ' ')
+  if (isReverseId1(cmd)) {
+    console.error('TBD, parse:' + JSON.stringify(args))
+    //return reverse1(cmd)
   }
   return null
 }

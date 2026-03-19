@@ -10,33 +10,13 @@ import {
   openBranches,
 } from '../model/derivation'
 import { AnySequent } from '../model/sequent'
-import { applicableRules as applicableRulesSequent } from '../rules'
+import {
+  applicableRules as applicableRulesSequent,
+  reverse0,
+  reverse1,
+} from '../rules'
 import { Event } from './event'
-import { RuleId, TryReverse0, TryReverse1 } from '../model/rule'
-import { ruleCL } from '../rules/cl'
-import { ruleCL1 } from '../rules/cl1'
-import { ruleCL2 } from '../rules/cl2'
-import { ruleCR } from '../rules/cr'
-import { ruleCut } from '../rules/cut'
-import { ruleDL } from '../rules/dl'
-import { ruleDR } from '../rules/dr'
-import { ruleDR1 } from '../rules/dr1'
-import { ruleDR2 } from '../rules/dr2'
-import { ruleI } from '../rules/i'
-import { ruleIL } from '../rules/il'
-import { ruleIR } from '../rules/ir'
-import { ruleNL } from '../rules/nl'
-import { ruleNR } from '../rules/nr'
-import { ruleSCL } from '../rules/scl'
-import { ruleSCR } from '../rules/scr'
-import { ruleSRotLB } from '../rules/srotlb'
-import { ruleSRotLF } from '../rules/srotlf'
-import { ruleSRotRB } from '../rules/srotrb'
-import { ruleSRotRF } from '../rules/srotrf'
-import { ruleSWL } from '../rules/swl'
-import { ruleSWR } from '../rules/swr'
-import { ruleSXL } from '../rules/sxl'
-import { ruleSXR } from '../rules/sxr'
+import { RuleId } from '../model/rule'
 
 export type Focus<J extends AnySequent> = {
   derivation: Derivation<J>
@@ -105,67 +85,19 @@ export const reset = <J extends AnySequent>(s: Focus<J>): Focus<J> => {
   return focus(premise(s.derivation.result))
 }
 
-export const rev1 = {
-  cut: ruleCut.tryReverse,
-} satisfies Partial<Record<RuleId, TryReverse1>>
-
-export const rev0 = {
-  i: ruleI.tryReverse,
-  cl: ruleCL.tryReverse,
-  dr: ruleDR.tryReverse,
-  cl1: ruleCL1.tryReverse,
-  dr1: ruleDR1.tryReverse,
-  cl2: ruleCL2.tryReverse,
-  dr2: ruleDR2.tryReverse,
-  dl: ruleDL.tryReverse,
-  cr: ruleCR.tryReverse,
-  il: ruleIL.tryReverse,
-  ir: ruleIR.tryReverse,
-  nl: ruleNL.tryReverse,
-  nr: ruleNR.tryReverse,
-  swl: ruleSWL.tryReverse,
-  swr: ruleSWR.tryReverse,
-  scl: ruleSCL.tryReverse,
-  scr: ruleSCR.tryReverse,
-  sRotLF: ruleSRotLF.tryReverse,
-  sRotLB: ruleSRotLB.tryReverse,
-  sRotRF: ruleSRotRF.tryReverse,
-  sRotRB: ruleSRotRB.tryReverse,
-  sxl: ruleSXL.tryReverse,
-  sxr: ruleSXR.tryReverse,
-} satisfies Partial<Record<RuleId, TryReverse0>>
-
-export const revses = {
-  rev0,
-  rev1,
-}
-
 export const applyEvent = <J extends AnySequent>(
   state: Focus<J>,
   ev: Event,
 ): Focus<J> => {
   switch (ev.kind) {
-    case 'reverse': {
-      if (ev.rev === 'a1') {
-        break
-      }
-      if (ev.rev === 'a2') {
-        break
-      }
-      if (ev.rev === 'a3') {
-        break
-      }
-      if (ev.rev === 'mp') {
-        break
-      }
-      if (ev.rev === 'cut') {
-        break
-      }
-      const edit = rev0[ev.rev]
-      if (!edit) {
-        break
-      }
-      state = apply(state, edit)
+    case 'reverse0': {
+      const rule = reverse0[ev.rev]
+      state = apply(state, rule.tryReverse)
+      break
+    }
+    case 'reverse1': {
+      const rule = reverse1[ev.rev]
+      state = apply(state, rule.tryReverse(ev.a))
       break
     }
     case 'undo':

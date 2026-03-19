@@ -367,7 +367,10 @@ const unit = 16
 const half = block.center(2 * unit)
 const full = block.center(4 * unit)
 
-type MetaSection<T> = { readonly title: string; readonly examples: ReadonlyArray<ReadonlyArray<T>> }
+type MetaSection<T> = {
+  readonly title: string
+  readonly examples: ReadonlyArray<ReadonlyArray<T>>
+}
 type Meta = {
   readonly name: string
   readonly propositions: ReadonlyArray<MetaSection<prop.Prop>>
