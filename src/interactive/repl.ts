@@ -28,6 +28,7 @@ import { exampleCL1 } from '../rules/cl1'
 import { exampleI } from '../rules/i'
 import { split } from '../utils/string'
 import { Theorems, isTheoremKey } from '../challenges'
+import { rules } from '../rules'
 
 type Workspace = Partial<{ [K in keyof Theorems]: Focus<Theorems[K]['goal']> }>
 
@@ -43,8 +44,8 @@ export function* repl(theorems: Theorems): Generator<string, string, string> {
       case 'quit':
         return '\nExiting...'
       case 'help': {
-        const [rule] = args
-        if (!rule) {
+        const [arg] = args
+        if (!arg) {
           output =
             '\nSystem commands:' +
             '\n  help - display this manual' +
@@ -57,73 +58,9 @@ export function* repl(theorems: Theorems): Generator<string, string, string> {
             '\n  select <conjecture> - select active conjecture'
           break
         }
-        if (isRuleId(rule)) {
-          output = '\nRule "' + rule + '":' + '\n' + '\n'
-          switch (rule) {
-            case 'cl1':
-              output += fromDerivation(exampleCL1)
-              break
-            case 'cl2':
-              output += fromDerivation(exampleCL2)
-              break
-            case 'cr':
-              output += fromDerivation(exampleCR)
-              break
-            case 'dl':
-              output += fromDerivation(exampleDL)
-              break
-            case 'dr1':
-              output += fromDerivation(exampleDR1)
-              break
-            case 'dr2':
-              output += fromDerivation(exampleDR2)
-              break
-            case 'i':
-              output += fromDerivation(exampleI)
-              break
-            case 'il':
-              output += fromDerivation(exampleIL)
-              break
-            case 'ir':
-              output += fromDerivation(exampleIR)
-              break
-            case 'nl':
-              output += fromDerivation(exampleNL)
-              break
-            case 'nr':
-              output += fromDerivation(exampleNR)
-              break
-            case 'sRotLB':
-              output += fromDerivation(exampleSRotLB)
-              break
-            case 'sRotLF':
-              output += fromDerivation(exampleSRotLF)
-              break
-            case 'sRotRB':
-              output += fromDerivation(exampleSRotRB)
-              break
-            case 'sRotRF':
-              output += fromDerivation(exampleSRotRF)
-              break
-            case 'scl':
-              output += fromDerivation(exampleSCL)
-              break
-            case 'scr':
-              output += fromDerivation(exampleSCR)
-              break
-            case 'swl':
-              output += fromDerivation(exampleSWL)
-              break
-            case 'swr':
-              output += fromDerivation(exampleSWR)
-              break
-            case 'sxl':
-              output += fromDerivation(exampleSXL)
-              break
-            case 'sxr':
-              output += fromDerivation(exampleSXR)
-              break
-          }
+        if (isRuleId(arg)) {
+          output = '\nRule "' + arg + '":' + '\n' + '\n'
+          output += fromDerivation(rules[arg].example)
           break
         }
         break
