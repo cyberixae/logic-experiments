@@ -28,61 +28,9 @@ import {
 } from './render/print'
 import { applicableRules } from './interactive/focus'
 import { RuleId } from './model/rule'
-import { exampleSRotRB } from './rules/srotrb'
-import { exampleSRotRF } from './rules/srotrf'
-import { exampleSRotLB } from './rules/srotlb'
-import { exampleSRotLF } from './rules/srotlf'
-import { exampleSCR } from './rules/scr'
-import { exampleSCL } from './rules/scl'
-import { exampleSWR } from './rules/swr'
-import { exampleSWL } from './rules/swl'
-import { exampleNR } from './rules/nr'
-import { exampleNL } from './rules/nl'
-import { exampleIR } from './rules/ir'
-import { exampleIL } from './rules/il'
-import { exampleCR } from './rules/cr'
-import { exampleDL } from './rules/dl'
-import { exampleDR2 } from './rules/dr2'
-import { exampleCL2 } from './rules/cl2'
-import { exampleDR1 } from './rules/dr1'
-import { exampleCL1 } from './rules/cl1'
-import { exampleI } from './rules/i'
 import { Theorems, challenges, isTheoremKey } from './challenges'
-import { exampleDR } from './rules/dr'
-import { exampleCL } from './rules/cl'
-import { ReverseId0 } from './rules'
-
-const main = {
-  i: fromDerivation(exampleI),
-}
-
-const left = {
-  scl: fromDerivation(exampleSCL),
-  swl: fromDerivation(exampleSWL),
-  sRotLB: fromDerivation(exampleSRotLB),
-  sRotLF: fromDerivation(exampleSRotLF),
-  //sxl: fromDerivation(exampleSXL), not relevant for reverse
-  nl: fromDerivation(exampleNL),
-  il: fromDerivation(exampleIL),
-  cl: fromDerivation(exampleCL),
-  cl1: fromDerivation(exampleCL1),
-  cl2: fromDerivation(exampleCL2),
-  dl: fromDerivation(exampleDL),
-}
-
-const right = {
-  scr: fromDerivation(exampleSCR),
-  swr: fromDerivation(exampleSWR),
-  sRotRB: fromDerivation(exampleSRotRB),
-  sRotRF: fromDerivation(exampleSRotRF),
-  //sxr: fromDerivation(exampleSXR), not relevant for reverse
-  nr: fromDerivation(exampleNR),
-  ir: fromDerivation(exampleIR),
-  dr: fromDerivation(exampleDR),
-  dr1: fromDerivation(exampleDR1),
-  dr2: fromDerivation(exampleDR2),
-  cr: fromDerivation(exampleCR),
-}
+import { center, left, ReverseId0, right } from './rules'
+import { entries } from './utils/record'
 
 //const controls = ['prev', 'undo', 'reset', 'level', 'next']
 const controls = ['undo', 'reset', 'level']
@@ -275,15 +223,16 @@ const levelHandler = (_ev?: Reset) => () => {
 const mainPanel = (ls: Array<RuleId>, rules: Array<RuleId>) => {
   const panel = document.createElement('div')
   panel.setAttribute('class', 'main')
-  Object.entries(main).forEach(([key, schem]) => {
-    if (rules.includes(key as RuleId)) {
+
+  entries(center).forEach(([key, rule]) => {
+    if (rules.includes(key)) {
       const pre = document.createElement('pre')
       const disabled = isDone || !ls.includes(key as RuleId)
       pre.setAttribute('class', 'rule button' + (disabled ? ' disabled' : ''))
       if (!disabled) {
         pre.onclick = ruleHandler(reverse0(key as ReverseId0))
       }
-      pre.innerHTML = schem
+      pre.innerHTML = fromDerivation(rule.example)
       panel.appendChild(pre)
     }
   })
@@ -292,7 +241,7 @@ const mainPanel = (ls: Array<RuleId>, rules: Array<RuleId>) => {
 const leftPanel = (ls: Array<RuleId>, rules: Array<RuleId>) => {
   const panel = document.createElement('div')
   panel.setAttribute('class', 'left')
-  Object.entries(left).forEach(([key, schem]) => {
+  Object.entries(left).forEach(([key, rule]) => {
     if (rules.includes(key as RuleId)) {
       const pre = document.createElement('pre')
       const disabled = isDone || !ls.includes(key as RuleId)
@@ -300,7 +249,7 @@ const leftPanel = (ls: Array<RuleId>, rules: Array<RuleId>) => {
       if (!disabled) {
         pre.onclick = ruleHandler(reverse0(key as ReverseId0))
       }
-      pre.innerHTML = schem
+      pre.innerHTML = fromDerivation(rule.example)
       panel.appendChild(pre)
     }
   })
@@ -309,7 +258,7 @@ const leftPanel = (ls: Array<RuleId>, rules: Array<RuleId>) => {
 const rightPanel = (ls: Array<RuleId>, rules: Array<RuleId>) => {
   const panel = document.createElement('div')
   panel.setAttribute('class', 'right')
-  Object.entries(right).forEach(([key, schem]) => {
+  Object.entries(right).forEach(([key, rule]) => {
     if (rules.includes(key as RuleId)) {
       const pre = document.createElement('pre')
       const disabled = isDone || !ls.includes(key as RuleId)
@@ -317,7 +266,7 @@ const rightPanel = (ls: Array<RuleId>, rules: Array<RuleId>) => {
         pre.onclick = ruleHandler(reverse0(key as ReverseId0))
       }
       pre.setAttribute('class', 'rule button' + (disabled ? ' disabled' : ''))
-      pre.innerHTML = schem
+      pre.innerHTML = fromDerivation(rule.example)
       panel.appendChild(pre)
     }
   })
