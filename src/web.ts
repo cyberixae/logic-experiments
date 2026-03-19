@@ -1,6 +1,6 @@
-import { Reset, reverse0, undo, reset, prev, next } from './interactive/event'
+import { Reset, reverse0, undo, reset } from './interactive/event'
 import { Focus, activePath, activeSequent } from './interactive/focus'
-import { branches } from './model/derivation'
+
 import { AnySequent } from './model/sequent'
 import {
   basic,
@@ -16,7 +16,6 @@ import { center, isReverseId0, left, right } from './rules'
 import { entries } from './utils/record'
 import { Workspace } from './interactive/workspace'
 
-//const controls = ['prev', 'undo', 'reset', 'level', 'next']
 const controls = ['undo', 'reset', 'level']
 
 const workspace = new Workspace(challenges)
@@ -220,8 +219,7 @@ const control = <J extends AnySequent>(s: Focus<J>) => {
   controls.forEach((key) => {
     const disabled = !(
       key === 'level' ||
-      (['undo', 'reset'].includes(key) && path.length > 0) ||
-      (['next', 'prev'].includes(key) && branches(s.derivation).length > 1)
+      (['undo', 'reset'].includes(key) && path.length > 0)
     )
     const pre = document.createElement('pre')
     pre.setAttribute('class', 'button' + (disabled ? ' disabled' : ''))
@@ -236,18 +234,6 @@ const control = <J extends AnySequent>(s: Focus<J>) => {
         case 'reset':
           pre.onclick = () => {
             workspace.applyEvent(reset())
-            render()
-          }
-          break
-        case 'prev':
-          pre.onclick = () => {
-            workspace.applyEvent(prev())
-            render()
-          }
-          break
-        case 'next':
-          pre.onclick = () => {
-            workspace.applyEvent(next())
             render()
           }
           break

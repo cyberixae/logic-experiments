@@ -106,10 +106,10 @@ export const applyEvent = <J extends AnySequent>(
     case 'reset':
       state = reset(state)
       break
-    case 'next':
+    case 'nextBranch':
       state = next(state)
       break
-    case 'prev':
+    case 'prevBranch':
       state = prev(state)
       break
   }

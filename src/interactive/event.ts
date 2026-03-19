@@ -28,26 +28,22 @@ export const undo = (): Undo => ({ kind: 'undo' })
 export type Reset = { kind: 'reset' }
 export const reset = (): Reset => ({ kind: 'reset' })
 
-export type Next = { kind: 'next' }
-export const next = (): Next => ({ kind: 'next' })
+export type NextBranch = { kind: 'nextBranch' }
+export const nextBranch = (): NextBranch => ({ kind: 'nextBranch' })
 
-export type Prev = { kind: 'prev' }
-export const prev = (): Prev => ({ kind: 'prev' })
+export type PrevBranch = { kind: 'prevBranch' }
+export const prevBranch = (): PrevBranch => ({ kind: 'prevBranch' })
 
 export type Event =
   | Reverse0<ReverseId0>
   | Reverse1<ReverseId1>
   | Undo
   | Reset
-  | Next
-  | Prev
+  | NextBranch
+  | PrevBranch
 
 export const parseEvent = (str: string): Event | null => {
   switch (str) {
-    case 'next':
-      return next()
-    case 'prev':
-      return prev()
     case 'undo':
       return undo()
     case 'reset':

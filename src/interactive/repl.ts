@@ -29,8 +29,8 @@ export function* repl<K extends string, C extends Record<K, Configuration<AnySeq
             '\n  help - display this manual' +
             '\n  help <rule> - display rule description' +
             '\n  list - list all conjectures' +
-            '\n  prev - change active branch in current conjecture' +
-            '\n  next - change active branch in current conjecture' +
+            '\n  prev - select previous conjecture' +
+            '\n  next - select next conjecture' +
             '\n  undo - undo applied rule in current conjecture' +
             '\n  reset - undo all applied rules of current conjecture' +
             '\n  select <conjecture> - select active conjecture'
@@ -51,6 +51,14 @@ export function* repl<K extends string, C extends Record<K, Configuration<AnySeq
             .listConjectures()
             .map(([id]) => (id === workspace.selected ? '*' : ' ') + ' ' + id)
             .join('\n')
+        break
+      case 'prev':
+        workspace.selectConjecture(workspace.previousConjectureId())
+        output = status(workspace.currentConjecture())
+        break
+      case 'next':
+        workspace.selectConjecture(workspace.nextConjectureId())
+        output = status(workspace.currentConjecture())
         break
       case 'select': {
         const [conjectureId] = args
@@ -77,7 +85,8 @@ const status = (s: Focus<AnySequent>): string =>
   fromFocus(s) +
   '\nRules: ' +
   applicableRules(s).join(', ') +
-  '\nNavigation: prev, next, undo' +
+  '\nProof: undo, reset' +
+  '\nConjectures: prev, next, select, list' +
   '\nSystem: quit, list, select' +
   '\n' +
   (isProof(s.derivation) ? '\nConglaturations!\n' : '')
