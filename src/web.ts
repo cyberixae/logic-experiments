@@ -1,23 +1,6 @@
-import {
-  Next,
-  Prev,
-  Reset,
-  Reverse0,
-  reverse0,
-  Undo,
-} from './interactive/event'
-import {
-  focus,
-  applyEvent,
-  Focus,
-  activePath,
-  next,
-  undo,
-  prev,
-  reset,
-  activeSequent,
-} from './interactive/focus'
-import { premise, isProof, branches } from './model/derivation'
+import { Reset, reverse0, undo, reset, prev, next } from './interactive/event'
+import { Focus, activePath, activeSequent } from './interactive/focus'
+import { branches } from './model/derivation'
 import { AnySequent } from './model/sequent'
 import {
   basic,
@@ -28,17 +11,15 @@ import {
 } from './render/print'
 import { applicableRules } from './interactive/focus'
 import { RuleId } from './model/rule'
-import { Theorems, challenges, isTheoremKey } from './challenges'
-import { center, left, ReverseId0, right } from './rules'
+import { challenges, isTheoremKey } from './challenges'
+import { center, isReverseId0, left, right } from './rules'
 import { entries } from './utils/record'
+import { Workspace } from './interactive/workspace'
 
 //const controls = ['prev', 'undo', 'reset', 'level', 'next']
 const controls = ['undo', 'reset', 'level']
 
-type Workspace = Partial<{ [K in keyof Theorems]: Focus<Theorems[K]['goal']> }>
-const workspace: Workspace = {}
-let selected: keyof Workspace | null = null
-let isDone = false
+const workspace = new Workspace(challenges)
 
 const proof = (s: Focus<AnySequent>) => {
   const pre = document.createElement('pre')
@@ -75,12 +56,15 @@ const listing = () => {
   panel.appendChild(close)
   const levels = document.createElement('div')
   levels.setAttribute('class', 'levels')
-  Object.entries(challenges).forEach(([id, challenge]) => {
+  workspace.listConjectures().forEach(([id, challenge]) => {
     const item = document.createElement('div')
-    item.setAttribute('class', 'level' + (id === selected ? ' active' : ''))
+    item.setAttribute(
+      'class',
+      'level' + (id === workspace.selected ? ' active' : ''),
+    )
     item.onclick = (click) => {
       click.preventDefault()
-      selectLevel(id as keyof Workspace)
+      selectLevel(id)
     }
     const title = document.createElement('div')
     title.setAttribute('class', 'title')
@@ -116,17 +100,26 @@ const congrats = () => {
   const previousButton = document.createElement('div')
   previousButton.setAttribute('class', 'button')
   previousButton.innerHTML = 'Prev Level'
-  previousButton.onclick = () => prevLevel()
+  previousButton.onclick = () => {
+    workspace.selectConjecture(workspace.previousConjectureId())
+    render()
+  }
   congratsButtons.appendChild(previousButton)
   const againbutton = document.createElement('div')
   againbutton.setAttribute('class', 'button')
   againbutton.innerHTML = 'Play Again'
-  againbutton.onclick = resetHandler()
+  againbutton.onclick = () => {
+    workspace.applyEvent(reset())
+    render()
+  }
   congratsButtons.appendChild(againbutton)
   const continueButton = document.createElement('div')
   continueButton.setAttribute('class', 'button')
   continueButton.innerHTML = 'Next Level'
-  continueButton.onclick = () => nextLevel()
+  continueButton.onclick = () => {
+    workspace.selectConjecture(workspace.nextConjectureId())
+    render()
+  }
   congratsButtons.appendChild(continueButton)
   panel.appendChild(congrats)
   panel.appendChild(congratsButtons)
@@ -134,7 +127,7 @@ const congrats = () => {
 }
 
 const current = <J extends AnySequent>(s: Focus<J>) => {
-  if (isDone) {
+  if (workspace.isSolved()) {
     return congrats()
   }
   const active = document.createElement('div')
@@ -152,69 +145,6 @@ const playArea = <J extends AnySequent>(s: Focus<J>) => {
   return panel
 }
 
-const ruleHandler = (ev: Reverse0<ReverseId0>) => () => {
-  if (!selected) {
-    return
-  }
-  const cursor = workspace[selected]
-  if (!cursor) {
-    return
-  }
-  const update = applyEvent(cursor, ev)
-  workspace[selected] = update
-  render()
-}
-const undoHandler = (_ev?: Undo) => () => {
-  if (!selected) {
-    return
-  }
-  const cursor = workspace[selected]
-  if (!cursor) {
-    return
-  }
-  const update = undo(cursor)
-  workspace[selected] = update
-  render()
-}
-
-const nextHandler = (_ev?: Next) => () => {
-  if (!selected) {
-    return
-  }
-  const cursor = workspace[selected]
-  if (!cursor) {
-    return
-  }
-  const update = next(cursor)
-  workspace[selected] = update
-  render()
-}
-
-const prevHandler = (_ev?: Prev) => () => {
-  if (!selected) {
-    return
-  }
-  const cursor = workspace[selected]
-  if (!cursor) {
-    return
-  }
-  const update = prev(cursor)
-  workspace[selected] = update
-  render()
-}
-
-const resetHandler = (_ev?: Reset) => () => {
-  if (!selected) {
-    return
-  }
-  const cursor = workspace[selected]
-  if (!cursor) {
-    return
-  }
-  const update = reset(cursor)
-  workspace[selected] = update
-  render()
-}
 const levelHandler = (_ev?: Reset) => () => {
   const menu = document.getElementById('levelmenu')
   menu?.removeAttribute('style')
@@ -227,10 +157,15 @@ const mainPanel = (ls: Array<RuleId>, rules: Array<RuleId>) => {
   entries(center).forEach(([key, rule]) => {
     if (rules.includes(key)) {
       const pre = document.createElement('pre')
-      const disabled = isDone || !ls.includes(key as RuleId)
+      const disabled = workspace.isSolved() || !ls.includes(key as RuleId)
       pre.setAttribute('class', 'rule button' + (disabled ? ' disabled' : ''))
       if (!disabled) {
-        pre.onclick = ruleHandler(reverse0(key as ReverseId0))
+        pre.onclick = () => {
+          if (isReverseId0(key)) {
+            workspace.applyEvent(reverse0(key))
+          }
+          render()
+        }
       }
       pre.innerHTML = fromDerivation(rule.example)
       panel.appendChild(pre)
@@ -241,13 +176,16 @@ const mainPanel = (ls: Array<RuleId>, rules: Array<RuleId>) => {
 const leftPanel = (ls: Array<RuleId>, rules: Array<RuleId>) => {
   const panel = document.createElement('div')
   panel.setAttribute('class', 'left')
-  Object.entries(left).forEach(([key, rule]) => {
-    if (rules.includes(key as RuleId)) {
+  entries(left).forEach(([key, rule]) => {
+    if (rules.includes(key)) {
       const pre = document.createElement('pre')
-      const disabled = isDone || !ls.includes(key as RuleId)
+      const disabled = workspace.isSolved() || !ls.includes(key)
       pre.setAttribute('class', 'rule button' + (disabled ? ' disabled' : ''))
       if (!disabled) {
-        pre.onclick = ruleHandler(reverse0(key as ReverseId0))
+        pre.onclick = () => {
+          workspace.applyEvent(reverse0(key))
+          render()
+        }
       }
       pre.innerHTML = fromDerivation(rule.example)
       panel.appendChild(pre)
@@ -258,12 +196,15 @@ const leftPanel = (ls: Array<RuleId>, rules: Array<RuleId>) => {
 const rightPanel = (ls: Array<RuleId>, rules: Array<RuleId>) => {
   const panel = document.createElement('div')
   panel.setAttribute('class', 'right')
-  Object.entries(right).forEach(([key, rule]) => {
-    if (rules.includes(key as RuleId)) {
+  entries(right).forEach(([key, rule]) => {
+    if (rules.includes(key)) {
       const pre = document.createElement('pre')
-      const disabled = isDone || !ls.includes(key as RuleId)
+      const disabled = workspace.isSolved() || !ls.includes(key)
       if (!disabled) {
-        pre.onclick = ruleHandler(reverse0(key as ReverseId0))
+        pre.onclick = () => {
+          workspace.applyEvent(reverse0(key))
+          render()
+        }
       }
       pre.setAttribute('class', 'rule button' + (disabled ? ' disabled' : ''))
       pre.innerHTML = fromDerivation(rule.example)
@@ -287,16 +228,28 @@ const control = <J extends AnySequent>(s: Focus<J>) => {
     if (!disabled) {
       switch (key) {
         case 'undo':
-          pre.onclick = undoHandler()
+          pre.onclick = () => {
+            workspace.applyEvent(undo())
+            render()
+          }
           break
         case 'reset':
-          pre.onclick = resetHandler()
+          pre.onclick = () => {
+            workspace.applyEvent(reset())
+            render()
+          }
           break
         case 'prev':
-          pre.onclick = prevHandler()
+          pre.onclick = () => {
+            workspace.applyEvent(prev())
+            render()
+          }
           break
         case 'next':
-          pre.onclick = nextHandler()
+          pre.onclick = () => {
+            workspace.applyEvent(next())
+            render()
+          }
           break
         case 'level':
           pre.onclick = levelHandler()
@@ -321,72 +274,29 @@ const bench = <J extends AnySequent>(s: Focus<J>, rules: Array<RuleId>) => {
 }
 
 const render = () => {
-  if (!selected) {
-    return
-  }
-  const current = workspace[selected]
-  if (!current) {
-    return
-  }
   const body = document.getElementById('body')
   if (!body) {
     return
   }
   body.innerHTML = ''
-  isDone = isProof(current.derivation)
   body.appendChild(listing())
-  body.appendChild(bench(current, challenges[selected].rules))
+  body.appendChild(
+    bench(workspace.currentConjecture(), workspace.availableRules()),
+  )
 }
 
-const selectLevel = (conjectureId: keyof Theorems) => {
-  if (!(conjectureId in workspace)) {
-    workspace[conjectureId] = focus(premise(challenges[conjectureId].goal))
+const selectLevel = (selected: string) => {
+  if (workspace.isConjectureId(selected)) {
+    workspace.selectConjecture(selected)
+    history.pushState({ selected }, '', `?level=${selected}`)
   }
-  selected = conjectureId
-  history.pushState({ selected }, '', `?level=${selected}`)
   render()
-}
-
-type TKey = keyof Theorems
-
-const theoremKeys: Array<TKey> = Object.keys(challenges) as Array<TKey>
-const first: TKey = theoremKeys.at(0) as TKey
-const last: TKey = theoremKeys.at(-1) as TKey
-
-const currentLevelIndex = (): number => {
-  if (!selected) {
-    return 0
-  }
-  const index = theoremKeys.findIndex((x) => x === selected)
-  if (index < 0) {
-    return 0
-  }
-  return index
-}
-
-const prevLevelId = (): keyof Theorems => {
-  const index = currentLevelIndex()
-  return theoremKeys[index - 1] ?? first
-}
-const prevLevel = () => {
-  selectLevel(prevLevelId())
-}
-const nextLevelId = (): keyof Theorems => {
-  const index = currentLevelIndex()
-  return theoremKeys[index + 1] ?? last
-}
-const nextLevel = () => {
-  selectLevel(nextLevelId())
 }
 
 const init = () => {
   const params = new URLSearchParams(window.location.search)
-  const level = params.get('level')
-  if (level && isTheoremKey(level)) {
-    selectLevel(level)
-  } else {
-    selectLevel(first)
-  }
+  const level = params.get('level') ?? ''
+  selectLevel(level)
 }
 
 document.addEventListener('DOMContentLoaded', init)

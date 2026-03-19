@@ -1,19 +1,18 @@
 import { parseEvent } from './event'
-import { focus, applyEvent, Focus } from './focus'
-import { premise, isProof } from '../model/derivation'
-import { AnySequent } from '../model/sequent'
+import { Focus } from './focus'
+import { isProof } from '../model/derivation'
 import { fromDerivation, fromFocus } from '../render/print'
 import { applicableRules } from './focus'
 import { isRuleId } from '../model/rule'
 import { split } from '../utils/string'
-import { Theorems, isTheoremKey } from '../challenges'
 import { rules } from '../rules'
+import { Workspace } from './workspace'
+import { Configuration } from '../model/theorem'
+import { AnySequent } from '../model/sequent'
 
-type Workspace = Partial<{ [K in keyof Theorems]: Focus<Theorems[K]['goal']> }>
-
-export function* repl(theorems: Theorems): Generator<string, string, string> {
-  const workspace: Workspace = {}
-  let selected: keyof Workspace | null = null
+export function* repl<K extends string, C extends Record<K, Configuration<AnySequent>>>(
+  workspace: Workspace<K, C>,
+): Generator<string, string, string> {
   let output = '\nWelcome!' + '\n' + '\nType "help" for help'
   while (true) {
     const input = yield output + '\n'
@@ -48,31 +47,18 @@ export function* repl(theorems: Theorems): Generator<string, string, string> {
         output =
           '\nConjectures:' +
           '\n' +
-          Object.keys(theorems)
-            .map((id) => (id === selected ? '*' : ' ') + ' ' + id)
+          workspace
+            .listConjectures()
+            .map(([id]) => (id === workspace.selected ? '*' : ' ') + ' ' + id)
             .join('\n')
         break
       case 'select': {
         const [conjectureId] = args
-        if (!conjectureId) {
+        if (!workspace.isConjectureId(conjectureId)) {
           break
         }
-        if (!isTheoremKey(conjectureId)) {
-          break
-        }
-        if (conjectureId in workspace) {
-          const pickled = workspace[conjectureId]
-          if (!pickled) {
-            break
-          }
-          selected = conjectureId
-          output = status(pickled)
-          break
-        }
-        const fresh = focus(premise(theorems[conjectureId].goal))
-        workspace[conjectureId] = fresh
-        selected = conjectureId
-        output = status(fresh)
+        workspace.selectConjecture(conjectureId)
+        output = status(workspace.currentConjecture())
         break
       }
       default: {
@@ -80,19 +66,8 @@ export function* repl(theorems: Theorems): Generator<string, string, string> {
         if (!ev) {
           break
         }
-        if (!selected) {
-          break
-        }
-        if (!isTheoremKey(selected)) {
-          break
-        }
-        const cursor = workspace[selected]
-        if (!cursor) {
-          break
-        }
-        const update = applyEvent(cursor, ev)
-        workspace[selected] = update
-        output = status(update)
+        workspace.applyEvent(ev)
+        output = status(workspace.currentConjecture())
       }
     }
   }

@@ -1,3 +1,5 @@
+import { AnySequent } from '../model/sequent'
+import { Configuration } from '../model/theorem'
 import { ch0identity1 } from './ch0-identity-1'
 import { ch0identity2 } from './ch0-identity-2'
 import { ch0identity3 } from './ch0-identity-3'
@@ -165,6 +167,6 @@ export const challenges = {
 
   // ch5compositionC,
   // ch5compositionE,
-}
-export type Theorems = typeof challenges
+} satisfies Theorems
+export type Theorems = Record<string, Configuration<AnySequent>>
 export const isTheoremKey = (k: string): k is keyof Theorems => k in challenges

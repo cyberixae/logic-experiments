@@ -4,6 +4,11 @@ export const isNonEmptyArray = <A>(a: Array<A>): a is NonEmptyArray<A> => {
   return a.length > 0
 }
 
+export const head = <T>(arr: NonEmptyArray<T>): T => arr[0]
+
+export const last = <T>(arr: NonEmptyArray<T>): T =>
+  arr.at(-1) as T
+
 export const init = <T>(arr: NonEmptyArray<T>): Array<T> =>
   arr.slice(0, -1) as Array<T>
 
