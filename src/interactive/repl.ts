@@ -41,6 +41,7 @@ export function* repl<K extends string, C extends Record<K, Configuration<AnySeq
           output += fromDerivation(rules[arg].example)
           break
         }
+        output = '\nUnknown rule "' + arg + '"'
         break
       }
       case 'list':
@@ -87,6 +88,6 @@ const status = (s: Focus<AnySequent>): string =>
   applicableRules(s).join(', ') +
   '\nProof: undo, reset' +
   '\nConjectures: prev, next, select, list' +
-  '\nSystem: quit, list, select' +
+  '\nSystem: quit, help' +
   '\n' +
   (isProof(s.derivation) ? '\nConglaturations!\n' : '')
