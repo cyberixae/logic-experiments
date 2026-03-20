@@ -18,6 +18,7 @@
   },
   "scripts": {
     "build:web": "esbuild --bundle src/web.ts > dist/lk.js",
+    "dev": "esbuild --bundle src/web.ts --outfile=dist/lk.js --watch=forever --servedir=dist",
     "build": "yarn tsc",
     "lk": "yarn build && node ./lib/lk.js",
     "la3": "yarn build && node ./lib/la3.js",
