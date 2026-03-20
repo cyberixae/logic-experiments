@@ -52,8 +52,8 @@ export type ApplyDR2<A extends Prop, S extends AnyDerivation> =
     ? DR2<Γ, A, B, Δ, DR2Result<Γ, A, B, Δ>>
     : never
 export const applyDR2 = <
-  A extends Prop,
   Γ extends Formulas,
+  A extends Prop,
   B extends Prop,
   Δ extends Formulas,
 >(
@@ -87,7 +87,7 @@ export const tryReverseDR2 = <J extends AnySequent>(
 }
 export const exampleDR2 = applyDR2(
   atom('A'),
-  premise(sequent([atom('Γ'), atom('B')], [atom('Δ')])),
+  premise(sequent([atom('Γ')], [atom('B'), atom('Δ')])),
 )
 
 export const ruleDR2 = {
