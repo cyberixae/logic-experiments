@@ -15,6 +15,7 @@ import { challenges, isTheoremKey } from './challenges'
 import { center, isReverseId0, left, right } from './rules'
 import { entries } from './utils/record'
 import { Workspace } from './interactive/workspace'
+import { repl } from './interactive/repl'
 
 const controls = ['undo', 'reset', 'level'] as const
 
@@ -285,6 +286,15 @@ const init = () => {
     history.replaceState({ selected: level }, '', `?level=${level}`)
   }
   render()
+}
+
+const gen = repl(workspace)
+gen.next('')
+;(window as unknown as Record<string, unknown>)['cmd'] = (input: string) => {
+  const result = gen.next(input)
+  console.log(result.value)
+  render()
+  return result.done
 }
 
 document.addEventListener('DOMContentLoaded', init)
