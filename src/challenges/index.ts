@@ -58,6 +58,7 @@ import { ch5composition5 } from './ch5-composition-5'
 import { ch5composition6 } from './ch5-composition-6'
 import { ch5composition7 } from './ch5-composition-7'
 import { ch5composition8 } from './ch5-composition-8'
+import { ch5composition9 } from './ch5-composition-9'
 
 import { ch6branching1 } from './ch6-branching-1'
 import { ch6branching2 } from './ch6-branching-2'
@@ -151,6 +152,7 @@ export const challenges = {
   ch5composition6,
   ch5composition7,
   ch5composition8,
+  ch5composition9,
 
   ch6branching1,
   ch6branching2,

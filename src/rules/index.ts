@@ -139,11 +139,11 @@ export const left = {
   sRotLF: ruleSRotLF,
   sxl: ruleSXL,
   nl: ruleNL,
-  il: ruleIL,
   cl: ruleCL,
   cl1: ruleCL1,
   cl2: ruleCL2,
   dl: ruleDL,
+  il: ruleIL,
 } satisfies Partial<{ [K in RuleId]: Rule<AnySequent, K> }>
 
 export const right = {
@@ -153,11 +153,11 @@ export const right = {
   sRotRF: ruleSRotRF,
   sxr: ruleSXR,
   nr: ruleNR,
-  ir: ruleIR,
   dr: ruleDR,
   dr1: ruleDR1,
   dr2: ruleDR2,
   cr: ruleCR,
+  ir: ruleIR,
 } satisfies Partial<{ [K in RuleId]: Rule<AnySequent, K> }>
 
 // Exhaustiveness check
