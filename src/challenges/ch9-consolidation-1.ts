@@ -15,12 +15,12 @@ export const ch9consolidation1: Configuration<AnySequent> = {
     'sRotRB',
     'nl',
     'nr',
-    'il',
-    'ir',
     'cl',
     'cr',
     'dl',
     'dr',
+    'il',
+    'ir',
   ],
   goal: conclusion(
     lk.o.p2.disjunction(

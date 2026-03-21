@@ -5,6 +5,8 @@ import { Configuration } from '../model/theorem'
 export const ch9consolidation2: Configuration<AnySequent> = {
   rules: [
     'i',
+    'f',
+    'v',
     'swl',
     'swr',
     'sRotLF',
@@ -13,12 +15,12 @@ export const ch9consolidation2: Configuration<AnySequent> = {
     'sRotRB',
     'nl',
     'nr',
-    'il',
-    'ir',
     'cl',
     'cr',
     'dl',
     'dr',
+    'il',
+    'ir',
   ],
   goal: conclusion(
     lk.o.p2.implication(

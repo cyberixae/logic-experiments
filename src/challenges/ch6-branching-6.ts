@@ -9,13 +9,15 @@ export const ch6branching6: Configuration<AnySequent> = {
     'swr',
     'sRotLF',
     'sRotRF',
+    'sRotLB',
+    'sRotRB',
     'nl',
     'nr',
-    'ir',
     'cl',
     'cr',
     'dl',
     'dr',
+    'ir',
   ],
   goal: conclusion(
     lk.o.p2.implication(

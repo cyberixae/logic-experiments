@@ -3,7 +3,17 @@ import { AnySequent, sequent } from '../model/sequent'
 import { Configuration } from '../model/theorem'
 
 export const ch6branching1: Configuration<AnySequent> = {
-  rules: ['i', 'swl', 'swr', 'sRotLF', 'sRotRF', 'dl', 'cr'],
+  rules: [
+    'i',
+    'swl',
+    'swr',
+    'sRotLF',
+    'sRotRF',
+    'sRotLB',
+    'sRotRB',
+    'dl',
+    'cr',
+  ],
   goal: sequent(
     [lk.o.p2.disjunction(lk.a('p'), lk.a('q'))],
     [lk.a('p'), lk.a('q')],

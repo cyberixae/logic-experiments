@@ -3,7 +3,17 @@ import { AnySequent, sequent } from '../model/sequent'
 import { Configuration } from '../model/theorem'
 
 export const ch5composition6: Configuration<AnySequent> = {
-  rules: ['i', 'swl', 'swr', 'sRotLF', 'sRotRF', 'cl', 'dr'],
+  rules: [
+    'i',
+    'swl',
+    'swr',
+    'sRotLF',
+    'sRotRF',
+    'sRotLB',
+    'sRotRB',
+    'cl',
+    'dr',
+  ],
   goal: sequent(
     [
       lk.o.p2.conjunction(

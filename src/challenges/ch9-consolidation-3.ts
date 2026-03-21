@@ -2,7 +2,7 @@ import { lk } from '../systems/lk'
 import { AnySequent, conclusion } from '../model/sequent'
 import { Configuration } from '../model/theorem'
 
-export const ch8constants5: Configuration<AnySequent> = {
+export const ch9consolidation3: Configuration<AnySequent> = {
   rules: [
     'i',
     'f',
@@ -24,11 +24,22 @@ export const ch8constants5: Configuration<AnySequent> = {
   ],
   goal: conclusion(
     lk.o.p2.implication(
+      lk.o.p2.conjunction(
+        lk.o.p2.implication(lk.a('p'), lk.a('q')),
+
+        lk.o.p2.disjunction(lk.o.p1.negation(lk.a('q')), lk.a('r')),
+      ),
+      lk.o.p2.disjunction(lk.o.p1.negation(lk.a('p')), lk.a('r')),
+    ),
+  ),
+  /*
+  solution: lk.z.ir(
+    lk.z.swl(
       lk.o.p2.implication(
         lk.a('p'),
         lk.o.p2.implication(lk.a('q'), lk.o.p1.negation(lk.a('p'))),
       ),
-      lk.o.p2.implication(lk.a('p'), lk.o.p0.verum),
+      lk.z.ir(lk.i.i(lk.a('p'))),
     ),
-  ),
+  ),*/
 }

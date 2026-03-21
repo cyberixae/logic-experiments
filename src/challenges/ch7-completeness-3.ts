@@ -3,7 +3,17 @@ import { AnySequent, conclusion } from '../model/sequent'
 import { Configuration } from '../model/theorem'
 
 export const ch7completeness3: Configuration<AnySequent> = {
-  rules: ['i', 'swl', 'swr', 'sRotLF', 'sRotRF', 'il', 'ir'],
+  rules: [
+    'i',
+    'swl',
+    'swr',
+    'sRotLF',
+    'sRotRF',
+    'sRotLB',
+    'sRotRB',
+    'il',
+    'ir',
+  ],
   goal: conclusion(
     lk.o.p2.implication(
       lk.o.p2.implication(lk.a('p'), lk.a('q')),

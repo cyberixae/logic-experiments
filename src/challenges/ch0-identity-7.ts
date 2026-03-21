@@ -5,7 +5,7 @@ import { Configuration } from '../model/theorem'
 export const ch0identity7: Configuration<AnySequent> = {
   rules: ['i'],
   goal: sequent(
-    [lk.o.p2.conjunction(lk.a('p'), lk.o.p1.negation(lk.a('q')))],
-    [lk.o.p2.conjunction(lk.a('p'), lk.o.p1.negation(lk.a('q')))],
+    [lk.o.p2.conjunction(lk.a('q'), lk.o.p1.negation(lk.a('p')))],
+    [lk.o.p2.conjunction(lk.a('q'), lk.o.p1.negation(lk.a('p')))],
   ),
 }

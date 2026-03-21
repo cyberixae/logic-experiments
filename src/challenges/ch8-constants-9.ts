@@ -15,12 +15,12 @@ export const ch8constants9: Configuration<AnySequent> = {
     'sRotRB',
     'nl',
     'nr',
-    'il',
-    'ir',
     'cl',
     'cr',
     'dl',
     'dr',
+    'il',
+    'ir',
   ],
   goal: sequent(
     [
