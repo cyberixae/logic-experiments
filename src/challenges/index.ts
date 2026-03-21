@@ -79,8 +79,18 @@ import { ch7completeness7 } from './ch7-completeness-7'
 import { ch7completeness8 } from './ch7-completeness-8'
 import { ch7completeness9 } from './ch7-completeness-9'
 
-import { ch8consolidation1 } from './ch8-consolidation-1'
-import { ch8consolidation2 } from './ch8-consolidation-2'
+import { ch8constants1 } from './ch8-constants-1'
+import { ch8constants2 } from './ch8-constants-2'
+import { ch8constants3 } from './ch8-constants-3'
+import { ch8constants4 } from './ch8-constants-4'
+import { ch8constants5 } from './ch8-constants-5'
+import { ch8constants6 } from './ch8-constants-6'
+import { ch8constants7 } from './ch8-constants-7'
+import { ch8constants8 } from './ch8-constants-8'
+import { ch8constants9 } from './ch8-constants-9'
+
+import { ch9consolidation1 } from './ch9-consolidation-1'
+import { ch9consolidation2 } from './ch9-consolidation-2'
 
 export const challenges = {
   ch0identity1,
@@ -162,8 +172,18 @@ export const challenges = {
   ch7completeness8,
   ch7completeness9,
 
-  ch8consolidation1,
-  ch8consolidation2,
+  ch8constants1,
+  ch8constants2,
+  ch8constants3,
+  ch8constants4,
+  ch8constants5,
+  ch8constants6,
+  ch8constants7,
+  ch8constants8,
+  ch8constants9,
+
+  ch9consolidation1,
+  ch9consolidation2,
 
   // ch5compositionC,
   // ch5compositionE,

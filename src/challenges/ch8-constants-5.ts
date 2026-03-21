@@ -1,0 +1,34 @@
+import { lk } from '../systems/lk'
+import { AnySequent, conclusion } from '../model/sequent'
+import { Configuration } from '../model/theorem'
+
+export const ch8constants5: Configuration<AnySequent> = {
+  rules: [
+    'i',
+    'f',
+    'v',
+    'swl',
+    'swr',
+    'sRotLF',
+    'sRotRF',
+    'sRotLB',
+    'sRotRB',
+    'nl',
+    'nr',
+    'il',
+    'ir',
+    'cl',
+    'cr',
+    'dl',
+    'dr',
+  ],
+  goal: conclusion(
+    lk.o.p2.implication(
+      lk.o.p2.implication(
+        lk.a('p'),
+        lk.o.p2.implication(lk.a('q'), lk.o.p1.negation(lk.a('p'))),
+      ),
+      lk.o.p2.implication(lk.a('p'), lk.o.p0.verum),
+    ),
+  ),
+}

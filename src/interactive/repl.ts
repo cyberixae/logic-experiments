@@ -10,9 +10,10 @@ import { Workspace } from './workspace'
 import { Configuration } from '../model/theorem'
 import { AnySequent } from '../model/sequent'
 
-export function* repl<K extends string, C extends Record<K, Configuration<AnySequent>>>(
-  workspace: Workspace<K, C>,
-): Generator<string, string, string> {
+export function* repl<
+  K extends string,
+  C extends Record<K, Configuration<AnySequent>>,
+>(workspace: Workspace<K, C>): Generator<string, string, string> {
   let output = '\nWelcome!' + '\n' + '\nType "help" for help'
   while (true) {
     const input = yield output + '\n'

@@ -3,8 +3,10 @@ import {
   atom,
   conjunction,
   disjunction,
+  falsum,
   implication,
   negation,
+  verum,
 } from '../model/prop'
 import { ruleI } from '../rules/i'
 import { ruleCut } from '../rules/cut'
@@ -37,7 +39,7 @@ export const alpha = <
   s: S,
 ): Atom<S> => atom(s)
 const omega = {
-  p0: {},
+  p0: { falsum, verum },
   p1: { negation },
   p2: { implication, conjunction, disjunction },
 }

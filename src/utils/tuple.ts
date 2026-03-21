@@ -16,4 +16,5 @@ export const init = <I extends Array<unknown>>(a: [...I, unknown]): I => {
 export const last = <L>(a: [...NonEmptyArray<unknown>, L]): L => {
   return a[a.length - 1] as L
 }
+export const isTupleOf0 = <A>(arr: Array<A>): arr is [] => arr.length === 0
 export const isTupleOf1 = <A>(arr: Array<A>): arr is [A] => arr.length === 1

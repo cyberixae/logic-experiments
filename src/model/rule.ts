@@ -16,53 +16,57 @@ export type RuleId =
   | 'dr'
   | 'dr1'
   | 'dr2'
+  | 'f'
   | 'i'
   | 'il'
   | 'ir'
   | 'mp'
   | 'nl'
   | 'nr'
-  | 'scl'
-  | 'scr'
   | 'sRotLB'
   | 'sRotLF'
   | 'sRotRB'
   | 'sRotRF'
+  | 'scl'
+  | 'scr'
   | 'swl'
   | 'swr'
   | 'sxl'
   | 'sxr'
+  | 'v'
 export const ruleId: {
   [K in RuleId]: K
 } = {
   a1: 'a1',
   a2: 'a2',
   a3: 'a3',
-  cl: 'cl',
   cl1: 'cl1',
   cl2: 'cl2',
+  cl: 'cl',
   cr: 'cr',
   cut: 'cut',
   dl: 'dl',
-  dr: 'dr',
   dr1: 'dr1',
   dr2: 'dr2',
+  dr: 'dr',
+  f: 'f',
   i: 'i',
   il: 'il',
   ir: 'ir',
   mp: 'mp',
   nl: 'nl',
   nr: 'nr',
-  scl: 'scl',
-  scr: 'scr',
   sRotLB: 'sRotLB',
   sRotLF: 'sRotLF',
   sRotRB: 'sRotRB',
   sRotRF: 'sRotRF',
+  scl: 'scl',
+  scr: 'scr',
   swl: 'swl',
   swr: 'swr',
   sxl: 'sxl',
   sxr: 'sxr',
+  v: 'v',
 }
 
 export const isRuleId = (u: unknown): u is RuleId =>

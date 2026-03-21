@@ -8,7 +8,10 @@ import { Focus } from './focus'
 import { Configuration } from '../model/theorem'
 import { AnySequent } from '../model/sequent'
 
-export class Workspace<K extends string, C extends Record<K, Configuration<AnySequent>>> {
+export class Workspace<
+  K extends string,
+  C extends Record<K, Configuration<AnySequent>>,
+> {
   private theorems: C
   private conjectures: Partial<{ [P in K]: Focus<C[P]['goal']> }> = {}
   private theoremKeys: NonEmptyArray<K>

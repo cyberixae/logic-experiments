@@ -21,12 +21,12 @@ export const atom = <V extends string>(value: V): Atom<V> => ({
 export const isAtom = (p: Prop): p is Atom<string> => p.kind === 'atom'
 
 export type Falsum = PropG<'falsum'>
-export const falsum = {
+export const falsum: Falsum = {
   kind: 'falsum',
 }
 
 export type Verum = PropG<'verum'>
-export const verum = {
+export const verum: Verum = {
   kind: 'verum',
 }
 

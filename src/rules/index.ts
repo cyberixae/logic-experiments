@@ -14,6 +14,7 @@ import { ruleDL } from './dl'
 import { ruleDR } from './dr'
 import { ruleDR1 } from './dr1'
 import { ruleDR2 } from './dr2'
+import { ruleF } from './f'
 import { ruleI } from './i'
 import { ruleIL } from './il'
 import { ruleIR } from './ir'
@@ -30,38 +31,41 @@ import { ruleSWL } from './swl'
 import { ruleSWR } from './swr'
 import { ruleSXL } from './sxl'
 import { ruleSXR } from './sxr'
+import { ruleV } from './v'
 
 export const rules: {
   [K in RuleId]: Rule<AnySequent, K>
 } = {
-  i: ruleI,
-  cut: ruleCut,
-  cl: ruleCL,
-  dr: ruleDR,
-  cl1: ruleCL1,
-  dr1: ruleDR1,
-  cl2: ruleCL2,
-  dr2: ruleDR2,
-  dl: ruleDL,
-  cr: ruleCR,
-  il: ruleIL,
-  ir: ruleIR,
-  nl: ruleNL,
-  nr: ruleNR,
-  swl: ruleSWL,
-  swr: ruleSWR,
-  scl: ruleSCL,
-  scr: ruleSCR,
-  sRotLF: ruleSRotLF,
-  sRotLB: ruleSRotLB,
-  sRotRF: ruleSRotRF,
-  sRotRB: ruleSRotRB,
-  sxl: ruleSXL,
-  sxr: ruleSXR,
   a1: ruleA1,
   a2: ruleA2,
   a3: ruleA3,
+  cl1: ruleCL1,
+  cl2: ruleCL2,
+  cl: ruleCL,
+  cr: ruleCR,
+  cut: ruleCut,
+  dl: ruleDL,
+  dr1: ruleDR1,
+  dr2: ruleDR2,
+  dr: ruleDR,
+  f: ruleF,
+  i: ruleI,
+  il: ruleIL,
+  ir: ruleIR,
   mp: ruleMP,
+  nl: ruleNL,
+  nr: ruleNR,
+  sRotLB: ruleSRotLB,
+  sRotLF: ruleSRotLF,
+  sRotRB: ruleSRotRB,
+  sRotRF: ruleSRotRF,
+  scl: ruleSCL,
+  scr: ruleSCR,
+  swl: ruleSWL,
+  swr: ruleSWR,
+  sxl: ruleSXL,
+  sxr: ruleSXR,
+  v: ruleV,
 }
 
 export const applicableRules = (j: AnySequent): Array<RuleId> =>
@@ -71,6 +75,7 @@ export const reverse0 = {
   a1: ruleA1,
   a2: ruleA2,
   a3: ruleA3,
+  f: ruleF,
   i: ruleI,
   cl: ruleCL,
   dr: ruleDR,
@@ -94,6 +99,7 @@ export const reverse0 = {
   sRotRB: ruleSRotRB,
   sxl: ruleSXL,
   sxr: ruleSXR,
+  v: ruleV,
 } satisfies Partial<{
   [K in RuleId]: Rule<AnySequent, K> & { tryReverse: TryReverse0 }
 }>
@@ -119,9 +125,11 @@ export const center = {
   a1: ruleA1,
   a2: ruleA2,
   a3: ruleA3,
+  f: ruleF,
   cut: ruleCut,
   i: ruleI,
   mp: ruleMP,
+  v: ruleV,
 } satisfies Partial<{ [K in RuleId]: Rule<AnySequent, K> }>
 
 export const left = {
