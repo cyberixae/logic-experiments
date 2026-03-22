@@ -285,6 +285,118 @@ const selectLevel = (selected: string) => {
   render()
 }
 
+const ps5KeyMap: Record<number, Action> = {
+  12: 'leftWeakening',
+  14: 'leftRotateLeft',
+  15: 'leftRotateRight',
+  13: 'leftConnective',
+  3: 'rightWeakening',
+  2: 'rightRotateLeft',
+  1: 'rightRotateRight',
+  0: 'rightConnective',
+  5: 'axiom',
+  4: 'undo',
+}
+const oldPresses: Array<boolean> = []
+function gameLoop() {
+  const pads = navigator.getGamepads()
+  if (pads.length < 1) {
+    return
+  }
+  const gp = pads[0]
+  if (!gp) {
+    return
+  }
+  for (const [button, action] of Object.entries(ps5KeyMap)) {
+    const index = Number(button)
+    const oldPress = oldPresses[index] ?? false
+    const newPress = gp.buttons[index]?.pressed ?? false
+    if (newPress !== oldPress) {
+      if (newPress) {
+        dispatch(action)
+      }
+      oldPresses[index] = newPress
+    }
+  }
+  requestAnimationFrame(gameLoop)
+}
+
+const autoRule = (rules: Array<RuleId>) => {
+  const available = workspace.applicableRules()
+  const [first] = rules.filter((rule) => available.includes(rule))
+  if (!first) {
+    return
+  }
+  if (isReverseId0(first)) {
+    workspace.applyEvent(reverse0(first))
+  }
+}
+
+const dispatch = (action: Action) => {
+  if (workspace.isSolved()) {
+    switch (action) {
+      case 'leftWeakening':
+      case 'rightWeakening':
+        workspace.applyEvent(reset())
+        break
+      case 'axiom':
+      case 'rightConnective':
+        workspace.selectConjecture(workspace.nextConjectureId())
+        break
+      case 'undo':
+        workspace.selectConjecture(workspace.previousConjectureId())
+        break
+    }
+  } else {
+    switch (action) {
+      case 'leftWeakening':
+        workspace.applyEvent(reverse0('swl'))
+        break
+      case 'leftRotateLeft':
+        workspace.applyEvent(reverse0('sRotLF'))
+        break
+      case 'leftRotateRight':
+        workspace.applyEvent(reverse0('sRotLB'))
+        break
+      case 'leftConnective':
+        autoRule(keys(leftLogical))
+        break
+      case 'rightWeakening':
+        workspace.applyEvent(reverse0('swr'))
+        break
+      case 'rightRotateLeft':
+        workspace.applyEvent(reverse0('sRotRB'))
+        break
+      case 'rightRotateRight':
+        workspace.applyEvent(reverse0('sRotRF'))
+        break
+      case 'rightConnective':
+        autoRule(keys(rightLogical))
+        break
+      case 'axiom':
+        autoRule(keys(center))
+        break
+      case 'undo':
+        workspace.applyEvent(undo())
+        break
+    }
+  }
+  render()
+}
+
+const qwertyKeyMap: Record<KeyboardEvent['key'], Action> = {
+  e: 'leftWeakening',
+  s: 'leftRotateLeft',
+  f: 'leftRotateRight',
+  d: 'leftConnective',
+  i: 'rightWeakening',
+  j: 'rightRotateLeft',
+  l: 'rightRotateRight',
+  k: 'rightConnective',
+  Enter: 'axiom',
+  Backspace: 'undo',
+}
+
 const init = () => {
   const params = new URLSearchParams(window.location.search)
   const level = params.get('level') ?? ''
@@ -294,86 +406,16 @@ const init = () => {
   }
   render()
 
-  const autoRule = (rules: Array<RuleId>) => {
-    const available = workspace.applicableRules()
-    const [first] = rules.filter((rule) => available.includes(rule))
-    if (!first) {
-      return
-    }
-    if (isReverseId0(first)) {
-      workspace.applyEvent(reverse0(first))
-    }
-  }
-
-  const dispatch = (action: Action) => {
-    if (workspace.isSolved()) {
-      switch (action) {
-        case 'leftWeakening':
-        case 'rightWeakening':
-          workspace.applyEvent(reset())
-          break
-        case 'axiom':
-          workspace.selectConjecture(workspace.nextConjectureId())
-          break
-        case 'undo':
-          workspace.selectConjecture(workspace.previousConjectureId())
-          break
-      }
-    } else {
-      switch (action) {
-        case 'leftWeakening':
-          workspace.applyEvent(reverse0('swl'))
-          break
-        case 'leftRotateLeft':
-          workspace.applyEvent(reverse0('sRotLF'))
-          break
-        case 'leftRotateRight':
-          workspace.applyEvent(reverse0('sRotLB'))
-          break
-        case 'leftConnective':
-          autoRule(keys(leftLogical))
-          break
-        case 'rightWeakening':
-          workspace.applyEvent(reverse0('swr'))
-          break
-        case 'rightRotateLeft':
-          workspace.applyEvent(reverse0('sRotRB'))
-          break
-        case 'rightRotateRight':
-          workspace.applyEvent(reverse0('sRotRF'))
-          break
-        case 'rightConnective':
-          autoRule(keys(rightLogical))
-          break
-        case 'axiom':
-          autoRule(keys(center))
-          break
-        case 'undo':
-          workspace.applyEvent(undo())
-          break
-      }
-    }
-    render()
-  }
-
   document.addEventListener('keydown', (ev) => {
-    const keyMap: Record<KeyboardEvent['key'], Action> = {
-      e: 'leftWeakening',
-      s: 'leftRotateLeft',
-      f: 'leftRotateRight',
-      d: 'leftConnective',
-      i: 'rightWeakening',
-      j: 'rightRotateLeft',
-      l: 'rightRotateRight',
-      k: 'rightConnective',
-      Enter: 'axiom',
-      Backspace: 'undo',
-    }
-    const action = keyMap[ev.key]
+    const action = qwertyKeyMap[ev.key]
     if (!action) {
       return
     }
     dispatch(action)
+  })
+
+  window.addEventListener('gamepadconnected', (_ev) => {
+    gameLoop()
   })
 }
 
