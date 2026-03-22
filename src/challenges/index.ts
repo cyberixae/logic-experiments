@@ -94,6 +94,9 @@ import { ch9consolidation1 } from './ch9-consolidation-1'
 import { ch9consolidation2 } from './ch9-consolidation-2'
 import { ch9consolidation3 } from './ch9-consolidation-3'
 import { ch9consolidation4 } from './ch9-consolidation-4'
+import { ch9consolidation5 } from './ch9-consolidation-5'
+import { ch9consolidation6 } from './ch9-consolidation-6'
+import { ch9consolidation7 } from './ch9-consolidation-7'
 
 export const challenges = {
   ch0identity1,
@@ -190,6 +193,9 @@ export const challenges = {
   ch9consolidation2,
   ch9consolidation3,
   ch9consolidation4,
+  ch9consolidation5,
+  ch9consolidation6,
+  ch9consolidation7,
 
   // ch5compositionC,
   // ch5compositionE,

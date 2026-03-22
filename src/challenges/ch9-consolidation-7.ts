@@ -1,0 +1,39 @@
+import { lk } from '../systems/lk'
+import { AnySequent, conclusion } from '../model/sequent'
+import { Configuration } from '../model/theorem'
+
+export const ch9consolidation7: Configuration<AnySequent> = {
+  rules: [
+    'i',
+    'f',
+    'v',
+    'swl',
+    'swr',
+    'sRotLF',
+    'sRotRF',
+    'sRotLB',
+    'sRotRB',
+    'nl',
+    'nr',
+    'cl',
+    'cr',
+    'dl',
+    'dr',
+    'il',
+    'ir',
+  ],
+  goal: conclusion(
+    lk.o.p1.negation(
+      lk.o.p2.implication(
+        lk.o.p2.implication(
+          lk.o.p2.implication(lk.a('p'), lk.a('r')),
+          lk.o.p2.implication(lk.a('q'), lk.a('r')),
+        ),
+        lk.o.p2.implication(
+          lk.o.p2.disjunction(lk.a('p'), lk.a('q')),
+          lk.a('r'),
+        ),
+      ),
+    ),
+  ),
+}
