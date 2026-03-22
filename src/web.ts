@@ -9,13 +9,20 @@ import {
   fromRule,
   fromSequent,
 } from './render/print'
-import { applicableRules } from './interactive/focus'
 import { RuleId } from './model/rule'
 import { challenges, isTheoremKey } from './challenges'
-import { center, isReverseId0, left, right } from './rules'
-import { entries } from './utils/record'
+import {
+  center,
+  isReverseId0,
+  left,
+  leftLogical,
+  right,
+  rightLogical,
+} from './rules'
+import { entries, keys } from './utils/record'
 import { Workspace } from './interactive/workspace'
 import { repl } from './interactive/repl'
+import { Action } from './interactive/action'
 
 const controls = ['undo', 'reset', 'level'] as const
 
@@ -247,7 +254,7 @@ const control = <J extends AnySequent>(s: Focus<J>) => {
   return panel
 }
 const bench = <J extends AnySequent>(s: Focus<J>, rules: Array<RuleId>) => {
-  const ls = applicableRules(s)
+  const ls = workspace.applicableRules()
   const panel = document.createElement('div')
   panel.setAttribute('class', 'bench')
   panel.appendChild(leftPanel(ls, rules))
@@ -286,6 +293,88 @@ const init = () => {
     history.replaceState({ selected: level }, '', `?level=${level}`)
   }
   render()
+
+  const autoRule = (rules: Array<RuleId>) => {
+    const available = workspace.applicableRules()
+    const [first] = rules.filter((rule) => available.includes(rule))
+    if (!first) {
+      return
+    }
+    if (isReverseId0(first)) {
+      workspace.applyEvent(reverse0(first))
+    }
+  }
+
+  const dispatch = (action: Action) => {
+    if (workspace.isSolved()) {
+      switch (action) {
+        case 'leftWeakening':
+        case 'rightWeakening':
+          workspace.applyEvent(reset())
+          break
+        case 'axiom':
+          workspace.selectConjecture(workspace.nextConjectureId())
+          break
+        case 'undo':
+          workspace.selectConjecture(workspace.previousConjectureId())
+          break
+      }
+    } else {
+      switch (action) {
+        case 'leftWeakening':
+          workspace.applyEvent(reverse0('swl'))
+          break
+        case 'leftRotateLeft':
+          workspace.applyEvent(reverse0('sRotLF'))
+          break
+        case 'leftRotateRight':
+          workspace.applyEvent(reverse0('sRotLB'))
+          break
+        case 'leftConnective':
+          autoRule(keys(leftLogical))
+          break
+        case 'rightWeakening':
+          workspace.applyEvent(reverse0('swr'))
+          break
+        case 'rightRotateLeft':
+          workspace.applyEvent(reverse0('sRotRB'))
+          break
+        case 'rightRotateRight':
+          workspace.applyEvent(reverse0('sRotRF'))
+          break
+        case 'rightConnective':
+          autoRule(keys(rightLogical))
+          break
+        case 'axiom':
+          autoRule(keys(center))
+          break
+        case 'undo':
+          workspace.applyEvent(undo())
+          break
+      }
+    }
+    render()
+  }
+
+  document.addEventListener('keydown', (ev) => {
+    const keyMap: Record<KeyboardEvent['key'], Action> = {
+      e: 'leftWeakening',
+      s: 'leftRotateLeft',
+      f: 'leftRotateRight',
+      d: 'leftConnective',
+      i: 'rightWeakening',
+      j: 'rightRotateLeft',
+      l: 'rightRotateRight',
+      k: 'rightConnective',
+      Enter: 'axiom',
+      Backspace: 'undo',
+    }
+    const action = keyMap[ev.key]
+    if (!action) {
+      return
+    }
+    dispatch(action)
+  })
 }
 
 const gen = repl(workspace)

@@ -132,12 +132,15 @@ export const center = {
   v: ruleV,
 } satisfies Partial<{ [K in RuleId]: Rule<AnySequent, K> }>
 
-export const left = {
+export const leftStructural = {
   scl: ruleSCL,
   swl: ruleSWL,
   sRotLB: ruleSRotLB,
   sRotLF: ruleSRotLF,
   sxl: ruleSXL,
+} satisfies Partial<{ [K in RuleId]: Rule<AnySequent, K> }>
+
+export const leftLogical = {
   nl: ruleNL,
   cl: ruleCL,
   cl1: ruleCL1,
@@ -146,18 +149,31 @@ export const left = {
   il: ruleIL,
 } satisfies Partial<{ [K in RuleId]: Rule<AnySequent, K> }>
 
-export const right = {
+export const left = {
+  ...leftStructural,
+  ...leftLogical,
+} satisfies Partial<{ [K in RuleId]: Rule<AnySequent, K> }>
+
+export const rightStructural = {
   scr: ruleSCR,
   swr: ruleSWR,
   sRotRB: ruleSRotRB,
   sRotRF: ruleSRotRF,
   sxr: ruleSXR,
+} satisfies Partial<{ [K in RuleId]: Rule<AnySequent, K> }>
+
+export const rightLogical = {
   nr: ruleNR,
   dr: ruleDR,
   dr1: ruleDR1,
   dr2: ruleDR2,
   cr: ruleCR,
   ir: ruleIR,
+} satisfies Partial<{ [K in RuleId]: Rule<AnySequent, K> }>
+
+export const right = {
+  ...rightStructural,
+  ...rightLogical,
 } satisfies Partial<{ [K in RuleId]: Rule<AnySequent, K> }>
 
 // Exhaustiveness check

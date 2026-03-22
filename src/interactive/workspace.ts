@@ -1,10 +1,10 @@
 import { RuleId } from '../model/rule'
-import { applyEvent as applyFocusEvent, focus } from '../interactive/focus'
+import { applyEvent, focus } from '../interactive/focus'
 import { Event } from '../interactive/event'
 import { isProof, premise } from '../model/derivation'
 import { head, isNonEmptyArray, last, NonEmptyArray } from '../utils/array'
 import { entries, get, keys } from '../utils/record'
-import { Focus } from './focus'
+import { Focus, applicableRules } from './focus'
 import { Configuration } from '../model/theorem'
 import { AnySequent } from '../model/sequent'
 
@@ -48,6 +48,11 @@ export class Workspace<
   availableRules(): Array<RuleId> {
     return get(this.theorems, this.selected).rules
   }
+  applicableRules(): Array<RuleId> {
+    const available = this.availableRules()
+    const appplicable = applicableRules(this.currentConjecture())
+    return available.filter((rule) => appplicable.includes(rule))
+  }
   selectConjecture(id: K) {
     if (!(id in this.conjectures)) {
       const conf = get(this.theorems, id)
@@ -63,7 +68,7 @@ export class Workspace<
   }
   applyEvent(ev: Event) {
     const cursor = this.currentConjecture()
-    const update = applyFocusEvent(cursor, ev)
+    const update = applyEvent(cursor, ev)
     this.conjectures[this.selected] = update
   }
 }

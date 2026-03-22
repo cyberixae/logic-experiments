@@ -1,0 +1,11 @@
+export type Action =
+  | 'leftWeakening'
+  | 'leftRotateLeft'
+  | 'leftRotateRight'
+  | 'leftConnective'
+  | 'rightWeakening'
+  | 'rightRotateLeft'
+  | 'rightRotateRight'
+  | 'rightConnective'
+  | 'undo'
+  | 'axiom'
