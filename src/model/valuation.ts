@@ -1,23 +1,24 @@
-import { NonEmptyArray, isNonEmptyArray } from '../utils/array'
+import { isNonEmptyArray } from '../utils/array'
 import { Lazy } from '../utils/lazy'
 import { Seq, map } from '../utils/seq'
 import { fold, Prop } from './prop'
 
 export type Valuation = Record<string, boolean>
 
-export const valuations = (atoms: NonEmptyArray<string>): Seq<Valuation> =>
+export const empty: Valuation = {}
+
+export const valuations = (atoms: Array<string>): Seq<Valuation> =>
   function* () {
+    if (!isNonEmptyArray(atoms)) {
+      yield empty
+      return
+    }
     const [x, ...xs] = atoms
     const t = { [x]: true }
     const f = { [x]: false }
-    if (isNonEmptyArray(xs)) {
-      const vs = valuations(xs)
-      yield* map(vs, (v) => ({ ...v, ...t }))()
-      yield* map(vs, (v) => ({ ...v, ...f }))()
-    } else {
-      yield t
-      yield f
-    }
+    const vs = valuations(xs)
+    yield* map(vs, (v) => ({ ...v, ...t }))()
+    yield* map(vs, (v) => ({ ...v, ...f }))()
   }
 
 export const satisfies = (v: Valuation, p: Prop) =>
@@ -84,3 +85,6 @@ export const satisfies = (v: Valuation, p: Prop) =>
       return false
     },
   })
+
+export const isModel = (v: Valuation, p: Prop) => satisfies(v, p)() ?? false
+export const isCountermodel = (v: Valuation, p: Prop) => !isModel(v, p)

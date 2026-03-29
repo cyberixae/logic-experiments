@@ -4,6 +4,7 @@ import { valuations } from '../valuation'
 describe('valuation module', () => {
   describe('valuations function', () => {
     it('works with empty array', () => {
+      expect(fromSeq(valuations([]))).toStrictEqual([{}])
       expect(fromSeq(valuations(['p']))).toStrictEqual([
         { p: true },
         { p: false },

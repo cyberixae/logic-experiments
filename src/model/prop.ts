@@ -1,4 +1,6 @@
-import { uniq } from '../utils/array'
+import * as array from '../utils/array'
+import * as seq from '../utils/seq'
+import { isCountermodel, isModel, Valuation, valuations } from './valuation'
 
 export type PropType =
   | 'atom'
@@ -180,12 +182,36 @@ export const atoms = (p: Prop): Array<string> =>
     verum: () => [],
     negation: (negand) => negand,
     implication: (antecedent, consequent) =>
-      uniq([...antecedent, ...consequent]),
+      array.uniq([...antecedent, ...consequent]),
     conjunction: (leftConjunct, rightConjunct) =>
-      uniq([...leftConjunct, ...rightConjunct]),
+      array.uniq([...leftConjunct, ...rightConjunct]),
     disjunction: (leftDisjunct, rightDisjunct) =>
-      uniq([...leftDisjunct, ...rightDisjunct]),
+      array.uniq([...leftDisjunct, ...rightDisjunct]),
   })
+
+export const models = (p: Prop): seq.Seq<Valuation> => {
+  return seq.filter(valuations(atoms(p)), (v) => isModel(v, p))
+}
+
+export const countermodels = (p: Prop): seq.Seq<Valuation> => {
+  return seq.filter(valuations(atoms(p)), (v) => isCountermodel(v, p))
+}
+
+export const isContradiction = (p: Prop): boolean => {
+  return seq.isEmpty(models(p))
+}
+
+export const isSatisfiable = (p: Prop): boolean => {
+  return !isContradiction(p)
+}
+
+export const isTautology = (p: Prop): boolean => {
+  return seq.isEmpty(countermodels(p))
+}
+
+export const isFalsifiable = (p: Prop): boolean => {
+  return !isTautology(p)
+}
 
 const split = (x: number) => {
   const rand = Math.random()
@@ -225,4 +251,12 @@ export const random = (size: number = 10): Prop => {
     return implication(random(left), random(right))
   }
   return negation(random(next))
+}
+
+export const randomTautology = (): Prop => {
+  let p = random()
+  while (!isTautology(p)) {
+    p = random()
+  }
+  return p
 }
