@@ -1,3 +1,5 @@
+import { uniq } from '../utils/array'
+
 export type PropType =
   | 'atom'
   | 'falsum'
@@ -145,4 +147,42 @@ export const equals = (a: Prop, b: Prop): boolean =>
       b.kind === 'disjunction' &&
       equals(b.leftDisjunct, leftDisjunct) &&
       equals(b.rightDisjunct, rightDisjunct),
+  })
+
+export type Fold<R> = {
+  atom: (value: string) => R
+  falsum: () => R
+  verum: () => R
+  negation: (negand: R) => R
+  implication: (antecedent: R, consequent: R) => R
+  conjunction: (leftConjunct: R, rightConjunct: R) => R
+  disjunction: (leftDisjunct: R, rightDisjunct: R) => R
+}
+
+export const fold = <R>(p: Prop, f: Fold<R>): R =>
+  match(p, {
+    atom: (value) => f.atom(value),
+    falsum: () => f.falsum(),
+    verum: () => f.verum(),
+    negation: (negand) => f.negation(fold(negand, f)),
+    implication: (antecedent, consequent) =>
+      f.implication(fold(antecedent, f), fold(consequent, f)),
+    conjunction: (leftConjunct, rightConjunct) =>
+      f.conjunction(fold(leftConjunct, f), fold(rightConjunct, f)),
+    disjunction: (leftDisjunct, rightDisjunct) =>
+      f.disjunction(fold(leftDisjunct, f), fold(rightDisjunct, f)),
+  })
+
+export const atoms = (p: Prop): Array<string> =>
+  fold(p, {
+    atom: (value) => [value],
+    falsum: () => [],
+    verum: () => [],
+    negation: (negand) => negand,
+    implication: (antecedent, consequent) =>
+      uniq([...antecedent, ...consequent]),
+    conjunction: (leftConjunct, rightConjunct) =>
+      uniq([...leftConjunct, ...rightConjunct]),
+    disjunction: (leftDisjunct, rightDisjunct) =>
+      uniq([...leftDisjunct, ...rightDisjunct]),
   })
