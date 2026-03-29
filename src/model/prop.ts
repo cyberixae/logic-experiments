@@ -98,33 +98,51 @@ export type Prop =
   | Conjunction<Prop, Prop>
   | Disjunction<Prop, Prop>
 
-export const equals = (a: Prop, b: Prop): boolean => {
-  switch (a.kind) {
+export type Match<R> = {
+  atom: (value: string) => R
+  falsum: () => R
+  verum: () => R
+  negation: (negand: Prop) => R
+  implication: (antecedent: Prop, consequent: Prop) => R
+  conjunction: (leftConjunct: Prop, rightConjunct: Prop) => R
+  disjunction: (leftDisjunct: Prop, rightDisjunct: Prop) => R
+}
+
+export const match = <R>(p: Prop, f: Match<R>): R => {
+  switch (p.kind) {
     case 'atom':
-      return b.kind === 'atom' && b.value === a.value
+      return f.atom(p.value)
     case 'falsum':
-      return b.kind === 'falsum'
+      return f.falsum()
     case 'verum':
-      return b.kind === 'verum'
+      return f.verum()
     case 'negation':
-      return b.kind === 'negation' && equals(b.negand, a.negand)
+      return f.negation(p.negand)
     case 'implication':
-      return (
-        b.kind === 'implication' &&
-        equals(b.antecedent, a.antecedent) &&
-        equals(b.consequent, a.consequent)
-      )
+      return f.implication(p.antecedent, p.consequent)
     case 'conjunction':
-      return (
-        b.kind === 'conjunction' &&
-        equals(b.leftConjunct, a.leftConjunct) &&
-        equals(b.rightConjunct, a.rightConjunct)
-      )
+      return f.conjunction(p.leftConjunct, p.rightConjunct)
     case 'disjunction':
-      return (
-        b.kind === 'disjunction' &&
-        equals(b.leftDisjunct, a.leftDisjunct) &&
-        equals(b.rightDisjunct, a.rightDisjunct)
-      )
+      return f.disjunction(p.leftDisjunct, p.rightDisjunct)
   }
 }
+
+export const equals = (a: Prop, b: Prop): boolean =>
+  match(a, {
+    atom: (value) => b.kind === 'atom' && b.value === value,
+    falsum: () => b.kind === 'falsum',
+    verum: () => b.kind === 'verum',
+    negation: (negand) => b.kind === 'negation' && equals(b.negand, negand),
+    implication: (antecedent, consequent) =>
+      b.kind === 'implication' &&
+      equals(b.antecedent, antecedent) &&
+      equals(b.consequent, consequent),
+    conjunction: (leftConjunct, rightConjunct) =>
+      b.kind === 'conjunction' &&
+      equals(b.leftConjunct, leftConjunct) &&
+      equals(b.rightConjunct, rightConjunct),
+    disjunction: (leftDisjunct, rightDisjunct) =>
+      b.kind === 'disjunction' &&
+      equals(b.leftDisjunct, leftDisjunct) &&
+      equals(b.rightDisjunct, rightDisjunct),
+  })
