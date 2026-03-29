@@ -22,7 +22,5 @@ export const ch9consolidation7: Configuration<AnySequent> = {
     'il',
     'ir',
   ],
-  goal: conclusion(
-    lk.o.p2.implication(lk.a('p'), lk.a('p')),
-  ),
+  goal: conclusion(lk.o.p2.implication(lk.a('p'), lk.a('p'))),
 }
