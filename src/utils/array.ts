@@ -1,4 +1,5 @@
 import * as iterable from './iterable'
+import { Seq } from './seq'
 
 export type NonEmptyArray<A> = Array<A> & { 0: A }
 
@@ -45,3 +46,5 @@ export const ensureNonEmpty = <T>(
 export const uniq = <T>(arr: Array<T>): Array<T> => {
   return [...iterable.uniq(arr)]
 }
+
+export const fromSeq = <T>(s: Seq<T>): Array<T> => [...s()]
