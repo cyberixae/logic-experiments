@@ -24,4 +24,16 @@ export default defineConfig([
       ],
     },
   },
+  {
+    files: ['**/*.ts'],
+    ignores: ['src/**/__tests__/**', 'scripts/**'],
+    languageOptions: {
+      parserOptions: {
+        project: true,
+      },
+    },
+    rules: {
+      '@typescript-eslint/strict-boolean-expressions': 'warn',
+    },
+  },
 ])
