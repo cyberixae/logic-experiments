@@ -186,3 +186,43 @@ export const atoms = (p: Prop): Array<string> =>
     disjunction: (leftDisjunct, rightDisjunct) =>
       uniq([...leftDisjunct, ...rightDisjunct]),
   })
+
+const split = (x: number) => {
+  const rand = Math.random()
+  const y = Math.floor(rand * x)
+  return [y, x - y]
+}
+
+export const random = (size: number = 10): Prop => {
+  const rand = Math.random()
+  if (size < 1) {
+    if (rand < 0.1) {
+      return falsum
+    }
+    if (rand < 0.2) {
+      return verum
+    }
+    if (rand < 0.3) {
+      return atom('s')
+    }
+    if (rand < 0.4) {
+      return atom('r')
+    }
+    if (rand < 0.6) {
+      return atom('q')
+    }
+    return atom('p')
+  }
+  const next = size - 1
+  const [left, right] = split(next)
+  if (rand < 0.2) {
+    return conjunction(random(left), random(right))
+  }
+  if (rand < 0.4) {
+    return disjunction(random(left), random(right))
+  }
+  if (rand < 0.6) {
+    return implication(random(left), random(right))
+  }
+  return negation(random(next))
+}
