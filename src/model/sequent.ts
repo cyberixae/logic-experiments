@@ -4,6 +4,8 @@ import { zip } from '../utils/array'
 import * as array from '../utils/array'
 import { Refinement } from '../utils/generic'
 import * as tuple from '../utils/tuple'
+import { brute0, premise, Proof } from './derivation'
+import { head, Seq } from '../utils/seq'
 
 export type Formulas = Array<Prop>
 export const equalFormulas = (aa: Formulas, ab: Formulas): boolean => {
@@ -65,4 +67,23 @@ export const equals = (a: AnySequent, b: AnySequent) => {
     equalFormulas(a.antecedent, b.antecedent) &&
     equalFormulas(a.succedent, b.succedent)
   )
+}
+
+const propify = (s: AnySequent): Prop => prop.implication(
+  s.antecedent.reduce((acc, p) => prop.conjunction(acc, p), prop.verum),
+  s.succedent.reduce((acc, p) => prop.disjunction(acc, p), prop.falsum),
+)
+
+export const isTautology = <S extends AnySequent>(s: S): boolean => prop.isTautology(propify(s))
+
+export const brute = <S extends AnySequent>(s: S): Proof<S> => {
+  let limit = 0
+  while (true) {
+    console.log(limit)
+    const proofs = head(brute0(premise(s), limit))
+    if (array.isNonEmptyArray(proofs)) {
+      return proofs[0]
+    }
+    limit += 1
+  }
 }

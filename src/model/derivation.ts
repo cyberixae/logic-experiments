@@ -4,8 +4,11 @@ import {
   replaceItem,
   zip,
 } from '../utils/array'
-import { AnySequent, equals } from './sequent'
+import { AnySequent, equals, Formulas, isTautology, Sequent, sequent } from './sequent'
 import { Refinement } from '../utils/generic'
+import * as seq from '../utils/seq'
+import { reverse0, reverseAxiom0, reverseLogic0 } from '../rules'
+import { sequence } from '../utils/seq'
 
 export type Rule = string
 
@@ -75,6 +78,13 @@ export type Proof<
   D extends Array<AnyProof> = Array<AnyProof>,
   R extends Rule = Rule,
 > = Transformation<J, D, R>
+export function proof<
+  J extends AnySequent,
+  D extends Array<AnyProof>,
+  R extends Rule,
+>(result: J, deps: D, rule: R): Proof<J, D, R> {
+  return { kind: 'transformation', result, deps, rule }
+}
 export type AnyProof = Proof<AnySequent, Array<AnyProof>, Rule>
 
 export const isEquivalent = <J extends AnySequent>(
@@ -286,5 +296,99 @@ export const equalsDerivation = (
         return false
       }
       return equalsTransformation(a, b)
+  }
+}
+
+const hypoWeaken = (d: Premise<AnySequent>): seq.Seq<Premise<AnySequent>> => function* () {
+  const activeLeft = d.result.antecedent.at(-1)
+  const activeRight = d.result.succedent.at(0)
+  if (activeLeft && activeRight) {
+    yield premise(sequent([activeLeft], [activeRight]))
+  }
+  if (activeLeft) {
+    yield premise(sequent([activeLeft], []))
+  }
+  if (activeRight) {
+    yield premise(sequent([], [activeRight]))
+  }
+}
+
+const bruteWeaken0 = <A extends AnySequent, B extends AnySequent>(d: Premise<A>, p: Proof<B>): seq.Seq<Proof<A>> => function* () {
+
+}
+
+const bruteAxiom0 = <S extends AnySequent>(d: Premise<S>, limit: number): seq.Seq<Proof<S>> => function* () {
+  for (const rule of Object.values(reverseAxiom0)) {
+    const result = rule.tryReverse(d)
+    if (!result) {
+      continue
+    }
+    yield* brute0(result, limit)()
+  }
+}
+
+const bruteLogic0 = <S extends AnySequent>(d: Premise<S>, limit: number): seq.Seq<Proof<S>> => function* () {
+  yield* seq.flatMap(hypoWeaken(d), (hypo) => seq.flatMap(bruteAxiom0(hypo, limit), (h) => bruteWeaken0(d, h)))()
+  for (const rule of Object.values(reverseLogic0)) {
+    const result = rule.tryReverse(d)
+    if (!result) {
+      continue
+    }
+    yield* brute0(result, limit)()
+  }
+}
+
+const rotate = <T>([x, ...xs]: NonEmptyArray<T>): NonEmptyArray<T> => [...xs, x] as unknown as NonEmptyArray<T>
+
+const rotationsF = (f: Formulas): seq.Seq<Formulas> => function* () {
+  yield f
+  if (!isNonEmptyArray(f)) {
+    return
+  }
+  let bob = f
+  while (bob[0] !== f[0]) {
+    bob = rotate(bob)
+  }
+  yield bob
+
+
+}
+
+const rotationsS = (s: AnySequent): seq.Seq<AnySequent> => function* () {
+  const foo: seq.Seq<[Formulas, Formulas]> = sequence([s.antecedent, s.succedent].map((formulas: Formulas): seq.Seq<Formulas> => rotationsF(formulas))) as seq.Seq<[Formulas, Formulas]>
+  const bob = seq.map<[Formulas, Formulas], AnySequent>(foo, ([antecedent, succedent]) => sequent(antecedent, succedent))
+  yield* bob()
+}
+
+const hypoRotate = (d: Premise<AnySequent>): seq.Seq<Premise<AnySequent>> => function* () {
+  yield * seq.map(rotationsS(d.result), premise)()
+}
+
+
+const bruteRotate0 = <A extends AnySequent, B extends AnySequent>(d: Premise<A>, p: Proof<B>): seq.Seq<Proof<A>> => function* () {
+
+}
+
+const brute0Premise = <S extends AnySequent>(d: Premise<S>, limit: number): seq.Seq<Proof<S>> => function* () {
+  if (limit < 1) {
+    return
+  }
+  if (!isTautology(d.result)) {
+    return
+  }
+  yield* seq.flatMap(hypoRotate(d), (hypo) => seq.flatMap(bruteLogic0(hypo, limit), (h) => bruteRotate0(d, h)))()
+}
+const brute0Transformation = <S extends AnySequent>(d: Transformation<S, Array<AnyNode>, Rule>, limit: number): seq.Seq<Proof<S>> => function*()  {
+  const depProofs = sequence(d.deps.map((dep) => brute0(dep, limit - 1)))
+  yield* seq.map(depProofs, (proofs) => proof(d.result, proofs, d.rule))()
+}
+export const brute0 = <S extends AnySequent>(d: Derivation<S>, limit: number): seq.Seq<Proof<S>> => function* () {
+  switch (d.kind) {
+    case 'premise':
+      yield* brute0Premise(d, (limit))()
+      break
+    case 'transformation':
+      yield* brute0Transformation(d, (limit))()
+      break
   }
 }

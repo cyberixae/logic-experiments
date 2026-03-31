@@ -398,12 +398,14 @@ const qwertyKeyMap: Record<KeyboardEvent['key'], Action> = {
 }
 
 const init = () => {
+  workspace.selectCustom()
+  /*
   const params = new URLSearchParams(window.location.search)
   const level = params.get('level') ?? ''
   if (workspace.isConjectureId(level)) {
     workspace.selectConjecture(level)
     history.replaceState({ selected: level }, '', `?level=${level}`)
-  }
+  }*/
   render()
 
   document.addEventListener('keydown', (ev) => {

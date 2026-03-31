@@ -1,5 +1,8 @@
+import { basic, fromDerivation } from '../render/print'
 import * as array from '../utils/array'
 import * as seq from '../utils/seq'
+import { head } from '../utils/seq'
+import { brute, conclusion } from './sequent'
 import { isCountermodel, isModel, Valuation, valuations } from './valuation'
 
 export type PropType =
@@ -258,5 +261,7 @@ export const randomTautology = (): Prop => {
   while (!isTautology(p)) {
     p = random()
   }
+  const proof = brute(conclusion(p))
+  console.log(fromDerivation(proof))
   return p
 }
