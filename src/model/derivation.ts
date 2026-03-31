@@ -4,10 +4,10 @@ import {
   replaceItem,
   zip,
 } from '../utils/array'
-import { AnySequent, equals, Formulas, isTautology, Sequent, sequent } from './sequent'
+import { AnySequent, equals, Formulas, isTautology, sequent } from './sequent'
 import { Refinement } from '../utils/generic'
 import * as seq from '../utils/seq'
-import { reverse0, reverseAxiom0, reverseLogic0 } from '../rules'
+import { reverseAxiom0, reverseLogic0, reverseStructure0 } from '../rules'
 import { sequence } from '../utils/seq'
 
 export type Rule = string
@@ -300,21 +300,40 @@ export const equalsDerivation = (
 }
 
 const hypoWeaken = (d: Premise<AnySequent>): seq.Seq<Premise<AnySequent>> => function* () {
-  const activeLeft = d.result.antecedent.at(-1)
-  const activeRight = d.result.succedent.at(0)
-  if (activeLeft && activeRight) {
-    yield premise(sequent([activeLeft], [activeRight]))
+  const farLeft = d.result.antecedent.at(0)
+  const farRight = d.result.succedent.at(-1)
+  if (farLeft && farRight) {
+    yield premise(sequent([farLeft], [farRight]))
   }
-  if (activeLeft) {
-    yield premise(sequent([activeLeft], []))
+  if (farLeft) {
+    yield premise(sequent([farLeft], []))
   }
-  if (activeRight) {
-    yield premise(sequent([], [activeRight]))
+  if (farRight) {
+    yield premise(sequent([], [farRight]))
   }
 }
 
 const bruteWeaken0 = <A extends AnySequent, B extends AnySequent>(d: Premise<A>, p: Proof<B>): seq.Seq<Proof<A>> => function* () {
-
+  if (equals(d.result, p.result)) {
+    yield proof(d.result, p.deps, p.rule)
+    return
+  }
+  if (d.result.antecedent.length > p.result.antecedent.length && reverseStructure0.swl.isResultDerivation(d)) {
+    const step = reverseStructure0.swl.reverse(d)
+    const [dep] = step.deps
+    if (dep.kind === 'premise') {
+      yield* seq.map(bruteWeaken0(dep, p), (depProof) => proof(step.result, [depProof], step.rule))()
+    }
+    return
+  }
+  if (d.result.succedent.length > p.result.succedent.length && reverseStructure0.swr.isResultDerivation(d)) {
+    const step = reverseStructure0.swr.reverse(d)
+    const [dep] = step.deps
+    if (dep.kind === 'premise') {
+      yield* seq.map(bruteWeaken0(dep, p), (depProof) => proof(step.result, [depProof], step.rule))()
+    }
+    return
+  }
 }
 
 const bruteAxiom0 = <S extends AnySequent>(d: Premise<S>, limit: number): seq.Seq<Proof<S>> => function* () {
