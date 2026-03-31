@@ -7,7 +7,8 @@ import {
   premise,
 } from '../model/derivation'
 import { Prop, atom } from '../model/prop'
-import { Formulas, Sequent, AnySequent, sequent } from '../model/sequent'
+import { Sequent, AnySequent, sequent } from '../model/sequent'
+import { Formulas } from '../model/formulas'
 import { Refinement } from '../utils/generic'
 import * as tuple from '../utils/tuple'
 import { Rule } from '../model/rule'
