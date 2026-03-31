@@ -90,3 +90,6 @@ export const head = <A>(s: Seq<A>): Option<A> => {
   }
   return [value]
 }
+
+export const sequenceT = <A, B>(t: [Seq<A>, Seq<B>]): Seq<[A, B]> =>
+  sequence(t as Array<Seq<A | B>>) as Seq<[A, B]>

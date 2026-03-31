@@ -48,3 +48,6 @@ export const uniq = <T>(arr: Array<T>): Array<T> => {
 }
 
 export const fromSeq = <T>(s: Seq<T>): Array<T> => [...s()]
+
+export const rotate = <T>([x, ...xs]: NonEmptyArray<T>): NonEmptyArray<T> =>
+  [...xs, x] as unknown as NonEmptyArray<T>

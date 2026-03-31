@@ -3,7 +3,10 @@ import * as prop from './prop'
 import * as array from '../utils/array'
 import { Refinement } from '../utils/generic'
 import * as tuple from '../utils/tuple'
-import { Formulas, equals as equalsFormulas } from './formulas'
+import type { Formulas } from './formulas'
+import * as formulas from './formulas'
+import { brute0, premise, Proof } from './derivation'
+import * as seq from '../utils/seq'
 
 export type Sequent<A extends Formulas, S extends Formulas> = {
   kind: 'sequent'
@@ -55,8 +58,8 @@ export const refineConclusion =
 
 export const equals = (a: AnySequent, b: AnySequent) => {
   return (
-    equalsFormulas(a.antecedent, b.antecedent) &&
-    equalsFormulas(a.succedent, b.succedent)
+    formulas.equals(a.antecedent, b.antecedent) &&
+    formulas.equals(a.succedent, b.succedent)
   )
 }
 
@@ -67,3 +70,14 @@ export const isTautology = <S extends AnySequent>(s: S): boolean =>
       s.succedent.reduce((acc, p) => prop.disjunction(acc, p), prop.falsum),
     ),
   )
+
+export const rotations = (s: AnySequent): seq.Seq<AnySequent> =>
+  function* () {
+    yield* seq.map(
+      seq.sequenceT([
+        formulas.rotations(s.antecedent),
+        formulas.rotations(s.succedent),
+      ]),
+      ([antecedent, succedent]) => sequent(antecedent, succedent),
+    )()
+  }
