@@ -225,32 +225,32 @@ const split = (x: number) => {
 export const random = (size: number = 10): Prop => {
   const rand = Math.random()
   if (size < 1) {
-    if (rand < 0.1) {
+    if (rand < 0.05) {
       return falsum
     }
-    if (rand < 0.2) {
+    if (rand < 0.1) {
       return verum
     }
-    if (rand < 0.3) {
+    if (rand < 0.2) {
       return atom('s')
     }
-    if (rand < 0.4) {
+    if (rand < 0.45) {
       return atom('r')
     }
-    if (rand < 0.6) {
+    if (rand < 0.7) {
       return atom('q')
     }
     return atom('p')
   }
   const next = size - 1
   const [left, right] = split(next)
-  if (rand < 0.2) {
+  if (rand < 0.3) {
     return conjunction(random(left), random(right))
   }
-  if (rand < 0.4) {
+  if (rand < 0.6) {
     return disjunction(random(left), random(right))
   }
-  if (rand < 0.6) {
+  if (rand < 0.9) {
     return implication(random(left), random(right))
   }
   return negation(random(next))
@@ -268,7 +268,7 @@ export const randomTautology = (): Prop => {
   return seq.head(seq.filter(seq.filter(rand, isTautology), (tautology) => {
     const [proof, difficulty] = brute(conclusion(tautology))
     stats[difficulty] = (stats[difficulty] ?? 0) + 1
-    console.log(stats)
+    console.log(JSON.stringify(stats))
     if (difficulty < 8) {
       return false
     }
