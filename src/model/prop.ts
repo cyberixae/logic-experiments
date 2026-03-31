@@ -1,5 +1,6 @@
 import * as array from '../utils/array'
 import * as seq from '../utils/seq'
+import { split } from '../utils/random'
 import { isCountermodel, isModel, Valuation, valuations } from './valuation'
 
 export type PropType =
@@ -213,50 +214,38 @@ export const isFalsifiable = (p: Prop): boolean => {
   return !isTautology(p)
 }
 
-const split = (x: number) => {
-  const rand = Math.random()
-  const y = Math.floor(rand * x)
-  return [y, x - y]
-}
-
-export const random = (size: number = 10): Prop => {
-  const rand = Math.random()
-  if (size < 1) {
-    if (rand < 0.1) {
-      return falsum
+export const random =
+  (size: number = 10) =>
+  (): Prop => {
+    const rand = Math.random()
+    if (size < 1) {
+      if (rand < 0.05) {
+        return falsum
+      }
+      if (rand < 0.1) {
+        return verum
+      }
+      if (rand < 0.2) {
+        return atom('s')
+      }
+      if (rand < 0.45) {
+        return atom('r')
+      }
+      if (rand < 0.7) {
+        return atom('q')
+      }
+      return atom('p')
     }
-    if (rand < 0.2) {
-      return verum
-    }
+    const next = size - 1
+    const [left, right] = split(next)()
     if (rand < 0.3) {
-      return atom('s')
-    }
-    if (rand < 0.4) {
-      return atom('r')
+      return conjunction(random(left)(), random(right)())
     }
     if (rand < 0.6) {
-      return atom('q')
+      return disjunction(random(left)(), random(right)())
     }
-    return atom('p')
+    if (rand < 0.9) {
+      return implication(random(left)(), random(right)())
+    }
+    return negation(random(next)())
   }
-  const next = size - 1
-  const [left, right] = split(next)
-  if (rand < 0.2) {
-    return conjunction(random(left), random(right))
-  }
-  if (rand < 0.4) {
-    return disjunction(random(left), random(right))
-  }
-  if (rand < 0.6) {
-    return implication(random(left), random(right))
-  }
-  return negation(random(next))
-}
-
-export const randomTautology = (): Prop => {
-  let p = random()
-  while (!isTautology(p)) {
-    p = random()
-  }
-  return p
-}
