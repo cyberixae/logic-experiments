@@ -75,6 +75,13 @@ export type Proof<
   D extends Array<AnyProof> = Array<AnyProof>,
   R extends Rule = Rule,
 > = Transformation<J, D, R>
+export function proof<
+  J extends AnySequent,
+  D extends Array<AnyProof>,
+  R extends Rule,
+>(result: J, deps: D, rule: R): Proof<J, D, R> {
+  return { kind: 'transformation', result, deps, rule }
+}
 export type AnyProof = Proof<AnySequent, Array<AnyProof>, Rule>
 
 export const isEquivalent = <J extends AnySequent>(
