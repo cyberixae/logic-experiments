@@ -365,11 +365,11 @@ const rotationsF = (f: Formulas): seq.Seq<Formulas> => function* () {
   if (!isNonEmptyArray(f)) {
     return
   }
-  let bob = f
+  let bob = rotate(f)
   while (bob[0] !== f[0]) {
+    yield bob
     bob = rotate(bob)
   }
-  yield bob
 
 
 }
