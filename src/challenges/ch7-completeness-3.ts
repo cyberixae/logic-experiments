@@ -1,6 +1,6 @@
 import { lk } from '../systems/lk'
 import { AnySequent, conclusion } from '../model/sequent'
-import { Configuration } from '../model/theorem'
+import { Configuration } from '../model/challenge'
 
 export const ch7completeness3: Configuration<AnySequent> = {
   rules: [

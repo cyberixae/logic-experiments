@@ -5,7 +5,7 @@ import { isProof, premise } from '../model/derivation'
 import { head, isNonEmptyArray, last, NonEmptyArray } from '../utils/array'
 import { entries, get, keys } from '../utils/record'
 import { Focus, applicableRules } from './focus'
-import { Configuration } from '../model/theorem'
+import { Configuration } from '../model/challenge'
 import { AnySequent } from '../model/sequent'
 
 export class Workspace<

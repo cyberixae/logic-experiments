@@ -7,7 +7,7 @@ import { isRuleId } from '../model/rule'
 import { split } from '../utils/string'
 import { rules } from '../rules'
 import { Workspace } from './workspace'
-import { Configuration } from '../model/theorem'
+import { Configuration } from '../model/challenge'
 import { AnySequent } from '../model/sequent'
 
 export function* repl<

@@ -1,5 +1,5 @@
 import { AnySequent } from '../model/sequent'
-import { Configuration } from '../model/theorem'
+import { Configuration } from '../model/challenge'
 import { ch0identity1 } from './ch0-identity-1'
 import { ch0identity2 } from './ch0-identity-2'
 import { ch0identity3 } from './ch0-identity-3'

@@ -1,6 +1,6 @@
 import { lk } from '../systems/lk'
 import { AnySequent, conclusion } from '../model/sequent'
-import { Configuration } from '../model/theorem'
+import { Configuration } from '../model/challenge'
 
 export const ch4theorem4: Configuration<AnySequent> = {
   rules: ['i', 'ir'],
