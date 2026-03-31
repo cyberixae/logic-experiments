@@ -1,3 +1,6 @@
+import { isNonEmptyArray } from './array'
+import { Option } from './option'
+
 export type Seq<T> = () => Generator<T, void, undefined>
 
 export const empty = <T = never>(): Seq<T> => function* () {}
@@ -16,6 +19,18 @@ export const map = <A, B>(s: Seq<A>, f: (a: A) => B): Seq<B> =>
         return
       }
       yield f(value)
+    }
+  }
+
+export const flatMap = <A, B>(s: Seq<A>, f: (a: A) => Seq<B>): Seq<B> =>
+  function* () {
+    const g = s()
+    while (true) {
+      const { done, value } = g.next()
+      if (done === true) {
+        return
+      }
+      yield* f(value)()
     }
   }
 
@@ -40,4 +55,36 @@ export const isEmpty = <A>(s: Seq<A>): boolean => {
     return true
   }
   return false
+}
+
+export const fromNullable = <A>(a: A): Seq<NonNullable<A>> => function*() {
+  if (a === null) {
+    return
+  }
+  if (typeof a === 'undefined') {
+    return
+  }
+  yield a
+}
+
+export const sequence = <T>(seqs: Array<Seq<T>>): Seq<Array<T>> => function* () {
+  if (!isNonEmptyArray(seqs)) {
+    yield []
+    return
+  }
+  const [first, ...rest] = seqs
+  for (const t of first()) {
+    for (const ts of sequence(rest)()) {
+      yield [t, ...ts]
+    }
+  }
+}
+
+export const head = <A>(s: Seq<A>): Option<A> => {
+  const g = s()
+  const { done, value } = g.next()
+  if (done === true) {
+    return []
+  }
+  return [value]
 }
