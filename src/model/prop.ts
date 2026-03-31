@@ -263,10 +263,12 @@ export const rand: seq.Seq<Prop> = function*() {
 }
 
 export const randomTautology = (): Prop => {
+  const stats: Record<number, number> = {}
 
   return seq.head(seq.filter(seq.filter(rand, isTautology), (tautology) => {
     const [proof, difficulty] = brute(conclusion(tautology))
-    console.log('d' + difficulty)
+    stats[difficulty] = (stats[difficulty] ?? 0) + 1
+    console.log(stats)
     if (difficulty < 8) {
       return false
     }

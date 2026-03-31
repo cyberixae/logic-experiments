@@ -72,29 +72,29 @@ export const applicableRules = (j: AnySequent): Array<RuleId> =>
   entries(rules).flatMap(([k, v]): Option<RuleId> => (v.isResult(j) ? [k] : []))
 
 export const reverseAxiom0 = {
+  f: ruleF,
+  v: ruleV,
+  i: ruleI,
   a1: ruleA1,
   a2: ruleA2,
   a3: ruleA3,
-  f: ruleF,
-  i: ruleI,
-  v: ruleV,
 } satisfies Partial<{
   [K in RuleId]: Rule<AnySequent, K> & { tryReverse: TryReverse0 }
 }>
 
 export const reverseLogic0 = {
+  ir: ruleIR,
+  nl: ruleNL,
+  nr: ruleNR,
   cl: ruleCL,
-  dr: ruleDR,
   cl1: ruleCL1,
-  dr1: ruleDR1,
   cl2: ruleCL2,
+  dr: ruleDR,
+  dr1: ruleDR1,
   dr2: ruleDR2,
   dl: ruleDL,
   cr: ruleCR,
   il: ruleIL,
-  ir: ruleIR,
-  nl: ruleNL,
-  nr: ruleNR,
 } satisfies Partial<{
   [K in RuleId]: Rule<AnySequent, K> & { tryReverse: TryReverse0 }
 }>
