@@ -8,12 +8,12 @@ import {
 } from '../model/derivation'
 import { Prop, Negation, isNegation, negation, atom } from '../model/prop'
 import {
-  Formulas,
   Sequent,
   AnySequent,
   refineActiveL,
   sequent,
 } from '../model/sequent'
+import { Formulas } from '../model/Formulas'
 import { Refinement } from '../utils/generic'
 import * as tuple from '../utils/tuple'
 import { Rule } from '../model/rule'

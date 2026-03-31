@@ -1,18 +1,11 @@
 import type { Prop } from './prop'
 import * as prop from './prop'
-import { zip } from '../utils/array'
 import * as array from '../utils/array'
 import { Refinement } from '../utils/generic'
 import * as tuple from '../utils/tuple'
 import { brute0, premise, Proof } from './derivation'
-import { head, Seq } from '../utils/seq'
-
-export type Formulas = Array<Prop>
-export const equalFormulas = (aa: Formulas, ab: Formulas): boolean => {
-  return (
-    aa.length === ab.length && zip(aa, ab).every(([a, b]) => prop.equals(a, b))
-  )
-}
+import { head } from '../utils/seq'
+import { Formulas, equals as equalsFormulas } from './Formulas'
 
 export type Sequent<A extends Formulas, S extends Formulas> = {
   kind: 'sequent'
@@ -64,8 +57,8 @@ export const refineConclusion =
 
 export const equals = (a: AnySequent, b: AnySequent) => {
   return (
-    equalFormulas(a.antecedent, b.antecedent) &&
-    equalFormulas(a.succedent, b.succedent)
+    equalsFormulas(a.antecedent, b.antecedent) &&
+    equalsFormulas(a.succedent, b.succedent)
   )
 }
 
