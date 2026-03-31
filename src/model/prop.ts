@@ -256,12 +256,21 @@ export const random = (size: number = 10): Prop => {
   return negation(random(next))
 }
 
-export const randomTautology = (): Prop => {
-  let p = random()
-  while (!isTautology(p)) {
-    p = random()
+export const rand: seq.Seq<Prop> = function*() {
+  while (true) {
+    yield random()
   }
-  const proof = brute(conclusion(p))
-  console.log(fromDerivation(proof))
-  return p
+}
+
+export const randomTautology = (): Prop => {
+
+  return seq.head(seq.filter(seq.filter(rand, isTautology), (tautology) => {
+    const [proof, difficulty] = brute(conclusion(tautology))
+    console.log('d' + difficulty)
+    if (difficulty < 8) {
+      return false
+    }
+    console.log(fromDerivation(proof))
+    return true
+  }))[0] ?? falsum
 }

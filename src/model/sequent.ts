@@ -69,13 +69,13 @@ const propify = (s: AnySequent): Prop => prop.implication(
 
 export const isTautology = <S extends AnySequent>(s: S): boolean => prop.isTautology(propify(s))
 
-export const brute = <S extends AnySequent>(s: S): Proof<S> => {
+export const brute = <S extends AnySequent>(s: S): [Proof<S>, number] => {
   let limit = 0
   while (true) {
     console.log(limit)
     const proofs = head(brute0(premise(s), limit))
     if (array.isNonEmptyArray(proofs)) {
-      return proofs[0]
+      return [proofs[0], limit]
     }
     limit += 1
   }
