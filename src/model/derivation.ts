@@ -4,7 +4,8 @@ import {
   replaceItem,
   zip,
 } from '../utils/array'
-import { AnySequent, equals, Formulas, isTautology, sequent } from './sequent'
+import { AnySequent, equals, isTautology, sequent } from './sequent'
+import { Formulas, equals as equalsFormulas } from './Formulas'
 import { Refinement } from '../utils/generic'
 import * as seq from '../utils/seq'
 import { reverseAxiom0, reverseLogic0, reverseStructure0 } from '../rules'
@@ -383,9 +384,27 @@ const hypoRotate = (d: Premise<AnySequent>): seq.Seq<Premise<AnySequent>> => fun
   yield * seq.map(rotationsS(d.result), premise)()
 }
 
-
 const bruteRotate0 = <A extends AnySequent, B extends AnySequent>(d: Premise<A>, p: Proof<B>): seq.Seq<Proof<A>> => function* () {
-
+  if (equals(d.result, p.result)) {
+    yield proof(d.result, p.deps, p.rule)
+    return
+  }
+  if (!equalsFormulas(d.result.antecedent, p.result.antecedent) && reverseStructure0.sRotLF.isResultDerivation(d)) {
+    const step = reverseStructure0.sRotLF.reverse(d)
+    const [dep] = step.deps
+    if (dep.kind === 'premise') {
+      yield* seq.map(bruteRotate0(dep, p), (depProof) => proof(step.result, [depProof], step.rule))()
+    }
+    return
+  }
+  if (!equalsFormulas(d.result.succedent, p.result.succedent) && reverseStructure0.sRotRF.isResultDerivation(d)) {
+    const step = reverseStructure0.sRotRF.reverse(d)
+    const [dep] = step.deps
+    if (dep.kind === 'premise') {
+      yield* seq.map(bruteRotate0(dep, p), (depProof) => proof(step.result, [depProof], step.rule))()
+    }
+    return
+  }
 }
 
 const brute0Premise = <S extends AnySequent>(d: Premise<S>, limit: number): seq.Seq<Proof<S>> => function* () {
