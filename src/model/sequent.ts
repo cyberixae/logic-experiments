@@ -1,4 +1,5 @@
 import type { Prop } from './prop'
+import * as prop from './prop'
 import * as array from '../utils/array'
 import { Refinement } from '../utils/generic'
 import * as tuple from '../utils/tuple'
@@ -58,3 +59,8 @@ export const equals = (a: AnySequent, b: AnySequent) => {
     equalsFormulas(a.succedent, b.succedent)
   )
 }
+
+export const isTautology = <S extends AnySequent>(s: S): boolean => prop.isTautology(prop.implication(
+  s.antecedent.reduce((acc, p) => prop.conjunction(acc, p), prop.verum),
+  s.succedent.reduce((acc, p) => prop.disjunction(acc, p), prop.falsum),
+))
