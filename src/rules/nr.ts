@@ -7,12 +7,7 @@ import {
   premise,
 } from '../model/derivation'
 import { Prop, Negation, isNegation, negation, atom } from '../model/prop'
-import {
-  Sequent,
-  AnySequent,
-  refineActiveR,
-  sequent,
-} from '../model/sequent'
+import { Sequent, AnySequent, refineActiveR, sequent } from '../model/sequent'
 import { Formulas } from '../model/formulas'
 import { Refinement } from '../utils/generic'
 import * as tuple from '../utils/tuple'

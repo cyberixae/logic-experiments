@@ -6,12 +6,7 @@ import {
   premise,
 } from '../model/derivation'
 import { Prop, atom } from '../model/prop'
-import {
-  Sequent,
-  AnySequent,
-  isActiveR,
-  sequent,
-} from '../model/sequent'
+import { Sequent, AnySequent, isActiveR, sequent } from '../model/sequent'
 import { Formulas } from '../model/formulas'
 import { Refinement } from '../utils/generic'
 import * as tuple from '../utils/tuple'

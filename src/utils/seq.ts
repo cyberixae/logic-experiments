@@ -57,28 +57,30 @@ export const isEmpty = <A>(s: Seq<A>): boolean => {
   return false
 }
 
-export const fromNullable = <A>(a: A): Seq<NonNullable<A>> => function*() {
-  if (a === null) {
-    return
+export const fromNullable = <A>(a: A): Seq<NonNullable<A>> =>
+  function* () {
+    if (a === null) {
+      return
+    }
+    if (typeof a === 'undefined') {
+      return
+    }
+    yield a
   }
-  if (typeof a === 'undefined') {
-    return
-  }
-  yield a
-}
 
-export const sequence = <T>(seqs: Array<Seq<T>>): Seq<Array<T>> => function* () {
-  if (!isNonEmptyArray(seqs)) {
-    yield []
-    return
-  }
-  const [first, ...rest] = seqs
-  for (const t of first()) {
-    for (const ts of sequence(rest)()) {
-      yield [t, ...ts]
+export const sequence = <T>(seqs: Array<Seq<T>>): Seq<Array<T>> =>
+  function* () {
+    if (!isNonEmptyArray(seqs)) {
+      yield []
+      return
+    }
+    const [first, ...rest] = seqs
+    for (const t of first()) {
+      for (const ts of sequence(rest)()) {
+        yield [t, ...ts]
+      }
     }
   }
-}
 
 export const head = <A>(s: Seq<A>): Option<A> => {
   const g = s()
