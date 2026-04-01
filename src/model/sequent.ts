@@ -5,7 +5,6 @@ import { Refinement } from '../utils/generic'
 import * as tuple from '../utils/tuple'
 import type { Formulas } from './formulas'
 import * as formulas from './formulas'
-import { brute0, premise, Proof } from './derivation'
 import * as seq from '../utils/seq'
 
 export type Sequent<A extends Formulas, S extends Formulas> = {

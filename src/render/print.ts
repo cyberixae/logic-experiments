@@ -10,6 +10,7 @@ import {
 } from '../model/derivation'
 import { Focus } from '../interactive/focus'
 import { AnySequent } from '../model/sequent'
+import { Formulas } from '../model/formulas'
 
 export type NullaryTemplate = [string]
 export const NullaryTemplateId = {
@@ -266,7 +267,7 @@ export function fromProp(proposition: prop.Prop): Printer {
   }
 }
 
-export function fromFormulas(formulas: judge.Formulas): Printer {
+export function fromFormulas(formulas: Formulas): Printer {
   return printArray('formulas')(formulas.map(fromProp))
 }
 
