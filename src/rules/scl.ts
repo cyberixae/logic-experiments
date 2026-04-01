@@ -24,46 +24,43 @@ export const isSCLResult: Refinement<AnySequent, AnySCLResult> = (
   return s.antecedent.length > 0
 }
 export const isSCLResultDerivation = refineDerivation(isSCLResult)
+export type SCLDeps<Γ extends Formulas, A extends Prop, Δ extends Formulas> = [
+  Derivation<Sequent<[...Γ, A, A], Δ>>,
+]
+export type AnySCLDeps = SCLDeps<Formulas, Prop, Formulas>
 export type SCL<
   Γ extends Formulas,
   A extends Prop,
   Δ extends Formulas,
   R extends SCLResult<Γ, A, Δ>,
-> = Transformation<R, [Derivation<Sequent<[...Γ, A, A], Δ>>], 'scl'>
-export type AnySCL = SCL<Formulas, Prop, Formulas, AnySCLResult>
+  D extends SCLDeps<Γ, A, Δ>,
+> = Transformation<R, D, 'scl'>
+export type AnySCL = SCL<Formulas, Prop, Formulas, AnySCLResult, AnySCLDeps>
 export const scl = <
   Γ extends Formulas,
   A extends Prop,
   Δ extends Formulas,
   R extends SCLResult<Γ, A, Δ>,
+  D extends SCLDeps<Γ, A, Δ>,
 >(
   result: R,
-  deps: [Derivation<Sequent<[...Γ, A, A], Δ>>],
-): SCL<Γ, A, Δ, R> => {
+  deps: D,
+): SCL<Γ, A, Δ, R, D> => {
   return transformation(result, deps, 'scl')
 }
-export type ApplySCL<
-  S extends Derivation<Sequent<[...Formulas, Prop, Prop], Formulas>>,
-> =
-  S extends Derivation<
-    Sequent<
-      [...infer Γ extends Formulas, infer A extends Prop, infer A extends Prop],
-      infer Δ
-    >
-  >
-    ? SCL<Γ, A, Δ, SCLResult<Γ, A, Δ>>
-    : never
 export const applySCL = <
   Γ extends Formulas,
   Δ extends Formulas,
   A extends Prop,
+  D extends SCLDeps<Γ, A, Δ>,
 >(
-  s: Derivation<Sequent<[...Γ, A, A], Δ>>,
-): ApplySCL<Derivation<Sequent<[...Γ, A, A], Δ>>> => {
-  const γ: Γ = tuple.init(tuple.init(s.result.antecedent))
-  const a: A = tuple.last(s.result.antecedent)
-  const δ: Δ = s.result.succedent
-  return scl(sequent([...γ, a], δ), [s])
+  ...deps: D & SCLDeps<Γ, A, Δ>
+): SCL<Γ, A, Δ, SCLResult<Γ, A, Δ>, D> => {
+  const [dep] = deps
+  const γ: Γ = tuple.init(tuple.init(dep.result.antecedent))
+  const a: A = tuple.last(dep.result.antecedent)
+  const δ: Δ = dep.result.succedent
+  return scl(sequent([...γ, a], δ), deps)
 }
 export const reverseSCL = <
   Γ extends Formulas,
@@ -72,7 +69,7 @@ export const reverseSCL = <
   R extends SCLResult<Γ, A, Δ>,
 >(
   p: Derivation<R>,
-): SCL<Γ, A, Δ, R> => {
+): SCL<Γ, A, Δ, R, SCLDeps<Γ, A, Δ>> => {
   const γ: Γ = tuple.init(p.result.antecedent)
   const a: A = tuple.last(p.result.antecedent)
   const δ: Δ = p.result.succedent

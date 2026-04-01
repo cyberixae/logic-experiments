@@ -3,7 +3,6 @@ import {
   Transformation,
   Derivation,
   transformation,
-  AnyDerivation,
   premise,
 } from '../model/derivation'
 import { Prop, atom } from '../model/prop'
@@ -21,55 +20,43 @@ export const isCutResult: Refinement<AnySequent, AnyCutResult> = (
   return true
 }
 export const isCutResultDerivation = refineDerivation(isCutResult)
+export type CutDeps<Γ extends Formulas, Δ extends Formulas, A extends Prop> = [
+  Derivation<Sequent<Γ, [...Δ, A]>>,
+  Derivation<Sequent<[A, ...Γ], Δ>>,
+]
+export type AnyCutDeps = CutDeps<Formulas, Formulas, Prop>
 export type Cut<
   Γ extends Formulas,
   Δ extends Formulas,
   A extends Prop,
   R extends CutResult<Γ, Δ>,
-> = Transformation<
-  R,
-  [Derivation<Sequent<Γ, [...Δ, A]>>, Derivation<Sequent<[A, ...Γ], Δ>>],
-  'Cut'
->
-export type AnyCut = Cut<Formulas, Formulas, Prop, AnyCutResult>
+  D extends CutDeps<Γ, Δ, A>,
+> = Transformation<R, D, 'Cut'>
+export type AnyCut = Cut<Formulas, Formulas, Prop, AnyCutResult, AnyCutDeps>
 export const cut = <
   Γ extends Formulas,
   Δ extends Formulas,
   A extends Prop,
   R extends CutResult<Γ, Δ>,
+  D extends CutDeps<Γ, Δ, A>,
 >(
   result: R,
-  deps: [Derivation<Sequent<Γ, [...Δ, A]>>, Derivation<Sequent<[A, ...Γ], Δ>>],
-): Cut<Γ, Δ, A, R> => {
+  deps: D,
+): Cut<Γ, Δ, A, R, D> => {
   return transformation(result, deps, 'Cut')
 }
-export type ApplyCut<S1 extends AnyDerivation, S2 extends AnyDerivation> = [
-  S1,
-  S2,
-] extends [
-  Derivation<
-    Sequent<infer Γ, [...infer Δ extends Formulas, infer A extends Prop]>
-  >,
-  Derivation<
-    Sequent<[infer A extends Prop, ...infer Γ extends Formulas], infer Δ>
-  >,
-]
-  ? Cut<Γ, Δ, A, CutResult<Γ, Δ>>
-  : never
 export const applyCut = <
   Γ extends Formulas,
   Δ extends Formulas,
   A extends Prop,
+  D extends CutDeps<Γ, Δ, A>,
 >(
-  s1: Derivation<Sequent<Γ, [...Δ, A]>>,
-  s2: Derivation<Sequent<[A, ...Γ], Δ>>,
-): ApplyCut<
-  Derivation<Sequent<Γ, [...Δ, A]>>,
-  Derivation<Sequent<[A, ...Γ], Δ>>
-> => {
-  const γ: Γ = s1.result.antecedent
-  const δ: Δ = tuple.init(s1.result.succedent)
-  return cut(sequent(γ, δ), [s1, s2])
+  ...deps: D & CutDeps<Γ, Δ, A>
+): Cut<Γ, Δ, A, CutResult<Γ, Δ>, D> => {
+  const [dep1] = deps
+  const γ: Γ = dep1.result.antecedent
+  const δ: Δ = tuple.init(dep1.result.succedent)
+  return cut(sequent(γ, δ), deps)
 }
 export const reverseCut = <
   Γ extends Formulas,
@@ -79,7 +66,7 @@ export const reverseCut = <
 >(
   p: Derivation<R>,
   a: A,
-): Cut<Γ, Δ, A, R> => {
+): Cut<Γ, Δ, A, R, CutDeps<Γ, Δ, A>> => {
   const γ: Γ = p.result.antecedent
   const δ: Δ = p.result.succedent
   return cut(p.result, [

@@ -3,7 +3,6 @@ import {
   Transformation,
   Derivation,
   transformation,
-  AnyDerivation,
   premise,
 } from '../model/derivation'
 import {
@@ -29,60 +28,50 @@ export type AnyCRResult = CRResult<Formulas, Prop, Prop, Formulas>
 export const isCRResult: Refinement<AnySequent, AnyCRResult> =
   refineActiveR(isConjunction)
 export const isCRResultDerivation = refineDerivation(isCRResult)
+export type CRDeps<
+  Γ extends Formulas,
+  A extends Prop,
+  B extends Prop,
+  Δ extends Formulas,
+> = [Derivation<Sequent<Γ, [A, ...Δ]>>, Derivation<Sequent<Γ, [B, ...Δ]>>]
+export type AnyCRDeps = CRDeps<Formulas, Prop, Prop, Formulas>
 export type CR<
   Γ extends Formulas,
   A extends Prop,
   B extends Prop,
   Δ extends Formulas,
   R extends CRResult<Γ, A, B, Δ>,
-> = Transformation<
-  R,
-  [Derivation<Sequent<Γ, [A, ...Δ]>>, Derivation<Sequent<Γ, [B, ...Δ]>>],
-  'cr'
->
-export type AnyCR = CR<Formulas, Prop, Prop, Formulas, AnyCRResult>
+  D extends CRDeps<Γ, A, B, Δ>,
+> = Transformation<R, D, 'cr'>
+export type AnyCR = CR<Formulas, Prop, Prop, Formulas, AnyCRResult, AnyCRDeps>
 export const cr = <
   Γ extends Formulas,
   A extends Prop,
   B extends Prop,
   Δ extends Formulas,
   R extends CRResult<Γ, A, B, Δ>,
+  D extends CRDeps<Γ, A, B, Δ>,
 >(
   result: R,
-  deps: [Derivation<Sequent<Γ, [A, ...Δ]>>, Derivation<Sequent<Γ, [B, ...Δ]>>],
-): CR<Γ, A, B, Δ, R> => {
+  deps: D,
+): CR<Γ, A, B, Δ, R, D> => {
   return transformation(result, deps, 'cr')
 }
-export type ApplyCR<S1 extends AnyDerivation, S2 extends AnyDerivation> = [
-  S1,
-  S2,
-] extends [
-  Derivation<
-    Sequent<infer Γ, [infer A extends Prop, ...infer Δ extends Formulas]>
-  >,
-  Derivation<
-    Sequent<infer Γ, [infer B extends Prop, ...infer Δ extends Formulas]>
-  >,
-]
-  ? CR<Γ, A, B, Δ, CRResult<Γ, A, B, Δ>>
-  : never
 export const applyCR = <
   Γ extends Formulas,
   A extends Prop,
   B extends Prop,
   Δ extends Formulas,
+  D extends CRDeps<Γ, A, B, Δ>,
 >(
-  s1: Derivation<Sequent<Γ, [A, ...Δ]>>,
-  s2: Derivation<Sequent<Γ, [B, ...Δ]>>,
-): ApplyCR<
-  Derivation<Sequent<Γ, [A, ...Δ]>>,
-  Derivation<Sequent<Γ, [B, ...Δ]>>
-> => {
-  const γ: Γ = s1.result.antecedent
-  const a: A = tuple.head(s1.result.succedent)
-  const b: B = tuple.head(s2.result.succedent)
-  const δ: Δ = tuple.tail(s1.result.succedent)
-  return cr(sequent(γ, [conjunction(a, b), ...δ]), [s1, s2])
+  ...deps: D & CRDeps<Γ, A, B, Δ>
+): CR<Γ, A, B, Δ, CRResult<Γ, A, B, Δ>, D> => {
+  const [dep1, dep2] = deps
+  const γ: Γ = dep1.result.antecedent
+  const a: A = tuple.head(dep1.result.succedent)
+  const b: B = tuple.head(dep2.result.succedent)
+  const δ: Δ = tuple.tail(dep1.result.succedent)
+  return cr(sequent(γ, [conjunction(a, b), ...δ]), deps)
 }
 export const reverseCR = <
   Γ extends Formulas,
@@ -92,7 +81,7 @@ export const reverseCR = <
   R extends CRResult<Γ, A, B, Δ>,
 >(
   p: Derivation<R>,
-): CR<Γ, A, B, Δ, R> => {
+): CR<Γ, A, B, Δ, R, CRDeps<Γ, A, B, Δ>> => {
   const γ: Γ = p.result.antecedent
   const acb: Conjunction<A, B> = tuple.head(p.result.succedent)
   const a: A = acb.leftConjunct

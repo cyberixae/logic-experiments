@@ -25,50 +25,57 @@ export const isSXLResult: Refinement<AnySequent, AnySXLResult> = (
   return s.antecedent.length > 1
 }
 export const isSXLResultDerivation = refineDerivation(isSXLResult)
+export type SXLDeps<
+  Γ extends Formulas,
+  A extends Prop,
+  B extends Prop,
+  Δ extends Formulas,
+> = [Derivation<Sequent<[...Γ, A, B], Δ>>]
+export type AnySXLDeps = SXLDeps<Formulas, Prop, Prop, Formulas>
 export type SXL<
   Γ extends Formulas,
   B extends Prop,
   A extends Prop,
   Δ extends Formulas,
   R extends SXLResult<Γ, B, A, Δ>,
-> = Transformation<R, [Derivation<Sequent<[...Γ, A, B], Δ>>], 'sxl'>
-export type AnySXL = SXL<Formulas, Prop, Prop, Formulas, AnySXLResult>
+  D extends SXLDeps<Γ, A, B, Δ>,
+> = Transformation<R, D, 'sxl'>
+export type AnySXL = SXL<
+  Formulas,
+  Prop,
+  Prop,
+  Formulas,
+  AnySXLResult,
+  AnySXLDeps
+>
 export const sxl = <
   Γ extends Formulas,
   A extends Prop,
   B extends Prop,
   Δ extends Formulas,
   R extends SXLResult<Γ, B, A, Δ>,
+  D extends SXLDeps<Γ, A, B, Δ>,
 >(
   result: R,
-  deps: [Derivation<Sequent<[...Γ, A, B], Δ>>],
-): SXL<Γ, B, A, Δ, R> => {
+  deps: D,
+): SXL<Γ, B, A, Δ, R, D> => {
   return transformation(result, deps, 'sxl')
 }
-export type ApplySXL<
-  S extends Derivation<Sequent<[...Formulas, Prop, Prop], Formulas>>,
-> =
-  S extends Derivation<
-    Sequent<
-      [...infer Γ extends Formulas, infer A extends Prop, infer B extends Prop],
-      infer Δ
-    >
-  >
-    ? SXL<Γ, B, A, Δ, SXLResult<Γ, B, A, Δ>>
-    : never
 export const applySXL = <
   Γ extends Formulas,
   A extends Prop,
   B extends Prop,
   Δ extends Formulas,
+  D extends SXLDeps<Γ, A, B, Δ>,
 >(
-  s: Derivation<Sequent<[...Γ, A, B], Δ>>,
-): ApplySXL<Derivation<Sequent<[...Γ, A, B], Δ>>> => {
-  const γ: Γ = tuple.init(tuple.init(s.result.antecedent))
-  const b: B = tuple.last(s.result.antecedent)
-  const a: A = tuple.last(tuple.init(s.result.antecedent))
-  const δ: Δ = s.result.succedent
-  return sxl(sequent([...γ, b, a], δ), [s])
+  ...deps: D & SXLDeps<Γ, A, B, Δ>
+): SXL<Γ, B, A, Δ, SXLResult<Γ, B, A, Δ>, D> => {
+  const [dep] = deps
+  const γ: Γ = tuple.init(tuple.init(dep.result.antecedent))
+  const b: B = tuple.last(dep.result.antecedent)
+  const a: A = tuple.last(tuple.init(dep.result.antecedent))
+  const δ: Δ = dep.result.succedent
+  return sxl(sequent([...γ, b, a], δ), deps)
 }
 export const reverseSXL = <
   Γ extends Formulas,
@@ -78,7 +85,7 @@ export const reverseSXL = <
   R extends SXLResult<Γ, B, A, Δ>,
 >(
   p: Derivation<R>,
-): SXL<Γ, B, A, Δ, R> => {
+): SXL<Γ, B, A, Δ, R, SXLDeps<Γ, A, B, Δ>> => {
   const γ: Γ = tuple.init(tuple.init(p.result.antecedent))
   const a: A = tuple.last(p.result.antecedent)
   const b: B = tuple.last(tuple.init(p.result.antecedent))

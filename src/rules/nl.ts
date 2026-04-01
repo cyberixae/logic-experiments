@@ -3,7 +3,6 @@ import {
   Transformation,
   Derivation,
   transformation,
-  AnyDerivation,
   premise,
 } from '../model/derivation'
 import { Prop, Negation, isNegation, negation, atom } from '../model/prop'
@@ -22,37 +21,43 @@ export type AnyNLResult = NLResult<Formulas, Prop, Formulas>
 export const isNLResult: Refinement<AnySequent, AnyNLResult> =
   refineActiveL(isNegation)
 export const isNLResultDerivation = refineDerivation(isNLResult)
+export type NLDeps<Γ extends Formulas, A extends Prop, Δ extends Formulas> = [
+  Derivation<Sequent<Γ, [A, ...Δ]>>,
+]
+export type AnyNLDeps = NLDeps<Formulas, Prop, Formulas>
 export type NL<
   Γ extends Formulas,
   A extends Prop,
   Δ extends Formulas,
   R extends NLResult<Γ, A, Δ>,
-> = Transformation<R, [Derivation<Sequent<Γ, [A, ...Δ]>>], 'nl'>
-export type AnyNL = NL<Formulas, Prop, Formulas, AnyNLResult>
+  D extends NLDeps<Γ, A, Δ>,
+> = Transformation<R, D, 'nl'>
+export type AnyNL = NL<Formulas, Prop, Formulas, AnyNLResult, AnyNLDeps>
 export const nl = <
   Γ extends Formulas,
   A extends Prop,
   Δ extends Formulas,
   R extends NLResult<Γ, A, Δ>,
+  D extends NLDeps<Γ, A, Δ>,
 >(
   result: R,
-  deps: [Derivation<Sequent<Γ, [A, ...Δ]>>],
-): NL<Γ, A, Δ, R> => {
+  deps: D,
+): NL<Γ, A, Δ, R, D> => {
   return transformation(result, deps, 'nl')
 }
-export type ApplyNL<S extends AnyDerivation> =
-  S extends Derivation<
-    Sequent<infer Γ, [infer A extends Prop, ...infer Δ extends Formulas]>
-  >
-    ? NL<Γ, A, Δ, NLResult<Γ, A, Δ>>
-    : never
-export const applyNL = <Γ extends Formulas, A extends Prop, Δ extends Formulas>(
-  s: Derivation<Sequent<Γ, [A, ...Δ]>>,
-): ApplyNL<Derivation<Sequent<Γ, [A, ...Δ]>>> => {
-  const γ: Γ = s.result.antecedent
-  const a: A = tuple.head(s.result.succedent)
-  const δ: Δ = tuple.tail(s.result.succedent)
-  return nl(sequent([...γ, negation(a)], δ), [s])
+export const applyNL = <
+  Γ extends Formulas,
+  A extends Prop,
+  Δ extends Formulas,
+  D extends NLDeps<Γ, A, Δ>,
+>(
+  ...deps: D & NLDeps<Γ, A, Δ>
+): NL<Γ, A, Δ, NLResult<Γ, A, Δ>, D> => {
+  const [dep] = deps
+  const γ: Γ = dep.result.antecedent
+  const a: A = tuple.head(dep.result.succedent)
+  const δ: Δ = tuple.tail(dep.result.succedent)
+  return nl(sequent([...γ, negation(a)], δ), deps)
 }
 export const reverseNL = <
   Γ extends Formulas,
@@ -61,7 +66,7 @@ export const reverseNL = <
   R extends NLResult<Γ, A, Δ>,
 >(
   p: Derivation<R>,
-): NL<Γ, A, Δ, R> => {
+): NL<Γ, A, Δ, R, NLDeps<Γ, A, Δ>> => {
   const γ: Γ = tuple.init(p.result.antecedent)
   const na: Negation<A> = tuple.last(p.result.antecedent)
   const a: A = na.negand

@@ -3,7 +3,6 @@ import {
   Transformation,
   Derivation,
   transformation,
-  AnyDerivation,
   premise,
 } from '../model/derivation'
 import { Prop, atom } from '../model/prop'
@@ -26,48 +25,57 @@ export const isSRotRFResult: Refinement<AnySequent, AnySRotRFResult> = (
   return s.succedent.length > 1
 }
 export const isSRotRFResultDerivation = refineDerivation(isSRotRFResult)
+export type SRotRFDeps<
+  Γ extends Formulas,
+  A extends Prop,
+  B extends Prop,
+  Δ extends Formulas,
+> = [Derivation<Sequent<Γ, [A, B, ...Δ]>>]
+export type AnySRotRFDeps = SRotRFDeps<Formulas, Prop, Prop, Formulas>
 export type SRotRF<
   Γ extends Formulas,
   B extends Prop,
   Δ extends Formulas,
   A extends Prop,
   R extends SRotRFResult<Γ, B, Δ, A>,
-> = Transformation<R, [Derivation<Sequent<Γ, [A, B, ...Δ]>>], 'sRotRF'>
-export type AnySRotRF = SRotRF<Formulas, Prop, Formulas, Prop, AnySRotRFResult>
+  D extends SRotRFDeps<Γ, A, B, Δ>,
+> = Transformation<R, D, 'sRotRF'>
+export type AnySRotRF = SRotRF<
+  Formulas,
+  Prop,
+  Formulas,
+  Prop,
+  AnySRotRFResult,
+  AnySRotRFDeps
+>
 export const sRotRF = <
   Γ extends Formulas,
   B extends Prop,
   Δ extends Formulas,
   A extends Prop,
   R extends SRotRFResult<Γ, B, Δ, A>,
+  D extends SRotRFDeps<Γ, A, B, Δ>,
 >(
   result: R,
-  deps: [Derivation<Sequent<Γ, [A, B, ...Δ]>>],
-): SRotRF<Γ, B, Δ, A, R> => {
+  deps: D,
+): SRotRF<Γ, B, Δ, A, R, D> => {
   return transformation(result, deps, 'sRotRF')
 }
-export type ApplySRotRF<S extends AnyDerivation> =
-  S extends Derivation<
-    Sequent<
-      infer Γ,
-      [infer A extends Prop, infer B extends Prop, ...infer Δ extends Formulas]
-    >
-  >
-    ? SRotRF<Γ, B, Δ, A, SRotRFResult<Γ, B, Δ, A>>
-    : never
 export const applySRotRF = <
   Γ extends Formulas,
   B extends Prop,
   Δ extends Formulas,
   A extends Prop,
+  D extends SRotRFDeps<Γ, A, B, Δ>,
 >(
-  s: Derivation<Sequent<Γ, [A, B, ...Δ]>>,
-): ApplySRotRF<Derivation<Sequent<Γ, [A, B, ...Δ]>>> => {
-  const γ: Γ = s.result.antecedent
-  const δ: Δ = tuple.tail(tuple.tail(s.result.succedent))
-  const a: A = tuple.head(s.result.succedent)
-  const b: B = tuple.head(tuple.tail(s.result.succedent))
-  return sRotRF(sequent(γ, [b, ...δ, a]), [s])
+  ...deps: D & SRotRFDeps<Γ, A, B, Δ>
+): SRotRF<Γ, B, Δ, A, SRotRFResult<Γ, B, Δ, A>, D> => {
+  const [dep] = deps
+  const γ: Γ = dep.result.antecedent
+  const δ: Δ = tuple.tail(tuple.tail(dep.result.succedent))
+  const a: A = tuple.head(dep.result.succedent)
+  const b: B = tuple.head(tuple.tail(dep.result.succedent))
+  return sRotRF(sequent(γ, [b, ...δ, a]), deps)
 }
 export const reverseSRotRF = <
   Γ extends Formulas,
@@ -77,7 +85,7 @@ export const reverseSRotRF = <
   R extends SRotRFResult<Γ, B, Δ, A>,
 >(
   p: Derivation<R>,
-): SRotRF<Γ, B, Δ, A, R> => {
+): SRotRF<Γ, B, Δ, A, R, SRotRFDeps<Γ, A, B, Δ>> => {
   const γ: Γ = p.result.antecedent
   const δ: Δ = tuple.init(tuple.tail(p.result.succedent))
   const a: A = tuple.last(p.result.succedent)

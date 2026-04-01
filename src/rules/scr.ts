@@ -20,46 +20,43 @@ export type SCRResult<
 export type AnySCRResult = SCRResult<Formulas, Prop, Formulas>
 export const isSCRResult: Refinement<AnySequent, AnySCRResult> = isActiveR
 export const isSCRResultDerivation = refineDerivation(isSCRResult)
+export type SCRDeps<Γ extends Formulas, A extends Prop, Δ extends Formulas> = [
+  Derivation<Sequent<Γ, [A, A, ...Δ]>>,
+]
+export type AnySCRDeps = SCRDeps<Formulas, Prop, Formulas>
 export type SCR<
   Γ extends Formulas,
   A extends Prop,
   Δ extends Formulas,
   R extends SCRResult<Γ, A, Δ>,
-> = Transformation<R, [Derivation<Sequent<Γ, [A, A, ...Δ]>>], 'scr'>
-export type AnySCR = SCR<Formulas, Prop, Formulas, AnySCRResult>
+  D extends SCRDeps<Γ, A, Δ>,
+> = Transformation<R, D, 'scr'>
+export type AnySCR = SCR<Formulas, Prop, Formulas, AnySCRResult, AnySCRDeps>
 export const scr = <
   Γ extends Formulas,
   A extends Prop,
   Δ extends Formulas,
   R extends SCRResult<Γ, A, Δ>,
+  D extends SCRDeps<Γ, A, Δ>,
 >(
   result: R,
-  deps: [Derivation<Sequent<Γ, [A, A, ...Δ]>>],
-): SCR<Γ, A, Δ, R> => {
+  deps: D,
+): SCR<Γ, A, Δ, R, D> => {
   return transformation(result, deps, 'scr')
 }
-export type ApplySCR<
-  S extends Derivation<Sequent<Formulas, [Prop, Prop, ...Formulas]>>,
-> =
-  S extends Derivation<
-    Sequent<
-      infer Γ,
-      [infer A extends Prop, infer A extends Prop, ...infer Δ extends Formulas]
-    >
-  >
-    ? SCR<Γ, A, Δ, SCRResult<Γ, A, Δ>>
-    : never
 export const applySCR = <
   Γ extends Formulas,
   Δ extends Formulas,
   A extends Prop,
+  D extends SCRDeps<Γ, A, Δ>,
 >(
-  s: Derivation<Sequent<Γ, [A, A, ...Δ]>>,
-): ApplySCR<Derivation<Sequent<Γ, [A, A, ...Δ]>>> => {
-  const γ: Γ = s.result.antecedent
-  const a: A = tuple.head(s.result.succedent)
-  const δ: Δ = tuple.tail(tuple.tail(s.result.succedent))
-  return scr(sequent(γ, [a, ...δ]), [s])
+  ...deps: D & SCRDeps<Γ, A, Δ>
+): SCR<Γ, A, Δ, SCRResult<Γ, A, Δ>, D> => {
+  const [dep] = deps
+  const γ: Γ = dep.result.antecedent
+  const a: A = tuple.head(dep.result.succedent)
+  const δ: Δ = tuple.tail(tuple.tail(dep.result.succedent))
+  return scr(sequent(γ, [a, ...δ]), deps)
 }
 export const reverseSCR = <
   Γ extends Formulas,
@@ -68,7 +65,7 @@ export const reverseSCR = <
   R extends SCRResult<Γ, A, Δ>,
 >(
   p: Derivation<R>,
-): SCR<Γ, A, Δ, R> => {
+): SCR<Γ, A, Δ, R, SCRDeps<Γ, A, Δ>> => {
   const γ: Γ = p.result.antecedent
   const a: A = tuple.head(p.result.succedent)
   const δ: Δ = tuple.tail(p.result.succedent)

@@ -3,7 +3,6 @@ import {
   Transformation,
   Derivation,
   transformation,
-  AnyDerivation,
   premise,
 } from '../model/derivation'
 import {
@@ -29,45 +28,54 @@ export type AnyCL2Result = CL2Result<Formulas, Prop, Prop, Formulas>
 export const isCL2Result: Refinement<AnySequent, AnyCL2Result> =
   refineActiveL(isConjunction)
 export const isCL2ResultDerivation = refineDerivation(isCL2Result)
+export type CL2Deps<Γ extends Formulas, B extends Prop, Δ extends Formulas> = [
+  Derivation<Sequent<[...Γ, B], Δ>>,
+]
+export type AnyCL2Deps = CL2Deps<Formulas, Prop, Formulas>
 export type CL2<
   Γ extends Formulas,
   A extends Prop,
   B extends Prop,
   Δ extends Formulas,
   R extends CL2Result<Γ, A, B, Δ>,
-> = Transformation<R, [Derivation<Sequent<[...Γ, B], Δ>>], 'cl2'>
-export type AnyCL2 = CL2<Formulas, Prop, Prop, Formulas, AnyCL2Result>
+  D extends CL2Deps<Γ, B, Δ>,
+> = Transformation<R, D, 'cl2'>
+export type AnyCL2 = CL2<
+  Formulas,
+  Prop,
+  Prop,
+  Formulas,
+  AnyCL2Result,
+  AnyCL2Deps
+>
 export const cl2 = <
   Γ extends Formulas,
   A extends Prop,
   B extends Prop,
   Δ extends Formulas,
   R extends CL2Result<Γ, A, B, Δ>,
+  D extends CL2Deps<Γ, B, Δ>,
 >(
   result: R,
-  deps: [Derivation<Sequent<[...Γ, B], Δ>>],
-): CL2<Γ, A, B, Δ, R> => {
+  deps: D,
+): CL2<Γ, A, B, Δ, R, D> => {
   return transformation(result, deps, 'cl2')
 }
-export type ApplyCL2<A extends Prop, S extends AnyDerivation> =
-  S extends Derivation<
-    Sequent<[...infer Γ extends Formulas, infer B extends Prop], infer Δ>
-  >
-    ? CL2<Γ, A, B, Δ, CL2Result<Γ, A, B, Δ>>
-    : never
 export const applyCL2 = <
   A extends Prop,
   Γ extends Formulas,
   B extends Prop,
   Δ extends Formulas,
+  D extends CL2Deps<Γ, B, Δ>,
 >(
   a: A,
-  s: Derivation<Sequent<[...Γ, B], Δ>>,
-): ApplyCL2<A, Derivation<Sequent<[...Γ, B], Δ>>> => {
-  const γ: Γ = tuple.init(s.result.antecedent)
-  const b: B = tuple.last(s.result.antecedent)
-  const δ: Δ = s.result.succedent
-  return cl2(sequent([...γ, conjunction(a, b)], δ), [s])
+  ...deps: D & CL2Deps<Γ, B, Δ>
+): CL2<Γ, A, B, Δ, CL2Result<Γ, A, B, Δ>, D> => {
+  const [dep] = deps
+  const γ: Γ = tuple.init(dep.result.antecedent)
+  const b: B = tuple.last(dep.result.antecedent)
+  const δ: Δ = dep.result.succedent
+  return cl2(sequent([...γ, conjunction(a, b)], δ), deps)
 }
 export const reverseCL2 = <
   Γ extends Formulas,
@@ -77,7 +85,7 @@ export const reverseCL2 = <
   R extends CL2Result<Γ, A, B, Δ>,
 >(
   p: Derivation<R>,
-): CL2<Γ, A, B, Δ, R> => {
+): CL2<Γ, A, B, Δ, R, CL2Deps<Γ, B, Δ>> => {
   const γ: Γ = tuple.init(p.result.antecedent)
   const acb: Conjunction<A, B> = tuple.last(p.result.antecedent)
   const b: B = acb.rightConjunct

@@ -3,7 +3,6 @@ import {
   Transformation,
   Derivation,
   transformation,
-  AnyDerivation,
   premise,
 } from '../model/derivation'
 import { Prop, Negation, isNegation, negation, atom } from '../model/prop'
@@ -22,38 +21,43 @@ export type AnyNRResult = NRResult<Formulas, Prop, Formulas>
 export const isNRResult: Refinement<AnySequent, AnyNRResult> =
   refineActiveR(isNegation)
 export const isNRResultDerivation = refineDerivation(isNRResult)
+export type NRDeps<Γ extends Formulas, A extends Prop, Δ extends Formulas> = [
+  Derivation<Sequent<[...Γ, A], Δ>>,
+]
+export type AnyNRDeps = NRDeps<Formulas, Prop, Formulas>
 export type NR<
   Γ extends Formulas,
   A extends Prop,
   Δ extends Formulas,
   R extends NRResult<Γ, A, Δ>,
-> = Transformation<R, [Derivation<Sequent<[...Γ, A], Δ>>], 'nr'>
-export type AnyNR = NR<Formulas, Prop, Formulas, AnyNRResult>
+  D extends NRDeps<Γ, A, Δ>,
+> = Transformation<R, D, 'nr'>
+export type AnyNR = NR<Formulas, Prop, Formulas, AnyNRResult, AnyNRDeps>
 export const nr = <
   Γ extends Formulas,
   A extends Prop,
   Δ extends Formulas,
   R extends NRResult<Γ, A, Δ>,
+  D extends NRDeps<Γ, A, Δ>,
 >(
   result: R,
-  deps: [Derivation<Sequent<[...Γ, A], Δ>>],
-): NR<Γ, A, Δ, R> => {
+  deps: D,
+): NR<Γ, A, Δ, R, D> => {
   return transformation(result, deps, 'nr')
 }
-export type ApplyNR<S extends AnyDerivation> =
-  S extends Derivation<
-    Sequent<[...infer Γ extends Formulas, infer A extends Prop], infer Δ>
-  >
-    ? NR<Γ, A, Δ, NRResult<Γ, A, Δ>>
-    : never
-
-export const applyNR = <Γ extends Formulas, A extends Prop, Δ extends Formulas>(
-  s: Derivation<Sequent<[...Γ, A], Δ>>,
-): ApplyNR<Derivation<Sequent<[...Γ, A], Δ>>> => {
-  const γ: Γ = tuple.init(s.result.antecedent)
-  const a: A = tuple.last(s.result.antecedent)
-  const δ: Δ = s.result.succedent
-  return nr(sequent(γ, [negation(a), ...δ]), [s])
+export const applyNR = <
+  Γ extends Formulas,
+  A extends Prop,
+  Δ extends Formulas,
+  D extends NRDeps<Γ, A, Δ>,
+>(
+  ...deps: D & NRDeps<Γ, A, Δ>
+): NR<Γ, A, Δ, NRResult<Γ, A, Δ>, D> => {
+  const [dep] = deps
+  const γ: Γ = tuple.init(dep.result.antecedent)
+  const a: A = tuple.last(dep.result.antecedent)
+  const δ: Δ = dep.result.succedent
+  return nr(sequent(γ, [negation(a), ...δ]), deps)
 }
 export const reverseNR = <
   Γ extends Formulas,
@@ -62,7 +66,7 @@ export const reverseNR = <
   R extends NRResult<Γ, A, Δ>,
 >(
   p: Derivation<R>,
-): NR<Γ, A, Δ, R> => {
+): NR<Γ, A, Δ, R, NRDeps<Γ, A, Δ>> => {
   const γ: Γ = p.result.antecedent
   const na: Negation<A> = tuple.head(p.result.succedent)
   const a: A = na.negand

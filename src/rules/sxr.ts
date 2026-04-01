@@ -25,50 +25,57 @@ export const isSXRResult: Refinement<AnySequent, AnySXRResult> = (
   return s.succedent.length > 1
 }
 export const isSXRResultDerivation = refineDerivation(isSXRResult)
+export type SXRDeps<
+  Γ extends Formulas,
+  A extends Prop,
+  B extends Prop,
+  Δ extends Formulas,
+> = [Derivation<Sequent<Γ, [A, B, ...Δ]>>]
+export type AnySXRDeps = SXRDeps<Formulas, Prop, Prop, Formulas>
 export type SXR<
   Γ extends Formulas,
   B extends Prop,
   A extends Prop,
   Δ extends Formulas,
   R extends SXRResult<Γ, B, A, Δ>,
-> = Transformation<R, [Derivation<Sequent<Γ, [A, B, ...Δ]>>], 'sxr'>
-export type AnySXR = SXR<Formulas, Prop, Prop, Formulas, AnySXRResult>
+  D extends SXRDeps<Γ, A, B, Δ>,
+> = Transformation<R, D, 'sxr'>
+export type AnySXR = SXR<
+  Formulas,
+  Prop,
+  Prop,
+  Formulas,
+  AnySXRResult,
+  AnySXRDeps
+>
 export const sxr = <
   Γ extends Formulas,
   A extends Prop,
   B extends Prop,
   Δ extends Formulas,
   R extends SXRResult<Γ, B, A, Δ>,
+  D extends SXRDeps<Γ, A, B, Δ>,
 >(
   result: R,
-  deps: [Derivation<Sequent<Γ, [A, B, ...Δ]>>],
-): SXR<Γ, B, A, Δ, R> => {
+  deps: D,
+): SXR<Γ, B, A, Δ, R, D> => {
   return transformation(result, deps, 'sxr')
 }
-export type ApplySXR<
-  S extends Derivation<Sequent<Formulas, [Prop, Prop, ...Formulas]>>,
-> =
-  S extends Derivation<
-    Sequent<
-      infer Γ,
-      [infer A extends Prop, infer B extends Prop, ...infer Δ extends Formulas]
-    >
-  >
-    ? SXR<Γ, B, A, Δ, SXRResult<Γ, B, A, Δ>>
-    : never
 export const applySXR = <
   Γ extends Formulas,
   A extends Prop,
   B extends Prop,
   Δ extends Formulas,
+  D extends SXRDeps<Γ, A, B, Δ>,
 >(
-  s: Derivation<Sequent<Γ, [A, B, ...Δ]>>,
-): ApplySXR<Derivation<Sequent<Γ, [A, B, ...Δ]>>> => {
-  const γ: Γ = s.result.antecedent
-  const b: B = tuple.head(tuple.tail(s.result.succedent))
-  const a: A = tuple.head(s.result.succedent)
-  const δ: Δ = tuple.tail(tuple.tail(s.result.succedent))
-  return sxr(sequent(γ, [b, a, ...δ]), [s])
+  ...deps: D & SXRDeps<Γ, A, B, Δ>
+): SXR<Γ, B, A, Δ, SXRResult<Γ, B, A, Δ>, D> => {
+  const [dep] = deps
+  const γ: Γ = dep.result.antecedent
+  const b: B = tuple.head(tuple.tail(dep.result.succedent))
+  const a: A = tuple.head(dep.result.succedent)
+  const δ: Δ = tuple.tail(tuple.tail(dep.result.succedent))
+  return sxr(sequent(γ, [b, a, ...δ]), deps)
 }
 export const reverseSXR = <
   Γ extends Formulas,
@@ -78,7 +85,7 @@ export const reverseSXR = <
   R extends SXRResult<Γ, B, A, Δ>,
 >(
   p: Derivation<R>,
-): SXR<Γ, B, A, Δ, R> => {
+): SXR<Γ, B, A, Δ, R, SXRDeps<Γ, A, B, Δ>> => {
   const γ: Γ = p.result.antecedent
   const a: A = tuple.head(tuple.tail(p.result.succedent))
   const b: B = tuple.head(p.result.succedent)

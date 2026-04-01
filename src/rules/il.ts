@@ -3,7 +3,6 @@ import {
   Transformation,
   Derivation,
   transformation,
-  AnyDerivation,
   premise,
 } from '../model/derivation'
 import {
@@ -29,60 +28,50 @@ export type AnyILResult = ILResult<Formulas, Prop, Prop, Formulas>
 export const isILResult: Refinement<AnySequent, AnyILResult> =
   refineActiveL(isImplication)
 export const isILResultDerivation = refineDerivation(isILResult)
+export type ILDeps<
+  Γ extends Formulas,
+  A extends Prop,
+  B extends Prop,
+  Δ extends Formulas,
+> = [Derivation<Sequent<Γ, [A, ...Δ]>>, Derivation<Sequent<[...Γ, B], Δ>>]
+export type AnyILDeps = ILDeps<Formulas, Prop, Prop, Formulas>
 export type IL<
   Γ extends Formulas,
   A extends Prop,
   B extends Prop,
   Δ extends Formulas,
   R extends ILResult<Γ, A, B, Δ>,
-> = Transformation<
-  R,
-  [Derivation<Sequent<Γ, [A, ...Δ]>>, Derivation<Sequent<[...Γ, B], Δ>>],
-  'il'
->
-export type AnyIL = IL<Formulas, Prop, Prop, Formulas, AnyILResult>
+  D extends ILDeps<Γ, A, B, Δ>,
+> = Transformation<R, D, 'il'>
+export type AnyIL = IL<Formulas, Prop, Prop, Formulas, AnyILResult, AnyILDeps>
 export const il = <
   Γ extends Formulas,
   A extends Prop,
   B extends Prop,
   Δ extends Formulas,
   R extends ILResult<Γ, A, B, Δ>,
+  D extends ILDeps<Γ, A, B, Δ>,
 >(
   result: R,
-  deps: [Derivation<Sequent<Γ, [A, ...Δ]>>, Derivation<Sequent<[...Γ, B], Δ>>],
-): IL<Γ, A, B, Δ, R> => {
+  deps: D,
+): IL<Γ, A, B, Δ, R, D> => {
   return transformation(result, deps, 'il')
 }
-export type ApplyIL<S1 extends AnyDerivation, S2 extends AnyDerivation> = [
-  S1,
-  S2,
-] extends [
-  Derivation<
-    Sequent<infer Γ, [infer A extends Prop, ...infer Δ extends Formulas]>
-  >,
-  Derivation<
-    Sequent<[...infer Γ extends Formulas, infer B extends Prop], infer Δ>
-  >,
-]
-  ? IL<Γ, A, B, Δ, ILResult<Γ, A, B, Δ>>
-  : never
 export const applyIL = <
   Γ extends Formulas,
   A extends Prop,
   Δ extends Formulas,
   B extends Prop,
+  D extends ILDeps<Γ, A, B, Δ>,
 >(
-  s1: Derivation<Sequent<Γ, [A, ...Δ]>>,
-  s2: Derivation<Sequent<[...Γ, B], Δ>>,
-): ApplyIL<
-  Derivation<Sequent<Γ, [A, ...Δ]>>,
-  Derivation<Sequent<[...Γ, B], Δ>>
-> => {
-  const γ: Γ = s1.result.antecedent
-  const a: A = tuple.head(s1.result.succedent)
-  const b: B = tuple.last(s2.result.antecedent)
-  const δ: Δ = tuple.tail(s1.result.succedent)
-  return il(sequent([...γ, implication(a, b)], δ), [s1, s2])
+  ...deps: D & ILDeps<Γ, A, B, Δ>
+): IL<Γ, A, B, Δ, ILResult<Γ, A, B, Δ>, D> => {
+  const [dep1, dep2] = deps
+  const γ: Γ = dep1.result.antecedent
+  const a: A = tuple.head(dep1.result.succedent)
+  const b: B = tuple.last(dep2.result.antecedent)
+  const δ: Δ = tuple.tail(dep1.result.succedent)
+  return il(sequent([...γ, implication(a, b)], δ), deps)
 }
 export const reverseIL = <
   Γ extends Formulas,
@@ -92,7 +81,7 @@ export const reverseIL = <
   R extends ILResult<Γ, A, B, Δ>,
 >(
   p: Derivation<R>,
-): IL<Γ, A, B, Δ, R> => {
+): IL<Γ, A, B, Δ, R, ILDeps<Γ, A, B, Δ>> => {
   const γ: Γ = tuple.init(p.result.antecedent)
   const aib: Implication<A, B> = tuple.last(p.result.antecedent)
   const a: A = aib.antecedent

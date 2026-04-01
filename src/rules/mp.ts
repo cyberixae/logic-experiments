@@ -23,43 +23,36 @@ export const isMPResult: Refinement<AnySequent, AnyMPResult> = (
   j: AnySequent,
 ): j is AnyMPResult => isConclusion(j)
 export const isMPResultDerivation = refineDerivation(isMPResult)
+export type MPDeps<Q extends Prop, P extends Prop> = [
+  Derivation<Conclusion<Implication<P, Q>>>,
+  Derivation<Conclusion<P>>,
+]
+export type AnyMPDeps = MPDeps<Prop, Prop>
 export type MP<
   Q extends Prop,
   P extends Prop,
   C extends MPResult<Q>,
-> = Transformation<
-  C,
-  [Derivation<Conclusion<Implication<P, Q>>>, Derivation<Conclusion<P>>],
-  'MP'
->
-export type AnyMP = MP<Prop, Prop, AnyMPResult>
-export const mp = <Q extends Prop, P extends Prop, C extends MPResult<Q>>(
+  D extends MPDeps<Q, P>,
+> = Transformation<C, D, 'MP'>
+export type AnyMP = MP<Prop, Prop, AnyMPResult, AnyMPDeps>
+export const mp = <
+  Q extends Prop,
+  P extends Prop,
+  C extends MPResult<Q>,
+  D extends MPDeps<Q, P>,
+>(
   result: C,
-  deps: [Derivation<Conclusion<Implication<P, Q>>>, Derivation<Conclusion<P>>],
-): MP<Q, P, C> => transformation(result, deps, 'MP')
-export type ApplyMP<
-  S1 extends Derivation<
-    Conclusion<Implication<S2['result']['succedent'][0], Prop>>
-  >,
-  S2 extends Derivation<Conclusion<Prop>>,
-> =
-  S1 extends Derivation<
-    Conclusion<Implication<infer P extends Prop, infer Q extends Prop>>
-  >
-    ? MP<Q, P, MPResult<Q>>
-    : never
-export const applyMP = <A extends Prop, C extends Prop>(
-  s1: Derivation<Conclusion<Implication<A, C>>>,
-  s2: Derivation<Conclusion<A>>,
-): ApplyMP<
-  Derivation<Conclusion<Implication<A & Prop, C>>>,
-  Derivation<Conclusion<A>>
-> => {
-  const a1: A = s1.result.succedent[0].antecedent
-  const a2: A = s2.result.succedent[0]
+  deps: D,
+): MP<Q, P, C, D> => transformation(result, deps, 'MP')
+export const applyMP = <A extends Prop, C extends Prop, D extends MPDeps<C, A>>(
+  ...deps: D & MPDeps<C, A>
+): MP<C, A, MPResult<C>, D> => {
+  const [dep1, dep2] = deps
+  const a1: A = dep1.result.succedent[0].antecedent
+  const a2: A = dep2.result.succedent[0]
   const _a: A = utils.assertEqual(a1, a2)
-  const c: C = s1.result.succedent[0].consequent
-  return transformation(conclusion(c), [s1, s2], 'MP')
+  const c: C = dep1.result.succedent[0].consequent
+  return transformation(conclusion(c), deps, 'MP')
 }
 export const reverseMP = <
   Q extends Prop,
@@ -68,7 +61,7 @@ export const reverseMP = <
 >(
   d: Derivation<C>,
   p: P,
-): MP<Q, P, C> => {
+): MP<Q, P, C, MPDeps<Q, P>> => {
   const q: Q = head.head(d.result.succedent)
   const piq: Implication<P, Q> = implication(p, q)
   return mp(d.result, [premise(conclusion(piq)), premise(conclusion(p))])

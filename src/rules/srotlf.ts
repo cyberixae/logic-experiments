@@ -3,7 +3,6 @@ import {
   Transformation,
   Derivation,
   transformation,
-  AnyDerivation,
   premise,
 } from '../model/derivation'
 import { Prop, atom } from '../model/prop'
@@ -26,48 +25,57 @@ export const isSRotLFResult: Refinement<AnySequent, AnySRotLFResult> = (
   return s.antecedent.length > 1
 }
 export const isSRotLFResultDerivation = refineDerivation(isSRotLFResult)
+export type SRotLFDeps<
+  Γ extends Formulas,
+  B extends Prop,
+  A extends Prop,
+  Δ extends Formulas,
+> = [Derivation<Sequent<[...Γ, B, A], Δ>>]
+export type AnySRotLFDeps = SRotLFDeps<Formulas, Prop, Prop, Formulas>
 export type SRotLF<
   A extends Prop,
   Γ extends Formulas,
   B extends Prop,
   Δ extends Formulas,
   R extends SRotLFResult<A, Γ, B, Δ>,
-> = Transformation<R, [Derivation<Sequent<[...Γ, B, A], Δ>>], 'sRotLF'>
-export type AnySRotLF = SRotLF<Prop, Formulas, Prop, Formulas, AnySRotLFResult>
+  D extends SRotLFDeps<Γ, B, A, Δ>,
+> = Transformation<R, D, 'sRotLF'>
+export type AnySRotLF = SRotLF<
+  Prop,
+  Formulas,
+  Prop,
+  Formulas,
+  AnySRotLFResult,
+  AnySRotLFDeps
+>
 export const sRotLF = <
   A extends Prop,
   Γ extends Formulas,
   B extends Prop,
   Δ extends Formulas,
   R extends SRotLFResult<A, Γ, B, Δ>,
+  D extends SRotLFDeps<Γ, B, A, Δ>,
 >(
   result: R,
-  deps: [Derivation<Sequent<[...Γ, B, A], Δ>>],
-): SRotLF<A, Γ, B, Δ, R> => {
+  deps: D,
+): SRotLF<A, Γ, B, Δ, R, D> => {
   return transformation(result, deps, 'sRotLF')
 }
-export type ApplySRotLF<S extends AnyDerivation> =
-  S extends Derivation<
-    Sequent<
-      [...infer Γ extends Formulas, infer B extends Prop, infer A extends Prop],
-      infer Δ
-    >
-  >
-    ? SRotLF<A, Γ, B, Δ, SRotLFResult<A, Γ, B, Δ>>
-    : never
 export const applySRotLF = <
   A extends Prop,
   Γ extends Formulas,
   B extends Prop,
   Δ extends Formulas,
+  D extends SRotLFDeps<Γ, B, A, Δ>,
 >(
-  s: Derivation<Sequent<[...Γ, B, A], Δ>>,
-): ApplySRotLF<Derivation<Sequent<[...Γ, B, A], Δ>>> => {
-  const γ: Γ = tuple.init(tuple.init(s.result.antecedent))
-  const a: A = tuple.last(s.result.antecedent)
-  const b: B = tuple.last(tuple.init(s.result.antecedent))
-  const δ: Δ = s.result.succedent
-  return sRotLF(sequent([a, ...γ, b], δ), [s])
+  ...deps: D & SRotLFDeps<Γ, B, A, Δ>
+): SRotLF<A, Γ, B, Δ, SRotLFResult<A, Γ, B, Δ>, D> => {
+  const [dep] = deps
+  const γ: Γ = tuple.init(tuple.init(dep.result.antecedent))
+  const a: A = tuple.last(dep.result.antecedent)
+  const b: B = tuple.last(tuple.init(dep.result.antecedent))
+  const δ: Δ = dep.result.succedent
+  return sRotLF(sequent([a, ...γ, b], δ), deps)
 }
 export const reverseSRotLF = <
   A extends Prop,
@@ -77,7 +85,7 @@ export const reverseSRotLF = <
   R extends SRotLFResult<A, Γ, B, Δ>,
 >(
   p: Derivation<R>,
-): SRotLF<A, Γ, B, Δ, R> => {
+): SRotLF<A, Γ, B, Δ, R, SRotLFDeps<Γ, B, A, Δ>> => {
   const γ: Γ = tuple.init(tuple.tail(p.result.antecedent))
   const a: A = tuple.head(p.result.antecedent)
   const b: B = tuple.last(p.result.antecedent)

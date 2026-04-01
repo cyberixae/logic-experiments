@@ -3,7 +3,6 @@ import {
   Transformation,
   Derivation,
   transformation,
-  AnyDerivation,
   premise,
 } from '../model/derivation'
 import { Prop, Disjunction, disjunction, atom } from '../model/prop'
@@ -26,45 +25,54 @@ export const isDR1Result: Refinement<AnySequent, AnyDR1Result> = (
   return s.succedent.at(0)?.kind === 'disjunction'
 }
 export const isDR1ResultDerivation = refineDerivation(isDR1Result)
+export type DR1Deps<Γ extends Formulas, A extends Prop, Δ extends Formulas> = [
+  Derivation<Sequent<Γ, [A, ...Δ]>>,
+]
+export type AnyDR1Deps = DR1Deps<Formulas, Prop, Formulas>
 export type DR1<
   Γ extends Formulas,
   A extends Prop,
   B extends Prop,
   Δ extends Formulas,
   R extends DR1Result<Γ, A, B, Δ>,
-> = Transformation<R, [Derivation<Sequent<Γ, [A, ...Δ]>>], 'dr1'>
-export type AnyDR1 = DR1<Formulas, Prop, Prop, Formulas, AnyDR1Result>
+  D extends DR1Deps<Γ, A, Δ>,
+> = Transformation<R, D, 'dr1'>
+export type AnyDR1 = DR1<
+  Formulas,
+  Prop,
+  Prop,
+  Formulas,
+  AnyDR1Result,
+  AnyDR1Deps
+>
 export const dr1 = <
   Γ extends Formulas,
   A extends Prop,
   B extends Prop,
   Δ extends Formulas,
   R extends DR1Result<Γ, A, B, Δ>,
+  D extends DR1Deps<Γ, A, Δ>,
 >(
   result: R,
-  deps: [Derivation<Sequent<Γ, [A, ...Δ]>>],
-): DR1<Γ, A, B, Δ, R> => {
+  deps: D,
+): DR1<Γ, A, B, Δ, R, D> => {
   return transformation(result, deps, 'dr1')
 }
-export type ApplyDR1<B extends Prop, S extends AnyDerivation> =
-  S extends Derivation<
-    Sequent<infer Γ, [infer A extends Prop, ...infer Δ extends Formulas]>
-  >
-    ? DR1<Γ, A, B, Δ, DR1Result<Γ, A, B, Δ>>
-    : never
 export const applyDR1 = <
   B extends Prop,
   Γ extends Formulas,
   A extends Prop,
   Δ extends Formulas,
+  D extends DR1Deps<Γ, A, Δ>,
 >(
   b: B,
-  s: Derivation<Sequent<Γ, [A, ...Δ]>>,
-): ApplyDR1<B, Derivation<Sequent<Γ, [A, ...Δ]>>> => {
-  const γ: Γ = s.result.antecedent
-  const δ: Δ = tuple.tail(s.result.succedent)
-  const a: A = tuple.head(s.result.succedent)
-  return dr1(sequent(γ, [disjunction(a, b), ...δ]), [s])
+  ...deps: D & DR1Deps<Γ, A, Δ>
+): DR1<Γ, A, B, Δ, DR1Result<Γ, A, B, Δ>, D> => {
+  const [dep] = deps
+  const γ: Γ = dep.result.antecedent
+  const δ: Δ = tuple.tail(dep.result.succedent)
+  const a: A = tuple.head(dep.result.succedent)
+  return dr1(sequent(γ, [disjunction(a, b), ...δ]), deps)
 }
 export const reverseDR1 = <
   Γ extends Formulas,
@@ -74,7 +82,7 @@ export const reverseDR1 = <
   R extends DR1Result<Γ, A, B, Δ>,
 >(
   p: Derivation<R>,
-): DR1<Γ, A, B, Δ, R> => {
+): DR1<Γ, A, B, Δ, R, DR1Deps<Γ, A, Δ>> => {
   const γ: Γ = p.result.antecedent
   const adb: Disjunction<A, B> = tuple.head(p.result.succedent)
   const a: A = adb.leftDisjunct
