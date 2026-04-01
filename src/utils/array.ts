@@ -51,3 +51,6 @@ export const fromSeq = <T>(s: Seq<T>): Array<T> => [...s()]
 
 export const rotate = <T>([x, ...xs]: NonEmptyArray<T>): NonEmptyArray<T> =>
   [...xs, x] as unknown as NonEmptyArray<T>
+
+export const includes = <T>(arr: ReadonlyArray<T>, val: unknown): val is T =>
+  arr.some((x) => x === val)

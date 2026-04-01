@@ -77,11 +77,23 @@ export type Proof<
   D extends Array<AnyProof> = Array<AnyProof>,
   R extends RuleId = RuleId,
 > = Transformation<J, D, R>
+
+export type ProofUsing<
+  J extends AnySequent,
+  AllowedR extends RuleId,
+> = Transformation<J, Array<ProofUsing<AnySequent, AllowedR>>, AllowedR>
 export function proof<
   J extends AnySequent,
   D extends Array<AnyProof>,
   R extends RuleId,
 >(result: J, deps: D, rule: R): Proof<J, D, R> {
+  return { kind: 'transformation', result, deps, rule }
+}
+export function proofUsing<J extends AnySequent, R extends RuleId>(
+  result: J,
+  deps: Array<ProofUsing<AnySequent, R>>,
+  rule: R,
+): ProofUsing<J, R> {
   return { kind: 'transformation', result, deps, rule }
 }
 export type AnyProof = Proof<AnySequent, Array<AnyProof>, RuleId>
