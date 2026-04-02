@@ -25,5 +25,5 @@
     "noPropertyAccessFromIndexSignature": true,
     "skipLibCheck": true
   },
-  "exclude": ["src/**/__tests__", "scripts"]
+  "exclude": ["src/**/__tests__", "scripts", "src/web.ts", "src/web/**"]
 }

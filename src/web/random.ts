@@ -1,7 +1,7 @@
 import { reset } from '../interactive/event'
 import { activePath } from '../interactive/focus'
-import { random } from '../model/challenge'
 import { Workspace } from '../interactive/workspace'
+import { ChallengePool } from './challenge-pool'
 import { Action } from '../interactive/action'
 import {
   AnyWorkspace,
@@ -14,8 +14,8 @@ import {
 } from './game'
 import { Navigate } from './types'
 
-const newWorkspace = (): AnyWorkspace =>
-  new Workspace({ challenge: random()() }) as unknown as AnyWorkspace
+const newWorkspace = (pool: ChallengePool): AnyWorkspace =>
+  new Workspace({ challenge: pool.take() }) as unknown as AnyWorkspace
 
 const createControls = (
   ws: AnyWorkspace,
@@ -59,10 +59,11 @@ const createCongrats = (
 }
 
 export const mountRandom = (container: HTMLElement, navigate: Navigate): (() => void) => {
-  let ws = newWorkspace()
+  const pool = new ChallengePool()
+  let ws = newWorkspace(pool)
 
   const onNew = () => {
-    ws = newWorkspace()
+    ws = newWorkspace(pool)
     rerender()
   }
 
@@ -101,5 +102,6 @@ export const mountRandom = (container: HTMLElement, navigate: Navigate): (() => 
   return () => {
     document.removeEventListener('keydown', handleKey)
     cleanupGamepad()
+    pool.cleanup()
   }
 }

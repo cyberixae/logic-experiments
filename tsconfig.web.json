@@ -1,0 +1,11 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "outDir": "./lib/web",
+    "noEmit": true
+  },
+  "exclude": ["src/**/__tests__", "scripts"],
+  "include": ["src/web.ts", "src/web/**/*.ts"]
+}
