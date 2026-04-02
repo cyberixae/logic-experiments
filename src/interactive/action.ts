@@ -9,5 +9,6 @@ export type Action =
   | 'rightConnective'
   | 'undo'
   | 'reset'
+  | 'level'
   | 'menu'
   | 'axiom'

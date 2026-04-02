@@ -39,7 +39,6 @@
 .left {
   grid-area: left;
   text-align: center;
-  overflow: auto;
   display: flex;
   flex-direction: column;
   gap: 1em;
@@ -47,7 +46,6 @@
 .right {
   grid-area: right;
   text-align: center;
-  overflow: auto;
   display: flex;
   flex-direction: column;
   gap: 1em;
@@ -61,7 +59,53 @@
   justify-content: start;
 }
 .rule {
+  position: relative;
   min-width: 260px;
+}
+.key-hint {
+  display: inline-block;
+  background: #000;
+  color: #fff;
+  text-transform: uppercase;
+  font-family: monospace;
+  font-weight: bold;
+  line-height: 40px;
+  width: 40px;
+  height: 40px;
+  text-align: center;
+  border-radius: 20px;
+  padding: 0;
+  box-sizing: border-box;
+  vertical-align: middle;
+}
+.left .rule .key-hint {
+  position: absolute;
+  top: 20px;
+  right: -20px;
+}
+.right .rule .key-hint {
+  position: absolute;
+  top: 20px;
+  left: -20px;
+}
+.main .rule .key-hint {
+  position: absolute;
+  bottom: -20px;
+  left: 20px;
+}
+.controls .button {
+  position: relative;
+}
+.controls .button .key-hint {
+  position: absolute;
+  width: 30px;
+  height: 30px;
+  line-height: 30px;
+  top: 8px;
+  left: -15px;
+}
+.button.disabled .key-hint {
+  visibility: hidden;
 }
 .button {
   user-select: none;

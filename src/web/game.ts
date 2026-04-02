@@ -23,6 +23,7 @@ export type AnyWorkspace = Workspace<string, Record<string, Configuration<AnySeq
 
 export const qwertyKeyMap: Record<KeyboardEvent['code'], Action> = {
   Escape: 'menu',
+  Backquote: 'level',
   KeyR: 'reset',
   KeyA: 'leftRotateLeft',
   KeyS: 'leftWeakening',
@@ -35,6 +36,63 @@ export const qwertyKeyMap: Record<KeyboardEvent['code'], Action> = {
   Space: 'axiom',
   Enter: 'axiom',
   Backspace: 'undo',
+}
+
+const codeToLabel = (code: string): string => {
+  const special: Record<string, string> = {
+    Backquote: '§',
+    Semicolon: 'ö',
+    Space: '⎵',
+    Enter: '↵',
+    Backspace: '⌫',
+    Escape: '\u238b',
+  }
+  const char = special[code] ?? String()
+  if (char) return char
+  if (code.startsWith('Key')) return code.slice(3).toLowerCase()
+  return code.toLowerCase()
+}
+
+// First binding for each action wins (e.g. Space before Enter for axiom)
+export const actionKeyHint: Partial<Record<Action, string>> = {}
+for (const [code, action] of Object.entries(qwertyKeyMap)) {
+  if (!(action in actionKeyHint)) {
+    actionKeyHint[action] = codeToLabel(code)
+  }
+}
+
+const ruleAction: Partial<Record<RuleId, Action>> = {
+  swl: 'leftWeakening',
+  sRotLF: 'leftRotateLeft',
+  sRotLB: 'leftRotateRight',
+  nl: 'leftConnective',
+  cl: 'leftConnective',
+  cl1: 'leftConnective',
+  cl2: 'leftConnective',
+  dl: 'leftConnective',
+  il: 'leftConnective',
+  swr: 'rightWeakening',
+  sRotRB: 'rightRotateLeft',
+  sRotRF: 'rightRotateRight',
+  nr: 'rightConnective',
+  dr: 'rightConnective',
+  dr1: 'rightConnective',
+  dr2: 'rightConnective',
+  cr: 'rightConnective',
+  ir: 'rightConnective',
+  i: 'axiom',
+  f: 'axiom',
+  v: 'axiom',
+  a1: 'axiom',
+  a2: 'axiom',
+  a3: 'axiom',
+}
+
+const keyHintBadge = (hint: string): HTMLElement => {
+  const badge = document.createElement('span')
+  badge.setAttribute('class', 'key-hint')
+  badge.textContent = hint
+  return badge
 }
 
 export const ps5KeyMap: Record<number, Action> = {
@@ -54,11 +112,17 @@ export const createButton = (
   label: string,
   disabled: boolean,
   onClick?: () => void,
+  hint?: string,
 ): HTMLElement => {
   const el = document.createElement('pre')
   el.setAttribute('class', 'button' + (disabled ? ' disabled' : ''))
   if (!disabled && onClick) el.onclick = onClick
-  el.innerHTML = label
+  if (hint !== undefined) {
+    el.appendChild(keyHintBadge(hint))
+    el.appendChild(document.createTextNode(' ' + label))
+  } else {
+    el.innerHTML = label
+  }
   return el
 }
 
@@ -108,6 +172,9 @@ const createPanel = (
       pre.setAttribute('class', 'rule button' + (disabled ? ' disabled' : ''))
       if (!disabled) pre.onclick = () => onApply(key)
       pre.innerHTML = fromDerivation(rule.example)
+      const action = ruleAction[key]
+      const hint = action !== undefined ? actionKeyHint[action] : undefined
+      if (hint !== undefined) pre.appendChild(keyHintBadge(hint))
       panel.appendChild(pre)
     },
   )
@@ -155,10 +222,15 @@ export const createDispatch = (
   rerender: () => void,
   navigate: Navigate,
   onSolved: (action: Action) => void,
+  onLevel?: () => void,
 ) =>
   (action: Action): void => {
     if (action === 'menu') {
       navigate('menu')
+      return
+    }
+    if (action === 'level') {
+      onLevel?.()
       return
     }
     const workspace = getWorkspace()

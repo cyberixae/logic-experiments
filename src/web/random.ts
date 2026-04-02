@@ -5,6 +5,7 @@ import { Workspace } from '../interactive/workspace'
 import { Action } from '../interactive/action'
 import {
   AnyWorkspace,
+  actionKeyHint,
   createBench,
   createButton,
   createDispatch,
@@ -26,10 +27,10 @@ const createControls = (
   const panel = document.createElement('div')
   panel.setAttribute('class', 'controls')
 
-  panel.appendChild(createButton('undo', !canUndo, () => { ws.applyEvent({ kind: 'undo' }); rerender() }))
-  panel.appendChild(createButton('reset', !canUndo, () => { ws.applyEvent(reset()); rerender() }))
+  panel.appendChild(createButton('undo', !canUndo, () => { ws.applyEvent({ kind: 'undo' }); rerender() }, actionKeyHint['undo']))
+  panel.appendChild(createButton('reset', !canUndo, () => { ws.applyEvent(reset()); rerender() }, actionKeyHint['reset']))
   panel.appendChild(createButton('new', false, onNew))
-  panel.appendChild(createButton('menu', false, () => navigate('menu')))
+  panel.appendChild(createButton('menu', false, () => navigate('menu'), actionKeyHint['menu']))
   return panel
 }
 

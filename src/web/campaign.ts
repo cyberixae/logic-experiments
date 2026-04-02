@@ -7,6 +7,7 @@ import { repl } from '../interactive/repl'
 import { Action } from '../interactive/action'
 import {
   AnyWorkspace,
+  actionKeyHint,
   createBench,
   createButton,
   createDispatch,
@@ -81,10 +82,10 @@ const createControls = (
   const panel = document.createElement('div')
   panel.setAttribute('class', 'controls')
 
-  panel.appendChild(createButton('undo', !canUndo, () => { ws.applyEvent({ kind: 'undo' }); rerender() }))
-  panel.appendChild(createButton('reset', !canUndo, () => { ws.applyEvent(reset()); rerender() }))
-  panel.appendChild(createButton('level', false, () => listingEl.removeAttribute('style')))
-  panel.appendChild(createButton('menu', false, () => navigate('menu')))
+  panel.appendChild(createButton('undo', !canUndo, () => { ws.applyEvent({ kind: 'undo' }); rerender() }, actionKeyHint['undo']))
+  panel.appendChild(createButton('reset', !canUndo, () => { ws.applyEvent(reset()); rerender() }, actionKeyHint['reset']))
+  panel.appendChild(createButton('level', false, () => listingEl.removeAttribute('style'), actionKeyHint['level']))
+  panel.appendChild(createButton('menu', false, () => navigate('menu'), actionKeyHint['menu']))
   return panel
 }
 
@@ -124,9 +125,11 @@ export const mountCampaign = (container: HTMLElement, navigate: Navigate): (() =
     rerender()
   }
 
+  let listingEl: HTMLElement = createListing(ws, selectLevel)
+
   const rerender = () => {
     container.innerHTML = ''
-    const listingEl = createListing(ws, selectLevel)
+    listingEl = createListing(ws, selectLevel)
     container.appendChild(listingEl)
     const controlsEl = createControls(ws, listingEl, rerender, navigate)
     const makeCongrats = () => createCongrats(ws, selectLevel, rerender)
@@ -150,7 +153,9 @@ export const mountCampaign = (container: HTMLElement, navigate: Navigate): (() =
     rerender()
   }
 
-  const dispatch = createDispatch(() => ws, rerender, navigate, onSolved)
+  const dispatch = createDispatch(() => ws, rerender, navigate, onSolved, () =>
+    listingEl.removeAttribute('style'),
+  )
 
   // Read initial level from URL
   const params = new URLSearchParams(window.location.search)
@@ -162,6 +167,7 @@ export const mountCampaign = (container: HTMLElement, navigate: Navigate): (() =
   rerender()
 
   const handleKey = (ev: KeyboardEvent) => {
+    console.log(ev.code)
     const action = qwertyKeyMap[ev.code]
     if (action) dispatch(action)
   }

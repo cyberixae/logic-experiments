@@ -28,6 +28,9 @@ export const undo = (): Undo => ({ kind: 'undo' })
 export type Reset = { kind: 'reset' }
 export const reset = (): Reset => ({ kind: 'reset' })
 
+export type Level = { kind: 'level' }
+export const level = (): Level => ({ kind: 'level' })
+
 export type NextBranch = { kind: 'nextBranch' }
 export const nextBranch = (): NextBranch => ({ kind: 'nextBranch' })
 
@@ -39,6 +42,7 @@ export type Event =
   | Reverse1<ReverseId1>
   | Undo
   | Reset
+  | Level
   | NextBranch
   | PrevBranch
 
