@@ -155,6 +155,29 @@
   padding-right: 1em;
 }
 
+.menu {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2em;
+}
+.menu-title {
+  font-size: 5em;
+  font-weight: bold;
+  letter-spacing: 0.1em;
+}
+.menu-modes {
+  display: flex;
+  flex-direction: row;
+  gap: 2em;
+}
+.menu-mode {
+  font-size: 1.5em;
+  padding: 0.8em 2em;
+}
 .current {
   padding: 2em 0 1em 0;
   font-size: 2em;

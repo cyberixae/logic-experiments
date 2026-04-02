@@ -1,0 +1,227 @@
+import { reverse0, undo } from '../interactive/event'
+import { activeSequent, activePath } from '../interactive/focus'
+import { AnyDerivation } from '../model/derivation'
+import { Rule } from '../model/rule'
+import { AnySequent } from '../model/sequent'
+import { basic, fromDerivation, fromFocus, fromSequent } from '../render/print'
+import { RuleId } from '../model/rule'
+import { Configuration } from '../model/challenge'
+import {
+  center,
+  isReverseId0,
+  left,
+  leftLogical,
+  right,
+  rightLogical,
+} from '../rules'
+import { entries, keys } from '../utils/record'
+import { Workspace } from '../interactive/workspace'
+import { Action } from '../interactive/action'
+
+export type AnyWorkspace = Workspace<string, Record<string, Configuration<AnySequent>>>
+
+export const qwertyKeyMap: Record<KeyboardEvent['key'], Action> = {
+  e: 'leftWeakening',
+  s: 'leftRotateLeft',
+  f: 'leftRotateRight',
+  d: 'leftConnective',
+  i: 'rightWeakening',
+  j: 'rightRotateLeft',
+  l: 'rightRotateRight',
+  k: 'rightConnective',
+  Enter: 'axiom',
+  Backspace: 'undo',
+}
+
+export const ps5KeyMap: Record<number, Action> = {
+  12: 'leftWeakening',
+  14: 'leftRotateLeft',
+  15: 'leftRotateRight',
+  13: 'leftConnective',
+  3: 'rightWeakening',
+  2: 'rightRotateLeft',
+  1: 'rightRotateRight',
+  0: 'rightConnective',
+  5: 'axiom',
+  4: 'undo',
+}
+
+export const createButton = (
+  label: string,
+  disabled: boolean,
+  onClick?: () => void,
+): HTMLElement => {
+  const el = document.createElement('pre')
+  el.setAttribute('class', 'button' + (disabled ? ' disabled' : ''))
+  if (!disabled && onClick) el.onclick = onClick
+  el.innerHTML = label
+  return el
+}
+
+const createProof = (workspace: AnyWorkspace): HTMLElement => {
+  const pre = document.createElement('pre')
+  pre.setAttribute('class', 'proof')
+  const s = workspace.currentConjecture()
+  if (s.derivation.kind === 'transformation') {
+    pre.innerHTML = '\n' + fromFocus(s) + '\n'
+  }
+  return pre
+}
+
+const createPlayArea = (
+  workspace: AnyWorkspace,
+  makeCongrats: () => HTMLElement,
+): HTMLElement => {
+  const panel = document.createElement('div')
+  panel.setAttribute('class', 'playarea')
+  if (workspace.isSolved()) {
+    panel.appendChild(makeCongrats())
+  } else {
+    const active = document.createElement('div')
+    active.setAttribute('class', 'current')
+    active.innerHTML = fromSequent(activeSequent(workspace.currentConjecture()))(basic)
+    panel.appendChild(active)
+  }
+  panel.appendChild(createProof(workspace))
+  return panel
+}
+
+const createPanel = (
+  className: string,
+  ruleRecord: Partial<Record<RuleId, Rule<AnySequent>>>,
+  ls: RuleId[],
+  rules: RuleId[],
+  solved: boolean,
+  onApply: (key: RuleId) => void,
+): HTMLElement => {
+  const panel = document.createElement('div')
+  panel.setAttribute('class', className)
+  ;(Object.entries(ruleRecord) as Array<[RuleId, Rule<AnySequent> | undefined]>).forEach(
+    ([key, rule]) => {
+      if (!rule || !rules.includes(key)) return
+      const disabled = solved || !ls.includes(key)
+      const pre = document.createElement('pre')
+      pre.setAttribute('class', 'rule button' + (disabled ? ' disabled' : ''))
+      if (!disabled) pre.onclick = () => onApply(key)
+      pre.innerHTML = fromDerivation(rule.example)
+      panel.appendChild(pre)
+    },
+  )
+  return panel
+}
+
+export const createBench = (
+  workspace: AnyWorkspace,
+  makeCongrats: () => HTMLElement,
+  controlsEl: HTMLElement,
+  rerender: () => void,
+): HTMLElement => {
+  const ls = workspace.applicableRules()
+  const rules = workspace.availableRules()
+  const solved = workspace.isSolved()
+
+  const apply = (key: RuleId) => {
+    if (isReverseId0(key)) workspace.applyEvent(reverse0(key))
+    rerender()
+  }
+  const applyCenter = (key: RuleId) => {
+    if (isReverseId0(key)) workspace.applyEvent(reverse0(key))
+    rerender()
+  }
+
+  const panel = document.createElement('div')
+  panel.setAttribute('class', 'bench')
+  panel.appendChild(createPanel('left', left, ls, rules, solved, apply))
+  panel.appendChild(createPanel('main', center, ls, rules, solved, applyCenter))
+  panel.appendChild(createPanel('right', right, ls, rules, solved, apply))
+  panel.appendChild(createPlayArea(workspace, makeCongrats))
+  panel.appendChild(controlsEl)
+  return panel
+}
+
+const autoRule = (workspace: AnyWorkspace, rules: RuleId[]) => {
+  const available = workspace.applicableRules()
+  const [first] = rules.filter((rule) => available.includes(rule))
+  if (!first) return
+  if (isReverseId0(first)) workspace.applyEvent(reverse0(first))
+}
+
+export const createDispatch = (
+  getWorkspace: () => AnyWorkspace,
+  rerender: () => void,
+  onSolved: (action: Action) => void,
+) =>
+  (action: Action): void => {
+    const workspace = getWorkspace()
+    if (workspace.isSolved()) {
+      onSolved(action)
+      return
+    }
+    switch (action) {
+      case 'leftWeakening':
+        workspace.applyEvent(reverse0('swl'))
+        break
+      case 'leftRotateLeft':
+        workspace.applyEvent(reverse0('sRotLF'))
+        break
+      case 'leftRotateRight':
+        workspace.applyEvent(reverse0('sRotLB'))
+        break
+      case 'leftConnective':
+        autoRule(workspace, keys(leftLogical))
+        break
+      case 'rightWeakening':
+        workspace.applyEvent(reverse0('swr'))
+        break
+      case 'rightRotateLeft':
+        workspace.applyEvent(reverse0('sRotRB'))
+        break
+      case 'rightRotateRight':
+        workspace.applyEvent(reverse0('sRotRF'))
+        break
+      case 'rightConnective':
+        autoRule(workspace, keys(rightLogical))
+        break
+      case 'axiom':
+        autoRule(workspace, keys(center))
+        break
+      case 'undo':
+        workspace.applyEvent(undo())
+        break
+    }
+    rerender()
+  }
+
+export const setupGamepad = (dispatch: (action: Action) => void): (() => void) => {
+  const oldPresses: Array<boolean> = []
+  let active = false
+
+  const loop = () => {
+    if (!active) return
+    const gp = navigator.getGamepads()[0]
+    if (gp) {
+      for (const [button, action] of Object.entries(ps5KeyMap)) {
+        const index = Number(button)
+        const oldPress = oldPresses[index] ?? false
+        const newPress = gp.buttons[index]?.pressed ?? false
+        if (newPress !== oldPress) {
+          if (newPress) dispatch(action)
+          oldPresses[index] = newPress
+        }
+      }
+    }
+    requestAnimationFrame(loop)
+  }
+
+  const onConnected = () => {
+    active = true
+    loop()
+  }
+
+  window.addEventListener('gamepadconnected', onConnected)
+
+  return () => {
+    active = false
+    window.removeEventListener('gamepadconnected', onConnected)
+  }
+}

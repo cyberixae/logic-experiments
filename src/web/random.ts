@@ -1,0 +1,104 @@
+import { reset } from '../interactive/event'
+import { activePath } from '../interactive/focus'
+import { random } from '../model/challenge'
+import { Workspace } from '../interactive/workspace'
+import { Action } from '../interactive/action'
+import {
+  AnyWorkspace,
+  createBench,
+  createButton,
+  createDispatch,
+  setupGamepad,
+  qwertyKeyMap,
+} from './game'
+import { Navigate } from './types'
+
+const newWorkspace = (): AnyWorkspace =>
+  new Workspace({ challenge: random()() }) as unknown as AnyWorkspace
+
+const createControls = (
+  ws: AnyWorkspace,
+  onNew: () => void,
+  rerender: () => void,
+  navigate: Navigate,
+): HTMLElement => {
+  const canUndo = activePath(ws.currentConjecture()).length > 0
+  const panel = document.createElement('div')
+  panel.setAttribute('class', 'controls')
+
+  panel.appendChild(createButton('undo', !canUndo, () => { ws.applyEvent({ kind: 'undo' }); rerender() }))
+  panel.appendChild(createButton('reset', !canUndo, () => { ws.applyEvent(reset()); rerender() }))
+  panel.appendChild(createButton('new', false, onNew))
+  panel.appendChild(createButton('menu', false, () => navigate('menu')))
+  return panel
+}
+
+const createCongrats = (
+  ws: AnyWorkspace,
+  onNew: () => void,
+  rerender: () => void,
+): HTMLElement => {
+  const panel = document.createElement('div')
+
+  const banner = document.createElement('div')
+  banner.setAttribute('class', 'congrats')
+  const hurray = document.createElement('div')
+  hurray.setAttribute('class', 'hurray')
+  hurray.innerHTML = '\n\n\u{1F389} Conglaturations! \u{1F389}\n'
+  banner.appendChild(hurray)
+  panel.appendChild(banner)
+
+  const buttons = document.createElement('div')
+  buttons.setAttribute('class', 'congrabuttons')
+  buttons.appendChild(createButton('Play Again', false, () => { ws.applyEvent(reset()); rerender() }))
+  buttons.appendChild(createButton('New Challenge', false, onNew))
+  panel.appendChild(buttons)
+
+  return panel
+}
+
+export const mountRandom = (container: HTMLElement, navigate: Navigate): (() => void) => {
+  let ws = newWorkspace()
+
+  const onNew = () => {
+    ws = newWorkspace()
+    rerender()
+  }
+
+  const rerender = () => {
+    container.innerHTML = ''
+    const controlsEl = createControls(ws, onNew, rerender, navigate)
+    const makeCongrats = () => createCongrats(ws, onNew, rerender)
+    container.appendChild(createBench(ws, makeCongrats, controlsEl, rerender))
+  }
+
+  const onSolved = (action: Action) => {
+    switch (action) {
+      case 'leftWeakening':
+      case 'rightWeakening':
+        ws.applyEvent(reset())
+        break
+      case 'axiom':
+      case 'rightConnective':
+        onNew()
+        return
+    }
+    rerender()
+  }
+
+  const dispatch = createDispatch(() => ws, rerender, onSolved)
+
+  rerender()
+
+  const handleKey = (ev: KeyboardEvent) => {
+    const action = qwertyKeyMap[ev.key]
+    if (action) dispatch(action)
+  }
+  document.addEventListener('keydown', handleKey)
+  const cleanupGamepad = setupGamepad(dispatch)
+
+  return () => {
+    document.removeEventListener('keydown', handleKey)
+    cleanupGamepad()
+  }
+}
