@@ -150,7 +150,7 @@ export const mountCampaign = (container: HTMLElement, navigate: Navigate): (() =
     rerender()
   }
 
-  const dispatch = createDispatch(() => ws, rerender, onSolved)
+  const dispatch = createDispatch(() => ws, rerender, navigate, onSolved)
 
   // Read initial level from URL
   const params = new URLSearchParams(window.location.search)
@@ -162,7 +162,7 @@ export const mountCampaign = (container: HTMLElement, navigate: Navigate): (() =
   rerender()
 
   const handleKey = (ev: KeyboardEvent) => {
-    const action = qwertyKeyMap[ev.key]
+    const action = qwertyKeyMap[ev.code]
     if (action) dispatch(action)
   }
   document.addEventListener('keydown', handleKey)

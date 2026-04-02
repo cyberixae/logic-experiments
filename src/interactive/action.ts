@@ -8,4 +8,6 @@ export type Action =
   | 'rightRotateRight'
   | 'rightConnective'
   | 'undo'
+  | 'reset'
+  | 'menu'
   | 'axiom'

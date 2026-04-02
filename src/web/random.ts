@@ -86,12 +86,12 @@ export const mountRandom = (container: HTMLElement, navigate: Navigate): (() => 
     rerender()
   }
 
-  const dispatch = createDispatch(() => ws, rerender, onSolved)
+  const dispatch = createDispatch(() => ws, rerender, navigate, onSolved)
 
   rerender()
 
   const handleKey = (ev: KeyboardEvent) => {
-    const action = qwertyKeyMap[ev.key]
+    const action = qwertyKeyMap[ev.code]
     if (action) dispatch(action)
   }
   document.addEventListener('keydown', handleKey)

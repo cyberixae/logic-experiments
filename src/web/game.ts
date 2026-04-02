@@ -1,4 +1,4 @@
-import { reverse0, undo } from '../interactive/event'
+import { reverse0, undo, reset } from '../interactive/event'
 import { activeSequent, activePath } from '../interactive/focus'
 import { AnyDerivation } from '../model/derivation'
 import { Rule } from '../model/rule'
@@ -17,18 +17,22 @@ import {
 import { entries, keys } from '../utils/record'
 import { Workspace } from '../interactive/workspace'
 import { Action } from '../interactive/action'
+import { Navigate } from './types'
 
 export type AnyWorkspace = Workspace<string, Record<string, Configuration<AnySequent>>>
 
-export const qwertyKeyMap: Record<KeyboardEvent['key'], Action> = {
-  e: 'leftWeakening',
-  s: 'leftRotateLeft',
-  f: 'leftRotateRight',
-  d: 'leftConnective',
-  i: 'rightWeakening',
-  j: 'rightRotateLeft',
-  l: 'rightRotateRight',
-  k: 'rightConnective',
+export const qwertyKeyMap: Record<KeyboardEvent['code'], Action> = {
+  Escape: 'menu',
+  KeyR: 'reset',
+  KeyA: 'leftRotateLeft',
+  KeyS: 'leftWeakening',
+  KeyF: 'leftConnective',
+  KeyG: 'leftRotateRight',
+  KeyH: 'rightRotateLeft',
+  KeyJ: 'rightConnective',
+  KeyL: 'rightWeakening',
+  Semicolon: 'rightRotateRight',
+  Space: 'axiom',
   Enter: 'axiom',
   Backspace: 'undo',
 }
@@ -149,10 +153,20 @@ const autoRule = (workspace: AnyWorkspace, rules: RuleId[]) => {
 export const createDispatch = (
   getWorkspace: () => AnyWorkspace,
   rerender: () => void,
+  navigate: Navigate,
   onSolved: (action: Action) => void,
 ) =>
   (action: Action): void => {
+    if (action === 'menu') {
+      navigate('menu')
+      return
+    }
     const workspace = getWorkspace()
+    if (action === 'reset') {
+      workspace.applyEvent(reset())
+      rerender()
+      return
+    }
     if (workspace.isSolved()) {
       onSolved(action)
       return
