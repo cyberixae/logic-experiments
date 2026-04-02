@@ -7,7 +7,7 @@ let cleanup: () => void = () => {}
 
 const navigate = (screen: Screen) => {
   cleanup()
-  history.pushState({ screen }, '', screen === 'menu' ? '/' : `?mode=${screen}`)
+  history.pushState({ screen }, '', screen === 'menu' ? window.location.pathname : `?mode=${screen}`)
   mount(screen)
 }
 
