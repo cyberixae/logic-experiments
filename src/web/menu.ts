@@ -12,17 +12,17 @@ export const mountMenu = (container: HTMLElement, navigate: Navigate): (() => vo
   const modes = document.createElement('div')
   modes.setAttribute('class', 'menu-modes')
 
-  const campaignBtn = document.createElement('div')
-  campaignBtn.setAttribute('class', 'button menu-mode')
-  campaignBtn.innerHTML = 'Campaign'
-  campaignBtn.onclick = () => navigate('campaign')
-  modes.appendChild(campaignBtn)
-
   const randomBtn = document.createElement('div')
   randomBtn.setAttribute('class', 'button menu-mode')
   randomBtn.innerHTML = 'Random'
   randomBtn.onclick = () => navigate('random')
   modes.appendChild(randomBtn)
+
+  const campaignBtn = document.createElement('div')
+  campaignBtn.setAttribute('class', 'button menu-mode')
+  campaignBtn.innerHTML = 'Campaign'
+  campaignBtn.onclick = () => navigate('campaign')
+  modes.appendChild(campaignBtn)
 
   panel.appendChild(modes)
 
