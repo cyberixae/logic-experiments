@@ -59,7 +59,9 @@ const createListing = (
     item.appendChild(title)
     const rules = document.createElement('div')
     rules.setAttribute('class', 'rules')
-    rules.innerHTML = challenge.rules.map((rule) => fromRule(rule)(basic)).join(', ')
+    rules.innerHTML = challenge.rules
+      .map((rule) => fromRule(rule)(basic))
+      .join(', ')
     item.appendChild(rules)
     const goal = document.createElement('div')
     goal.setAttribute('class', 'goal')
@@ -82,10 +84,39 @@ const createControls = (
   const panel = document.createElement('div')
   panel.setAttribute('class', 'controls')
 
-  panel.appendChild(createButton('undo', !canUndo, () => { ws.applyEvent({ kind: 'undo' }); rerender() }, actionKeyHint['undo']))
-  panel.appendChild(createButton('reset', !canUndo, () => { ws.applyEvent(reset()); rerender() }, actionKeyHint['reset']))
-  panel.appendChild(createButton('level', false, () => listingEl.removeAttribute('style'), actionKeyHint['level']))
-  panel.appendChild(createButton('menu', false, () => navigate('menu'), actionKeyHint['menu']))
+  panel.appendChild(
+    createButton(
+      'undo',
+      !canUndo,
+      () => {
+        ws.applyEvent({ kind: 'undo' })
+        rerender()
+      },
+      actionKeyHint['undo'],
+    ),
+  )
+  panel.appendChild(
+    createButton(
+      'reset',
+      !canUndo,
+      () => {
+        ws.applyEvent(reset())
+        rerender()
+      },
+      actionKeyHint['reset'],
+    ),
+  )
+  panel.appendChild(
+    createButton(
+      'level',
+      false,
+      () => listingEl.removeAttribute('style'),
+      actionKeyHint['level'],
+    ),
+  )
+  panel.appendChild(
+    createButton('menu', false, () => navigate('menu'), actionKeyHint['menu']),
+  )
   return panel
 }
 
@@ -106,21 +137,39 @@ const createCongrats = (
 
   const buttons = document.createElement('div')
   buttons.setAttribute('class', 'congrabuttons')
-  buttons.appendChild(createButton('Prev Level', false, () => selectLevel(ws.previousConjectureId())))
-  buttons.appendChild(createButton('Play Again', false, () => { ws.applyEvent(reset()); rerender() }))
-  buttons.appendChild(createButton('Next Level', false, () => selectLevel(ws.nextConjectureId())))
+  buttons.appendChild(
+    createButton('Prev Level', false, () =>
+      selectLevel(ws.previousConjectureId()),
+    ),
+  )
+  buttons.appendChild(
+    createButton('Play Again', false, () => {
+      ws.applyEvent(reset())
+      rerender()
+    }),
+  )
+  buttons.appendChild(
+    createButton('Next Level', false, () => selectLevel(ws.nextConjectureId())),
+  )
   panel.appendChild(buttons)
 
   return panel
 }
 
-export const mountCampaign = (container: HTMLElement, navigate: Navigate): (() => void) => {
+export const mountCampaign = (
+  container: HTMLElement,
+  navigate: Navigate,
+): (() => void) => {
   const ws = new Workspace(challenges) as unknown as AnyWorkspace
 
   const selectLevel = (id: string) => {
     if (ws.isConjectureId(id)) {
       ws.selectConjecture(id)
-      history.pushState({ screen: 'campaign', selected: id }, '', `?mode=campaign&level=${id}`)
+      history.pushState(
+        { screen: 'campaign', selected: id },
+        '',
+        `?mode=campaign&level=${id}`,
+      )
     }
     rerender()
   }
@@ -153,8 +202,12 @@ export const mountCampaign = (container: HTMLElement, navigate: Navigate): (() =
     rerender()
   }
 
-  const dispatch = createDispatch(() => ws, rerender, navigate, onSolved, () =>
-    listingEl.removeAttribute('style'),
+  const dispatch = createDispatch(
+    () => ws,
+    rerender,
+    navigate,
+    onSolved,
+    () => listingEl.removeAttribute('style'),
   )
 
   // Read initial level from URL

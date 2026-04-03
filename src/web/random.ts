@@ -27,10 +27,32 @@ const createControls = (
   const panel = document.createElement('div')
   panel.setAttribute('class', 'controls')
 
-  panel.appendChild(createButton('undo', !canUndo, () => { ws.applyEvent({ kind: 'undo' }); rerender() }, actionKeyHint['undo']))
-  panel.appendChild(createButton('reset', !canUndo, () => { ws.applyEvent(reset()); rerender() }, actionKeyHint['reset']))
+  panel.appendChild(
+    createButton(
+      'undo',
+      !canUndo,
+      () => {
+        ws.applyEvent({ kind: 'undo' })
+        rerender()
+      },
+      actionKeyHint['undo'],
+    ),
+  )
+  panel.appendChild(
+    createButton(
+      'reset',
+      !canUndo,
+      () => {
+        ws.applyEvent(reset())
+        rerender()
+      },
+      actionKeyHint['reset'],
+    ),
+  )
   panel.appendChild(createButton('new', false, onNew))
-  panel.appendChild(createButton('menu', false, () => navigate('menu'), actionKeyHint['menu']))
+  panel.appendChild(
+    createButton('menu', false, () => navigate('menu'), actionKeyHint['menu']),
+  )
   return panel
 }
 
@@ -51,14 +73,22 @@ const createCongrats = (
 
   const buttons = document.createElement('div')
   buttons.setAttribute('class', 'congrabuttons')
-  buttons.appendChild(createButton('Play Again', false, () => { ws.applyEvent(reset()); rerender() }))
+  buttons.appendChild(
+    createButton('Play Again', false, () => {
+      ws.applyEvent(reset())
+      rerender()
+    }),
+  )
   buttons.appendChild(createButton('New Challenge', false, onNew))
   panel.appendChild(buttons)
 
   return panel
 }
 
-export const mountRandom = (container: HTMLElement, navigate: Navigate): (() => void) => {
+export const mountRandom = (
+  container: HTMLElement,
+  navigate: Navigate,
+): (() => void) => {
   const pool = new ChallengePool()
   let ws = newWorkspace(pool)
 

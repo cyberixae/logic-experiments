@@ -19,7 +19,10 @@ import { Workspace } from '../interactive/workspace'
 import { Action } from '../interactive/action'
 import { Navigate } from './types'
 
-export type AnyWorkspace = Workspace<string, Record<string, Configuration<AnySequent>>>
+export type AnyWorkspace = Workspace<
+  string,
+  Record<string, Configuration<AnySequent>>
+>
 
 export const qwertyKeyMap: Record<KeyboardEvent['code'], Action> = {
   Escape: 'menu',
@@ -147,7 +150,9 @@ const createPlayArea = (
   } else {
     const active = document.createElement('div')
     active.setAttribute('class', 'current')
-    active.innerHTML = fromSequent(activeSequent(workspace.currentConjecture()))(basic)
+    active.innerHTML = fromSequent(
+      activeSequent(workspace.currentConjecture()),
+    )(basic)
     panel.appendChild(active)
   }
   panel.appendChild(createProof(workspace))
@@ -164,20 +169,20 @@ const createPanel = (
 ): HTMLElement => {
   const panel = document.createElement('div')
   panel.setAttribute('class', className)
-  ;(Object.entries(ruleRecord) as Array<[RuleId, Rule<AnySequent> | undefined]>).forEach(
-    ([key, rule]) => {
-      if (!rule || !rules.includes(key)) return
-      const disabled = solved || !ls.includes(key)
-      const pre = document.createElement('pre')
-      pre.setAttribute('class', 'rule button' + (disabled ? ' disabled' : ''))
-      if (!disabled) pre.onclick = () => onApply(key)
-      pre.innerHTML = fromDerivation(rule.example)
-      const action = ruleAction[key]
-      const hint = action !== undefined ? actionKeyHint[action] : undefined
-      if (hint !== undefined) pre.appendChild(keyHintBadge(hint))
-      panel.appendChild(pre)
-    },
-  )
+  ;(
+    Object.entries(ruleRecord) as Array<[RuleId, Rule<AnySequent> | undefined]>
+  ).forEach(([key, rule]) => {
+    if (!rule || !rules.includes(key)) return
+    const disabled = solved || !ls.includes(key)
+    const pre = document.createElement('pre')
+    pre.setAttribute('class', 'rule button' + (disabled ? ' disabled' : ''))
+    if (!disabled) pre.onclick = () => onApply(key)
+    pre.innerHTML = fromDerivation(rule.example)
+    const action = ruleAction[key]
+    const hint = action !== undefined ? actionKeyHint[action] : undefined
+    if (hint !== undefined) pre.appendChild(keyHintBadge(hint))
+    panel.appendChild(pre)
+  })
   return panel
 }
 
@@ -217,13 +222,14 @@ const autoRule = (workspace: AnyWorkspace, rules: RuleId[]) => {
   if (isReverseId0(first)) workspace.applyEvent(reverse0(first))
 }
 
-export const createDispatch = (
-  getWorkspace: () => AnyWorkspace,
-  rerender: () => void,
-  navigate: Navigate,
-  onSolved: (action: Action) => void,
-  onLevel?: () => void,
-) =>
+export const createDispatch =
+  (
+    getWorkspace: () => AnyWorkspace,
+    rerender: () => void,
+    navigate: Navigate,
+    onSolved: (action: Action) => void,
+    onLevel?: () => void,
+  ) =>
   (action: Action): void => {
     if (action === 'menu') {
       navigate('menu')
@@ -278,7 +284,9 @@ export const createDispatch = (
     rerender()
   }
 
-export const setupGamepad = (dispatch: (action: Action) => void): (() => void) => {
+export const setupGamepad = (
+  dispatch: (action: Action) => void,
+): (() => void) => {
   const oldPresses: Array<boolean> = []
   let active = false
 

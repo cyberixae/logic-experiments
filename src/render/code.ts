@@ -64,12 +64,19 @@ export function fromTransformation({
     a1: () => {
       const p2qp = result.succedent[0] as prop.Implication<prop.Prop, prop.Prop>
       const p = p2qp.antecedent
-      const q = (p2qp.consequent as prop.Implication<prop.Prop, prop.Prop>).antecedent
+      const q = (p2qp.consequent as prop.Implication<prop.Prop, prop.Prop>)
+        .antecedent
       return `i.a1(${fromProp(p)},${fromProp(q)})`
     },
     a2: () => {
-      const pqr2pq2pr = result.succedent[0] as prop.Implication<prop.Prop, prop.Prop>
-      const p2q2r = pqr2pq2pr.antecedent as prop.Implication<prop.Prop, prop.Prop>
+      const pqr2pq2pr = result.succedent[0] as prop.Implication<
+        prop.Prop,
+        prop.Prop
+      >
+      const p2q2r = pqr2pq2pr.antecedent as prop.Implication<
+        prop.Prop,
+        prop.Prop
+      >
       const p = p2q2r.antecedent
       const q2r = p2q2r.consequent as prop.Implication<prop.Prop, prop.Prop>
       const q = q2r.antecedent
@@ -77,8 +84,14 @@ export function fromTransformation({
       return `i.a2(${fromProp(p)},${fromProp(q)},${fromProp(r)})`
     },
     a3: () => {
-      const np2nq2q2p = result.succedent[0] as prop.Implication<prop.Prop, prop.Prop>
-      const np2nq = np2nq2q2p.antecedent as prop.Implication<prop.Prop, prop.Prop>
+      const np2nq2q2p = result.succedent[0] as prop.Implication<
+        prop.Prop,
+        prop.Prop
+      >
+      const np2nq = np2nq2q2p.antecedent as prop.Implication<
+        prop.Prop,
+        prop.Prop
+      >
       const p = (np2nq.antecedent as prop.Negation<prop.Prop>).negand
       const q = (np2nq.consequent as prop.Negation<prop.Prop>).negand
       return `i.a3(${fromProp(p)},${fromProp(q)})`
@@ -90,11 +103,17 @@ export function fromTransformation({
     cl: () => `z.cl(${d.join(',')})`,
     cr: () => `z.cr(${d.join(',')})`,
     cl1: () => {
-      const conj = result.antecedent.at(-1) as prop.Conjunction<prop.Prop, prop.Prop>
+      const conj = result.antecedent.at(-1) as prop.Conjunction<
+        prop.Prop,
+        prop.Prop
+      >
       return `z.cl1(${fromProp(conj.rightConjunct)},${d.join(',')})`
     },
     cl2: () => {
-      const conj = result.antecedent.at(-1) as prop.Conjunction<prop.Prop, prop.Prop>
+      const conj = result.antecedent.at(-1) as prop.Conjunction<
+        prop.Prop,
+        prop.Prop
+      >
       return `z.cl2(${fromProp(conj.leftConjunct)},${d.join(',')})`
     },
     dl: () => `z.dl(${d.join(',')})`,

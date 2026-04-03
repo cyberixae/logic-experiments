@@ -1,6 +1,9 @@
 import { Navigate } from './types'
 
-export const mountMenu = (container: HTMLElement, navigate: Navigate): (() => void) => {
+export const mountMenu = (
+  container: HTMLElement,
+  navigate: Navigate,
+): (() => void) => {
   const panel = document.createElement('div')
   panel.setAttribute('class', 'menu')
 
