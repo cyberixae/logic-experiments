@@ -33,7 +33,7 @@ export type MP<
   P extends Prop,
   C extends MPResult<Q>,
   D extends MPDeps<Q, P>,
-> = Transformation<C, D, 'MP'>
+> = Transformation<C, D, 'mp'>
 export type AnyMP = MP<Prop, Prop, AnyMPResult, AnyMPDeps>
 export const mp = <
   Q extends Prop,
@@ -43,7 +43,7 @@ export const mp = <
 >(
   result: C,
   deps: D,
-): MP<Q, P, C, D> => transformation(result, deps, 'MP')
+): MP<Q, P, C, D> => transformation(result, deps, 'mp')
 export const applyMP = <A extends Prop, C extends Prop, D extends MPDeps<C, A>>(
   ...deps: D & MPDeps<C, A>
 ): MP<C, A, MPResult<C>, D> => {
@@ -52,7 +52,7 @@ export const applyMP = <A extends Prop, C extends Prop, D extends MPDeps<C, A>>(
   const a2: A = dep2.result.succedent[0]
   const _a: A = utils.assertEqual(a1, a2)
   const c: C = dep1.result.succedent[0].consequent
-  return transformation(conclusion(c), deps, 'MP')
+  return transformation(conclusion(c), deps, 'mp')
 }
 export const reverseMP = <
   Q extends Prop,

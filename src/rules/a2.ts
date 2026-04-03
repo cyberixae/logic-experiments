@@ -88,7 +88,7 @@ export type A2<
   Q extends Prop,
   R extends Prop,
   C extends A2Result<P, Q, R>,
-> = Introduction<C, 'A2'>
+> = Introduction<C, 'a2'>
 export const a2 = <
   P extends Prop,
   Q extends Prop,
@@ -97,7 +97,7 @@ export const a2 = <
 >(
   result: C,
 ): A2<P, Q, R, C> => {
-  return introduction(result, 'A2')
+  return introduction(result, 'a2')
 }
 export type AnyA2 = A2<Prop, Prop, Prop, AnyA2Result>
 export type ApplyA2<P extends Prop, Q extends Prop, R extends Prop> = A2<

@@ -31,7 +31,7 @@ export type Cut<
   A extends Prop,
   R extends CutResult<Γ, Δ>,
   D extends CutDeps<Γ, Δ, A>,
-> = Transformation<R, D, 'Cut'>
+> = Transformation<R, D, 'cut'>
 export type AnyCut = Cut<Formulas, Formulas, Prop, AnyCutResult, AnyCutDeps>
 export const cut = <
   Γ extends Formulas,
@@ -43,7 +43,7 @@ export const cut = <
   result: R,
   deps: D,
 ): Cut<Γ, Δ, A, R, D> => {
-  return transformation(result, deps, 'Cut')
+  return transformation(result, deps, 'cut')
 }
 export const applyCut = <
   Γ extends Formulas,

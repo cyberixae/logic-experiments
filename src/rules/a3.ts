@@ -66,12 +66,12 @@ export type A3<
   P extends Prop,
   Q extends Prop,
   C extends A3Result<P, Q>,
-> = Introduction<C, 'A3'>
+> = Introduction<C, 'a3'>
 export type AnyA3 = A3<Prop, Prop, AnyA3Result>
 export const a3 = <P extends Prop, Q extends Prop, C extends A3Result<P, Q>>(
   result: C,
 ): A3<P, Q, C> => {
-  return introduction(result, 'A3')
+  return introduction(result, 'a3')
 }
 export type ApplyA3<P extends Prop, Q extends Prop> = A3<P, Q, A3Result<P, Q>>
 export const applyA3 = <P extends Prop, Q extends Prop>(

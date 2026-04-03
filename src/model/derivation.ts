@@ -6,8 +6,7 @@ import {
 } from '../utils/array'
 import { AnySequent, equals } from './sequent'
 import { Refinement } from '../utils/generic'
-
-export type Rule = string
+import { RuleId } from './rule'
 
 export interface Premise<J extends AnySequent> {
   kind: 'premise'
@@ -29,7 +28,7 @@ export const refinePremise =
 export interface Transformation<
   J extends AnySequent,
   D extends Array<AnyNode>,
-  R extends Rule,
+  R extends RuleId,
 > {
   kind: 'transformation'
   result: J
@@ -39,17 +38,17 @@ export interface Transformation<
 export function transformation<
   J extends AnySequent,
   D extends Array<AnyNode>,
-  R extends Rule,
+  R extends RuleId,
 >(result: J, deps: D, rule: R): Transformation<J, D, R> {
   return { kind: 'transformation', result, deps, rule }
 }
-export type AnyTransformation = Transformation<AnySequent, Array<AnyNode>, Rule>
+export type AnyTransformation = Transformation<AnySequent, Array<AnyNode>, RuleId>
 
 export type AnyNode = AnyPremise | AnyTransformation
 
 export type Derivation<R extends AnySequent> =
   | Premise<R>
-  | Transformation<R, Array<AnyNode>, Rule>
+  | Transformation<R, Array<AnyNode>, RuleId>
 export type AnyDerivation = Derivation<AnySequent>
 export const refineDerivation =
   <A extends AnySequent, B extends A>(r: Refinement<A, B>) =>
@@ -57,32 +56,32 @@ export const refineDerivation =
     return r(s.result)
   }
 
-export type Introduction<J extends AnySequent, R extends Rule> = Transformation<
+export type Introduction<J extends AnySequent, R extends RuleId> = Transformation<
   J,
   [],
   R
 >
-export function introduction<J extends AnySequent, R extends Rule>(
+export function introduction<J extends AnySequent, R extends RuleId>(
   result: J,
   rule: R,
 ): Introduction<J, R> {
   return transformation(result, [], rule)
 }
-export type AnyIntroduction = Introduction<AnySequent, Rule>
+export type AnyIntroduction = Introduction<AnySequent, RuleId>
 
 export type Proof<
   J extends AnySequent,
   D extends Array<AnyProof> = Array<AnyProof>,
-  R extends Rule = Rule,
+  R extends RuleId = RuleId,
 > = Transformation<J, D, R>
 export function proof<
   J extends AnySequent,
   D extends Array<AnyProof>,
-  R extends Rule,
+  R extends RuleId,
 >(result: J, deps: D, rule: R): Proof<J, D, R> {
   return { kind: 'transformation', result, deps, rule }
 }
-export type AnyProof = Proof<AnySequent, Array<AnyProof>, Rule>
+export type AnyProof = Proof<AnySequent, Array<AnyProof>, RuleId>
 
 export const isEquivalent = <J extends AnySequent>(
   a: Derivation<J>,
@@ -90,7 +89,7 @@ export const isEquivalent = <J extends AnySequent>(
 ) => equals(a.result, b.result)
 
 export const replaceDep = <
-  P extends Transformation<AnySequent, Array<AnyNode>, Rule>,
+  P extends Transformation<AnySequent, Array<AnyNode>, RuleId>,
   I extends number,
 >(
   parent: P,
@@ -126,7 +125,7 @@ export const editPremise = <J extends AnySequent>(
 }
 
 export const editTransformation = <J extends AnySequent>(
-  root: Transformation<J, Array<AnyNode>, string>,
+  root: Transformation<J, Array<AnyNode>, RuleId>,
   path: Path,
   edit: Edit,
 ): Derivation<J> | null => {
@@ -173,7 +172,7 @@ const subDerivationPremise = <J extends AnySequent>(
 }
 
 const subDerivationTransformation = <J extends AnySequent>(
-  root: Transformation<J, Array<AnyNode>, string>,
+  root: Transformation<J, Array<AnyNode>, RuleId>,
   path: Path,
 ): AnyDerivation | null => {
   if (isNonEmptyArray(path)) {

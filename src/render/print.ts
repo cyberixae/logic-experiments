@@ -11,6 +11,7 @@ import {
 import { Focus } from '../interactive/focus'
 import { AnySequent } from '../model/sequent'
 import { Formulas } from '../model/formulas'
+import { RuleId } from '../model/rule'
 
 export type NullaryTemplate = [string]
 export const NullaryTemplateId = {
@@ -278,7 +279,7 @@ export function right(n: string | null = null): string {
   return n ? r + n : r
 }
 
-export function fromRule(s: string): Printer {
+export function fromRuleId(s: RuleId): Printer {
   return (t) => {
     switch (s) {
       case 'i':
@@ -344,7 +345,7 @@ export function fromTransformation({ rule, deps, result }: AnyTransformation) {
   return block.treeAuto(
     fromSequent(result)(basic),
     deps.map(fromDerivation),
-    '(' + fromRule(rule)(basic) + ')',
+    '(' + fromRuleId(rule)(basic) + ')',
   )
 }
 

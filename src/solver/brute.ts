@@ -8,7 +8,6 @@ import {
   proof,
   Transformation,
   AnyNode,
-  Rule,
   Derivation,
 } from '../model/derivation'
 import { equals as equalsFormulas } from '../model/formulas'
@@ -20,6 +19,7 @@ import {
   isTautology,
 } from '../model/sequent'
 import * as array from '../utils/array'
+import { RuleId } from '../model/rule'
 
 const hypoWeaken = (d: Premise<AnySequent>): seq.Seq<Premise<AnySequent>> =>
   function* () {
@@ -156,7 +156,7 @@ const brute0Premise = <S extends AnySequent>(
     )()
   }
 const brute0Transformation = <S extends AnySequent>(
-  d: Transformation<S, Array<AnyNode>, Rule>,
+  d: Transformation<S, Array<AnyNode>, RuleId>,
   limit: number,
 ): seq.Seq<Proof<S>> =>
   function* () {

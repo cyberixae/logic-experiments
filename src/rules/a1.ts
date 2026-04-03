@@ -46,12 +46,12 @@ export type A1<
   P extends Prop,
   Q extends Prop,
   C extends A1Result<P, Q>,
-> = Introduction<C, 'A1'>
+> = Introduction<C, 'a1'>
 export type AnyA1 = A1<Prop, Prop, AnyA1Result>
 export const a1 = <P extends Prop, Q extends Prop, C extends A1Result<P, Q>>(
   result: C,
 ): A1<P, Q, C> => {
-  return introduction(result, 'A1')
+  return introduction(result, 'a1')
 }
 export type ApplyA1<P extends Prop, Q extends Prop> = A1<P, Q, A1Result<P, Q>>
 export const applyA1 = <P extends Prop, Q extends Prop>(
