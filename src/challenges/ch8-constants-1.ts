@@ -1,11 +1,25 @@
 import { lk } from '../systems/lk'
-import { AnySequent, sequent } from '../model/sequent'
-import { Configuration } from '../model/challenge'
+import { sequent } from '../model/sequent'
+import { challenge } from '../model/challenge'
 
-export const ch8constants1: Configuration<AnySequent> = {
-  rules: ['i', 'swl', 'swr', 'sRotLF', 'sRotRF', 'sRotLB', 'sRotRB'],
-  goal: sequent(
-    [lk.a('p'), lk.o.p0.verum, lk.a('q')],
-    [lk.a('r'), lk.o.p0.verum, lk.a('s')],
+const { a, o, z, i } = lk
+
+const rules = [
+  'i',
+  'swl',
+  'swr',
+  'sRotLF',
+  'sRotRF',
+  'sRotLB',
+  'sRotRB',
+] as const
+
+const goal = sequent([a('p'), o.p0.verum, a('q')], [a('r'), o.p0.verum, a('s')])
+
+const solution = z.sRotLF(
+  z.sRotRF(
+    z.swl(a('p'), z.swl(a('q'), z.swr(a('s'), z.swr(a('r'), i.i(o.p0.verum))))),
   ),
-}
+)
+
+export const ch8constants1 = challenge({ rules, goal, solution })

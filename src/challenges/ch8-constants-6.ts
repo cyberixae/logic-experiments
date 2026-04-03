@@ -1,33 +1,45 @@
 import { lk } from '../systems/lk'
-import { AnySequent, conclusion } from '../model/sequent'
-import { Configuration } from '../model/challenge'
+import { conclusion } from '../model/sequent'
+import { challenge } from '../model/challenge'
 
-export const ch8constants6: Configuration<AnySequent> = {
-  rules: [
-    'i',
-    'f',
-    'v',
-    'swl',
-    'swr',
-    'sRotLF',
-    'sRotRF',
-    'sRotLB',
-    'sRotRB',
-    'nl',
-    'nr',
-    'cl',
-    'cr',
-    'dl',
-    'dr',
-    'il',
-    'ir',
-  ],
-  goal: conclusion(
-    lk.o.p2.implication(
-      lk.o.p1.negation(lk.o.p1.negation(lk.o.p0.falsum)),
-      lk.o.p1.negation(
-        lk.o.p1.negation(lk.o.p1.negation(lk.o.p1.negation(lk.a('s')))),
+const { a, o, z, i } = lk
+
+const rules = [
+  'i',
+  'f',
+  'v',
+  'swl',
+  'swr',
+  'sRotLF',
+  'sRotRF',
+  'sRotLB',
+  'sRotRB',
+  'nl',
+  'nr',
+  'cl',
+  'cr',
+  'dl',
+  'dr',
+  'il',
+  'ir',
+] as const
+
+const goal = conclusion(
+  o.p2.implication(
+    o.p1.negation(o.p1.negation(o.p0.falsum)),
+    o.p1.negation(o.p1.negation(o.p1.negation(o.p1.negation(a('s'))))),
+  ),
+)
+
+const solution = z.ir(
+  z.nl(
+    z.nr(
+      z.swr(
+        o.p1.negation(o.p1.negation(o.p1.negation(o.p1.negation(a('s'))))),
+        i.f(),
       ),
     ),
   ),
-}
+)
+
+export const ch8constants6 = challenge({ rules, goal, solution })

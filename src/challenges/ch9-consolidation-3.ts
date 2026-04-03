@@ -1,45 +1,76 @@
 import { lk } from '../systems/lk'
-import { AnySequent, conclusion } from '../model/sequent'
-import { Configuration } from '../model/challenge'
+import { conclusion } from '../model/sequent'
+import { challenge } from '../model/challenge'
 
-export const ch9consolidation3: Configuration<AnySequent> = {
-  rules: [
-    'i',
-    'f',
-    'v',
-    'swl',
-    'swr',
-    'sRotLF',
-    'sRotRF',
-    'sRotLB',
-    'sRotRB',
-    'nl',
-    'nr',
-    'cl',
-    'cr',
-    'dl',
-    'dr',
-    'il',
-    'ir',
-  ],
-  goal: conclusion(
-    lk.o.p2.implication(
-      lk.o.p2.conjunction(
-        lk.o.p2.implication(lk.a('p'), lk.a('q')),
+const { a, o, z, i } = lk
 
-        lk.o.p2.disjunction(lk.o.p1.negation(lk.a('q')), lk.a('r')),
+const rules = [
+  'i',
+  'f',
+  'v',
+  'swl',
+  'swr',
+  'sRotLF',
+  'sRotRF',
+  'sRotLB',
+  'sRotRB',
+  'nl',
+  'nr',
+  'cl',
+  'cr',
+  'dl',
+  'dr',
+  'il',
+  'ir',
+] as const
+
+const goal = conclusion(
+  o.p2.implication(
+    o.p2.conjunction(
+      o.p2.implication(a('p'), a('q')),
+
+      o.p2.disjunction(o.p1.negation(a('q')), a('r')),
+    ),
+    o.p2.disjunction(o.p1.negation(a('p')), a('r')),
+  ),
+)
+
+const solution = z.ir(
+  z.cl(
+    z.sRotLF(
+      z.il(
+        z.sRotRF(
+          z.dr(
+            z.nr(
+              z.sRotLF(
+                z.swl(
+                  o.p2.disjunction(o.p1.negation(a('q')), a('r')),
+                  z.swr(a('r'), i.i(a('p'))),
+                ),
+              ),
+            ),
+          ),
+        ),
+        z.sRotLF(
+          z.dl(
+            z.nl(
+              z.sRotRF(
+                z.swr(
+                  o.p2.disjunction(o.p1.negation(a('p')), a('r')),
+                  i.i(a('q')),
+                ),
+              ),
+            ),
+            z.dr(
+              z.sRotLF(
+                z.swl(a('q'), z.swr(o.p1.negation(a('p')), i.i(a('r')))),
+              ),
+            ),
+          ),
+        ),
       ),
-      lk.o.p2.disjunction(lk.o.p1.negation(lk.a('p')), lk.a('r')),
     ),
   ),
-  /*
-  solution: lk.z.ir(
-    lk.z.swl(
-      lk.o.p2.implication(
-        lk.a('p'),
-        lk.o.p2.implication(lk.a('q'), lk.o.p1.negation(lk.a('p'))),
-      ),
-      lk.z.ir(lk.i.i(lk.a('p'))),
-    ),
-  ),*/
-}
+)
+
+export const ch9consolidation3 = challenge({ rules, goal, solution })

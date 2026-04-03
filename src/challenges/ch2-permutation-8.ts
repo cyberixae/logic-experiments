@@ -1,21 +1,60 @@
 import { lk } from '../systems/lk'
-import { AnySequent, sequent } from '../model/sequent'
-import { Configuration } from '../model/challenge'
+import { sequent } from '../model/sequent'
+import { challenge } from '../model/challenge'
 
-export const ch2permutation8: Configuration<AnySequent> = {
-  rules: ['i', 'swl', 'swr', 'sRotLF', 'sRotRF', 'sRotLB', 'sRotRB'],
-  goal: sequent(
-    [
-      lk.o.p2.conjunction(lk.a('s'), lk.a('q')),
-      lk.a('r'),
-      lk.o.p2.implication(lk.a('q'), lk.a('p')),
-      lk.o.p1.negation(lk.a('r')),
-    ],
-    [
-      lk.o.p1.negation(lk.a('p')),
-      lk.o.p2.implication(lk.a('s'), lk.a('q')),
-      lk.o.p1.negation(lk.a('r')),
-      lk.o.p2.disjunction(lk.a('q'), lk.a('p')),
-    ],
+const { a, o, z, i } = lk
+
+const rules = [
+  'i',
+  'swl',
+  'swr',
+  'sRotLF',
+  'sRotRF',
+  'sRotLB',
+  'sRotRB',
+] as const
+
+const goal = sequent(
+  [
+    o.p2.conjunction(a('s'), a('q')),
+    a('r'),
+    o.p2.implication(a('q'), a('p')),
+    o.p1.negation(a('r')),
+  ],
+  [
+    o.p1.negation(a('p')),
+    o.p2.implication(a('s'), a('q')),
+    o.p1.negation(a('r')),
+    o.p2.disjunction(a('q'), a('p')),
+  ],
+)
+
+const solution = z.sRotLF(
+  z.sRotLF(
+    z.sRotLF(
+      z.sRotRF(
+        z.swl(
+          o.p2.implication(a('q'), a('p')),
+          z.swl(
+            a('r'),
+            z.swl(
+              o.p2.conjunction(a('s'), a('q')),
+              z.swr(
+                o.p2.disjunction(a('q'), a('p')),
+                z.swr(
+                  o.p1.negation(a('p')),
+                  z.swr(
+                    o.p2.implication(a('s'), a('q')),
+                    i.i(o.p1.negation(a('r'))),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    ),
   ),
-}
+)
+
+export const ch2permutation8 = challenge({ rules, goal, solution })

@@ -1,23 +1,24 @@
 import { lk } from '../systems/lk'
-import { AnySequent, sequent } from '../model/sequent'
-import { Configuration } from '../model/challenge'
+import { sequent } from '../model/sequent'
+import { challenge } from '../model/challenge'
 
-export const ch3negation5: Configuration<AnySequent> = {
-  rules: ['i', 'swl', 'swr', 'nl', 'nr'],
-  goal: sequent(
-    [
-      lk.o.p1.negation(
-        lk.o.p1.negation(lk.o.p2.conjunction(lk.a('p'), lk.a('q'))),
+const { a, o, z, i } = lk
+
+const rules = ['i', 'swl', 'swr', 'nl', 'nr'] as const
+
+const goal = sequent(
+  [o.p1.negation(o.p1.negation(o.p2.conjunction(a('p'), a('q'))))],
+  [
+    o.p1.negation(
+      o.p1.negation(
+        o.p1.negation(o.p1.negation(o.p2.conjunction(a('p'), a('q')))),
       ),
-    ],
-    [
-      lk.o.p1.negation(
-        lk.o.p1.negation(
-          lk.o.p1.negation(
-            lk.o.p1.negation(lk.o.p2.conjunction(lk.a('p'), lk.a('q'))),
-          ),
-        ),
-      ),
-    ],
-  ),
-}
+    ),
+  ],
+)
+
+const solution = z.nr(
+  z.nl(i.i(o.p1.negation(o.p1.negation(o.p2.conjunction(a('p'), a('q')))))),
+)
+
+export const ch3negation5 = challenge({ rules, goal, solution })

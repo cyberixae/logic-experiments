@@ -6,17 +6,37 @@ import * as prop from './prop'
 import { RuleId } from './rule'
 import { AnySequent, conclusion } from './sequent'
 
-export type Configuration<J extends AnySequent> = {
+export type Configuration<
+  J extends AnySequent,
+  S extends ReadonlyArray<RuleId> = ReadonlyArray<RuleId>,
+> = {
   goal: J
-  rules: Array<RuleId>
+  rules: S
 }
-export interface Challenge<J extends AnySequent> extends Configuration<J> {
-  solution: Proof<J>
+export const configuration = <
+  J extends AnySequent,
+  const S extends ReadonlyArray<RuleId>,
+>(
+  c: Configuration<J, S>,
+) => c
+
+export interface Challenge<
+  J extends AnySequent,
+  S extends ReadonlyArray<RuleId>,
+> extends Configuration<J, S> {
+  solution: Proof<NoInfer<J>>
 }
+export type AnyChallenge = Challenge<AnySequent, ReadonlyArray<RuleId>>
+export const challenge = <
+  J extends AnySequent,
+  const S extends ReadonlyArray<RuleId>,
+>(
+  c: Challenge<J, S>,
+) => c
 
 export const random =
   (size: number = 10, minDifficulty: number = 8) =>
-  (): Challenge<AnySequent> => {
+  (): AnyChallenge => {
     let solution
     while (!solution) {
       ;[solution] = seq.head(

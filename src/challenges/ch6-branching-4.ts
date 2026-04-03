@@ -1,23 +1,30 @@
 import { lk } from '../systems/lk'
-import { AnySequent, sequent } from '../model/sequent'
-import { Configuration } from '../model/challenge'
+import { sequent } from '../model/sequent'
+import { challenge } from '../model/challenge'
 
-export const ch6branching4: Configuration<AnySequent> = {
-  rules: [
-    'i',
-    'swl',
-    'swr',
-    'sRotLF',
-    'sRotRF',
-    'sRotLB',
-    'sRotRB',
-    'cl',
-    'cr',
-    'dl',
-    'dr',
-  ],
-  goal: sequent(
-    [lk.o.p2.disjunction(lk.a('p'), lk.a('q'))],
-    [lk.o.p2.disjunction(lk.a('q'), lk.a('p'))],
-  ),
-}
+const { a, o, z, i } = lk
+
+const rules = [
+  'i',
+  'swl',
+  'swr',
+  'sRotLF',
+  'sRotRF',
+  'sRotLB',
+  'sRotRB',
+  'cl',
+  'cr',
+  'dl',
+  'dr',
+] as const
+
+const goal = sequent(
+  [o.p2.disjunction(a('p'), a('q'))],
+  [o.p2.disjunction(a('q'), a('p'))],
+)
+
+const solution = z.dr(
+  z.dl(z.swr(a('q'), i.i(a('p'))), z.sRotRF(z.swr(a('p'), i.i(a('q'))))),
+)
+
+export const ch6branching4 = challenge({ rules, goal, solution })

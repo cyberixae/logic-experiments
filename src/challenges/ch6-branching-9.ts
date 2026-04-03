@@ -1,29 +1,49 @@
 import { lk } from '../systems/lk'
-import { AnySequent, conclusion } from '../model/sequent'
-import { Configuration } from '../model/challenge'
+import { conclusion } from '../model/sequent'
+import { challenge } from '../model/challenge'
 
-export const ch6branching9: Configuration<AnySequent> = {
-  rules: [
-    'i',
-    'swl',
-    'swr',
-    'sRotLF',
-    'sRotRF',
-    'sRotLB',
-    'sRotRB',
-    'cl',
-    'cr',
-    'dl',
-    'dr',
-    'ir',
-  ],
-  goal: conclusion(
-    lk.o.p2.implication(
-      lk.o.p2.disjunction(
-        lk.o.p2.conjunction(lk.a('p'), lk.a('q')),
-        lk.o.p2.conjunction(lk.a('p'), lk.a('r')),
+const { a, o, z, i } = lk
+
+const rules = [
+  'i',
+  'swl',
+  'swr',
+  'sRotLF',
+  'sRotRF',
+  'sRotLB',
+  'sRotRB',
+  'cl',
+  'cr',
+  'dl',
+  'dr',
+  'ir',
+] as const
+
+const goal = conclusion(
+  o.p2.implication(
+    o.p2.disjunction(
+      o.p2.conjunction(a('p'), a('q')),
+      o.p2.conjunction(a('p'), a('r')),
+    ),
+    o.p2.conjunction(a('p'), o.p2.disjunction(a('q'), a('r'))),
+  ),
+)
+
+const solution = z.ir(
+  z.dl(
+    z.cl(
+      z.cr(
+        z.swl(a('q'), i.i(a('p'))),
+        z.dr(z.sRotLF(z.sRotRF(z.swl(a('p'), z.swr(a('r'), i.i(a('q'))))))),
       ),
-      lk.o.p2.conjunction(lk.a('p'), lk.o.p2.disjunction(lk.a('q'), lk.a('r'))),
+    ),
+    z.cl(
+      z.cr(
+        z.swl(a('r'), i.i(a('p'))),
+        z.dr(z.sRotLF(z.swl(a('p'), z.swr(a('q'), i.i(a('r')))))),
+      ),
     ),
   ),
-}
+)
+
+export const ch6branching9 = challenge({ rules, goal, solution })

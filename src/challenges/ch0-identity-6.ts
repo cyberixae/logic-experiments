@@ -1,11 +1,16 @@
 import { lk } from '../systems/lk'
-import { AnySequent, sequent } from '../model/sequent'
-import { Configuration } from '../model/challenge'
+import { sequent } from '../model/sequent'
+import { challenge } from '../model/challenge'
 
-export const ch0identity6: Configuration<AnySequent> = {
-  rules: ['i'],
-  goal: sequent(
-    [lk.o.p2.implication(lk.a('r'), lk.a('p'))],
-    [lk.o.p2.implication(lk.a('r'), lk.a('p'))],
-  ),
-}
+const { a, o, z, i } = lk
+
+const rules = ['i'] as const
+
+const goal = sequent(
+  [o.p2.implication(a('r'), a('p'))],
+  [o.p2.implication(a('r'), a('p'))],
+)
+
+const solution = i.i(o.p2.implication(a('r'), a('p')))
+
+export const ch0identity6 = challenge({ rules, goal, solution })

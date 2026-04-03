@@ -1,11 +1,22 @@
 import { lk } from '../systems/lk'
-import { AnySequent, sequent } from '../model/sequent'
-import { Configuration } from '../model/challenge'
+import { sequent } from '../model/sequent'
+import { challenge } from '../model/challenge'
 
-export const ch1weakening6: Configuration<AnySequent> = {
-  rules: ['i', 'swl', 'swr'],
-  goal: sequent(
-    [lk.a('p'), lk.a('q'), lk.a('q'), lk.a('p')],
-    [lk.a('p'), lk.a('q'), lk.a('q'), lk.a('p')],
+const { a, o, z, i } = lk
+
+const rules = ['i', 'swl', 'swr'] as const
+
+const goal = sequent(
+  [a('p'), a('q'), a('q'), a('p')],
+  [a('p'), a('q'), a('q'), a('p')],
+)
+
+const solution = z.swl(
+  a('p'),
+  z.swl(
+    a('q'),
+    z.swl(a('q'), z.swr(a('p'), z.swr(a('q'), z.swr(a('q'), i.i(a('p')))))),
   ),
-}
+)
+
+export const ch1weakening6 = challenge({ rules, goal, solution })

@@ -1,11 +1,16 @@
 import { lk } from '../systems/lk'
-import { AnySequent, sequent } from '../model/sequent'
-import { Configuration } from '../model/challenge'
+import { sequent } from '../model/sequent'
+import { challenge } from '../model/challenge'
 
-export const ch5composition3: Configuration<AnySequent> = {
-  rules: ['i', 'swl', 'swr', 'cl', 'dr'],
-  goal: sequent(
-    [lk.o.p2.conjunction(lk.a('q'), lk.a('p'))],
-    [lk.o.p2.disjunction(lk.a('p'), lk.a('q'))],
-  ),
-}
+const { a, o, z, i } = lk
+
+const rules = ['i', 'swl', 'swr', 'cl', 'dr'] as const
+
+const goal = sequent(
+  [o.p2.conjunction(a('q'), a('p'))],
+  [o.p2.disjunction(a('p'), a('q'))],
+)
+
+const solution = z.cl(z.dr(z.swl(a('p'), z.swr(a('p'), i.i(a('q'))))))
+
+export const ch5composition3 = challenge({ rules, goal, solution })

@@ -9,7 +9,11 @@ import {
   verum,
 } from '../model/prop'
 import { ruleI } from '../rules/i'
+import { ruleV } from '../rules/v'
+import { ruleF } from '../rules/f'
 import { ruleCut } from '../rules/cut'
+import { ruleCL } from '../rules/cl'
+import { ruleDR } from '../rules/dr'
 import { ruleCL1 } from '../rules/cl1'
 import { ruleDR1 } from '../rules/dr1'
 import { ruleCL2 } from '../rules/cl2'
@@ -45,9 +49,13 @@ const omega = {
 }
 const iota = {
   i: ruleI.apply,
+  v: ruleV.apply,
+  f: ruleF.apply,
 }
 const zeta = {
   cut: ruleCut.apply,
+  cl: ruleCL.apply,
+  dr: ruleDR.apply,
   cl1: ruleCL1.apply,
   dr1: ruleDR1.apply,
   cl2: ruleCL2.apply,

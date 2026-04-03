@@ -1,23 +1,46 @@
 import { lk } from '../systems/lk'
-import { AnySequent, conclusion } from '../model/sequent'
-import { Configuration } from '../model/challenge'
+import { conclusion } from '../model/sequent'
+import { challenge } from '../model/challenge'
 
-export const ch7completeness8: Configuration<AnySequent> = {
-  rules: [
-    'i',
-    'swl',
-    'swr',
-    'sRotLF',
-    'sRotRF',
-    'sRotLB',
-    'sRotRB',
-    'il',
-    'ir',
-  ],
-  goal: conclusion(
-    lk.o.p2.implication(
-      lk.o.p2.implication(lk.o.p2.implication(lk.a('p'), lk.a('q')), lk.a('q')),
-      lk.o.p2.implication(lk.o.p2.implication(lk.a('q'), lk.a('p')), lk.a('p')),
+const { a, o, z, i } = lk
+
+const rules = [
+  'i',
+  'swl',
+  'swr',
+  'sRotLF',
+  'sRotRF',
+  'sRotLB',
+  'sRotRB',
+  'il',
+  'ir',
+] as const
+
+const goal = conclusion(
+  o.p2.implication(
+    o.p2.implication(o.p2.implication(a('p'), a('q')), a('q')),
+    o.p2.implication(o.p2.implication(a('q'), a('p')), a('p')),
+  ),
+)
+
+const solution = z.ir(
+  z.ir(
+    z.sRotLF(
+      z.il(
+        z.ir(
+          z.sRotLF(
+            z.swl(o.p2.implication(a('q'), a('p')), z.swr(a('q'), i.i(a('p')))),
+          ),
+        ),
+        z.sRotLF(
+          z.il(
+            z.sRotRF(z.swr(a('p'), i.i(a('q')))),
+            z.sRotLF(z.swl(a('q'), i.i(a('p')))),
+          ),
+        ),
+      ),
     ),
   ),
-}
+)
+
+export const ch7completeness8 = challenge({ rules, goal, solution })

@@ -1,31 +1,58 @@
 import { lk } from '../systems/lk'
-import { AnySequent, sequent } from '../model/sequent'
-import { Configuration } from '../model/challenge'
+import { sequent } from '../model/sequent'
+import { challenge } from '../model/challenge'
 
-export const ch3negation9: Configuration<AnySequent> = {
-  rules: [
-    'i',
-    'swl',
-    'swr',
-    'sRotLF',
-    'sRotRF',
-    'sRotLB',
-    'sRotRB',
-    'nl',
-    'nr',
-  ],
-  goal: sequent(
-    [
-      lk.o.p1.negation(lk.a('p')),
-      lk.o.p1.negation(lk.a('s')),
-      lk.o.p1.negation(lk.a('p')),
-      lk.a('r'),
-    ],
-    [
-      lk.a('q'),
-      lk.o.p1.negation(lk.a('q')),
-      lk.a('s'),
-      lk.o.p1.negation(lk.a('r')),
-    ],
+const { a, o, z, i } = lk
+
+const rules = [
+  'i',
+  'swl',
+  'swr',
+  'sRotLF',
+  'sRotRF',
+  'sRotLB',
+  'sRotRB',
+  'nl',
+  'nr',
+] as const
+
+const goal = sequent(
+  [o.p1.negation(a('p')), o.p1.negation(a('s')), o.p1.negation(a('p')), a('r')],
+  [a('q'), o.p1.negation(a('q')), a('s'), o.p1.negation(a('r'))],
+)
+
+const solution = z.sRotRF(
+  z.sRotRF(
+    z.sRotRF(
+      z.nr(
+        z.sRotLF(
+          z.sRotLF(
+            z.sRotLF(
+              z.sRotLF(
+                // @ts-expect-error TODO: fix type error
+                z.swl(
+                  a('r'),
+                  z.swl(
+                    o.p1.negation(a('p')),
+                    z.swl(
+                      o.p1.negation(a('s')),
+                      z.swl(
+                        o.p1.negation(a('p')),
+                        z.swr(
+                          a('s'),
+                          z.swr(o.p1.negation(a('r')), i.i(a('q'))),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    ),
   ),
-}
+)
+
+export const ch3negation9 = challenge({ rules, goal, solution })

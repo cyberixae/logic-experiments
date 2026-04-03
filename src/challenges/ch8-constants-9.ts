@@ -1,42 +1,77 @@
 import { lk } from '../systems/lk'
-import { AnySequent, sequent } from '../model/sequent'
-import { Configuration } from '../model/challenge'
+import { sequent } from '../model/sequent'
+import { challenge } from '../model/challenge'
 
-export const ch8constants9: Configuration<AnySequent> = {
-  rules: [
-    'i',
-    'f',
-    'v',
-    'swl',
-    'swr',
-    'sRotLF',
-    'sRotRF',
-    'sRotLB',
-    'sRotRB',
-    'nl',
-    'nr',
-    'cl',
-    'cr',
-    'dl',
-    'dr',
-    'il',
-    'ir',
+const { a, o, z, i } = lk
+
+const rules = [
+  'i',
+  'f',
+  'v',
+  'swl',
+  'swr',
+  'sRotLF',
+  'sRotRF',
+  'sRotLB',
+  'sRotRB',
+  'nl',
+  'nr',
+  'cl',
+  'cr',
+  'dl',
+  'dr',
+  'il',
+  'ir',
+] as const
+
+const goal = sequent(
+  [
+    o.p2.conjunction(
+      o.p2.conjunction(a('r'), a('q')),
+      o.p2.implication(a('s'), o.p1.negation(o.p0.verum)),
+    ),
   ],
-  goal: sequent(
-    [
-      lk.o.p2.conjunction(
-        lk.o.p2.conjunction(lk.a('r'), lk.a('q')),
-        lk.o.p2.implication(lk.a('s'), lk.o.p1.negation(lk.o.p0.verum)),
-      ),
-    ],
-    [
-      lk.o.p2.disjunction(
-        lk.o.p2.implication(
-          lk.a('s'),
-          lk.o.p2.implication(lk.a('q'), lk.a('r')),
+  [
+    o.p2.disjunction(
+      o.p2.implication(a('s'), o.p2.implication(a('q'), a('r'))),
+      o.p0.falsum,
+    ),
+  ],
+)
+
+const solution = z.cl(
+  z.dr(
+    z.il(
+      z.sRotRF(
+        z.sRotRF(
+          z.ir(
+            z.sRotLF(
+              z.swl(
+                o.p2.conjunction(a('r'), a('q')),
+                z.swr(
+                  o.p2.implication(a('q'), a('r')),
+                  z.swr(o.p0.falsum, i.i(a('s'))),
+                ),
+              ),
+            ),
+          ),
         ),
-        lk.o.p0.falsum,
       ),
-    ],
+      z.nl(
+        z.sRotRF(
+          z.sRotRF(
+            z.swl(
+              o.p2.conjunction(a('r'), a('q')),
+              z.swr(
+                o.p2.implication(a('s'), o.p2.implication(a('q'), a('r'))),
+                z.swr(o.p0.falsum, i.v()),
+              ),
+            ),
+          ),
+        ),
+      ),
+    ),
   ),
-}
+)
+
+export const ch8constants9 = challenge({ rules, goal, solution })

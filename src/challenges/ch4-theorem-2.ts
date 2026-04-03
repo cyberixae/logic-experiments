@@ -1,13 +1,18 @@
 import { lk } from '../systems/lk'
-import { AnySequent, conclusion } from '../model/sequent'
-import { Configuration } from '../model/challenge'
+import { conclusion } from '../model/sequent'
+import { challenge } from '../model/challenge'
 
-export const ch4theorem2: Configuration<AnySequent> = {
-  rules: ['i', 'ir'],
-  goal: conclusion(
-    lk.o.p2.implication(
-      lk.o.p2.conjunction(lk.a('q'), lk.a('q')),
-      lk.o.p2.conjunction(lk.a('q'), lk.a('q')),
-    ),
+const { a, o, z, i } = lk
+
+const rules = ['i', 'ir'] as const
+
+const goal = conclusion(
+  o.p2.implication(
+    o.p2.conjunction(a('q'), a('q')),
+    o.p2.conjunction(a('q'), a('q')),
   ),
-}
+)
+
+const solution = z.ir(i.i(o.p2.conjunction(a('q'), a('q'))))
+
+export const ch4theorem2 = challenge({ rules, goal, solution })

@@ -1,34 +1,49 @@
 import { lk } from '../systems/lk'
-import { AnySequent, conclusion } from '../model/sequent'
-import { Configuration } from '../model/challenge'
+import { conclusion } from '../model/sequent'
+import { challenge } from '../model/challenge'
 
-export const ch8constants5: Configuration<AnySequent> = {
-  rules: [
-    'i',
-    'f',
-    'v',
-    'swl',
-    'swr',
-    'sRotLF',
-    'sRotRF',
-    'sRotLB',
-    'sRotRB',
-    'nl',
-    'nr',
-    'cl',
-    'cr',
-    'dl',
-    'dr',
-    'il',
-    'ir',
-  ],
-  goal: conclusion(
-    lk.o.p2.implication(
-      lk.o.p2.implication(
-        lk.a('p'),
-        lk.o.p2.implication(lk.a('q'), lk.o.p1.negation(lk.a('p'))),
+const { a, o, z, i } = lk
+
+const rules = [
+  'i',
+  'f',
+  'v',
+  'swl',
+  'swr',
+  'sRotLF',
+  'sRotRF',
+  'sRotLB',
+  'sRotRB',
+  'nl',
+  'nr',
+  'cl',
+  'cr',
+  'dl',
+  'dr',
+  'il',
+  'ir',
+] as const
+
+const goal = conclusion(
+  o.p2.implication(
+    o.p2.implication(a('p'), o.p2.implication(a('q'), o.p1.negation(a('p')))),
+    o.p2.implication(a('p'), o.p0.verum),
+  ),
+)
+
+const solution = z.ir(
+  z.ir(
+    z.swl(
+      a('p'),
+      z.swl(
+        o.p2.implication(
+          a('p'),
+          o.p2.implication(a('q'), o.p1.negation(a('p'))),
+        ),
+        i.v(),
       ),
-      lk.o.p2.implication(lk.a('p'), lk.o.p0.verum),
     ),
   ),
-}
+)
+
+export const ch8constants5 = challenge({ rules, goal, solution })

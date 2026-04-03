@@ -1,36 +1,51 @@
 import { lk } from '../systems/lk'
-import { AnySequent, sequent } from '../model/sequent'
-import { Configuration } from '../model/challenge'
+import { sequent } from '../model/sequent'
+import { challenge } from '../model/challenge'
 
-export const ch3negation8: Configuration<AnySequent> = {
-  rules: [
-    'i',
-    'swl',
-    'swr',
-    'sRotLF',
-    'sRotRF',
-    'sRotLB',
-    'sRotRB',
-    'nl',
-    'nr',
+const { a, o, z, i } = lk
+
+const rules = [
+  'i',
+  'swl',
+  'swr',
+  'sRotLF',
+  'sRotRF',
+  'sRotLB',
+  'sRotRB',
+  'nl',
+  'nr',
+] as const
+
+const goal = sequent(
+  [
+    o.p1.negation(o.p1.negation(a('p'))),
+    o.p2.conjunction(o.p1.negation(a('p')), o.p1.negation(a('q'))),
+    o.p1.negation(o.p1.negation(o.p1.negation(a('q')))),
   ],
-  goal: sequent(
-    [
-      lk.o.p1.negation(lk.o.p1.negation(lk.a('p'))),
-      lk.o.p2.conjunction(
-        lk.o.p1.negation(lk.a('p')),
-        lk.o.p1.negation(lk.a('q')),
-      ),
-      lk.o.p1.negation(lk.o.p1.negation(lk.o.p1.negation(lk.a('q')))),
-    ],
-    [
-      lk.o.p1.negation(lk.o.p1.negation(lk.o.p1.negation(lk.a('p')))),
+  [
+    o.p1.negation(o.p1.negation(o.p1.negation(a('p')))),
 
-      lk.o.p2.conjunction(
-        lk.o.p1.negation(lk.a('p')),
-        lk.o.p1.negation(lk.a('q')),
+    o.p2.conjunction(o.p1.negation(a('p')), o.p1.negation(a('q'))),
+    o.p1.negation(o.p1.negation(a('q'))),
+  ],
+)
+
+const solution = z.sRotLF(
+  z.sRotRF(
+    z.swl(
+      o.p1.negation(o.p1.negation(a('p'))),
+      z.swl(
+        o.p1.negation(o.p1.negation(o.p1.negation(a('q')))),
+        z.swr(
+          o.p1.negation(o.p1.negation(a('q'))),
+          z.swr(
+            o.p1.negation(o.p1.negation(o.p1.negation(a('p')))),
+            i.i(o.p2.conjunction(o.p1.negation(a('p')), o.p1.negation(a('q')))),
+          ),
+        ),
       ),
-      lk.o.p1.negation(lk.o.p1.negation(lk.a('q'))),
-    ],
+    ),
   ),
-}
+)
+
+export const ch3negation8 = challenge({ rules, goal, solution })

@@ -45,7 +45,7 @@ export class Workspace<
     return this.theoremKeys[index + 1] ?? last(this.theoremKeys)
   }
 
-  availableRules(): Array<RuleId> {
+  availableRules(): ReadonlyArray<RuleId> {
     return get(this.theorems, this.selected).rules
   }
   applicableRules(): Array<RuleId> {

@@ -1,32 +1,47 @@
 import { lk } from '../systems/lk'
-import { AnySequent, sequent } from '../model/sequent'
-import { Configuration } from '../model/challenge'
+import { sequent } from '../model/sequent'
+import { challenge } from '../model/challenge'
 
-export const ch5composition6: Configuration<AnySequent> = {
-  rules: [
-    'i',
-    'swl',
-    'swr',
-    'sRotLF',
-    'sRotRF',
-    'sRotLB',
-    'sRotRB',
-    'cl',
-    'dr',
+const { a, o, z, i } = lk
+
+const rules = [
+  'i',
+  'swl',
+  'swr',
+  'sRotLF',
+  'sRotRF',
+  'sRotLB',
+  'sRotRB',
+  'cl',
+  'dr',
+] as const
+
+const goal = sequent(
+  [
+    o.p2.conjunction(
+      o.p2.disjunction(a('r'), a('p')),
+      o.p2.disjunction(a('p'), a('s')),
+    ),
   ],
-  goal: sequent(
-    [
-      lk.o.p2.conjunction(
-        lk.o.p2.disjunction(lk.a('r'), lk.a('p')),
-        lk.o.p2.disjunction(lk.a('p'), lk.a('s')),
-      ),
-    ],
 
-    [
-      lk.o.p2.disjunction(
-        lk.o.p2.disjunction(lk.a('s'), lk.a('p')),
-        lk.o.p2.disjunction(lk.a('r'), lk.a('p')),
+  [
+    o.p2.disjunction(
+      o.p2.disjunction(a('s'), a('p')),
+      o.p2.disjunction(a('r'), a('p')),
+    ),
+  ],
+)
+
+const solution = z.cl(
+  z.dr(
+    z.swl(
+      o.p2.disjunction(a('p'), a('s')),
+      z.swr(
+        o.p2.disjunction(a('s'), a('p')),
+        i.i(o.p2.disjunction(a('r'), a('p'))),
       ),
-    ],
+    ),
   ),
-}
+)
+
+export const ch5composition6 = challenge({ rules, goal, solution })

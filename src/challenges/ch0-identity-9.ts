@@ -1,21 +1,31 @@
 import { lk } from '../systems/lk'
-import { AnySequent, sequent } from '../model/sequent'
-import { Configuration } from '../model/challenge'
+import { sequent } from '../model/sequent'
+import { challenge } from '../model/challenge'
 
-export const ch0identity9: Configuration<AnySequent> = {
-  rules: ['i'],
-  goal: sequent(
-    [
-      lk.o.p2.implication(
-        lk.o.p2.disjunction(lk.a('p'), lk.o.p1.negation(lk.a('q'))),
-        lk.o.p1.negation(lk.o.p2.conjunction(lk.a('r'), lk.a('s'))),
-      ),
-    ],
-    [
-      lk.o.p2.implication(
-        lk.o.p2.disjunction(lk.a('p'), lk.o.p1.negation(lk.a('q'))),
-        lk.o.p1.negation(lk.o.p2.conjunction(lk.a('r'), lk.a('s'))),
-      ),
-    ],
+const { a, o, z, i } = lk
+
+const rules = ['i'] as const
+
+const goal = sequent(
+  [
+    o.p2.implication(
+      o.p2.disjunction(a('p'), o.p1.negation(a('q'))),
+      o.p1.negation(o.p2.conjunction(a('r'), a('s'))),
+    ),
+  ],
+  [
+    o.p2.implication(
+      o.p2.disjunction(a('p'), o.p1.negation(a('q'))),
+      o.p1.negation(o.p2.conjunction(a('r'), a('s'))),
+    ),
+  ],
+)
+
+const solution = i.i(
+  o.p2.implication(
+    o.p2.disjunction(a('p'), o.p1.negation(a('q'))),
+    o.p1.negation(o.p2.conjunction(a('r'), a('s'))),
   ),
-}
+)
+
+export const ch0identity9 = challenge({ rules, goal, solution })
