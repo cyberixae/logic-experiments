@@ -1,6 +1,5 @@
 import { reverse0, undo, reset } from '../interactive/event'
-import { activeSequent, activePath } from '../interactive/focus'
-import { AnyDerivation } from '../model/derivation'
+import { activeSequent } from '../interactive/focus'
 import { Rule } from '../model/rule'
 import { AnySequent } from '../model/sequent'
 import { basic, fromDerivation, fromFocus, fromSequent } from '../render/print'
@@ -14,10 +13,10 @@ import {
   right,
   rightLogical,
 } from '../rules'
-import { entries, keys } from '../utils/record'
 import { Workspace } from '../interactive/workspace'
 import { Action } from '../interactive/action'
 import { Navigate } from './types'
+import { keys } from '../utils/record'
 
 export type AnyWorkspace = Workspace<
   string,
@@ -162,8 +161,8 @@ const createPlayArea = (
 const createPanel = (
   className: string,
   ruleRecord: Partial<Record<RuleId, Rule<AnySequent>>>,
-  ls: RuleId[],
-  rules: RuleId[],
+  ls: ReadonlyArray<RuleId>,
+  rules: ReadonlyArray<RuleId>,
   solved: boolean,
   onApply: (key: RuleId) => void,
 ): HTMLElement => {

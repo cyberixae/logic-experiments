@@ -1,8 +1,10 @@
 import { reset } from '../interactive/event'
 import { activePath } from '../interactive/focus'
 import { challenges } from '../challenges'
-import { basic, fromRule, fromSequent } from '../render/print'
+import { basic, fromRuleId, fromSequent } from '../render/print'
 import { Workspace } from '../interactive/workspace'
+import { Configuration } from '../model/challenge'
+import { AnySequent } from '../model/sequent'
 import { repl } from '../interactive/repl'
 import { Action } from '../interactive/action'
 import {
@@ -60,7 +62,7 @@ const createListing = (
     const rules = document.createElement('div')
     rules.setAttribute('class', 'rules')
     rules.innerHTML = challenge.rules
-      .map((rule) => fromRule(rule)(basic))
+      .map((rule) => fromRuleId(rule)(basic))
       .join(', ')
     item.appendChild(rules)
     const goal = document.createElement('div')
@@ -160,7 +162,7 @@ export const mountCampaign = (
   container: HTMLElement,
   navigate: Navigate,
 ): (() => void) => {
-  const ws = new Workspace(challenges) as unknown as AnyWorkspace
+  const ws = new Workspace(challenges)
 
   const selectLevel = (id: string) => {
     if (ws.isConjectureId(id)) {
@@ -228,14 +230,16 @@ export const mountCampaign = (
   const cleanupGamepad = setupGamepad(dispatch)
 
   // Debug REPL
-  const gen = repl(ws as Parameters<typeof repl>[0])
+  const gen = repl(ws)
   gen.next('')
-  ;(window as unknown as Record<string, unknown>)['cmd'] = (input: string) => {
-    const result = gen.next(input)
-    console.log(result.value)
-    rerender()
-    return result.done
-  }
+  Object.assign(window, {
+    cmd: (input: string) => {
+      const result = gen.next(input)
+      console.log(result.value)
+      rerender()
+      return result.done
+    },
+  })
 
   return () => {
     document.removeEventListener('keydown', handleKey)

@@ -15,7 +15,7 @@ import {
 import { Navigate } from './types'
 
 const newWorkspace = (pool: ChallengePool): AnyWorkspace =>
-  new Workspace({ challenge: pool.take() }) as unknown as AnyWorkspace
+  new Workspace({ challenge: pool.take() })
 
 const createControls = (
   ws: AnyWorkspace,
