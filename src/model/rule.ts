@@ -2,6 +2,7 @@ import { AnyDerivation, Derivation } from './derivation'
 import { AnySequent } from './sequent'
 import { Refinement } from '../utils/generic'
 import { Prop } from './prop'
+import { Lazy } from '../utils/lazy'
 
 export type RuleId =
   | 'a1'
@@ -68,6 +69,9 @@ export const ruleId: {
   sxr: 'sxr',
   v: 'v',
 }
+
+export type MatchRuleId<R> = { [K in RuleId]: Lazy<R> }
+export const matchRuleId = <R>(s: RuleId, f: MatchRuleId<R>): R => f[s]()
 
 export const isRuleId = (u: unknown): u is RuleId =>
   typeof u === 'string' && u in ruleId

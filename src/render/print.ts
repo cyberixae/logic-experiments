@@ -11,7 +11,7 @@ import {
 import { Focus } from '../interactive/focus'
 import { AnySequent } from '../model/sequent'
 import { Formulas } from '../model/formulas'
-import { RuleId } from '../model/rule'
+import * as rule from '../model/rule'
 
 export type NullaryTemplate = [string]
 export const NullaryTemplateId = {
@@ -279,62 +279,39 @@ export function right(n: string | null = null): string {
   return n ? r + n : r
 }
 
-export function fromRuleId(s: RuleId): Printer {
-  return (t) => {
-    switch (s) {
-      case 'i':
-        return 'I'
-      case 'f':
-        return '⊥'
-      case 'v':
-        return '⊤'
-      case 'cl':
-        return t.conjunction.join(empty) + left()
-      case 'dr':
-        return t.disjunction.join(empty) + right()
-      case 'cl1':
-        return t.conjunction.join(empty) + left('\u2081')
-      case 'dr1':
-        return t.disjunction.join(empty) + right('\u2081')
-      case 'cl2':
-        return t.conjunction.join(empty) + left('\u2082')
-      case 'dr2':
-        return t.disjunction.join(empty) + right('\u2082')
-      case 'dl':
-        return t.disjunction.join(empty) + left()
-      case 'cr':
-        return t.conjunction.join(empty) + right()
-      case 'il':
-        return t.implication.join(empty) + left()
-      case 'ir':
-        return t.implication.join(empty) + right()
-      case 'nl':
-        return t.negation.join(empty) + left()
-      case 'nr':
-        return t.negation.join(empty) + right()
-      case 'swl':
-        return 'WL'
-      case 'swr':
-        return 'WR'
-      case 'scl':
-        return 'CL'
-      case 'scr':
-        return 'CR'
-      case 'sRotLF':
-        return '\u21B6L'
-      case 'sRotRF':
-        return '\u21b7R'
-      case 'sRotLB':
-        return '\u21b7L'
-      case 'sRotRB':
-        return '\u21B6R'
-      case 'sxl':
-        return 'XL'
-      case 'sxr':
-        return 'XR'
-    }
-    return s
-  }
+export function fromRuleId(s: rule.RuleId): Printer {
+  return (t) => rule.matchRuleId(s, {
+    i: () => 'I',
+    f: () => '⊥',
+    v: () => '⊤',
+    cl: () => t.conjunction.join(empty) + left(),
+    dr: () => t.disjunction.join(empty) + right(),
+    cl1: () => t.conjunction.join(empty) + left('\u2081'),
+    dr1: () => t.disjunction.join(empty) + right('\u2081'),
+    cl2: () => t.conjunction.join(empty) + left('\u2082'),
+    dr2: () => t.disjunction.join(empty) + right('\u2082'),
+    dl: () => t.disjunction.join(empty) + left(),
+    cr: () => t.conjunction.join(empty) + right(),
+    il: () => t.implication.join(empty) + left(),
+    ir: () => t.implication.join(empty) + right(),
+    nl: () => t.negation.join(empty) + left(),
+    nr: () => t.negation.join(empty) + right(),
+    swl: () => 'WL',
+    swr: () => 'WR',
+    scl: () => 'CL',
+    scr: () => 'CR',
+    sRotLF: () => '\u21B6L',
+    sRotRF: () => '\u21b7R',
+    sRotLB: () => '\u21b7L',
+    sRotRB: () => '\u21B6R',
+    sxl: () => 'XL',
+    sxr: () => 'XR',
+    a1: () => 'a1',
+    a2: () => 'a2',
+    a3: () => 'a3',
+    cut: () => 'cut',
+    mp: () => 'mp',
+  })
 }
 
 export function fromPremise({ result }: AnyPremise) {
