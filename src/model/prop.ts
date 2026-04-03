@@ -132,6 +132,35 @@ export const match = <R>(p: Prop, f: Match<R>): R => {
   }
 }
 
+export type MatchRaw<R> = {
+  atom: (p: Atom<string>) => R
+  falsum: (p: Falsum) => R
+  verum: (p: Verum) => R
+  negation: (p: Negation<Prop>) => R
+  implication: (p: Implication<Prop, Prop>) => R
+  conjunction: (p: Conjunction<Prop, Prop>) => R
+  disjunction: (p: Disjunction<Prop, Prop>) => R
+}
+
+export const matchRaw = <R>(p: Prop, f: MatchRaw<R>): R => {
+  switch (p.kind) {
+    case 'atom':
+      return f.atom(p)
+    case 'falsum':
+      return f.falsum(p)
+    case 'verum':
+      return f.verum(p)
+    case 'negation':
+      return f.negation(p)
+    case 'implication':
+      return f.implication(p)
+    case 'conjunction':
+      return f.conjunction(p)
+    case 'disjunction':
+      return f.disjunction(p)
+  }
+}
+
 export const equals = (a: Prop, b: Prop): boolean =>
   match(a, {
     atom: (value) => b.kind === 'atom' && b.value === value,

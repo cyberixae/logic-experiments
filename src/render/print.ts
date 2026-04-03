@@ -168,19 +168,18 @@ export function fromVerum(_verum: prop.Verum): Printer {
 }
 
 export function fromNegation({ negand }: prop.Negation<prop.Prop>): Printer {
-  const expand = (operand: prop.Prop) => {
-    switch (operand.kind) {
-      case 'atom':
-        return fromProp(operand)
-      case 'falsum':
-      case 'verum':
-      case 'negation':
-        return print('optional')(fromProp(operand))
-      case 'conjunction':
-      case 'disjunction':
-      case 'implication':
-        return print('parenthesis')(fromProp(operand))
-    }
+  const expand = (operand: prop.Prop): Printer => {
+    const optional = () => print('optional')(fromProp(operand))
+    const parenthesized = () => print('parenthesis')(fromProp(operand))
+    return prop.matchRaw(operand, {
+      atom: fromProp,
+      falsum: optional,
+      verum: optional,
+      negation: optional,
+      conjunction: parenthesized,
+      disjunction: parenthesized,
+      implication: parenthesized,
+    })
   }
   return print('negation')(expand(negand))
 }
@@ -189,19 +188,18 @@ export function fromConjunction({
   leftConjunct,
   rightConjunct,
 }: prop.Conjunction<prop.Prop, prop.Prop>): Printer {
-  const expand = (operand: prop.Prop) => {
-    switch (operand.kind) {
-      case 'atom':
-        return fromProp(operand)
-      case 'falsum':
-      case 'verum':
-      case 'negation':
-        return print('optional')(fromProp(operand))
-      case 'conjunction':
-      case 'disjunction':
-      case 'implication':
-        return print('parenthesis')(fromProp(operand))
-    }
+  const expand = (operand: prop.Prop): Printer => {
+    const optional = () => print('optional')(fromProp(operand))
+    const parenthesized = () => print('parenthesis')(fromProp(operand))
+    return prop.matchRaw(operand, {
+      atom: fromProp,
+      falsum: optional,
+      verum: optional,
+      negation: optional,
+      conjunction: parenthesized,
+      disjunction: parenthesized,
+      implication: parenthesized,
+    })
   }
   return print('conjunction')(expand(leftConjunct), expand(rightConjunct))
 }
@@ -210,19 +208,18 @@ export function fromDisjunction({
   leftDisjunct,
   rightDisjunct,
 }: prop.Disjunction<prop.Prop, prop.Prop>): Printer {
-  const expand = (operand: prop.Prop) => {
-    switch (operand.kind) {
-      case 'atom':
-        return fromProp(operand)
-      case 'falsum':
-      case 'verum':
-      case 'negation':
-        return print('optional')(fromProp(operand))
-      case 'conjunction':
-      case 'disjunction':
-      case 'implication':
-        return print('parenthesis')(fromProp(operand))
-    }
+  const expand = (operand: prop.Prop): Printer => {
+    const optional = () => print('optional')(fromProp(operand))
+    const parenthesized = () => print('parenthesis')(fromProp(operand))
+    return prop.matchRaw(operand, {
+      atom: fromProp,
+      falsum: optional,
+      verum: optional,
+      negation: optional,
+      conjunction: parenthesized,
+      disjunction: parenthesized,
+      implication: parenthesized,
+    })
   }
   return print('disjunction')(expand(leftDisjunct), expand(rightDisjunct))
 }
@@ -231,40 +228,32 @@ export function fromImplication({
   antecedent,
   consequent,
 }: prop.Implication<prop.Prop, prop.Prop>): Printer {
-  const expand = (operand: prop.Prop) => {
-    switch (operand.kind) {
-      case 'atom':
-        return fromProp(operand)
-      case 'falsum':
-      case 'verum':
-      case 'negation':
-      case 'conjunction':
-      case 'disjunction':
-        return print('optional')(fromProp(operand))
-      case 'implication':
-        return print('parenthesis')(fromProp(operand))
-    }
+  const expand = (operand: prop.Prop): Printer => {
+    const optional = () => print('optional')(fromProp(operand))
+    const parenthesized = () => print('parenthesis')(fromProp(operand))
+    return prop.matchRaw(operand, {
+      atom: fromProp,
+      falsum: optional,
+      verum: optional,
+      negation: optional,
+      conjunction: optional,
+      disjunction: optional,
+      implication: parenthesized,
+    })
   }
   return print('implication')(expand(antecedent), expand(consequent))
 }
 
 export function fromProp(proposition: prop.Prop): Printer {
-  switch (proposition.kind) {
-    case 'atom':
-      return fromAtom(proposition)
-    case 'falsum':
-      return fromFalsum(proposition)
-    case 'verum':
-      return fromVerum(proposition)
-    case 'negation':
-      return fromNegation(proposition)
-    case 'conjunction':
-      return fromConjunction(proposition)
-    case 'disjunction':
-      return fromDisjunction(proposition)
-    case 'implication':
-      return fromImplication(proposition)
-  }
+  return prop.matchRaw(proposition, {
+    atom: fromAtom,
+    falsum: fromFalsum,
+    verum: fromVerum,
+    negation: fromNegation,
+    conjunction: fromConjunction,
+    disjunction: fromDisjunction,
+    implication: fromImplication,
+  })
 }
 
 export function fromFormulas(formulas: Formulas): Printer {
