@@ -67,15 +67,13 @@ describe('isTautology on sequents', () => {
 
   describe('implication and negation', () => {
     it('returns true for modus ponens: p, p→q ⊢ q', () => {
-      expect(
-        isTautology(sequent([p, o.p2.implication(p, q)], [q])),
-      ).toBe(true)
+      expect(isTautology(sequent([p, o.p2.implication(p, q)], [q]))).toBe(true)
     })
 
     it('returns true for double negation: ¬¬p ⊢ p', () => {
-      expect(
-        isTautology(sequent([o.p1.negation(o.p1.negation(p))], [p])),
-      ).toBe(true)
+      expect(isTautology(sequent([o.p1.negation(o.p1.negation(p))], [p]))).toBe(
+        true,
+      )
     })
 
     it('returns true for contrapositive: p→q ⊢ ¬q→¬p', () => {
