@@ -45,8 +45,10 @@ export const negation = <N extends Prop>(negand: N): Negation<N> => ({
 export const isNegation = (p: Prop): p is Negation<Prop> =>
   p.kind === 'negation'
 
-export interface Implication<A extends Prop, C extends Prop>
-  extends PropG<'implication'> {
+export interface Implication<
+  A extends Prop,
+  C extends Prop,
+> extends PropG<'implication'> {
   antecedent: A
   consequent: C
 }
@@ -61,8 +63,10 @@ export const implication = <A extends Prop, C extends Prop>(
 export const isImplication = (p: Prop): p is Implication<Prop, Prop> =>
   p.kind === 'implication'
 
-export interface Conjunction<L extends Prop, R extends Prop>
-  extends PropG<'conjunction'> {
+export interface Conjunction<
+  L extends Prop,
+  R extends Prop,
+> extends PropG<'conjunction'> {
   leftConjunct: L
   rightConjunct: R
 }
@@ -77,8 +81,10 @@ export const conjunction = <L extends Prop, R extends Prop>(
 export const isConjunction = (p: Prop): p is Conjunction<Prop, Prop> =>
   p.kind === 'conjunction'
 
-export interface Disjunction<L extends Prop, R extends Prop>
-  extends PropG<'disjunction'> {
+export interface Disjunction<
+  L extends Prop,
+  R extends Prop,
+> extends PropG<'disjunction'> {
   kind: 'disjunction'
   leftDisjunct: L
   rightDisjunct: R
