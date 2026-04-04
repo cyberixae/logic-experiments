@@ -65,6 +65,7 @@ export function* repl<
       case 'select': {
         const [conjectureId] = args
         if (!workspace.isConjectureId(conjectureId)) {
+          output = '\nUnknown conjecture "' + conjectureId + '"'
           break
         }
         workspace.selectConjecture(conjectureId)
@@ -74,6 +75,7 @@ export function* repl<
       default: {
         const ev = parseEvent(cmd)
         if (!ev) {
+          output = '\nUnknown command "' + cmd + '"'
           break
         }
         workspace.applyEvent(ev)
