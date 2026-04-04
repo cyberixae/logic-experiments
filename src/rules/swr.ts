@@ -82,6 +82,7 @@ export const exampleSWR = applySWR(
 
 export const ruleSWR = {
   id: 'swr',
+  connectives: [],
   isResult: isSWRResult,
   isResultDerivation: isSWRResultDerivation,
   make: swr,

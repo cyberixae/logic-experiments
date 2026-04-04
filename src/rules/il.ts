@@ -104,6 +104,7 @@ export const exampleIL = applyIL(
 
 export const ruleIL = {
   id: 'il',
+  connectives: ['implication'],
   isResult: isILResult,
   isResultDerivation: isILResultDerivation,
   make: il,

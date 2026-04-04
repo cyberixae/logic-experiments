@@ -1,4 +1,11 @@
-import { reverseAxiom0, reverseLogic0, reverseStructure0 } from '../rules'
+import {
+  reverseAxiom0,
+  reverseLogic0,
+  reverseStructure0,
+  reverse0,
+  reverse1,
+} from '../rules'
+import * as prop from '../model/prop'
 import * as seq from '../utils/seq'
 import { sequence } from '../utils/seq'
 import { entries } from '../utils/record'
@@ -92,6 +99,75 @@ const bruteAxiom0 = <S extends AnySequent, R extends RuleId>(
       yield* brute0(result, rules, limit)()
     }
   }
+const candidateConnectives = (
+  rules: ReadonlyArray<RuleId>,
+  sequent: AnySequent,
+): Set<prop.ConnectiveType> => {
+  const kinds = new Set<prop.ConnectiveType>()
+  for (const [rId, rule] of entries(reverse0)) {
+    if (!includes(rules, rId)) continue
+    for (const kind of rule.connectives) kinds.add(kind)
+  }
+  for (const p of [...sequent.antecedent, ...sequent.succedent])
+    for (const kind of prop.connectives(p)) kinds.add(kind)
+  return kinds
+}
+
+const formulasOfOpCount = (
+  opCount: number,
+  atoms: ReadonlyArray<string>,
+  connectives: ReadonlySet<prop.ConnectiveType>,
+): seq.Seq<prop.Prop> =>
+  function* () {
+    if (opCount === 0) {
+      for (const a of atoms) yield prop.atom(a)
+      if (connectives.has('falsum')) yield prop.falsum
+      if (connectives.has('verum')) yield prop.verum
+      return
+    }
+    if (connectives.has('negation')) {
+      for (const p of formulasOfOpCount(opCount - 1, atoms, connectives)()) {
+        yield prop.negation(p)
+      }
+    }
+    for (let leftOps = 0; leftOps < opCount; leftOps++) {
+      const rightOps = opCount - 1 - leftOps
+      for (const l of formulasOfOpCount(leftOps, atoms, connectives)()) {
+        for (const r of formulasOfOpCount(rightOps, atoms, connectives)()) {
+          if (connectives.has('implication')) yield prop.implication(l, r)
+          if (connectives.has('conjunction')) yield prop.conjunction(l, r)
+          if (connectives.has('disjunction')) yield prop.disjunction(l, r)
+        }
+      }
+    }
+  }
+
+const bruteLogic1 = <S extends AnySequent, R extends RuleId>(
+  d: Premise<S>,
+  rules: ReadonlyArray<R>,
+  limit: number,
+): seq.Seq<ProofUsing<S, R>> =>
+  function* () {
+    const applicableRules = entries(reverse1).filter(([rId]) =>
+      includes(rules, rId),
+    )
+    if (applicableRules.length === 0) return
+    const atoms = array.uniq([
+      ...d.result.antecedent.flatMap(prop.atoms),
+      ...d.result.succedent.flatMap(prop.atoms),
+    ])
+    const connectives = candidateConnectives(rules, d.result)
+    for (let opCount = 0; opCount <= limit * 2; opCount++) {
+      for (const formula of formulasOfOpCount(opCount, atoms, connectives)()) {
+        for (const [, rule] of applicableRules) {
+          const result = rule.tryReverse(formula)(d)
+          if (!result) continue
+          yield* brute0(result, rules, limit)()
+        }
+      }
+    }
+  }
+
 const bruteLogic0 = <S extends AnySequent, R extends RuleId>(
   d: Premise<S>,
   rules: ReadonlyArray<R>,
@@ -113,6 +189,7 @@ const bruteLogic0 = <S extends AnySequent, R extends RuleId>(
       }
       yield* brute0(result, rules, limit)()
     }
+    yield* bruteLogic1(d, rules, limit)()
   }
 const hypoStructure = <R extends RuleId>(
   d: Premise<AnySequent>,

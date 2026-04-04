@@ -3,14 +3,15 @@ import * as seq from '../utils/seq'
 import { split } from '../utils/random'
 import { isCountermodel, isModel, Valuation, valuations } from './valuation'
 
-export type PropType =
-  | 'atom'
+export type ConnectiveType =
   | 'falsum'
   | 'verum'
   | 'negation'
   | 'implication'
   | 'conjunction'
   | 'disjunction'
+
+export type PropType = 'atom' | ConnectiveType
 
 export interface PropG<K extends PropType> {
   kind: K
@@ -223,6 +224,20 @@ export const atoms = (p: Prop): Array<string> =>
       array.uniq([...leftConjunct, ...rightConjunct]),
     disjunction: (leftDisjunct, rightDisjunct) =>
       array.uniq([...leftDisjunct, ...rightDisjunct]),
+  })
+
+export const connectives = (p: Prop): Array<ConnectiveType> =>
+  fold<Array<ConnectiveType>>(p, {
+    atom: () => [],
+    falsum: () => ['falsum'],
+    verum: () => ['verum'],
+    negation: (negand) => array.uniq(['negation', ...negand]),
+    implication: (antecedent, consequent) =>
+      array.uniq(['implication', ...antecedent, ...consequent]),
+    conjunction: (leftConjunct, rightConjunct) =>
+      array.uniq(['conjunction', ...leftConjunct, ...rightConjunct]),
+    disjunction: (leftDisjunct, rightDisjunct) =>
+      array.uniq(['disjunction', ...leftDisjunct, ...rightDisjunct]),
   })
 
 export const models = (p: Prop): seq.Seq<Valuation> => {

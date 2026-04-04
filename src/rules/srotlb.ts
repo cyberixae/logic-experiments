@@ -103,6 +103,7 @@ export const exampleSRotLB = applySRotLB(
 
 export const ruleSRotLB = {
   id: 'sRotLB',
+  connectives: [],
   isResult: isSRotLBResult,
   isResultDerivation: isSRotLBResultDerivation,
   make: sRotLB,

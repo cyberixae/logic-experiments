@@ -42,6 +42,7 @@ export const exampleI = applyI(atom('A'))
 
 export const ruleI = {
   id: 'i',
+  connectives: [],
   isResult: isIResult,
   isResultDerivation: isIResultDerivation,
   make: i,

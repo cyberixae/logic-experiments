@@ -86,6 +86,7 @@ export const exampleSCL = applySCL(
 
 export const ruleSCL = {
   id: 'scl',
+  connectives: [],
   isResult: isSCLResult,
   isResultDerivation: isSCLResultDerivation,
   make: scl,

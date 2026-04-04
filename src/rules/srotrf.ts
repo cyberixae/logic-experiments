@@ -103,6 +103,7 @@ export const exampleSRotRF = applySRotRF(
 
 export const ruleSRotRF = {
   id: 'sRotRF',
+  connectives: [],
   isResult: isSRotRFResult,
   isResultDerivation: isSRotRFResultDerivation,
   make: sRotRF,

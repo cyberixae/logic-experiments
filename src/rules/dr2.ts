@@ -101,6 +101,7 @@ export const exampleDR2 = applyDR2(
 
 export const ruleDR2 = {
   id: 'dr2',
+  connectives: ['disjunction'],
   isResult: isDR2Result,
   isResultDerivation: isDR2ResultDerivation,
   make: dr2,

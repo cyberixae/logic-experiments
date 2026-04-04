@@ -78,6 +78,7 @@ export const exampleA1 = applyA1(atom('A'), atom('B'))
 
 export const ruleA1 = {
   id: 'a1',
+  connectives: ['implication'],
   isResult: isA1Result,
   isResultDerivation: isA1ResultDerivation,
   make: a1,

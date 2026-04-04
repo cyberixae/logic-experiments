@@ -103,6 +103,7 @@ export const exampleSXR = applySXR(
 
 export const ruleSXR = {
   id: 'sxr',
+  connectives: [],
   isResult: isSXRResult,
   isResultDerivation: isSXRResultDerivation,
   make: sxr,

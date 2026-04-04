@@ -84,6 +84,7 @@ export const exampleNL = applyNL(
 
 export const ruleNL = {
   id: 'nl',
+  connectives: ['negation'],
   isResult: isNLResult,
   isResultDerivation: isNLResultDerivation,
   make: nl,

@@ -40,6 +40,7 @@ export const exampleF = applyF()
 
 export const ruleF = {
   id: 'f',
+  connectives: ['falsum'],
   isResult: isFResult,
   isResultDerivation: isFResultDerivation,
   make: f,

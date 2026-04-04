@@ -104,6 +104,7 @@ export const exampleCL1 = applyCL1(
 
 export const ruleCL1 = {
   id: 'cl1',
+  connectives: ['conjunction'],
   isResult: isCL1Result,
   isResultDerivation: isCL1ResultDerivation,
   make: cl1,

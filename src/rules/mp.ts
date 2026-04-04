@@ -78,6 +78,7 @@ export const exampleMP = applyMP(
 
 export const ruleMP = {
   id: 'mp',
+  connectives: [],
   isResult: isMPResult,
   isResultDerivation: isMPResultDerivation,
   make: mp,

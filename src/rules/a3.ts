@@ -101,6 +101,7 @@ export const exampleA3 = applyA3(atom('A'), atom('B'))
 
 export const ruleA3 = {
   id: 'a3',
+  connectives: ['implication', 'negation'],
   isResult: isA3Result,
   isResultDerivation: isA3ResultDerivation,
   make: a3,

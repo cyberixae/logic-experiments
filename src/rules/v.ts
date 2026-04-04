@@ -40,6 +40,7 @@ export const exampleV = applyV()
 
 export const ruleV = {
   id: 'v',
+  connectives: ['verum'],
   isResult: isVResult,
   isResultDerivation: isVResultDerivation,
   make: v,

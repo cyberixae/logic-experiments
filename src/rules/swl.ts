@@ -86,6 +86,7 @@ export const exampleSWL = applySWL(
 
 export const ruleSWL = {
   id: 'swl',
+  connectives: [],
   isResult: isSWLResult,
   isResultDerivation: isSWLResultDerivation,
   make: swl,

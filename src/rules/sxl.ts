@@ -103,6 +103,7 @@ export const exampleSXL = applySXL(
 
 export const ruleSXL = {
   id: 'sxl',
+  connectives: [],
   isResult: isSXLResult,
   isResultDerivation: isSXLResultDerivation,
   make: sxl,

@@ -97,6 +97,7 @@ export const exampleDR = applyDR(
 
 export const ruleDR = {
   id: 'dr',
+  connectives: ['disjunction'],
   isResult: isDRResult,
   isResultDerivation: isDRResultDerivation,
   make: dr,

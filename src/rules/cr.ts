@@ -104,6 +104,7 @@ export const exampleCR = applyCR(
 
 export const ruleCR = {
   id: 'cr',
+  connectives: ['conjunction'],
   isResult: isCRResult,
   isResultDerivation: isCRResultDerivation,
   make: cr,

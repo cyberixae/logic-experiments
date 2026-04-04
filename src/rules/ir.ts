@@ -100,6 +100,7 @@ export const exampleIR = applyIR(
 
 export const ruleIR = {
   id: 'ir',
+  connectives: ['implication'],
   isResult: isIRResult,
   isResultDerivation: isIRResultDerivation,
   make: ir,

@@ -104,6 +104,7 @@ export const exampleDL = applyDL(
 
 export const ruleDL = {
   id: 'dl',
+  connectives: ['disjunction'],
   isResult: isDLResult,
   isResultDerivation: isDLResultDerivation,
   make: dl,

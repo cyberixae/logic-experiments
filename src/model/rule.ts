@@ -1,6 +1,7 @@
 import { AnyDerivation, Derivation } from './derivation'
 import { AnySequent } from './sequent'
 import { Refinement } from '../utils/generic'
+import type { ConnectiveType } from './prop'
 import { Prop } from './prop'
 import { Lazy } from '../utils/lazy'
 
@@ -84,6 +85,7 @@ export type TryReverse = TryReverse0 | TryReverse1
 
 export interface Rule<R extends AnySequent, I extends RuleId = RuleId> {
   id: I
+  connectives: ReadonlyArray<ConnectiveType>
   isResult: Refinement<AnySequent, R>
   isResultDerivation: Refinement<AnyDerivation, Derivation<R>>
   make: unknown
