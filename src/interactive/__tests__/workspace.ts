@@ -5,7 +5,6 @@ import { isProof } from '../../model/derivation'
 import { reverse0 as ev0, undo as evUndo } from '../event'
 
 const p = atom('p')
-const q = atom('q')
 
 const challenges = {
   identity: {

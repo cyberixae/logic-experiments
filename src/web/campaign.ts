@@ -3,8 +3,6 @@ import { activePath } from '../interactive/focus'
 import { challenges } from '../challenges'
 import { basic, fromRuleId, fromSequent } from '../render/print'
 import { Workspace } from '../interactive/workspace'
-import { Configuration } from '../model/challenge'
-import { AnySequent } from '../model/sequent'
 import { repl } from '../interactive/repl'
 import { Action } from '../interactive/action'
 import {

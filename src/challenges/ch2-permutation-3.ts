@@ -2,7 +2,7 @@ import { lk } from '../systems/lk'
 import { sequent } from '../model/sequent'
 import { challenge } from '../model/challenge'
 
-const { a, o, z, i } = lk
+const { a, z, i } = lk
 
 const rules = [
   'i',

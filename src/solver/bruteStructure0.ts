@@ -2,7 +2,7 @@ import { reverseStructure0 } from '../rules'
 import * as seq from '../utils/seq'
 import { entries } from '../utils/record'
 import { Premise, ProofUsing, proofUsing } from '../model/derivation'
-import { AnySequent, sequent, equals } from '../model/sequent'
+import { AnySequent, equals } from '../model/sequent'
 import { includes } from '../utils/array'
 import { RuleId } from '../model/rule'
 
