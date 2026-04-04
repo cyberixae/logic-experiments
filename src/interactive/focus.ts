@@ -68,7 +68,19 @@ export const apply = <J extends AnySequent>(
 
 export const undo = <J extends AnySequent>(s: Focus<J>): Focus<J> => {
   const path = activePath(s)
+  const current = subDerivation(s.derivation, path)
+  if (current?.kind === 'transformation') {
+    // Active path points to a closed axiom — undo it directly
+    const derivation = editDerivation(s.derivation, path, (d) =>
+      premise(d.result),
+    )
+    if (!derivation) {
+      return s
+    }
+    return focus(derivation, s.branch)
+  }
   if (array.isNonEmptyArray(path)) {
+    // Active path points to an open premise — undo the rule that introduced it
     const parentPath = array.init(path)
     const derivation = editDerivation(s.derivation, parentPath, (parent) =>
       premise(parent.result),
