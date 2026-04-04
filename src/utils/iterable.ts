@@ -8,7 +8,7 @@ export const uniq = <T>(arr: Iterable<T>): Iterable<T> =>
         return
       }
       if (skip.has(value)) {
-        break
+        continue
       }
       yield value
       skip.add(value)
