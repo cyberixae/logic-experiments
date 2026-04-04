@@ -25,6 +25,13 @@ export default defineConfig([
     },
   },
   {
+    files: ['scripts/**/*.ts'],
+    rules: {
+      '@typescript-eslint/no-require-imports': 'off',
+      '@typescript-eslint/no-explicit-any': 'off',
+    },
+  },
+  {
     files: ['**/*.ts'],
     ignores: ['src/**/__tests__/**', 'scripts/**'],
     languageOptions: {
