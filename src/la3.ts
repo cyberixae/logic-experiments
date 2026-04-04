@@ -83,7 +83,6 @@ cursor = apply(
 cursor = apply(cursor, tryReverseA2)
 cursor = apply(cursor, tryReverseA1)
 if (
-  !cursor ||
   !isProof(cursor.derivation) ||
   !equalsDerivation(cursor.derivation, proof)
 ) {

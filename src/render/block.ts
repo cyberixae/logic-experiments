@@ -123,7 +123,7 @@ export function tree(
   const line3 = center(lineWidth)(root)
 
   const aligned = align(line1, pad(leftify(last, line2, line3)))
-  if (aligned) {
+  if (aligned != null) {
     return aligned
   }
   return pad(leftify(line1, line2, line3))

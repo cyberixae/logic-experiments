@@ -272,11 +272,11 @@ export function fromSequent(judgement: judge.AnySequent): Printer {
 
 export function left(n: string | null = null): string {
   const l = 'L'
-  return n ? l + n : l
+  return n != null ? l + n : l
 }
 export function right(n: string | null = null): string {
   const r = 'R'
-  return n ? r + n : r
+  return n != null ? r + n : r
 }
 
 export function fromRuleId(s: rule.RuleId): Printer {

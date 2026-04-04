@@ -24,7 +24,7 @@ export function* repl<
         return '\nExiting...'
       case 'help': {
         const [arg] = args
-        if (!arg) {
+        if (arg == null) {
           output =
             '\nSystem commands:' +
             '\n  help - display this manual' +

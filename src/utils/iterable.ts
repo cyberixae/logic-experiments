@@ -4,7 +4,7 @@ export const uniq = <T>(arr: Iterable<T>): Iterable<T> =>
     const it = arr[Symbol.iterator]()
     while (true) {
       const { done, value } = it.next()
-      if (done) {
+      if (done === true) {
         return
       }
       if (skip.has(value)) {

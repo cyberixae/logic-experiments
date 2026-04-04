@@ -11,8 +11,8 @@ const main = () => {
   process.stdout.write('\n> ')
   rl.on('line', (line) => {
     const { value, done } = gen.next(line.trim())
-    if (value) process.stdout.write(value)
-    if (done) rl.close()
+    if (value != null) process.stdout.write(value)
+    if (done === true) rl.close()
     process.stdout.write('\n> ')
   })
   rl.on('SIGINT', () => {

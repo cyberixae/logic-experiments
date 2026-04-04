@@ -124,7 +124,6 @@ state = applyEvent(state, reverse0('swl'))
 state = applyEvent(state, reverse0('ir'))
 state = applyEvent(state, reverse0('i'))
 if (
-  !state ||
   !isProof(state.derivation) ||
   !equalsDerivation(state.derivation, proof)
 ) {
