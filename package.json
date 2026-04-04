@@ -5,6 +5,7 @@
   "main": "index.js",
   "license": "UNLICENSED",
   "author": "Toni Ruottu <toni.ruottu@iki.fi>",
+  "packageManager": "yarn@4.13.0",
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@types/jest": "^29.5.12",
