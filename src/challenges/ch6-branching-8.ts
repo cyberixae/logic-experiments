@@ -46,22 +46,11 @@ const solution = z.ir(
             ),
           ),
         ),
-        z.sRotRF(
+        z.swr(
+          o.p2.conjunction(a('p'), a('q')),
           z.cr(
-            z.sRotRF(
-              z.swl(
-                a('r'),
-                z.swr(o.p2.conjunction(a('p'), a('q')), i.i(a('p'))),
-              ),
-            ),
-            z.sRotLF(
-              z.sRotRF(
-                z.swl(
-                  a('p'),
-                  z.swr(o.p2.conjunction(a('p'), a('q')), i.i(a('r'))),
-                ),
-              ),
-            ),
+            z.swl(a('r'), i.i(a('p'))),
+            z.sRotLF(z.swl(a('p'), i.i(a('r')))),
           ),
         ),
       ),

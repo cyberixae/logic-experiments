@@ -38,10 +38,8 @@ const solution = z.ir(
   z.ir(
     z.nl(
       z.dr(
-        z.sRotRF(
-          z.sRotRF(
-            z.swr(a('q'), z.swr(o.p2.implication(a('q'), a('r')), i.i(a('p')))),
-          ),
+        z.sRotRB(
+          z.swr(a('q'), z.swr(o.p2.implication(a('q'), a('r')), i.i(a('p')))),
         ),
       ),
     ),

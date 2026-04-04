@@ -48,32 +48,26 @@ const solution = z.ir(
                 ),
               ),
             ),
-            z.sRotLF(
-              z.sRotLF(
-                z.swl(
-                  a('p'),
-                  z.swl(o.p2.implication(a('q'), a('r')), i.i(a('r'))),
-                ),
+            z.sRotLB(
+              z.swl(
+                a('p'),
+                z.swl(o.p2.implication(a('q'), a('r')), i.i(a('r'))),
               ),
             ),
           ),
         ),
-        z.sRotLF(
-          z.sRotLF(
-            z.il(
-              z.sRotRF(
-                z.swl(
-                  o.p2.implication(a('p'), a('r')),
-                  z.swr(a('r'), i.i(a('q'))),
-                ),
+        z.sRotLB(
+          z.il(
+            z.sRotRF(
+              z.swl(
+                o.p2.implication(a('p'), a('r')),
+                z.swr(a('r'), i.i(a('q'))),
               ),
-              z.sRotLF(
-                z.sRotLF(
-                  z.swl(
-                    o.p2.implication(a('p'), a('r')),
-                    z.swl(a('q'), i.i(a('r'))),
-                  ),
-                ),
+            ),
+            z.sRotLB(
+              z.swl(
+                o.p2.implication(a('p'), a('r')),
+                z.swl(a('q'), i.i(a('r'))),
               ),
             ),
           ),

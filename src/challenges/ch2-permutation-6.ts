@@ -27,18 +27,16 @@ const goal = sequent(
   ],
 )
 
-const solution = z.sRotRF(
-  z.sRotRF(
+const solution = z.sRotRB(
+  z.swl(
+    o.p2.conjunction(a('q'), a('s')),
     z.swl(
       o.p2.conjunction(a('q'), a('s')),
-      z.swl(
-        o.p2.conjunction(a('q'), a('s')),
+      z.swr(
+        o.p2.conjunction(a('s'), a('q')),
         z.swr(
           o.p2.conjunction(a('s'), a('q')),
-          z.swr(
-            o.p2.conjunction(a('s'), a('q')),
-            i.i(o.p2.conjunction(a('q'), a('s'))),
-          ),
+          i.i(o.p2.conjunction(a('q'), a('s'))),
         ),
       ),
     ),

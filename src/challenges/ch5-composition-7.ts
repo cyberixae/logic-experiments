@@ -33,27 +33,12 @@ const goal = sequent(
 
 const solution = z.cl(
   z.dr(
-    z.sRotRF(
-      z.dr(
-        z.sRotLF(
-          z.cl(
-            z.sRotLF(
-              z.sRotRF(
-                z.sRotRF(
-                  z.swl(
-                    o.p2.implication(a('r'), a('q')),
-                    z.swl(
-                      a('q'),
-                      z.swr(
-                        a('q'),
-                        z.swr(o.p2.implication(a('q'), a('r')), i.i(a('p'))),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
+    z.swl(
+      o.p2.implication(a('r'), a('q')),
+      z.cl(
+        z.swr(
+          o.p2.implication(a('q'), a('r')),
+          z.dr(z.sRotLF(z.swl(a('p'), z.swr(a('p'), i.i(a('q')))))),
         ),
       ),
     ),

@@ -42,30 +42,26 @@ const goal = sequent(
 const solution = z.cl(
   z.dr(
     z.il(
-      z.sRotRF(
-        z.sRotRF(
-          z.ir(
-            z.sRotLF(
-              z.swl(
-                o.p2.conjunction(a('r'), a('q')),
-                z.swr(
-                  o.p2.implication(a('q'), a('r')),
-                  z.swr(o.p0.falsum, i.i(a('s'))),
-                ),
+      z.sRotRB(
+        z.ir(
+          z.sRotLF(
+            z.swl(
+              o.p2.conjunction(a('r'), a('q')),
+              z.swr(
+                o.p2.implication(a('q'), a('r')),
+                z.swr(o.p0.falsum, i.i(a('s'))),
               ),
             ),
           ),
         ),
       ),
       z.nl(
-        z.sRotRF(
-          z.sRotRF(
-            z.swl(
-              o.p2.conjunction(a('r'), a('q')),
-              z.swr(
-                o.p2.implication(a('s'), o.p2.implication(a('q'), a('r'))),
-                z.swr(o.p0.falsum, i.v()),
-              ),
+        z.sRotRB(
+          z.swl(
+            o.p2.conjunction(a('r'), a('q')),
+            z.swr(
+              o.p2.implication(a('s'), o.p2.implication(a('q'), a('r'))),
+              z.swr(o.p0.falsum, i.v()),
             ),
           ),
         ),

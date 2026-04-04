@@ -21,32 +21,18 @@ const goal = sequent(
   [a('q'), o.p1.negation(a('q')), a('s'), o.p1.negation(a('r'))],
 )
 
-const solution = z.sRotRF(
-  z.sRotRF(
-    z.sRotRF(
-      z.nr(
-        z.sRotLF(
-          z.sRotLF(
-            z.sRotLF(
-              z.sRotLF(
-                // @ts-expect-error TODO: fix type error
-                z.swl(
-                  a('r'),
-                  z.swl(
-                    o.p1.negation(a('p')),
-                    z.swl(
-                      o.p1.negation(a('s')),
-                      z.swl(
-                        o.p1.negation(a('p')),
-                        z.swr(
-                          a('s'),
-                          z.swr(o.p1.negation(a('r')), i.i(a('q'))),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
+const solution = z.sRotRB(
+  z.nr(
+    z.sRotLB(
+      z.swl(
+        a('r'),
+        z.swl(
+          o.p1.negation(a('p')),
+          z.swl(
+            o.p1.negation(a('s')),
+            z.swl(
+              o.p1.negation(a('p')),
+              z.swr(a('s'), z.swr(o.p1.negation(a('r')), i.i(a('q')))),
             ),
           ),
         ),

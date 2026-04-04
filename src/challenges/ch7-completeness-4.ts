@@ -35,7 +35,7 @@ const solution = z.ir(
             z.sRotRF(z.swl(a('q'), z.swr(a('r'), i.i(a('p'))))),
             z.sRotLF(z.sRotRF(z.swl(a('p'), z.swr(a('r'), i.i(a('q')))))),
           ),
-          z.sRotLF(z.swl(a('p'), z.sRotLF(z.swl(a('q'), i.i(a('r')))))),
+          z.sRotLB(z.swl(a('q'), z.swl(a('p'), i.i(a('r'))))),
         ),
       ),
     ),

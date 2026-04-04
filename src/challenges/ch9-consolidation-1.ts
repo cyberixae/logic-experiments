@@ -38,17 +38,13 @@ const goal = conclusion(
 )
 
 const solution = z.dr(
-  z.sRotRF(
+  z.swr(
+    o.p2.disjunction(a('r'), a('s')),
     z.ir(
       z.cl(
-        z.sRotRF(
-          z.swl(
-            o.p2.conjunction(a('p'), a('q')),
-            z.swr(
-              o.p2.disjunction(a('r'), a('s')),
-              i.i(o.p2.implication(a('q'), a('r'))),
-            ),
-          ),
+        z.swl(
+          o.p2.conjunction(a('p'), a('q')),
+          i.i(o.p2.implication(a('q'), a('r'))),
         ),
       ),
     ),

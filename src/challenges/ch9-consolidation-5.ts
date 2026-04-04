@@ -36,12 +36,10 @@ const solution = z.ir(
     z.ir(
       z.sRotLF(
         z.il(
-          z.sRotRF(z.swr(a('r'), z.sRotLF(z.swl(a('q'), i.i(a('p')))))),
+          z.sRotLF(z.sRotRF(z.swl(a('q'), z.swr(a('r'), i.i(a('p')))))),
           z.il(
             z.sRotRF(z.swl(a('p'), z.swr(a('r'), i.i(a('q'))))),
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-ignore TODO: fix type error
-            z.sRotLF(z.sRotLF(z.swl(a('p'), z.swl(a('q'), i.i(a('r')))))),
+            z.sRotLB(z.swl(a('p'), z.swl(a('q'), i.i(a('r'))))),
           ),
         ),
       ),

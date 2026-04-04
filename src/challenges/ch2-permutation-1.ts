@@ -16,14 +16,11 @@ const rules = [
 
 const goal = sequent([a('p'), a('p'), a('p'), a('q'), a('p'), a('p')], [a('q')])
 
-const solution = z.sRotLF(
-  z.sRotLF(
-    z.sRotLF(
-      z.swl(
-        a('p'),
-        z.swl(a('p'), z.swl(a('p'), z.swl(a('p'), z.swl(a('p'), i.i(a('q')))))),
-      ),
-    ),
+const solution = z.swl(
+  a('p'),
+  z.swl(
+    a('p'),
+    z.sRotLB(z.swl(a('p'), z.swl(a('p'), z.swl(a('p'), i.i(a('q')))))),
   ),
 )
 

@@ -35,22 +35,17 @@ const goal = conclusion(
 const solution = z.ir(
   z.dr(
     z.dr(
-      z.sRotRF(
-        z.sRotRF(
-          z.nr(
-            z.sRotLF(
-              z.swl(
-                o.p2.conjunction(
-                  o.p2.conjunction(
-                    o.p1.negation(a('p')),
-                    o.p1.negation(a('s')),
-                  ),
-                  o.p2.conjunction(o.p1.negation(a('p')), a('r')),
-                ),
-                z.swr(
-                  o.p2.disjunction(a('s'), o.p1.negation(a('r'))),
-                  i.i(a('q')),
-                ),
+      z.sRotRB(
+        z.nr(
+          z.sRotLF(
+            z.swl(
+              o.p2.conjunction(
+                o.p2.conjunction(o.p1.negation(a('p')), o.p1.negation(a('s'))),
+                o.p2.conjunction(o.p1.negation(a('p')), a('r')),
+              ),
+              z.swr(
+                o.p2.disjunction(a('s'), o.p1.negation(a('r'))),
+                i.i(a('q')),
               ),
             ),
           ),

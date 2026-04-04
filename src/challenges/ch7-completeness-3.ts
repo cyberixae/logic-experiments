@@ -31,17 +31,16 @@ const solution = z.ir(
     z.ir(
       z.sRotLF(
         z.il(
-          z.sRotRF(
-            z.swr(
-              a('r'),
-              z.sRotLF(z.swl(o.p2.implication(a('q'), a('r')), i.i(a('p')))),
+          z.sRotLF(
+            z.il(
+              z.sRotRF(z.swr(a('r'), z.swr(a('q'), i.i(a('p'))))),
+              z.sRotLF(z.swl(a('p'), z.swr(a('p'), i.i(a('r'))))),
             ),
           ),
           z.sRotLF(
             z.il(
               z.sRotLF(z.sRotRF(z.swl(a('p'), z.swr(a('r'), i.i(a('q')))))),
-              // @ts-expect-error TODO: fix type error
-              z.sRotLF(z.sRotLF(z.swl(a('q'), z.swl(a('p'), i.i(a('r')))))),
+              z.sRotLB(z.swl(a('q'), z.swl(a('p'), i.i(a('r'))))),
             ),
           ),
         ),

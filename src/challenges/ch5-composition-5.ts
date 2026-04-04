@@ -34,28 +34,12 @@ const goal = sequent(
 
 const solution = z.cl(
   z.dr(
-    z.sRotRF(
-      z.dr(
-        z.sRotLF(
-          z.cl(
-            z.sRotLF(
-              z.sRotRF(
-                z.sRotRF(
-                  z.swl(
-                    o.p2.disjunction(a('p'), a('r')),
-                    z.swl(
-                      a('p'),
-                      // @ts-expect-error TODO: fix type error
-                      z.swr(
-                        a('p'),
-                        z.swr(o.p2.conjunction(a('p'), a('r')), i.i(a('r'))),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
+    z.swl(
+      o.p2.disjunction(a('p'), a('r')),
+      z.cl(
+        z.swr(
+          o.p2.conjunction(a('p'), a('r')),
+          z.dr(z.sRotLF(z.swl(a('r'), z.swr(a('r'), i.i(a('p')))))),
         ),
       ),
     ),

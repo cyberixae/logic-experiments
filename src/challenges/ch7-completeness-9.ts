@@ -30,10 +30,10 @@ const solution = z.ir(
     z.cl(
       z.sRotLF(
         z.il(
-          z.swl(a('q'), z.sRotRF(z.swr(a('r'), i.i(a('p'))))),
+          z.sRotRF(z.swl(a('q'), z.swr(a('r'), i.i(a('p'))))),
           z.il(
             z.sRotLF(z.sRotRF(z.swl(a('p'), z.swr(a('r'), i.i(a('q')))))),
-            z.sRotLF(z.sRotLF(z.swl(a('q'), z.swl(a('p'), i.i(a('r')))))),
+            z.sRotLB(z.swl(a('q'), z.swl(a('p'), i.i(a('r'))))),
           ),
         ),
       ),

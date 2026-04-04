@@ -19,19 +19,12 @@ const goal = sequent(
   [a('s'), a('r'), a('q'), a('p')],
 )
 
-const solution = z.sRotRF(
-  z.sRotRF(
-    z.sRotRF(
-      z.swl(
-        a('p'),
-        z.swl(
-          a('q'),
-          z.swl(
-            a('r'),
-            z.swr(a('r'), z.swr(a('q'), z.swr(a('p'), i.i(a('s'))))),
-          ),
-        ),
-      ),
+const solution = z.sRotLB(
+  z.swl(
+    a('q'),
+    z.swl(
+      a('r'),
+      z.swl(a('s'), z.swr(a('s'), z.swr(a('r'), z.swr(a('q'), i.i(a('p')))))),
     ),
   ),
 )
