@@ -36,7 +36,7 @@ export default defineConfig([
     ignores: ['src/**/__tests__/**', 'scripts/**'],
     languageOptions: {
       parserOptions: {
-        project: true,
+        project: ['./tsconfig.json', './tsconfig.web.json'],
       },
     },
     rules: {
