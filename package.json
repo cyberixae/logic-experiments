@@ -22,6 +22,7 @@
     "dev": "esbuild --bundle --format=esm src/web.ts --outfile=dist/lk.js --watch=forever & esbuild --bundle src/web/challenge-worker.ts --outfile=dist/lk.w.js --watch=forever & esbuild --servedir=dist & open http://localhost:8000/lk.html && wait",
     "typecheck": "yarn tsc --noEmit",
     "test": "yarn jest",
+    "lint": "yarn eslint",
     "build": "yarn tsc",
     "lk": "yarn build && node ./lib/lk.js",
     "la3": "yarn build && node ./lib/la3.js",
