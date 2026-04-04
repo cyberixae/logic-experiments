@@ -11,6 +11,7 @@ yarn dev            # Watch + serve web interface locally
 yarn lk             # Build + run LK sandbox demo
 yarn la3            # Build + run LA3 sandbox demo
 yarn main           # Build + run interactive REPL
+yarn lint           # Lint all files with ESLint
 yarn prettify       # Format all files with Prettier
 yarn test           # Run Jest tests
 yarn typecheck      # Type-check without emitting
