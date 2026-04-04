@@ -1,6 +1,7 @@
-import { reverseStructure0, reverseAxiom0, reverseLogic0 } from '../rules'
+import { reverseAxiom0, reverseLogic0, reverseStructure0 } from '../rules'
 import * as seq from '../utils/seq'
 import { sequence } from '../utils/seq'
+import { entries } from '../utils/record'
 import {
   Premise,
   premise,
@@ -10,18 +11,13 @@ import {
   ProofUsing,
   proofUsing,
 } from '../model/derivation'
-import { equals as equalsFormulas } from '../model/formulas'
-import {
-  AnySequent,
-  sequent,
-  equals,
-  rotations,
-  isTautology,
-} from '../model/sequent'
+import { AnySequent, sequent, equals, isTautology } from '../model/sequent'
 import * as array from '../utils/array'
 import { includes } from '../utils/array'
 import { RuleId } from '../model/rule'
 import { Configuration } from '../model/challenge'
+import { bruteStructure0, seqKey } from './bruteStructure0'
+export { bruteStructure0 } from './bruteStructure0'
 
 const hypoWeaken = (d: Premise<AnySequent>): seq.Seq<Premise<AnySequent>> =>
   function* () {
@@ -117,51 +113,31 @@ const bruteLogic0 = <S extends AnySequent, R extends RuleId>(
       yield* brute0(result, rules, limit)()
     }
   }
-const hypoRotate = (d: Premise<AnySequent>): seq.Seq<Premise<AnySequent>> =>
-  function* () {
-    yield* seq.map(rotations(d.result), premise)()
-  }
-const bruteRotate0 = <A extends AnySequent, R extends RuleId>(
-  d: Premise<A>,
+const hypoStructure = <R extends RuleId>(
+  d: Premise<AnySequent>,
   rules: ReadonlyArray<R>,
-  p: ProofUsing<AnySequent, R>,
-): seq.Seq<ProofUsing<A, R>> =>
+): seq.Seq<Premise<AnySequent>> =>
   function* () {
-    if (equals(d.result, p.result)) {
-      yield proofUsing(d.result, p.deps, p.rule)
-      return
-    }
-    const sRotLF: RuleId = 'sRotLF'
-    if (
-      includes(rules, sRotLF) &&
-      !equalsFormulas(d.result.antecedent, p.result.antecedent) &&
-      reverseStructure0[sRotLF].isResultDerivation(d)
-    ) {
-      const step = reverseStructure0.sRotLF.reverse(d)
-      const [dep] = step.deps
-      if (dep.kind === 'premise') {
-        yield* seq.map(bruteRotate0(dep, rules, p), (depProof) =>
-          proofUsing(step.result, [depProof], sRotLF),
-        )()
+    const visited = new Set<string>()
+    const queue: Premise<AnySequent>[] = [d]
+    while (queue.length > 0) {
+      const current = queue.shift()!
+      const key = seqKey(current.result)
+      if (visited.has(key)) continue
+      visited.add(key)
+      yield current
+      for (const [rId, rule] of entries(reverseStructure0)) {
+        const ruleId: RuleId = rId
+        if (!includes(rules, ruleId)) continue
+        const reversed = rule.tryReverse(current)
+        if (!reversed || reversed.kind !== 'transformation') continue
+        const [dep] = reversed.deps
+        if (!dep || dep.kind !== 'premise') continue
+        queue.push(dep)
       }
-      return
-    }
-    const sRotRF: RuleId = 'sRotRF'
-    if (
-      includes(rules, sRotRF) &&
-      !equalsFormulas(d.result.succedent, p.result.succedent) &&
-      reverseStructure0[sRotRF].isResultDerivation(d)
-    ) {
-      const step = reverseStructure0.sRotRF.reverse(d)
-      const [dep] = step.deps
-      if (dep.kind === 'premise') {
-        yield* seq.map(bruteRotate0(dep, rules, p), (depProof) =>
-          proofUsing(step.result, [depProof], sRotRF),
-        )()
-      }
-      return
     }
   }
+
 const brute0Premise = <S extends AnySequent, R extends RuleId>(
   d: Premise<S>,
   rules: ReadonlyArray<R>,
@@ -174,9 +150,9 @@ const brute0Premise = <S extends AnySequent, R extends RuleId>(
     if (!isTautology(d.result)) {
       return
     }
-    yield* seq.flatMap(hypoRotate(d), (hypo) =>
+    yield* seq.flatMap(hypoStructure(d, rules), (hypo) =>
       seq.flatMap(bruteLogic0(hypo, rules, limit), (h) =>
-        bruteRotate0(d, rules, h),
+        bruteStructure0(d, rules, h),
       ),
     )()
   }
@@ -213,6 +189,19 @@ const brute0 = <S extends AnySequent, R extends RuleId>(
       }
     }
   }
+
+export const bruteLimit = <S extends AnySequent, R extends RuleId>(
+  c: Configuration<S, ReadonlyArray<R>>,
+  maxLimit: number,
+): [ProofUsing<S, R>] | [] => {
+  for (let limit = 0; limit <= maxLimit; limit++) {
+    const proofs = seq.head(brute0(premise(c.goal), c.rules, limit))
+    if (array.isNonEmptyArray(proofs)) {
+      return [proofs[0]]
+    }
+  }
+  return []
+}
 
 export const brute = <S extends AnySequent, R extends RuleId>(
   c: Configuration<S, ReadonlyArray<R>>,
