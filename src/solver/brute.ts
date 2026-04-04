@@ -14,6 +14,7 @@ import {
 import { AnySequent, sequent, equals, isTautology } from '../model/sequent'
 import * as array from '../utils/array'
 import { includes } from '../utils/array'
+import { Option } from '../utils/option'
 import { RuleId } from '../model/rule'
 import { Configuration } from '../model/challenge'
 import { bruteStructure0, seqKey } from './bruteStructure0'
@@ -190,28 +191,41 @@ const brute0 = <S extends AnySequent, R extends RuleId>(
     }
   }
 
+const tryAtDepth = <S extends AnySequent, R extends RuleId>(
+  c: Configuration<S, ReadonlyArray<R>>,
+  limit: number,
+): ProofUsing<S, R> | undefined => {
+  const proofs = seq.head(brute0(premise(c.goal), c.rules, limit))
+  return array.isNonEmptyArray(proofs) ? proofs[0] : undefined
+}
+
 export const bruteLimit = <S extends AnySequent, R extends RuleId>(
   c: Configuration<S, ReadonlyArray<R>>,
   maxLimit: number,
-): [ProofUsing<S, R>] | [] => {
+): Option<ProofUsing<S, R>> => {
   for (let limit = 0; limit <= maxLimit; limit++) {
-    const proofs = seq.head(brute0(premise(c.goal), c.rules, limit))
-    if (array.isNonEmptyArray(proofs)) {
-      return [proofs[0]]
-    }
+    const proof = tryAtDepth(c, limit)
+    if (proof) return [proof]
   }
   return []
+}
+
+export function* bruteSearch<S extends AnySequent, R extends RuleId>(
+  c: Configuration<S, ReadonlyArray<R>>,
+): Generator<void, [ProofUsing<S, R>, number]> {
+  for (let limit = 0; ; limit++) {
+    const proof = tryAtDepth(c, limit)
+    if (proof) return [proof, limit]
+    yield
+  }
 }
 
 export const brute = <S extends AnySequent, R extends RuleId>(
   c: Configuration<S, ReadonlyArray<R>>,
 ): [ProofUsing<S, R>, number] => {
-  let limit = 0
+  const gen = bruteSearch(c)
   while (true) {
-    const proofs = seq.head(brute0(premise(c.goal), c.rules, limit))
-    if (array.isNonEmptyArray(proofs)) {
-      return [proofs[0], limit]
-    }
-    limit += 1
+    const { done, value } = gen.next()
+    if (done === true) return value
   }
 }
