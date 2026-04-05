@@ -7,6 +7,7 @@ import {
   fromDerivation,
   type Templates,
 } from '../print'
+import { plain } from '../segment'
 import {
   atom,
   falsum,
@@ -40,163 +41,189 @@ const custom: Templates = {
 describe('print module', () => {
   describe('fromProp', () => {
     it('atom with emoji p', () => {
-      expect(fromProp(atom('p'))(basic)).toBe('🐧')
+      expect(plain(fromProp(atom('p'))(basic))).toBe('🐧')
     })
 
     it('atom with emoji q', () => {
-      expect(fromProp(atom('q'))(basic)).toBe('🦜')
+      expect(plain(fromProp(atom('q'))(basic))).toBe('🦜')
     })
 
     it('atom with emoji r', () => {
-      expect(fromProp(atom('r'))(basic)).toBe('🦃')
+      expect(plain(fromProp(atom('r'))(basic))).toBe('🦃')
     })
 
     it('atom with emoji s', () => {
-      expect(fromProp(atom('s'))(basic)).toBe('🦆')
+      expect(plain(fromProp(atom('s'))(basic))).toBe('🦆')
     })
 
     it('atom without emoji', () => {
-      expect(fromProp(atom('x'))(basic)).toBe('x')
+      expect(plain(fromProp(atom('x'))(basic))).toBe('x')
     })
 
     it('falsum', () => {
-      expect(fromProp(falsum)(basic)).toBe('⊥')
+      expect(plain(fromProp(falsum)(basic))).toBe('⊥')
     })
 
     it('verum', () => {
-      expect(fromProp(verum)(basic)).toBe('⊤')
+      expect(plain(fromProp(verum)(basic))).toBe('⊤')
     })
 
     it('negation of atom', () => {
-      expect(fromProp(negation(atom('p')))(basic)).toBe('¬🐧')
+      expect(plain(fromProp(negation(atom('p')))(basic))).toBe('¬🐧')
     })
 
     it('negation of negation (no parens)', () => {
-      expect(fromProp(negation(negation(atom('p'))))(basic)).toBe('¬¬🐧')
+      expect(plain(fromProp(negation(negation(atom('p'))))(basic))).toBe('¬¬🐧')
     })
 
     it('negation of falsum (no parens)', () => {
-      expect(fromProp(negation(falsum))(basic)).toBe('¬⊥')
+      expect(plain(fromProp(negation(falsum))(basic))).toBe('¬⊥')
     })
 
     it('negation of conjunction (parenthesized)', () => {
-      expect(fromProp(negation(conjunction(atom('p'), atom('q'))))(basic)).toBe(
-        '¬(🐧∧🦜)',
-      )
+      expect(
+        plain(fromProp(negation(conjunction(atom('p'), atom('q'))))(basic)),
+      ).toBe('¬(🐧∧🦜)')
     })
 
     it('negation of disjunction (parenthesized)', () => {
-      expect(fromProp(negation(disjunction(atom('p'), atom('q'))))(basic)).toBe(
-        '¬(🐧∨🦜)',
-      )
+      expect(
+        plain(fromProp(negation(disjunction(atom('p'), atom('q'))))(basic)),
+      ).toBe('¬(🐧∨🦜)')
     })
 
     it('negation of implication (parenthesized)', () => {
-      expect(fromProp(negation(implication(atom('p'), atom('q'))))(basic)).toBe(
-        '¬(🐧→🦜)',
-      )
+      expect(
+        plain(fromProp(negation(implication(atom('p'), atom('q'))))(basic)),
+      ).toBe('¬(🐧→🦜)')
     })
 
     it('conjunction of atoms', () => {
-      expect(fromProp(conjunction(atom('p'), atom('q')))(basic)).toBe('🐧∧🦜')
+      expect(plain(fromProp(conjunction(atom('p'), atom('q')))(basic))).toBe(
+        '🐧∧🦜',
+      )
     })
 
     it('conjunction of conjunctions (parenthesized)', () => {
       expect(
-        fromProp(
-          conjunction(
-            conjunction(atom('p'), atom('q')),
-            conjunction(atom('r'), atom('s')),
-          ),
-        )(basic),
+        plain(
+          fromProp(
+            conjunction(
+              conjunction(atom('p'), atom('q')),
+              conjunction(atom('r'), atom('s')),
+            ),
+          )(basic),
+        ),
       ).toBe('(🐧∧🦜)∧(🦃∧🦆)')
     })
 
     it('conjunction of negation (no parens)', () => {
-      expect(fromProp(conjunction(negation(atom('p')), atom('q')))(basic)).toBe(
-        '¬🐧∧🦜',
-      )
+      expect(
+        plain(fromProp(conjunction(negation(atom('p')), atom('q')))(basic)),
+      ).toBe('¬🐧∧🦜')
     })
 
     it('conjunction of disjunction (parenthesized)', () => {
       expect(
-        fromProp(conjunction(disjunction(atom('p'), atom('q')), atom('r')))(
-          basic,
+        plain(
+          fromProp(conjunction(disjunction(atom('p'), atom('q')), atom('r')))(
+            basic,
+          ),
         ),
       ).toBe('(🐧∨🦜)∧🦃')
     })
 
     it('conjunction of implication (parenthesized)', () => {
       expect(
-        fromProp(conjunction(implication(atom('p'), atom('q')), atom('r')))(
-          basic,
+        plain(
+          fromProp(conjunction(implication(atom('p'), atom('q')), atom('r')))(
+            basic,
+          ),
         ),
       ).toBe('(🐧→🦜)∧🦃')
     })
 
     it('disjunction of atoms', () => {
-      expect(fromProp(disjunction(atom('p'), atom('q')))(basic)).toBe('🐧∨🦜')
+      expect(plain(fromProp(disjunction(atom('p'), atom('q')))(basic))).toBe(
+        '🐧∨🦜',
+      )
     })
 
     it('disjunction of disjunctions (parenthesized)', () => {
       expect(
-        fromProp(
-          disjunction(
-            disjunction(atom('p'), atom('q')),
-            disjunction(atom('r'), atom('s')),
-          ),
-        )(basic),
+        plain(
+          fromProp(
+            disjunction(
+              disjunction(atom('p'), atom('q')),
+              disjunction(atom('r'), atom('s')),
+            ),
+          )(basic),
+        ),
       ).toBe('(🐧∨🦜)∨(🦃∨🦆)')
     })
 
     it('disjunction of conjunction (parenthesized)', () => {
       expect(
-        fromProp(disjunction(conjunction(atom('p'), atom('q')), atom('r')))(
-          basic,
+        plain(
+          fromProp(disjunction(conjunction(atom('p'), atom('q')), atom('r')))(
+            basic,
+          ),
         ),
       ).toBe('(🐧∧🦜)∨🦃')
     })
 
     it('disjunction of implication (parenthesized)', () => {
       expect(
-        fromProp(disjunction(implication(atom('p'), atom('q')), atom('r')))(
-          basic,
+        plain(
+          fromProp(disjunction(implication(atom('p'), atom('q')), atom('r')))(
+            basic,
+          ),
         ),
       ).toBe('(🐧→🦜)∨🦃')
     })
 
     it('implication of atoms', () => {
-      expect(fromProp(implication(atom('p'), atom('q')))(basic)).toBe('🐧→🦜')
+      expect(plain(fromProp(implication(atom('p'), atom('q')))(basic))).toBe(
+        '🐧→🦜',
+      )
     })
 
     it('implication antecedent is implication (parenthesized)', () => {
       expect(
-        fromProp(implication(implication(atom('p'), atom('q')), atom('r')))(
-          basic,
+        plain(
+          fromProp(implication(implication(atom('p'), atom('q')), atom('r')))(
+            basic,
+          ),
         ),
       ).toBe('(🐧→🦜)→🦃')
     })
 
     it('implication consequent is implication (parenthesized)', () => {
       expect(
-        fromProp(implication(atom('p'), implication(atom('q'), atom('r'))))(
-          basic,
+        plain(
+          fromProp(implication(atom('p'), implication(atom('q'), atom('r'))))(
+            basic,
+          ),
         ),
       ).toBe('🐧→(🦜→🦃)')
     })
 
     it('implication of conjunction (no parens)', () => {
       expect(
-        fromProp(implication(conjunction(atom('p'), atom('q')), atom('r')))(
-          basic,
+        plain(
+          fromProp(implication(conjunction(atom('p'), atom('q')), atom('r')))(
+            basic,
+          ),
         ),
       ).toBe('🐧∧🦜→🦃')
     })
 
     it('implication of disjunction (no parens)', () => {
       expect(
-        fromProp(implication(disjunction(atom('p'), atom('q')), atom('r')))(
-          basic,
+        plain(
+          fromProp(implication(disjunction(atom('p'), atom('q')), atom('r')))(
+            basic,
+          ),
         ),
       ).toBe('🐧∨🦜→🦃')
     })
@@ -204,27 +231,29 @@ describe('print module', () => {
 
   describe('fromSequent', () => {
     it('empty antecedent and succedent', () => {
-      expect(fromSequent(sequent([], []))(basic)).toBe('⊢')
+      expect(plain(fromSequent(sequent([], []))(basic))).toBe('⊢')
     })
 
     it('single formula on each side', () => {
-      expect(fromSequent(sequent([atom('p')], [atom('q')]))(basic)).toBe(
+      expect(plain(fromSequent(sequent([atom('p')], [atom('q')]))(basic))).toBe(
         '🐧 ⊢ 🦜',
       )
     })
 
     it('empty antecedent', () => {
-      expect(fromSequent(sequent([], [atom('p')]))(basic)).toBe('⊢ 🐧')
+      expect(plain(fromSequent(sequent([], [atom('p')]))(basic))).toBe('⊢ 🐧')
     })
 
     it('empty succedent', () => {
-      expect(fromSequent(sequent([atom('p')], []))(basic)).toBe('🐧 ⊢')
+      expect(plain(fromSequent(sequent([atom('p')], []))(basic))).toBe('🐧 ⊢')
     })
 
     it('multiple formulas', () => {
       expect(
-        fromSequent(sequent([atom('p'), atom('q')], [atom('r'), atom('s')]))(
-          basic,
+        plain(
+          fromSequent(sequent([atom('p'), atom('q')], [atom('r'), atom('s')]))(
+            basic,
+          ),
         ),
       ).toBe('🐧,🦜 ⊢ 🦃,🦆')
     })
@@ -232,193 +261,258 @@ describe('print module', () => {
 
   describe('fromRuleId', () => {
     it('i', () => {
-      expect(fromRuleId('i')(basic)).toBe('I')
+      expect(plain(fromRuleId('i')(basic))).toBe('I')
     })
 
     it('f', () => {
-      expect(fromRuleId('f')(basic)).toBe('⊥')
+      expect(plain(fromRuleId('f')(basic))).toBe('⊥')
     })
 
     it('v', () => {
-      expect(fromRuleId('v')(basic)).toBe('⊤')
+      expect(plain(fromRuleId('v')(basic))).toBe('⊤')
     })
 
     it('il', () => {
-      expect(fromRuleId('il')(basic)).toBe('→L')
+      expect(plain(fromRuleId('il')(basic))).toBe('→L')
     })
 
     it('ir', () => {
-      expect(fromRuleId('ir')(basic)).toBe('→R')
+      expect(plain(fromRuleId('ir')(basic))).toBe('→R')
     })
 
     it('cl', () => {
-      expect(fromRuleId('cl')(basic)).toBe('∧L')
+      expect(plain(fromRuleId('cl')(basic))).toBe('∧L')
     })
 
     it('cr', () => {
-      expect(fromRuleId('cr')(basic)).toBe('∧R')
+      expect(plain(fromRuleId('cr')(basic))).toBe('∧R')
     })
 
     it('dl', () => {
-      expect(fromRuleId('dl')(basic)).toBe('∨L')
+      expect(plain(fromRuleId('dl')(basic))).toBe('∨L')
     })
 
     it('dr', () => {
-      expect(fromRuleId('dr')(basic)).toBe('∨R')
+      expect(plain(fromRuleId('dr')(basic))).toBe('∨R')
     })
 
     it('nl', () => {
-      expect(fromRuleId('nl')(basic)).toBe('¬L')
+      expect(plain(fromRuleId('nl')(basic))).toBe('¬L')
     })
 
     it('nr', () => {
-      expect(fromRuleId('nr')(basic)).toBe('¬R')
+      expect(plain(fromRuleId('nr')(basic))).toBe('¬R')
     })
 
     it('swl', () => {
-      expect(fromRuleId('swl')(basic)).toBe('WL')
+      expect(plain(fromRuleId('swl')(basic))).toBe('WL')
     })
 
     it('swr', () => {
-      expect(fromRuleId('swr')(basic)).toBe('WR')
+      expect(plain(fromRuleId('swr')(basic))).toBe('WR')
     })
 
     it('cl1', () => {
-      expect(fromRuleId('cl1')(basic)).toBe('∧L\u2081')
+      expect(plain(fromRuleId('cl1')(basic))).toBe('∧L\u2081')
     })
 
     it('cl2', () => {
-      expect(fromRuleId('cl2')(basic)).toBe('∧L\u2082')
+      expect(plain(fromRuleId('cl2')(basic))).toBe('∧L\u2082')
     })
 
     it('dr1', () => {
-      expect(fromRuleId('dr1')(basic)).toBe('∨R\u2081')
+      expect(plain(fromRuleId('dr1')(basic))).toBe('∨R\u2081')
     })
 
     it('dr2', () => {
-      expect(fromRuleId('dr2')(basic)).toBe('∨R\u2082')
+      expect(plain(fromRuleId('dr2')(basic))).toBe('∨R\u2082')
     })
 
     it('scl', () => {
-      expect(fromRuleId('scl')(basic)).toBe('CL')
+      expect(plain(fromRuleId('scl')(basic))).toBe('CL')
     })
 
     it('scr', () => {
-      expect(fromRuleId('scr')(basic)).toBe('CR')
+      expect(plain(fromRuleId('scr')(basic))).toBe('CR')
     })
 
     it('sxl', () => {
-      expect(fromRuleId('sxl')(basic)).toBe('XL')
+      expect(plain(fromRuleId('sxl')(basic))).toBe('XL')
     })
 
     it('sxr', () => {
-      expect(fromRuleId('sxr')(basic)).toBe('XR')
+      expect(plain(fromRuleId('sxr')(basic))).toBe('XR')
     })
 
     it('sRotLF', () => {
-      expect(fromRuleId('sRotLF')(basic)).toBe('\u21B6L')
+      expect(plain(fromRuleId('sRotLF')(basic))).toBe('\u21B6L')
     })
 
     it('sRotRF', () => {
-      expect(fromRuleId('sRotRF')(basic)).toBe('\u21b7R')
+      expect(plain(fromRuleId('sRotRF')(basic))).toBe('\u21b7R')
     })
 
     it('sRotLB', () => {
-      expect(fromRuleId('sRotLB')(basic)).toBe('\u21b7L')
+      expect(plain(fromRuleId('sRotLB')(basic))).toBe('\u21b7L')
     })
 
     it('sRotRB', () => {
-      expect(fromRuleId('sRotRB')(basic)).toBe('\u21B6R')
+      expect(plain(fromRuleId('sRotRB')(basic))).toBe('\u21B6R')
     })
 
     it('a1', () => {
-      expect(fromRuleId('a1')(basic)).toBe('a1')
+      expect(plain(fromRuleId('a1')(basic))).toBe('a1')
     })
 
     it('a2', () => {
-      expect(fromRuleId('a2')(basic)).toBe('a2')
+      expect(plain(fromRuleId('a2')(basic))).toBe('a2')
     })
 
     it('a3', () => {
-      expect(fromRuleId('a3')(basic)).toBe('a3')
+      expect(plain(fromRuleId('a3')(basic))).toBe('a3')
     })
 
     it('cut', () => {
-      expect(fromRuleId('cut')(basic)).toBe('cut')
+      expect(plain(fromRuleId('cut')(basic))).toBe('cut')
     })
 
     it('mp', () => {
-      expect(fromRuleId('mp')(basic)).toBe('mp')
+      expect(plain(fromRuleId('mp')(basic))).toBe('mp')
     })
   })
 
   describe('custom theme', () => {
     it('falsum', () => {
-      expect(fromProp(falsum)(custom)).toBe('F')
+      expect(plain(fromProp(falsum)(custom))).toBe('F')
     })
 
     it('verum', () => {
-      expect(fromProp(verum)(custom)).toBe('T')
+      expect(plain(fromProp(verum)(custom))).toBe('T')
     })
 
     it('atom wrapped', () => {
-      expect(fromProp(atom('x'))(custom)).toBe('[x]')
+      expect(plain(fromProp(atom('x'))(custom))).toBe('[x]')
     })
 
     it('negation', () => {
-      expect(fromProp(negation(atom('x')))(custom)).toBe('NOT [x]')
+      expect(plain(fromProp(negation(atom('x')))(custom))).toBe('NOT [x]')
     })
 
     it('conjunction', () => {
-      expect(fromProp(conjunction(atom('x'), atom('y')))(custom)).toBe(
+      expect(plain(fromProp(conjunction(atom('x'), atom('y')))(custom))).toBe(
         '[x] AND [y]',
       )
     })
 
     it('parenthesis template used for nested conjunction', () => {
       expect(
-        fromProp(negation(conjunction(atom('x'), atom('y'))))(custom),
+        plain(fromProp(negation(conjunction(atom('x'), atom('y'))))(custom)),
       ).toBe('NOT {[x] AND [y]}')
     })
 
     it('implication', () => {
-      expect(fromProp(implication(atom('x'), atom('y')))(custom)).toBe(
+      expect(plain(fromProp(implication(atom('x'), atom('y')))(custom))).toBe(
         '[x] IMP [y]',
       )
     })
 
     it('sequent separator', () => {
-      expect(fromSequent(sequent([atom('x')], [atom('y')]))(custom)).toBe(
-        '[x] PROVES [y]',
-      )
+      expect(
+        plain(fromSequent(sequent([atom('x')], [atom('y')]))(custom)),
+      ).toBe('[x] PROVES [y]')
     })
 
     it('formulas separator', () => {
       expect(
-        fromSequent(sequent([atom('x'), atom('y')], [atom('z')]))(custom),
+        plain(
+          fromSequent(sequent([atom('x'), atom('y')], [atom('z')]))(custom),
+        ),
       ).toBe('[x]; [y] PROVES [z]')
     })
 
     it('implication rule label uses theme', () => {
-      expect(fromRuleId('il')(custom)).toBe(' IMP L')
+      expect(plain(fromRuleId('il')(custom))).toBe(' IMP L')
     })
 
     it('conjunction rule label uses theme', () => {
-      expect(fromRuleId('cl')(custom)).toBe(' AND L')
+      expect(plain(fromRuleId('cl')(custom))).toBe(' AND L')
     })
 
     it('disjunction rule label uses theme', () => {
-      expect(fromRuleId('dr')(custom)).toBe(' OR R')
+      expect(plain(fromRuleId('dr')(custom))).toBe(' OR R')
     })
 
     it('negation rule label uses theme', () => {
-      expect(fromRuleId('nl')(custom)).toBe('NOT L')
+      expect(plain(fromRuleId('nl')(custom))).toBe('NOT L')
     })
   })
 
   describe('fromPremise', () => {
     it('renders the sequent as string', () => {
       expect(fromPremise(premise(conclusion(atom('p'))))).toBe('⊢ 🐧')
+    })
+  })
+
+  describe('active connective', () => {
+    const activeText = (segments: ReturnType<ReturnType<typeof fromProp>>) =>
+      segments.filter((s) => s.active).map((s) => s.text)
+
+    it('no active segments by default', () => {
+      expect(
+        activeText(fromProp(conjunction(atom('p'), atom('q')))(basic)),
+      ).toEqual([])
+    })
+
+    it('negation marks ¬', () => {
+      expect(activeText(fromProp(negation(atom('p')), true)(basic))).toEqual([
+        '¬',
+      ])
+    })
+
+    it('conjunction marks ∧', () => {
+      expect(
+        activeText(fromProp(conjunction(atom('p'), atom('q')), true)(basic)),
+      ).toEqual(['∧'])
+    })
+
+    it('disjunction marks ∨', () => {
+      expect(
+        activeText(fromProp(disjunction(atom('p'), atom('q')), true)(basic)),
+      ).toEqual(['∨'])
+    })
+
+    it('implication marks →', () => {
+      expect(
+        activeText(fromProp(implication(atom('p'), atom('q')), true)(basic)),
+      ).toEqual(['→'])
+    })
+
+    it('only outermost connective is marked', () => {
+      expect(
+        activeText(
+          fromProp(conjunction(negation(atom('p')), atom('q')), true)(basic),
+        ),
+      ).toEqual(['∧'])
+    })
+
+    it('fromSequent marks left active connective for applicable rule', () => {
+      const seq = sequent([conjunction(atom('p'), atom('q'))], [])
+      expect(activeText(fromSequent(seq, ['cl'])(basic))).toEqual(['∧'])
+    })
+
+    it('fromSequent marks right active connective for applicable rule', () => {
+      const seq = sequent([], [implication(atom('p'), atom('q'))])
+      expect(activeText(fromSequent(seq, ['ir'])(basic))).toEqual(['→'])
+    })
+
+    it('fromSequent no active when rule does not apply', () => {
+      const seq = sequent([implication(atom('p'), atom('q'))], [])
+      expect(activeText(fromSequent(seq, ['cl'])(basic))).toEqual([])
+    })
+
+    it('fromSequent no active with empty rules', () => {
+      const seq = sequent([conjunction(atom('p'), atom('q'))], [])
+      expect(activeText(fromSequent(seq, [])(basic))).toEqual([])
     })
   })
 

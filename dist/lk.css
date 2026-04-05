@@ -225,7 +225,12 @@
 .current {
   padding: 2em 0 1em 0;
   font-size: 2em;
+  color: #000;
 }
 .proof {
   font-size: 1.2em;
+}
+.connective-active {
+  background-color: #fcaa;
+  border-radius: 10px;
 }

@@ -12,6 +12,8 @@ import { Focus } from '../interactive/focus'
 import { AnySequent } from '../model/sequent'
 import { Formulas } from '../model/formulas'
 import * as rule from '../model/rule'
+import * as segment from './segment'
+import { leftLogical, rightLogical, rules as ruleRegistry } from '../rules'
 
 export type NullaryTemplate = [string]
 export const NullaryTemplateId = {
@@ -65,7 +67,7 @@ export const basic: Templates = {
   sequent: ['', ' ⊢ ', ''],
 }
 
-export type Printer = (t: Templates) => string
+export type Printer = (t: Templates) => segment.Segments
 
 export const empty = String()
 
@@ -74,24 +76,36 @@ export function printNullary<K extends NullaryTemplateId>(
 ): () => Printer {
   return () => (theme) => {
     const [s0] = theme[key]
-    return s0
+    return [segment.of(s0)]
   }
 }
 export function printUnary<K extends UnaryTemplateId>(
   key: K,
+  activeConn = false,
 ): (a: Printer) => Printer {
   return (a) => (theme) => {
     const [s0, s1] = theme[key]
-    return [s0, a(theme), s1].join(empty)
+    return [
+      activeConn ? segment.active(s0) : segment.of(s0),
+      ...a(theme),
+      segment.of(s1),
+    ]
   }
 }
 
 export function printBinary<K extends BinaryTemplateId>(
   key: K,
+  activeConn = false,
 ): (a: Printer, b: Printer) => Printer {
   return (a, b) => (theme) => {
     const [s0, s1, s2] = theme[key]
-    return [s0, a(theme), s1, b(theme), s2].join(empty)
+    return [
+      segment.of(s0),
+      ...a(theme),
+      activeConn ? segment.active(s1) : segment.of(s1),
+      ...b(theme),
+      segment.of(s2),
+    ]
   }
 }
 
@@ -119,7 +133,9 @@ export function print<K extends TemplateId>(
   return utils.assertNever(key)
 }
 
-export const printString = (s: string) => () => s
+export const printString =
+  (s: string): Printer =>
+  (_theme) => [segment.of(s)]
 
 export const printNothing = printString(empty)
 
@@ -168,7 +184,10 @@ export function fromVerum(_verum: prop.Verum): Printer {
   return print('verum')()
 }
 
-export function fromNegation({ negand }: prop.Negation<prop.Prop>): Printer {
+export function fromNegation(
+  { negand }: prop.Negation<prop.Prop>,
+  activeConnective = false,
+): Printer {
   const expand = (operand: prop.Prop): Printer => {
     const optional = () => print('optional')(fromProp(operand))
     const parenthesized = () => print('parenthesis')(fromProp(operand))
@@ -182,13 +201,13 @@ export function fromNegation({ negand }: prop.Negation<prop.Prop>): Printer {
       implication: parenthesized,
     })
   }
-  return print('negation')(expand(negand))
+  return printUnary('negation', activeConnective)(expand(negand))
 }
 
-export function fromConjunction({
-  leftConjunct,
-  rightConjunct,
-}: prop.Conjunction<prop.Prop, prop.Prop>): Printer {
+export function fromConjunction(
+  { leftConjunct, rightConjunct }: prop.Conjunction<prop.Prop, prop.Prop>,
+  activeConnective = false,
+): Printer {
   const expand = (operand: prop.Prop): Printer => {
     const optional = () => print('optional')(fromProp(operand))
     const parenthesized = () => print('parenthesis')(fromProp(operand))
@@ -202,13 +221,16 @@ export function fromConjunction({
       implication: parenthesized,
     })
   }
-  return print('conjunction')(expand(leftConjunct), expand(rightConjunct))
+  return printBinary('conjunction', activeConnective)(
+    expand(leftConjunct),
+    expand(rightConjunct),
+  )
 }
 
-export function fromDisjunction({
-  leftDisjunct,
-  rightDisjunct,
-}: prop.Disjunction<prop.Prop, prop.Prop>): Printer {
+export function fromDisjunction(
+  { leftDisjunct, rightDisjunct }: prop.Disjunction<prop.Prop, prop.Prop>,
+  activeConnective = false,
+): Printer {
   const expand = (operand: prop.Prop): Printer => {
     const optional = () => print('optional')(fromProp(operand))
     const parenthesized = () => print('parenthesis')(fromProp(operand))
@@ -222,13 +244,16 @@ export function fromDisjunction({
       implication: parenthesized,
     })
   }
-  return print('disjunction')(expand(leftDisjunct), expand(rightDisjunct))
+  return printBinary('disjunction', activeConnective)(
+    expand(leftDisjunct),
+    expand(rightDisjunct),
+  )
 }
 
-export function fromImplication({
-  antecedent,
-  consequent,
-}: prop.Implication<prop.Prop, prop.Prop>): Printer {
+export function fromImplication(
+  { antecedent, consequent }: prop.Implication<prop.Prop, prop.Prop>,
+  activeConnective = false,
+): Printer {
   const expand = (operand: prop.Prop): Printer => {
     const optional = () => print('optional')(fromProp(operand))
     const parenthesized = () => print('parenthesis')(fromProp(operand))
@@ -242,32 +267,58 @@ export function fromImplication({
       implication: parenthesized,
     })
   }
-  return print('implication')(expand(antecedent), expand(consequent))
+  return printBinary('implication', activeConnective)(
+    expand(antecedent),
+    expand(consequent),
+  )
 }
 
-export function fromProp(proposition: prop.Prop): Printer {
+export function fromProp(
+  proposition: prop.Prop,
+  activeConnective = false,
+): Printer {
   return prop.matchRaw(proposition, {
     atom: fromAtom,
     falsum: fromFalsum,
     verum: fromVerum,
-    negation: fromNegation,
-    conjunction: fromConjunction,
-    disjunction: fromDisjunction,
-    implication: fromImplication,
+    negation: (p) => fromNegation(p, activeConnective),
+    conjunction: (p) => fromConjunction(p, activeConnective),
+    disjunction: (p) => fromDisjunction(p, activeConnective),
+    implication: (p) => fromImplication(p, activeConnective),
   })
 }
 
 export function fromFormulas(formulas: Formulas): Printer {
-  return printArray('formulas')(formulas.map(fromProp))
+  return printArray('formulas')(formulas.map((f) => fromProp(f)))
 }
 
-export function fromSequent(judgement: judge.AnySequent): Printer {
+export function fromSequent(
+  judgement: judge.AnySequent,
+  ruleIds: ReadonlyArray<rule.RuleId> = [],
+): Printer {
   const { antecedent, succedent } = judgement
+
+  const activeLeft = ruleIds.some(
+    (id) => id in leftLogical && ruleRegistry[id].isResult(judgement),
+  )
+  const activeRight = ruleIds.some(
+    (id) => id in rightLogical && ruleRegistry[id].isResult(judgement),
+  )
+
+  const antPrinters = antecedent.map((f, i) =>
+    activeLeft && i === antecedent.length - 1 ? fromProp(f, true) : fromProp(f),
+  )
+  const sucPrinters = succedent.map((f, i) =>
+    activeRight && i === 0 ? fromProp(f, true) : fromProp(f),
+  )
+
   return (t) =>
-    print('sequent')(
-      fromFormulas(antecedent),
-      fromFormulas(succedent),
-    )(t).trim()
+    segment.trim(
+      print('sequent')(
+        printArray('formulas')(antPrinters),
+        printArray('formulas')(sucPrinters),
+      )(t),
+    )
 }
 
 export function left(n: string | null = null): string {
@@ -280,50 +331,53 @@ export function right(n: string | null = null): string {
 }
 
 export function fromRuleId(s: rule.RuleId): Printer {
-  return (t) =>
-    rule.matchRuleId(s, {
-      i: () => 'I',
-      f: () => '⊥',
-      v: () => '⊤',
-      cl: () => t.conjunction.join(empty) + left(),
-      dr: () => t.disjunction.join(empty) + right(),
-      cl1: () => t.conjunction.join(empty) + left('\u2081'),
-      dr1: () => t.disjunction.join(empty) + right('\u2081'),
-      cl2: () => t.conjunction.join(empty) + left('\u2082'),
-      dr2: () => t.disjunction.join(empty) + right('\u2082'),
-      dl: () => t.disjunction.join(empty) + left(),
-      cr: () => t.conjunction.join(empty) + right(),
-      il: () => t.implication.join(empty) + left(),
-      ir: () => t.implication.join(empty) + right(),
-      nl: () => t.negation.join(empty) + left(),
-      nr: () => t.negation.join(empty) + right(),
-      swl: () => 'WL',
-      swr: () => 'WR',
-      scl: () => 'CL',
-      scr: () => 'CR',
-      sRotLF: () => '\u21B6L',
-      sRotRF: () => '\u21b7R',
-      sRotLB: () => '\u21b7L',
-      sRotRB: () => '\u21B6R',
-      sxl: () => 'XL',
-      sxr: () => 'XR',
-      a1: () => 'a1',
-      a2: () => 'a2',
-      a3: () => 'a3',
-      cut: () => 'cut',
-      mp: () => 'mp',
-    })
+  return (t) => [
+    segment.of(
+      rule.matchRuleId(s, {
+        i: () => 'I',
+        f: () => '⊥',
+        v: () => '⊤',
+        cl: () => t.conjunction.join(empty) + left(),
+        dr: () => t.disjunction.join(empty) + right(),
+        cl1: () => t.conjunction.join(empty) + left('\u2081'),
+        dr1: () => t.disjunction.join(empty) + right('\u2081'),
+        cl2: () => t.conjunction.join(empty) + left('\u2082'),
+        dr2: () => t.disjunction.join(empty) + right('\u2082'),
+        dl: () => t.disjunction.join(empty) + left(),
+        cr: () => t.conjunction.join(empty) + right(),
+        il: () => t.implication.join(empty) + left(),
+        ir: () => t.implication.join(empty) + right(),
+        nl: () => t.negation.join(empty) + left(),
+        nr: () => t.negation.join(empty) + right(),
+        swl: () => 'WL',
+        swr: () => 'WR',
+        scl: () => 'CL',
+        scr: () => 'CR',
+        sRotLF: () => '\u21B6L',
+        sRotRF: () => '\u21b7R',
+        sRotLB: () => '\u21b7L',
+        sRotRB: () => '\u21B6R',
+        sxl: () => 'XL',
+        sxr: () => 'XR',
+        a1: () => 'a1',
+        a2: () => 'a2',
+        a3: () => 'a3',
+        cut: () => 'cut',
+        mp: () => 'mp',
+      }),
+    ),
+  ]
 }
 
 export function fromPremise({ result }: AnyPremise) {
-  return fromSequent(result)(basic)
+  return segment.plain(fromSequent(result)(basic))
 }
 
 export function fromTransformation({ rule, deps, result }: AnyTransformation) {
   return block.treeAuto(
-    fromSequent(result)(basic),
+    segment.plain(fromSequent(result)(basic)),
     deps.map(fromDerivation),
-    '(' + fromRuleId(rule)(basic) + ')',
+    '(' + segment.plain(fromRuleId(rule)(basic)) + ')',
   )
 }
 
@@ -364,7 +418,7 @@ export function fromMeta(meta: Meta) {
       ...examples.flatMap((line) => [
         half(
           block.spaced(
-            line.map((x) => fromProp(x)(basic)),
+            line.map((x) => segment.plain(fromProp(x)(basic))),
             1,
           ),
         ),

@@ -3,6 +3,7 @@ import { activeSequent } from '../interactive/focus'
 import { Rule } from '../model/rule'
 import { AnySequent } from '../model/sequent'
 import { basic, fromDerivation, fromFocus, fromSequent } from '../render/print'
+import { html } from '../render/segment'
 import { RuleId } from '../model/rule'
 import { Configuration } from '../model/challenge'
 import {
@@ -149,9 +150,12 @@ const createPlayArea = (
   } else {
     const active = document.createElement('div')
     active.setAttribute('class', 'current')
-    active.innerHTML = fromSequent(
-      activeSequent(workspace.currentConjecture()),
-    )(basic)
+    active.innerHTML = html(
+      fromSequent(
+        activeSequent(workspace.currentConjecture()),
+        workspace.applicableRules(),
+      )(basic),
+    )
     panel.appendChild(active)
   }
   panel.appendChild(createProof(workspace))

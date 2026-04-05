@@ -4,6 +4,7 @@ import { challenges } from '../challenges'
 import { basic, fromRuleId, fromSequent } from '../render/print'
 import { Workspace } from '../interactive/workspace'
 import { repl } from '../interactive/repl'
+import { plain } from '../render/segment'
 import { Action } from '../interactive/action'
 import {
   AnyWorkspace,
@@ -233,7 +234,7 @@ export const mountCampaign = (
   Object.assign(window, {
     cmd: (input: string) => {
       const result = gen.next(input)
-      console.log(result.value)
+      console.log(plain(result.value))
       rerender()
       return result.done
     },
