@@ -1,4 +1,5 @@
 node_modules
+coverage
 lib
 dist/lk.js
 dist/lk.w.js
