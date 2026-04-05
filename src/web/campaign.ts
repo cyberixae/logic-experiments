@@ -61,7 +61,7 @@ const createListing = (
     const rules = document.createElement('div')
     rules.setAttribute('class', 'rules')
     rules.innerHTML = challenge.rules
-      .map((rule) => fromRuleId(rule)(basic))
+      .map((rule) => html(fromRuleId(rule)(basic)))
       .join(', ')
     item.appendChild(rules)
     const goal = document.createElement('div')
