@@ -92,9 +92,9 @@ describe('print module', () => {
     })
 
     it('negation of implication (parenthesized)', () => {
-      expect(
-        fromProp(negation(implication(atom('p'), atom('q'))))(basic),
-      ).toBe('¬(🐧→🦜)')
+      expect(fromProp(negation(implication(atom('p'), atom('q'))))(basic)).toBe(
+        '¬(🐧→🦜)',
+      )
     })
 
     it('conjunction of atoms', () => {
@@ -113,9 +113,9 @@ describe('print module', () => {
     })
 
     it('conjunction of negation (no parens)', () => {
-      expect(
-        fromProp(conjunction(negation(atom('p')), atom('q')))(basic),
-      ).toBe('¬🐧∧🦜')
+      expect(fromProp(conjunction(negation(atom('p')), atom('q')))(basic)).toBe(
+        '¬🐧∧🦜',
+      )
     })
 
     it('conjunction of disjunction (parenthesized)', () => {
@@ -171,17 +171,17 @@ describe('print module', () => {
 
     it('implication antecedent is implication (parenthesized)', () => {
       expect(
-        fromProp(
-          implication(implication(atom('p'), atom('q')), atom('r')),
-        )(basic),
+        fromProp(implication(implication(atom('p'), atom('q')), atom('r')))(
+          basic,
+        ),
       ).toBe('(🐧→🦜)→🦃')
     })
 
     it('implication consequent is implication (parenthesized)', () => {
       expect(
-        fromProp(
-          implication(atom('p'), implication(atom('q'), atom('r'))),
-        )(basic),
+        fromProp(implication(atom('p'), implication(atom('q'), atom('r'))))(
+          basic,
+        ),
       ).toBe('🐧→(🦜→🦃)')
     })
 

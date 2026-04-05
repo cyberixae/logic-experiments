@@ -123,10 +123,7 @@ state = applyEvent(state, reverse0('ir'))
 state = applyEvent(state, reverse0('swl'))
 state = applyEvent(state, reverse0('ir'))
 state = applyEvent(state, reverse0('i'))
-if (
-  !isProof(state.derivation) ||
-  !equalsDerivation(state.derivation, proof)
-) {
+if (!isProof(state.derivation) || !equalsDerivation(state.derivation, proof)) {
   throw state
 }
 

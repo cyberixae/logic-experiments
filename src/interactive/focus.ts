@@ -46,7 +46,9 @@ export const activeSequent = (s: AnyFocus): AnySequent => {
   const path = activePath(s)
   const derivation = subDerivation(s.derivation, path)
   if (!derivation) {
-    console.warn('activeSequent: path not found in derivation, falling back to root')
+    console.warn(
+      'activeSequent: path not found in derivation, falling back to root',
+    )
   }
   return (derivation ?? s.derivation).result
 }
