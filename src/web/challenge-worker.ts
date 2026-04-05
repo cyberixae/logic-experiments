@@ -1,7 +1,7 @@
 /// <reference lib="webworker" />
 
-import { random } from '../model/challenge'
 import { Configuration } from '../model/challenge'
+import { random } from '../random/challenge'
 import { AnySequent } from '../model/sequent'
 
 export type ChallengeMessage = {

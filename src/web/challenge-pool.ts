@@ -1,4 +1,5 @@
-import { random, Configuration } from '../model/challenge'
+import { Configuration } from '../model/challenge'
+import { random } from '../random/challenge'
 import { AnySequent } from '../model/sequent'
 import { ChallengeMessage, ControlMessage } from './challenge-worker'
 
