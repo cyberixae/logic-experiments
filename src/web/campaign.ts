@@ -4,7 +4,7 @@ import { challenges } from '../challenges'
 import { basic, fromRuleId, fromSequent } from '../render/print'
 import { Workspace } from '../interactive/workspace'
 import { repl } from '../interactive/repl'
-import { plain } from '../render/segment'
+import { html, plain } from '../render/segment'
 import { Action } from '../interactive/action'
 import {
   AnyWorkspace,
@@ -66,7 +66,7 @@ const createListing = (
     item.appendChild(rules)
     const goal = document.createElement('div')
     goal.setAttribute('class', 'goal')
-    goal.innerHTML = fromSequent(challenge.goal)(basic)
+    goal.innerHTML = html(fromSequent(challenge.goal)(basic))
     item.appendChild(goal)
     levels.appendChild(item)
   })
