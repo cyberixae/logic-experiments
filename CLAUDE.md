@@ -8,7 +8,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 yarn build          # Compile TypeScript → lib/
 yarn build:web      # Bundle web interface → dist/lk.js + dist/lk.w.js (via esbuild)
 yarn dev            # Watch + serve web interface locally
-yarn lk             # Build + run LK sandbox demo
+yarn rk             # Build + run RK sandbox demo
+yarn fk             # Build + run FK sandbox demo
 yarn la3            # Build + run LA3 sandbox demo
 yarn main           # Build + run interactive REPL
 yarn lint           # Lint all files with ESLint
