@@ -15,6 +15,10 @@ export type RuleId =
   | 'cr'
   | 'cut'
   | 'dl'
+  | 'fcr'
+  | 'fcut'
+  | 'fdl'
+  | 'fil'
   | 'dr'
   | 'dr1'
   | 'dr2'
@@ -48,6 +52,10 @@ export const ruleId: {
   cr: 'cr',
   cut: 'cut',
   dl: 'dl',
+  fcr: 'fcr',
+  fcut: 'fcut',
+  fdl: 'fdl',
+  fil: 'fil',
   dr1: 'dr1',
   dr2: 'dr2',
   dr: 'dr',

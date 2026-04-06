@@ -11,6 +11,10 @@ import { ruleCL2 } from './cl2'
 import { ruleCR } from './cr'
 import { ruleCut } from './cut'
 import { ruleDL } from './dl'
+import { ruleFCR } from './fcr'
+import { ruleFCut } from './fcut'
+import { ruleFDL } from './fdl'
+import { ruleFIL } from './fil'
 import { ruleDR } from './dr'
 import { ruleDR1 } from './dr1'
 import { ruleDR2 } from './dr2'
@@ -45,6 +49,10 @@ export const rules: {
   cr: ruleCR,
   cut: ruleCut,
   dl: ruleDL,
+  fcr: ruleFCR,
+  fcut: ruleFCut,
+  fdl: ruleFDL,
+  fil: ruleFIL,
   dr1: ruleDR1,
   dr2: ruleDR2,
   dr: ruleDR,
@@ -95,6 +103,9 @@ export const reverseLogic0 = {
   dl: ruleDL,
   cr: ruleCR,
   il: ruleIL,
+  fcr: ruleFCR,
+  fdl: ruleFDL,
+  fil: ruleFIL,
 } satisfies Partial<{
   [K in RuleId]: Rule<AnySequent, K> & { tryReverse: TryReverse0 }
 }>
@@ -126,6 +137,7 @@ export const isReverseId0 = (s: string): s is ReverseId0 => s in reverse0
 
 export const reverse1 = {
   cut: ruleCut,
+  fcut: ruleFCut,
   mp: ruleMP,
 } satisfies Partial<
   Record<RuleId, Rule<AnySequent> & { tryReverse: TryReverse1 }>
@@ -145,6 +157,7 @@ export const center = {
   a3: ruleA3,
   f: ruleF,
   cut: ruleCut,
+  fcut: ruleFCut,
   i: ruleI,
   mp: ruleMP,
   v: ruleV,
@@ -164,7 +177,9 @@ export const leftLogical = {
   cl1: ruleCL1,
   cl2: ruleCL2,
   dl: ruleDL,
+  fdl: ruleFDL,
   il: ruleIL,
+  fil: ruleFIL,
 } satisfies Partial<{ [K in RuleId]: Rule<AnySequent, K> }>
 
 export const left = {
@@ -186,6 +201,7 @@ export const rightLogical = {
   dr1: ruleDR1,
   dr2: ruleDR2,
   cr: ruleCR,
+  fcr: ruleFCR,
   ir: ruleIR,
 } satisfies Partial<{ [K in RuleId]: Rule<AnySequent, K> }>
 

@@ -139,6 +139,10 @@ export function fromTransformation({
     sRotRF: () => `z.sRotRF(${d.join(',')})`,
     sRotRB: () => `z.sRotRB(${d.join(',')})`,
     cut: () => `z.cut(${d.join(',')})`,
+    fcut: () => `z.fcut(${d.join(',')})`,
+    fcr: () => `z.fcr(${d.join(',')})`,
+    fdl: () => `z.fdl(${d.join(',')})`,
+    fil: () => `z.fil(${d.join(',')})`,
     mp: () => `z.mp(${d.join(',')})`,
   })
 }
