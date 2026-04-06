@@ -11,6 +11,8 @@ import {
   implication,
   conjunction,
   disjunction,
+  falsum,
+  verum,
 } from './model/prop'
 import * as print from './render/print'
 import { ruleCL1 } from './rules/cl1'
@@ -21,6 +23,12 @@ import { ruleI } from './rules/i'
 import { ruleIR } from './rules/ir'
 import { ruleNL } from './rules/nl'
 import { ruleNR } from './rules/nr'
+import { ruleV } from './rules/v'
+import { ruleF } from './rules/f'
+import { ruleFCut } from './rules/fcut'
+import { ruleFCR } from './rules/fcr'
+import { ruleFDL } from './rules/fdl'
+import { ruleFIL } from './rules/fil'
 import { ruleSCL } from './rules/scl'
 import { ruleSCR } from './rules/scr'
 import { ruleSRotLB } from './rules/srotlb'
@@ -52,6 +60,8 @@ const meta = {
       title: 'Connectives',
       examples: [
         [
+          falsum,
+          verum,
           negation(atom('A')),
           implication(atom('A'), atom('B')),
           conjunction(atom('A'), atom('B')),
@@ -63,15 +73,17 @@ const meta = {
   rules: [
     {
       title: 'Axiom',
-      examples: [[ruleI.example]],
+      examples: [[ruleF.example, ruleV.example], [ruleI.example]],
     },
     {
       title: 'Logical Rules',
       examples: [
         [ruleCL1.example, ruleDR1.example],
         [ruleCL2.example, ruleDR2.example],
-        [ruleIR.example],
+        [ruleFIL.example, ruleIR.example],
+        [ruleFDL.example, ruleFCR.example],
         [ruleNL.example, ruleNR.example],
+        [ruleFCut.example],
       ],
     },
     {

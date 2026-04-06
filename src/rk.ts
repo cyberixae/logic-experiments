@@ -11,6 +11,8 @@ import {
   implication,
   conjunction,
   disjunction,
+  falsum,
+  verum,
 } from './model/prop'
 import * as print from './render/print'
 import { ruleCL } from './rules/cl'
@@ -27,6 +29,8 @@ import { ruleSRotLB } from './rules/srotlb'
 import { ruleSRotLF } from './rules/srotlf'
 import { ruleSRotRB } from './rules/srotrb'
 import { ruleSRotRF } from './rules/srotrf'
+import { ruleV } from './rules/v'
+import { ruleF } from './rules/f'
 import { ruleSWL } from './rules/swl'
 import { ruleSWR } from './rules/swr'
 
@@ -50,6 +54,8 @@ const meta = {
       title: 'Connectives',
       examples: [
         [
+          falsum,
+          verum,
           negation(atom('A')),
           implication(atom('A'), atom('B')),
           conjunction(atom('A'), atom('B')),
@@ -61,7 +67,7 @@ const meta = {
   rules: [
     {
       title: 'Axiom',
-      examples: [[ruleI.example]],
+      examples: [[ruleF.example, ruleV.example], [ruleI.example]],
     },
     {
       title: 'Cut',
