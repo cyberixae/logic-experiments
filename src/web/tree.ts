@@ -1,5 +1,5 @@
 import { AnyDerivation, Path } from '../model/derivation'
-import { basic, fromRuleId, fromSequent } from '../render/print'
+import { basic, fromDerivation, fromRuleId, fromSequent } from '../render/print'
 import { html } from '../render/segment'
 import { RuleId } from '../model/rule'
 
@@ -65,6 +65,13 @@ export const renderDerivation = (
   if (isActive) {
     requestAnimationFrame(() => {
       node.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' })
+    })
+  }
+
+  if (currentPath.length === 0) {
+    node.addEventListener('copy', (e) => {
+      e.preventDefault()
+      e.clipboardData?.setData('text/plain', fromDerivation(derivation))
     })
   }
 
