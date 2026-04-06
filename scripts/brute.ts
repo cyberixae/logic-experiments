@@ -25,7 +25,7 @@ for (const [name, challenge] of Object.entries(challenges)) {
 
   if (found.length === 0) {
     console.log(`${name}: no proof found within limit ${maxLimit}`)
-    missing++
+    missing += 1
     continue
   }
 
@@ -35,7 +35,7 @@ for (const [name, challenge] of Object.entries(challenges)) {
   const file = fileMap[name.toLowerCase()]
   if (!file) {
     console.log(`${name}: source file not found`)
-    missing++
+    missing += 1
     continue
   }
 
@@ -48,13 +48,13 @@ for (const [name, challenge] of Object.entries(challenges)) {
 
   if (newContent === content) {
     console.log(`${name}: could not replace solution (pattern mismatch)`)
-    missing++
+    missing += 1
     continue
   }
 
   fs.writeFileSync(file, newContent)
   console.log(`${name}: updated`)
-  updated++
+  updated += 1
 }
 
 if (updated > 0) console.log(`\n${updated} challenge(s) updated`)

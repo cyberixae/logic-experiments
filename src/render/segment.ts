@@ -39,14 +39,14 @@ export function html(segments: Segments): string {
 
 export function trim(segments: Segments): Segments {
   const result = [...segments]
-  for (let i = 0; i < result.length; i++) {
+  for (let i = 0; i < result.length; i += 1) {
     const s = result[i]
     if (s === undefined) break
     const trimmed = s.text.trimStart()
     result[i] = { ...s, text: trimmed }
     if (trimmed.length > 0) break
   }
-  for (let i = result.length - 1; i >= 0; i--) {
+  for (let i = result.length - 1; i >= 0; i -= 1) {
     const s = result[i]
     if (s === undefined) break
     const trimmed = s.text.trimEnd()

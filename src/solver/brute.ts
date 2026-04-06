@@ -130,7 +130,7 @@ const formulasOfOpCount = (
         yield prop.negation(p)
       }
     }
-    for (let leftOps = 0; leftOps < opCount; leftOps++) {
+    for (let leftOps = 0; leftOps < opCount; leftOps += 1) {
       const rightOps = opCount - 1 - leftOps
       for (const l of formulasOfOpCount(leftOps, atoms, connectives)()) {
         for (const r of formulasOfOpCount(rightOps, atoms, connectives)()) {
@@ -157,7 +157,7 @@ const bruteLogic1 = <S extends AnySequent, R extends RuleId>(
       ...d.result.succedent.flatMap(prop.atoms),
     ])
     const connectives = candidateConnectives(rules, d.result)
-    for (let opCount = 0; opCount <= limit * 2; opCount++) {
+    for (let opCount = 0; opCount <= limit * 2; opCount += 1) {
       for (const formula of formulasOfOpCount(opCount, atoms, connectives)()) {
         for (const [, rule] of applicableRules) {
           const result = rule.tryReverse(formula)(d)
@@ -280,7 +280,7 @@ export const bruteLimit = <S extends AnySequent, R extends RuleId>(
   c: Configuration<S, ReadonlyArray<R>>,
   maxLimit: number,
 ): Option<ProofUsing<S, R>> => {
-  for (let limit = 0; limit <= maxLimit; limit++) {
+  for (let limit = 0; limit <= maxLimit; limit += 1) {
     const proof = tryAtDepth(c, limit)
     if (proof) return [proof]
   }
@@ -290,7 +290,7 @@ export const bruteLimit = <S extends AnySequent, R extends RuleId>(
 export function* bruteSearch<S extends AnySequent, R extends RuleId>(
   c: Configuration<S, ReadonlyArray<R>>,
 ): Generator<void, [ProofUsing<S, R>, number]> {
-  for (let limit = 0; ; limit++) {
+  for (let limit = 0; ; limit += 1) {
     const proof = tryAtDepth(c, limit)
     if (proof) return [proof, limit]
     yield
