@@ -22,6 +22,7 @@ export default defineConfig([
           ignoreRestSiblings: true,
         },
       ],
+      'no-plusplus': 'warn',
     },
   },
   {
