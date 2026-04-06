@@ -145,9 +145,9 @@ const createPlayArea = (workspace: AnyWorkspace): HTMLElement => {
   return panel
 }
 
-const createPanel = (
+const createPanel = <K extends RuleId>(
   className: string,
-  ruleRecord: Partial<Record<RuleId, Rule<AnySequent>>>,
+  ruleRecord: Record<K, Rule<AnySequent>>,
   ls: ReadonlyArray<RuleId>,
   rules: ReadonlyArray<RuleId>,
   solved: boolean,
@@ -156,7 +156,7 @@ const createPanel = (
   const panel = document.createElement('div')
   panel.setAttribute('class', className)
   entries(ruleRecord).forEach(([key, rule]) => {
-    if (!rule || !rules.includes(key)) return
+    if (!rules.includes(key)) return
     const disabled = solved || !ls.includes(key)
     const pre = document.createElement('pre')
     pre.setAttribute('class', 'rule button' + (disabled ? ' disabled' : ''))
