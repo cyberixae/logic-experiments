@@ -1,10 +1,10 @@
 import { reverse0, undo, reset } from '../interactive/event'
-import { activeSequent } from '../interactive/focus'
+import { activePath } from '../interactive/focus'
 import { Rule } from '../model/rule'
 import { AnySequent } from '../model/sequent'
-import { basic, fromDerivation, fromFocus, fromSequent } from '../render/print'
-import { html } from '../render/segment'
+import { fromDerivation } from '../render/print'
 import { RuleId } from '../model/rule'
+import { renderDerivation } from './tree'
 import { Configuration } from '../model/challenge'
 import {
   center,
@@ -132,16 +132,6 @@ export const createButton = (
   return el
 }
 
-const createProof = (workspace: AnyWorkspace): HTMLElement => {
-  const pre = document.createElement('pre')
-  pre.setAttribute('class', 'proof')
-  const s = workspace.currentConjecture()
-  if (s.derivation.kind === 'transformation') {
-    pre.innerHTML = '\n' + fromFocus(s) + '\n'
-  }
-  return pre
-}
-
 const createPlayArea = (
   workspace: AnyWorkspace,
   makeCongrats: () => HTMLElement,
@@ -150,18 +140,14 @@ const createPlayArea = (
   panel.setAttribute('class', 'playarea')
   if (workspace.isSolved()) {
     panel.appendChild(makeCongrats())
-  } else {
-    const active = document.createElement('div')
-    active.setAttribute('class', 'current')
-    active.innerHTML = html(
-      fromSequent(
-        activeSequent(workspace.currentConjecture()),
-        workspace.applicableRules(),
-      )(basic),
-    )
-    panel.appendChild(active)
   }
-  panel.appendChild(createProof(workspace))
+  const focus = workspace.currentConjecture()
+  const tree = renderDerivation(
+    focus.derivation,
+    activePath(focus),
+    workspace.applicableRules(),
+  )
+  panel.appendChild(tree)
   return panel
 }
 
