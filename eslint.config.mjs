@@ -22,6 +22,7 @@ export default defineConfig([
           ignoreRestSiblings: true,
         },
       ],
+      '@typescript-eslint/no-non-null-assertion': 'warn',
       'no-plusplus': 'warn',
     },
   },
