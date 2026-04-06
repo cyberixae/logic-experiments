@@ -1,4 +1,4 @@
-import { lk } from '../../systems/lk'
+import { rk } from '../../systems/rk'
 import { premise, ProofUsing } from '../../model/derivation'
 import { AnySequent, sequent, equals } from '../../model/sequent'
 import { RuleId } from '../../model/rule'
@@ -6,7 +6,7 @@ import { Prop } from '../../model/prop'
 import { head } from '../../utils/seq'
 import { bruteStructure0 } from '../bruteStructure0'
 
-const { a, i } = lk
+const { a, i } = rk
 const p = a('p')
 const q = a('q')
 const r = a('r')

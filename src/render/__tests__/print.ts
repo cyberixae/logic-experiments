@@ -20,9 +20,9 @@ import {
 import { sequent } from '../../model/sequent'
 import { premise } from '../../model/derivation'
 import { conclusion } from '../../model/sequent'
-import { lk } from '../../systems/lk'
+import { rk } from '../../systems/rk'
 
-const { a, z, i } = lk
+const { a, z, i } = rk
 
 const custom: Templates = {
   falsum: ['F'],

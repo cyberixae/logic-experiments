@@ -1,9 +1,9 @@
-import { lk } from '../../systems/lk'
+import { rk } from '../../systems/rk'
 import { sequent } from '../../model/sequent'
 import { isTautology } from '../../model/sequent'
 import { bruteLimit } from '../brute'
 
-const { a } = lk
+const { a } = rk
 const p = a('p')
 const q = a('q')
 

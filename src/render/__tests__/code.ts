@@ -1,5 +1,5 @@
 import { fromDerivation, fromProp } from '../code'
-import { lk } from '../../systems/lk'
+import { rk } from '../../systems/rk'
 import { la3 } from '../../systems/la3'
 import { AnyDerivation, premise, transformation } from '../../model/derivation'
 import {
@@ -13,7 +13,7 @@ import {
 import { conclusion, sequent } from '../../model/sequent'
 import { challenges } from '../../challenges'
 
-const { a, o, z, i } = lk
+const { a, o, z, i } = rk
 const la3a = la3.a
 const la3i = la3.i
 const la3z = la3.z

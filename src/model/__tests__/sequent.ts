@@ -1,7 +1,7 @@
-import { lk } from '../../systems/lk'
+import { rk } from '../../systems/rk'
 import { sequent, isTautology } from '../sequent'
 
-const { a, o } = lk
+const { a, o } = rk
 const p = a('p')
 const q = a('q')
 const r = a('r')

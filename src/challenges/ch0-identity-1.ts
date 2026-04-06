@@ -1,8 +1,8 @@
-import { lk } from '../systems/lk'
+import { rk } from '../systems/rk'
 import { sequent } from '../model/sequent'
 import { challenge } from '../model/challenge'
 
-const { a, i } = lk
+const { a, i } = rk
 
 const rules = ['i'] as const
 

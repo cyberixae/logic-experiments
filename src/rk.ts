@@ -4,7 +4,7 @@ import { conclusion } from './model/sequent'
 import { applyEvent, focus } from './interactive/focus'
 import { reverse0 } from './interactive/event'
 
-import { alpha, lk, name } from './systems/lk'
+import { alpha, rk, name } from './systems/rk'
 import {
   negation,
   atom,
@@ -13,20 +13,16 @@ import {
   disjunction,
 } from './model/prop'
 import * as print from './render/print'
-import { ruleCL1 } from './rules/cl1'
-import { ruleCL2 } from './rules/cl2'
+import { ruleCL } from './rules/cl'
 import { ruleCR } from './rules/cr'
 import { ruleCut } from './rules/cut'
 import { ruleDL } from './rules/dl'
-import { ruleDR1 } from './rules/dr1'
-import { ruleDR2 } from './rules/dr2'
+import { ruleDR } from './rules/dr'
 import { ruleI } from './rules/i'
 import { ruleIL } from './rules/il'
 import { ruleIR } from './rules/ir'
 import { ruleNL } from './rules/nl'
 import { ruleNR } from './rules/nr'
-import { ruleSCL } from './rules/scl'
-import { ruleSCR } from './rules/scr'
 import { ruleSRotLB } from './rules/srotlb'
 import { ruleSRotLF } from './rules/srotlf'
 import { ruleSRotRB } from './rules/srotrb'
@@ -76,8 +72,7 @@ const meta = {
     {
       title: 'Logical Rules',
       examples: [
-        [ruleCL1.example, ruleDR1.example],
-        [ruleCL2.example, ruleDR2.example],
+        [ruleCL.example, ruleDR.example],
         [ruleDL.example, ruleCR.example],
         [ruleIL.example, ruleIR.example],
         [ruleNL.example, ruleNR.example],
@@ -87,7 +82,6 @@ const meta = {
       title: 'Structural Rules',
       examples: [
         [ruleSWL.example, ruleSWR.example],
-        [ruleSCL.example, ruleSCR.example],
         [ruleSRotLF.example, ruleSRotRF.example],
         [ruleSRotLB.example, ruleSRotRB.example],
         [ruleSXL.example, ruleSXR.example],
@@ -99,22 +93,22 @@ const meta = {
 export const usage = () => print.fromMeta(meta)
 
 const goal = conclusion(
-  lk.o.p2.implication(
-    lk.o.p2.implication(
-      lk.a('p'),
-      lk.o.p2.implication(lk.a('q'), lk.o.p1.negation(lk.a('p'))),
+  rk.o.p2.implication(
+    rk.o.p2.implication(
+      rk.a('p'),
+      rk.o.p2.implication(rk.a('q'), rk.o.p1.negation(rk.a('p'))),
     ),
-    lk.o.p2.implication(lk.a('p'), lk.a('p')),
+    rk.o.p2.implication(rk.a('p'), rk.a('p')),
   ),
 )
 
-const proof = lk.z.ir(
-  lk.z.swl(
-    lk.o.p2.implication(
-      lk.a('p'),
-      lk.o.p2.implication(lk.a('q'), lk.o.p1.negation(lk.a('p'))),
+const proof = rk.z.ir(
+  rk.z.swl(
+    rk.o.p2.implication(
+      rk.a('p'),
+      rk.o.p2.implication(rk.a('q'), rk.o.p1.negation(rk.a('p'))),
     ),
-    lk.z.ir(lk.i.i(lk.a('p'))),
+    rk.z.ir(rk.i.i(rk.a('p'))),
   ),
 )
 

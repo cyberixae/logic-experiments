@@ -29,4 +29,3 @@ export const challenge = <
 >(
   c: Challenge<J, S>,
 ) => c
-
