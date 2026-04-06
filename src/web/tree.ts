@@ -13,7 +13,9 @@ const renderSequent = (
 ): HTMLElement => {
   const el = document.createElement('div')
   el.setAttribute('class', 'tree-sequent')
-  el.innerHTML = html(fromSequent(derivation.result, isActive ? ruleIds : [])(basic))
+  el.innerHTML = html(
+    fromSequent(derivation.result, isActive ? ruleIds : [])(basic),
+  )
   return el
 }
 
@@ -35,13 +37,11 @@ export const renderDerivation = (
   applicableRules: ReadonlyArray<RuleId>,
   currentPath: Path = [],
 ): HTMLElement => {
-  const isActive = derivation.kind === 'premise' && equalPaths(currentPath, activePath)
+  const isActive =
+    derivation.kind === 'premise' && equalPaths(currentPath, activePath)
 
   const node = document.createElement('div')
-  node.setAttribute(
-    'class',
-    'tree-node' + (isActive ? ' tree-active' : ''),
-  )
+  node.setAttribute('class', 'tree-node' + (isActive ? ' tree-active' : ''))
 
   if (derivation.kind === 'transformation') {
     const premises = document.createElement('div')
@@ -64,7 +64,11 @@ export const renderDerivation = (
 
   if (isActive) {
     requestAnimationFrame(() => {
-      node.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' })
+      node.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center',
+        inline: 'center',
+      })
     })
   }
 

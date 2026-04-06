@@ -195,7 +195,9 @@ export const createBench = (
   if (solved) {
     panel.appendChild(makeCongrats())
   } else {
-    panel.appendChild(createPanel('main', center, ls, rules, solved, applyCenter))
+    panel.appendChild(
+      createPanel('main', center, ls, rules, solved, applyCenter),
+    )
   }
   panel.appendChild(createPanel('right', right, ls, rules, solved, apply))
   panel.appendChild(createPlayArea(workspace))
