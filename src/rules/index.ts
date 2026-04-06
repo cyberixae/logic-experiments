@@ -1,4 +1,10 @@
-import { RuleId, Rule, TryReverse0, TryReverse1 } from '../model/rule'
+import {
+  RuleId,
+  Rule,
+  TryReverse0,
+  TryReverse1,
+  TryReverseSplit2,
+} from '../model/rule'
 import { AnySequent } from '../model/sequent'
 import { Option } from '../utils/option'
 import { entries } from '../utils/record'
@@ -103,9 +109,6 @@ export const reverseLogic0 = {
   dl: ruleDL,
   cr: ruleCR,
   il: ruleIL,
-  fcr: ruleFCR,
-  fdl: ruleFDL,
-  fil: ruleFIL,
 } satisfies Partial<{
   [K in RuleId]: Rule<AnySequent, K> & { tryReverse: TryReverse0 }
 }>
@@ -145,10 +148,22 @@ export const reverse1 = {
 export type ReverseId1 = keyof typeof reverse1
 export const isReverseId1 = (s: string): s is ReverseId1 => s in reverse1
 
+export const reverseSplit2 = {
+  fcr: ruleFCR,
+  fdl: ruleFDL,
+  fil: ruleFIL,
+} satisfies Partial<{
+  [K in RuleId]: Rule<AnySequent, K> & { tryReverse: TryReverseSplit2 }
+}>
+export type ReverseSplit2Id = keyof typeof reverseSplit2
+export const isReverseSplit2Id = (s: string): s is ReverseSplit2Id =>
+  s in reverseSplit2
+
 // Exhaustiveness check
 const _reverse: { [K in RuleId]: Rule<AnySequent, K> } = {
   ...reverse0,
   ...reverse1,
+  ...reverseSplit2,
 }
 
 export const center = {

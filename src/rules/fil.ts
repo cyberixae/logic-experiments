@@ -17,6 +17,7 @@ import { Formulas } from '../model/formulas'
 import { Refinement } from '../utils/generic'
 import * as tuple from '../utils/tuple'
 import { Rule } from '../model/rule'
+import { Split } from '../model/formulas'
 
 export type FILResult<
   Γ extends Formulas,
@@ -121,31 +122,27 @@ export const reverseFIL = <
   Π extends Formulas,
   R extends FILResult<Γ, Δ, Σ, A, B, Π>,
 >(
-  p: Derivation<R>,
-  splitAnt: number,
-  splitSuc: number,
+  p: Derivation<R> & Derivation<FILResult<Γ, Δ, Σ, A, B, Π>>,
+  splitAnt: (arr: [...Γ, ...Σ]) => [Γ, Σ],
+  splitSuc: (arr: [...Δ, ...Π]) => [Δ, Π],
 ): FIL<Γ, A, Δ, Σ, B, Π, R, FILDeps<Γ, A, Δ, Σ, B, Π>> => {
-  const aib = tuple.last(p.result.antecedent) as Implication<A, B>
+  const aib = tuple.last(p.result.antecedent)
   const rest = tuple.init(p.result.antecedent)
-  const γ = rest.slice(0, splitAnt) as unknown as Γ
-  const ς = rest.slice(splitAnt) as unknown as Σ
+  const [γ, ς] = splitAnt(rest)
   const a: A = aib.antecedent
   const b: B = aib.consequent
-  const δ = p.result.succedent.slice(0, splitSuc) as unknown as Δ
-  const π = p.result.succedent.slice(splitSuc) as unknown as Π
+  const [δ, π] = splitSuc(p.result.succedent)
   return fil(p.result, [
     premise(sequent(γ, [a, ...δ])),
     premise(sequent([...ς, b], π)),
   ])
 }
-export const tryReverseFIL = <J extends AnySequent>(
-  d: Derivation<J>,
-): Derivation<J> | null => {
-  if (!isFILResultDerivation(d)) return null
-  const antLen = d.result.antecedent.length - 1
-  const sucLen = d.result.succedent.length
-  return reverseFIL(d, antLen, sucLen)
-}
+export const tryReverseFIL =
+  (splitAnt: Split, splitSuc: Split) =>
+  <J extends AnySequent>(d: Derivation<J>): Derivation<J> | null => {
+    if (!isFILResultDerivation(d)) return null
+    return reverseFIL(d, splitAnt, splitSuc)
+  }
 export const exampleFIL = applyFIL(
   premise(sequent([atom('Γ')], [atom('A'), atom('Δ')])),
   premise(sequent([atom('Σ'), atom('B')], [atom('Π')])),

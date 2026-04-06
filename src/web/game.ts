@@ -17,7 +17,7 @@ import {
 import { Workspace } from '../interactive/workspace'
 import { Action } from '../interactive/action'
 import { Navigate } from './types'
-import { keys } from '../utils/record'
+import { entries, keys } from '../utils/record'
 
 export type AnyWorkspace = Workspace<
   string,
@@ -175,9 +175,7 @@ const createPanel = (
 ): HTMLElement => {
   const panel = document.createElement('div')
   panel.setAttribute('class', className)
-  ;(
-    Object.entries(ruleRecord) as Array<[RuleId, Rule<AnySequent> | undefined]>
-  ).forEach(([key, rule]) => {
+  entries(ruleRecord).forEach(([key, rule]) => {
     if (!rule || !rules.includes(key)) return
     const disabled = solved || !ls.includes(key)
     const pre = document.createElement('pre')

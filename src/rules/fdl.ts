@@ -17,6 +17,7 @@ import { Formulas } from '../model/formulas'
 import { Refinement } from '../utils/generic'
 import * as tuple from '../utils/tuple'
 import { Rule } from '../model/rule'
+import { Split } from '../model/formulas'
 
 export type FDLResult<
   Γ extends Formulas,
@@ -121,31 +122,27 @@ export const reverseFDL = <
   Π extends Formulas,
   R extends FDLResult<Γ, Δ, Σ, A, B, Π>,
 >(
-  p: Derivation<R>,
-  splitAnt: number,
-  splitSuc: number,
+  p: Derivation<R> & Derivation<FDLResult<Γ, Δ, Σ, A, B, Π>>,
+  splitAnt: (arr: [...Γ, ...Σ]) => [Γ, Σ],
+  splitSuc: (arr: [...Δ, ...Π]) => [Δ, Π],
 ): FDL<Γ, A, Δ, Σ, B, Π, R, FDLDeps<Γ, A, Δ, Σ, B, Π>> => {
-  const adb = tuple.last(p.result.antecedent) as Disjunction<A, B>
+  const adb = tuple.last(p.result.antecedent)
   const rest = tuple.init(p.result.antecedent)
-  const γ = rest.slice(0, splitAnt) as unknown as Γ
-  const ς = rest.slice(splitAnt) as unknown as Σ
+  const [γ, ς] = splitAnt(rest)
   const a: A = adb.leftDisjunct
   const b: B = adb.rightDisjunct
-  const δ = p.result.succedent.slice(0, splitSuc) as unknown as Δ
-  const π = p.result.succedent.slice(splitSuc) as unknown as Π
+  const [δ, π] = splitSuc(p.result.succedent)
   return fdl(p.result, [
     premise(sequent([...γ, a], δ)),
     premise(sequent([...ς, b], π)),
   ])
 }
-export const tryReverseFDL = <J extends AnySequent>(
-  d: Derivation<J>,
-): Derivation<J> | null => {
-  if (!isFDLResultDerivation(d)) return null
-  const antLen = d.result.antecedent.length - 1
-  const sucLen = d.result.succedent.length
-  return reverseFDL(d, antLen, sucLen)
-}
+export const tryReverseFDL =
+  (splitAnt: Split, splitSuc: Split) =>
+  <J extends AnySequent>(d: Derivation<J>): Derivation<J> | null => {
+    if (!isFDLResultDerivation(d)) return null
+    return reverseFDL(d, splitAnt, splitSuc)
+  }
 export const exampleFDL = applyFDL(
   premise(sequent([atom('Γ'), atom('A')], [atom('Δ')])),
   premise(sequent([atom('Σ'), atom('B')], [atom('Π')])),

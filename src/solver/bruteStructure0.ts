@@ -21,7 +21,7 @@ const buildStructurePath = <R extends RuleId>(
   }
   const target = seqKey(p.result)
   // BFS: map from seqKey → {parent seqKey, rule used from parent to this node}
-  const parent = new Map<string, { parentKey: string; ruleId: RuleId }>()
+  const parent = new Map<string, { parentKey: string; ruleId: R }>()
   const startKey = seqKey(d.result)
   const queue: Premise<AnySequent>[] = [d]
   const visited = new Set<string>([startKey])
@@ -60,7 +60,7 @@ const buildStructurePath = <R extends RuleId>(
     if (!edge) break
     const parentNode = nodes.get(edge.parentKey)
     if (!parentNode) break
-    proof = proofUsing(parentNode.result, [proof], edge.ruleId as R)
+    proof = proofUsing(parentNode.result, [proof], edge.ruleId)
     key = edge.parentKey
   }
   return proof

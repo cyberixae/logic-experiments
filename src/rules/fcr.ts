@@ -17,6 +17,7 @@ import { Formulas } from '../model/formulas'
 import { Refinement } from '../utils/generic'
 import * as tuple from '../utils/tuple'
 import { Rule } from '../model/rule'
+import { Split } from '../model/formulas'
 
 export type FCRResult<
   Γ extends Formulas,
@@ -121,31 +122,27 @@ export const reverseFCR = <
   Π extends Formulas,
   R extends FCRResult<Γ, Δ, Σ, A, B, Π>,
 >(
-  p: Derivation<R>,
-  splitAnt: number,
-  splitSuc: number,
+  p: Derivation<R> & Derivation<FCRResult<Γ, Δ, Σ, A, B, Π>>,
+  splitAnt: (arr: [...Γ, ...Σ]) => [Γ, Σ],
+  splitSuc: (arr: [...Δ, ...Π]) => [Δ, Π],
 ): FCR<Γ, A, Δ, Σ, B, Π, R, FCRDeps<Γ, A, Δ, Σ, B, Π>> => {
-  const acb = tuple.head(p.result.succedent) as Conjunction<A, B>
+  const acb = tuple.head(p.result.succedent)
   const rest = tuple.tail(p.result.succedent)
-  const γ = p.result.antecedent.slice(0, splitAnt) as unknown as Γ
-  const ς = p.result.antecedent.slice(splitAnt) as unknown as Σ
+  const [γ, ς] = splitAnt(p.result.antecedent)
   const a: A = acb.leftConjunct
   const b: B = acb.rightConjunct
-  const δ = rest.slice(0, splitSuc) as unknown as Δ
-  const π = rest.slice(splitSuc) as unknown as Π
+  const [δ, π] = splitSuc(rest)
   return fcr(p.result, [
     premise(sequent(γ, [a, ...δ])),
     premise(sequent(ς, [b, ...π])),
   ])
 }
-export const tryReverseFCR = <J extends AnySequent>(
-  d: Derivation<J>,
-): Derivation<J> | null => {
-  if (!isFCRResultDerivation(d)) return null
-  const antLen = d.result.antecedent.length
-  const sucLen = d.result.succedent.length - 1
-  return reverseFCR(d, antLen, sucLen)
-}
+export const tryReverseFCR =
+  (splitAnt: Split, splitSuc: Split) =>
+  <J extends AnySequent>(d: Derivation<J>): Derivation<J> | null => {
+    if (!isFCRResultDerivation(d)) return null
+    return reverseFCR(d, splitAnt, splitSuc)
+  }
 export const exampleFCR = applyFCR(
   premise(sequent([atom('Γ')], [atom('A'), atom('Δ')])),
   premise(sequent([atom('Σ')], [atom('B'), atom('Π')])),

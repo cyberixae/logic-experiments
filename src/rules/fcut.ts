@@ -92,13 +92,11 @@ export const reverseFCut = <
 >(
   p: Derivation<R>,
   a: A,
-  splitAnt: number,
-  splitSuc: number,
+  splitAnt: (arr: [...Γ, ...Σ]) => [Γ, Σ],
+  splitSuc: (arr: [...Δ, ...Π]) => [Δ, Π],
 ): FCut<Γ, Δ, A, Σ, Π, R, FCutDeps<Γ, Δ, A, Σ, Π>> => {
-  const γ = p.result.antecedent.slice(0, splitAnt) as unknown as Γ
-  const ς = p.result.antecedent.slice(splitAnt) as unknown as Σ
-  const δ = p.result.succedent.slice(0, splitSuc) as unknown as Δ
-  const π = p.result.succedent.slice(splitSuc) as unknown as Π
+  const [γ, ς] = splitAnt(p.result.antecedent)
+  const [δ, π] = splitSuc(p.result.succedent)
   return fcut(p.result, [
     premise(sequent(γ, [...δ, a])),
     premise(sequent([a, ...ς], π)),
@@ -107,9 +105,15 @@ export const reverseFCut = <
 export const tryReverseFCut =
   (a: Prop) =>
   <J extends AnySequent>(d: Derivation<J>): Derivation<J> | null => {
-    return isFCutResultDerivation(d)
-      ? reverseFCut(d, a, d.result.antecedent.length, d.result.succedent.length)
-      : null
+    if (!isFCutResultDerivation(d)) return null
+    const antLen = d.result.antecedent.length
+    const sucLen = d.result.succedent.length
+    return reverseFCut(
+      d,
+      a,
+      (arr) => [arr.slice(0, antLen), arr.slice(antLen)],
+      (arr) => [arr.slice(0, sucLen), arr.slice(sucLen)],
+    )
   }
 export const exampleFCut = applyFCut(
   premise(sequent([atom('Γ')], [atom('Δ'), atom('A')])),

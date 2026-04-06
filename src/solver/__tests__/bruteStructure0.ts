@@ -10,7 +10,7 @@ const { a, i } = rk
 const p = a('p')
 const q = a('q')
 const r = a('r')
-const iProof = i.i(p) as ProofUsing<AnySequent, RuleId>
+const iProof: ProofUsing<AnySequent, RuleId> = i.i(p)
 
 describe('bruteStructure0', () => {
   const goal = (ant: Prop[], suc: Prop[]) => premise(sequent(ant, suc))

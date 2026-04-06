@@ -33,7 +33,13 @@ export class Workspace<
   }
 
   currentConjecture(): Focus<AnySequent> {
-    return this.conjectures[this.selected] as Focus<AnySequent>
+    const c = this.conjectures[this.selected]
+    if (c) return c
+    console.warn(`Conjecture '${this.selected}' not initialized, recovering`)
+    const conf = get(this.theorems, this.selected)
+    const f = focus(premise(conf.goal))
+    this.conjectures[this.selected] = f
+    return f
   }
 
   previousConjectureId(): K {

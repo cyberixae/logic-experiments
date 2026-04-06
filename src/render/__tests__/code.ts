@@ -72,7 +72,7 @@ describe('render code module', () => {
 
     it('all lk challenge solutions are serializable', () => {
       for (const [, { solution }] of Object.entries(challenges)) {
-        expect(() => fromDerivation(solution as AnyDerivation)).not.toThrow()
+        expect(() => fromDerivation(solution)).not.toThrow()
       }
     })
 
@@ -95,7 +95,7 @@ describe('render code module', () => {
     })
 
     it('cut', () => {
-      const leaf = i.i(a('p')) as AnyDerivation
+      const leaf: AnyDerivation = i.i(a('p'))
       const cut = transformation(
         sequent([atom('p')], [atom('q')]),
         [leaf, leaf],
@@ -105,35 +105,35 @@ describe('render code module', () => {
     })
 
     it('cl1', () => {
-      const leaf = i.i(a('p')) as AnyDerivation
+      const leaf: AnyDerivation = i.i(a('p'))
       const pAndQ = conjunction(atom('p'), atom('q'))
       const cl1 = transformation(sequent([pAndQ], [atom('p')]), [leaf], 'cl1')
       expect(fromDerivation(cl1)).toBe("z.cl1(a('q'),i.i(a('p')))")
     })
 
     it('cl2', () => {
-      const leaf = i.i(a('p')) as AnyDerivation
+      const leaf: AnyDerivation = i.i(a('p'))
       const pAndQ = conjunction(atom('p'), atom('q'))
       const cl2 = transformation(sequent([pAndQ], [atom('p')]), [leaf], 'cl2')
       expect(fromDerivation(cl2)).toBe("z.cl2(a('p'),i.i(a('p')))")
     })
 
     it('dr1', () => {
-      const leaf = i.i(a('p')) as AnyDerivation
+      const leaf: AnyDerivation = i.i(a('p'))
       const pOrQ = disjunction(atom('p'), atom('q'))
       const dr1 = transformation(sequent([], [pOrQ]), [leaf], 'dr1')
       expect(fromDerivation(dr1)).toBe("z.dr1(a('q'),i.i(a('p')))")
     })
 
     it('dr2', () => {
-      const leaf = i.i(a('p')) as AnyDerivation
+      const leaf: AnyDerivation = i.i(a('p'))
       const pOrQ = disjunction(atom('p'), atom('q'))
       const dr2 = transformation(sequent([], [pOrQ]), [leaf], 'dr2')
       expect(fromDerivation(dr2)).toBe("z.dr2(a('p'),i.i(a('p')))")
     })
 
     it('scl', () => {
-      const leaf = i.i(a('p')) as AnyDerivation
+      const leaf: AnyDerivation = i.i(a('p'))
       const scl = transformation(
         sequent([atom('p')], [atom('p')]),
         [leaf],
@@ -143,7 +143,7 @@ describe('render code module', () => {
     })
 
     it('scr', () => {
-      const leaf = i.i(a('p')) as AnyDerivation
+      const leaf: AnyDerivation = i.i(a('p'))
       const scr = transformation(
         sequent([atom('p')], [atom('p')]),
         [leaf],
@@ -153,7 +153,7 @@ describe('render code module', () => {
     })
 
     it('sxl', () => {
-      const leaf = i.i(a('p')) as AnyDerivation
+      const leaf: AnyDerivation = i.i(a('p'))
       const sxl = transformation(
         sequent([atom('p'), atom('q')], [atom('p')]),
         [leaf],
@@ -163,7 +163,7 @@ describe('render code module', () => {
     })
 
     it('sxr', () => {
-      const leaf = i.i(a('p')) as AnyDerivation
+      const leaf: AnyDerivation = i.i(a('p'))
       const sxr = transformation(
         sequent([atom('p')], [atom('p'), atom('q')]),
         [leaf],
