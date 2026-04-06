@@ -32,13 +32,7 @@ export type FCutDeps<
   Σ extends Formulas,
   Π extends Formulas,
 > = [Derivation<Sequent<Γ, [...Δ, A]>>, Derivation<Sequent<[A, ...Σ], Π>>]
-export type AnyFCutDeps = FCutDeps<
-  Formulas,
-  Formulas,
-  Prop,
-  Formulas,
-  Formulas
->
+export type AnyFCutDeps = FCutDeps<Formulas, Formulas, Prop, Formulas, Formulas>
 export type FCut<
   Γ extends Formulas,
   Δ extends Formulas,

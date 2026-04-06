@@ -18,7 +18,8 @@ describe('bruteStructure0', () => {
   describe('baseline: no structural work needed', () => {
     it('succeeds when goal matches core proof directly', () => {
       const [proof] = head(bruteStructure0(goal([p], [p]), ['i'], iProof))
-      expect(equals(proof!.result, sequent([p], [p]))).toBe(true)
+      if (!proof) throw new Error('no proof')
+      expect(equals(proof.result, sequent([p], [p]))).toBe(true)
     })
   })
 
@@ -28,7 +29,8 @@ describe('bruteStructure0', () => {
       const [proof] = head(
         bruteStructure0(goal([p, q], [p]), ['i', 'swl'], iProof),
       )
-      expect(equals(proof!.result, sequent([p, q], [p]))).toBe(true)
+      if (!proof) throw new Error('no proof')
+      expect(equals(proof.result, sequent([p, q], [p]))).toBe(true)
     })
 
     it('cannot strip non-boundary formula without rotation', () => {
@@ -46,7 +48,8 @@ describe('bruteStructure0', () => {
       const [proof] = head(
         bruteStructure0(goal([p], [q, p]), ['i', 'swr'], iProof),
       )
-      expect(equals(proof!.result, sequent([p], [q, p]))).toBe(true)
+      if (!proof) throw new Error('no proof')
+      expect(equals(proof.result, sequent([p], [q, p]))).toBe(true)
     })
 
     it('cannot strip non-boundary formula without rotation', () => {
@@ -64,7 +67,8 @@ describe('bruteStructure0', () => {
       const [proof] = head(
         bruteStructure0(goal([q, p], [p]), ['i', 'sRotLF', 'swl'], iProof),
       )
-      expect(equals(proof!.result, sequent([q, p], [p]))).toBe(true)
+      if (!proof) throw new Error('no proof')
+      expect(equals(proof.result, sequent([q, p], [p]))).toBe(true)
     })
 
     it('chains multiple forward rotations', () => {
@@ -72,7 +76,8 @@ describe('bruteStructure0', () => {
       const [proof] = head(
         bruteStructure0(goal([r, q, p], [p]), ['i', 'sRotLF', 'swl'], iProof),
       )
-      expect(equals(proof!.result, sequent([r, q, p], [p]))).toBe(true)
+      if (!proof) throw new Error('no proof')
+      expect(equals(proof.result, sequent([r, q, p], [p]))).toBe(true)
     })
   })
 
@@ -82,7 +87,8 @@ describe('bruteStructure0', () => {
       const [proof] = head(
         bruteStructure0(goal([q, p], [p]), ['i', 'sRotLB', 'swl'], iProof),
       )
-      expect(equals(proof!.result, sequent([q, p], [p]))).toBe(true)
+      if (!proof) throw new Error('no proof')
+      expect(equals(proof.result, sequent([q, p], [p]))).toBe(true)
     })
 
     it('chains multiple backward rotations', () => {
@@ -90,7 +96,8 @@ describe('bruteStructure0', () => {
       const [proof] = head(
         bruteStructure0(goal([r, q, p], [p]), ['i', 'sRotLB', 'swl'], iProof),
       )
-      expect(equals(proof!.result, sequent([r, q, p], [p]))).toBe(true)
+      if (!proof) throw new Error('no proof')
+      expect(equals(proof.result, sequent([r, q, p], [p]))).toBe(true)
     })
   })
 
@@ -100,7 +107,8 @@ describe('bruteStructure0', () => {
       const [proof] = head(
         bruteStructure0(goal([p], [p, q]), ['i', 'sRotRF', 'swr'], iProof),
       )
-      expect(equals(proof!.result, sequent([p], [p, q]))).toBe(true)
+      if (!proof) throw new Error('no proof')
+      expect(equals(proof.result, sequent([p], [p, q]))).toBe(true)
     })
   })
 
@@ -110,7 +118,8 @@ describe('bruteStructure0', () => {
       const [proof] = head(
         bruteStructure0(goal([p], [p, q]), ['i', 'sRotRB', 'swr'], iProof),
       )
-      expect(equals(proof!.result, sequent([p], [p, q]))).toBe(true)
+      if (!proof) throw new Error('no proof')
+      expect(equals(proof.result, sequent([p], [p, q]))).toBe(true)
     })
   })
 
@@ -120,7 +129,8 @@ describe('bruteStructure0', () => {
       const [proof] = head(
         bruteStructure0(goal([q, p, r], [p]), ['i', 'sxl', 'swl'], iProof),
       )
-      expect(equals(proof!.result, sequent([q, p, r], [p]))).toBe(true)
+      if (!proof) throw new Error('no proof')
+      expect(equals(proof.result, sequent([q, p, r], [p]))).toBe(true)
     })
 
     it('cannot reach core with swl alone when target is not at boundary', () => {
@@ -138,7 +148,8 @@ describe('bruteStructure0', () => {
       const [proof] = head(
         bruteStructure0(goal([p], [r, p, q]), ['i', 'sxr', 'swr'], iProof),
       )
-      expect(equals(proof!.result, sequent([p], [r, p, q]))).toBe(true)
+      if (!proof) throw new Error('no proof')
+      expect(equals(proof.result, sequent([p], [r, p, q]))).toBe(true)
     })
   })
 })

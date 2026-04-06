@@ -199,7 +199,8 @@ const hypoStructure = <R extends RuleId>(
     const visited = new Set<string>()
     const queue: Premise<AnySequent>[] = [d]
     while (queue.length > 0) {
-      const current = queue.shift()!
+      const current = queue.shift()
+      if (!current) break
       const key = seqKey(current.result)
       if (visited.has(key)) continue
       visited.add(key)

@@ -29,7 +29,8 @@ const buildStructurePath = <R extends RuleId>(
   const nodes = new Map<string, Premise<AnySequent>>([[startKey, d]])
   let found = false
   outer: while (queue.length > 0) {
-    const current = queue.shift()!
+    const current = queue.shift()
+    if (!current) break
     const currentKey = seqKey(current.result)
     for (const [rId, rule] of entries(reverseStructure0)) {
       const ruleId: RuleId = rId
@@ -55,8 +56,10 @@ const buildStructurePath = <R extends RuleId>(
   let proof: ProofUsing<AnySequent, R> = proofUsing(p.result, p.deps, p.rule)
   let key = target
   while (key !== startKey) {
-    const edge = parent.get(key)!
-    const parentNode = nodes.get(edge.parentKey)!
+    const edge = parent.get(key)
+    if (!edge) break
+    const parentNode = nodes.get(edge.parentKey)
+    if (!parentNode) break
     proof = proofUsing(parentNode.result, [proof], edge.ruleId as R)
     key = edge.parentKey
   }
