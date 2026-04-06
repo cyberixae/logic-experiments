@@ -29,8 +29,6 @@ import { ruleSRotRB } from './rules/srotrb'
 import { ruleSRotRF } from './rules/srotrf'
 import { ruleSWL } from './rules/swl'
 import { ruleSWR } from './rules/swr'
-import { ruleSXL } from './rules/sxl'
-import { ruleSXR } from './rules/sxr'
 
 const meta = {
   name,
@@ -84,7 +82,6 @@ const meta = {
         [ruleSWL.example, ruleSWR.example],
         [ruleSRotLF.example, ruleSRotRF.example],
         [ruleSRotLB.example, ruleSRotRB.example],
-        [ruleSXL.example, ruleSXR.example],
       ],
     },
   ],

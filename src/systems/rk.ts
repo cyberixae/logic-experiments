@@ -26,8 +26,6 @@ import { ruleSRotLF } from '../rules/srotlf'
 import { ruleSRotLB } from '../rules/srotlb'
 import { ruleSRotRF } from '../rules/srotrf'
 import { ruleSRotRB } from '../rules/srotrb'
-import { ruleSXL } from '../rules/sxl'
-import { ruleSXR } from '../rules/sxr'
 
 // Language
 
@@ -62,8 +60,6 @@ const zeta = {
   sRotLB: ruleSRotLB.apply,
   sRotRF: ruleSRotRF.apply,
   sRotRB: ruleSRotRB.apply,
-  sxl: ruleSXL.apply,
-  sxr: ruleSXR.apply,
 }
 
 export const name = 'RK'
