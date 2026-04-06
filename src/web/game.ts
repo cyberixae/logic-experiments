@@ -132,15 +132,9 @@ export const createButton = (
   return el
 }
 
-const createPlayArea = (
-  workspace: AnyWorkspace,
-  makeCongrats: () => HTMLElement,
-): HTMLElement => {
+const createPlayArea = (workspace: AnyWorkspace): HTMLElement => {
   const panel = document.createElement('div')
   panel.setAttribute('class', 'playarea')
-  if (workspace.isSolved()) {
-    panel.appendChild(makeCongrats())
-  }
   const focus = workspace.currentConjecture()
   const tree = renderDerivation(
     focus.derivation,
@@ -198,9 +192,13 @@ export const createBench = (
   const panel = document.createElement('div')
   panel.setAttribute('class', 'bench')
   panel.appendChild(createPanel('left', left, ls, rules, solved, apply))
-  panel.appendChild(createPanel('main', center, ls, rules, solved, applyCenter))
+  if (solved) {
+    panel.appendChild(makeCongrats())
+  } else {
+    panel.appendChild(createPanel('main', center, ls, rules, solved, applyCenter))
+  }
   panel.appendChild(createPanel('right', right, ls, rules, solved, apply))
-  panel.appendChild(createPlayArea(workspace, makeCongrats))
+  panel.appendChild(createPlayArea(workspace))
   panel.appendChild(controlsEl)
   return panel
 }

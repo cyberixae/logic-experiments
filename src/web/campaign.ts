@@ -127,14 +127,12 @@ const createCongrats = (
   rerender: () => void,
 ): HTMLElement => {
   const panel = document.createElement('div')
+  panel.setAttribute('class', 'congrats-panel')
 
-  const banner = document.createElement('div')
-  banner.setAttribute('class', 'congrats')
   const hurray = document.createElement('div')
   hurray.setAttribute('class', 'hurray')
-  hurray.innerHTML = '\n\n\u{1F389} Conglaturations! \u{1F389}\n'
-  banner.appendChild(hurray)
-  panel.appendChild(banner)
+  hurray.innerHTML = '\u{1F389} Conglaturations! \u{1F389}'
+  panel.appendChild(hurray)
 
   const buttons = document.createElement('div')
   buttons.setAttribute('class', 'congrabuttons')
