@@ -1,6 +1,12 @@
-#body {
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Math&family=Noto+Sans:ital,wght@0,100..900;1,100..900&display=swap');
+
+body {
   background-color: #ffeedd;
-  font-family: sans-serif;
+  font-family: "Noto Sans", "Noto Sans Math", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+  font-variation-settings: "wdth" 100;
   font-size: 1.2em;
   height: 100%;
   overflow: hidden;
