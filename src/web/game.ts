@@ -138,6 +138,8 @@ let treeZoom = 1
 const ZOOM_MIN = 0.4
 const ZOOM_MAX = 2
 const ZOOM_STEP = 0.2
+const AUTO_ZOOM_MAX = 1.4
+const AUTO_ZOOM_PAD = 0.9
 
 const CHECK_STEP_MS = 120
 const CHECK_HOLD_MS = 260
@@ -192,11 +194,37 @@ const createPlayArea = (workspace: AnyWorkspace): HTMLElement => {
     workspace.applicableRules(),
   )
   const solved = workspace.isSolved()
+  const isFresh = focus.derivation.kind === 'premise'
   tree.style.visibility = 'hidden'
   panel.appendChild(tree)
   requestAnimationFrame(() => {
     panel.scrollTo({ top: startTop, behavior: 'instant' })
     layoutTree(tree, { skipActiveScroll: solved })
+    if (isFresh && !solved) {
+      const rootSequent = tree.querySelector(
+        ':scope > .tree-sequent',
+      ) as HTMLElement | null
+      if (rootSequent) {
+        const sequentRect = rootSequent.getBoundingClientRect()
+        const areaRect = panel.getBoundingClientRect()
+        const fontPx = parseFloat(getComputedStyle(panel).fontSize)
+        const availW = areaRect.width - 2 * 8 * fontPx
+        if (sequentRect.width > 0 && availW > 0) {
+          const target = Math.max(
+            ZOOM_MIN,
+            Math.min(
+              AUTO_ZOOM_MAX,
+              (treeZoom * availW * AUTO_ZOOM_PAD) / sequentRect.width,
+            ),
+          )
+          if (Math.abs(target - treeZoom) > 0.01) {
+            treeZoom = target
+            panel.style.setProperty('--tree-zoom', String(treeZoom))
+            layoutTree(tree, { skipActiveScroll: solved })
+          }
+        }
+      }
+    }
     tree.style.visibility = ''
     if (solved) {
       const treeRect = tree.getBoundingClientRect()
