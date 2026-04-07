@@ -7,6 +7,7 @@ import { activeSequent, applicableRules } from './focus'
 import { isRuleId } from '../model/rule'
 import { split } from '../utils/string'
 import { rules } from '../rules'
+import { helpSystems, isHelpSystemId, renderSystemHelp } from '../help'
 import { Workspace } from './workspace'
 import { Configuration } from '../model/challenge'
 import { AnySequent } from '../model/sequent'
@@ -30,6 +31,8 @@ export function* repl<
               '\nSystem commands:' +
                 '\n  help - display this manual' +
                 '\n  help <rule> - display rule description' +
+                '\n  systems - list available logic systems' +
+                '\n  system <id> - display logic system documentation' +
                 '\n  list - list all conjectures' +
                 '\n  prev - select previous conjecture' +
                 '\n  next - select next conjecture' +
@@ -49,6 +52,25 @@ export function* repl<
           break
         }
         output = [of('\nUnknown rule "' + arg + '"')]
+        break
+      }
+      case 'systems':
+        output = [
+          of(
+            '\nSystems:\n' +
+              Object.values(helpSystems)
+                .map((s) => '  ' + s.id + ' - ' + s.name)
+                .join('\n'),
+          ),
+        ]
+        break
+      case 'system': {
+        const [arg] = args
+        if (arg == null || !isHelpSystemId(arg)) {
+          output = [of('\nUnknown system "' + arg + '"')]
+          break
+        }
+        output = [of('\n' + renderSystemHelp(arg))]
         break
       }
       case 'list':
@@ -104,7 +126,7 @@ const status = (s: Focus<AnySequent>): Segments => {
     of('\nRules: ' + rules.join(', ')),
     of('\nProof: undo, reset'),
     of('\nConjectures: prev, next, select, list'),
-    of('\nSystem: quit, help\n'),
+    of('\nSystem: quit, help, systems\n'),
     ...(isProof(s.derivation) ? [of('\nConglaturations!\n')] : []),
   ]
 }

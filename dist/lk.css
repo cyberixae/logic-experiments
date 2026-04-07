@@ -232,6 +232,47 @@ body {
   justify-content: center;
   gap: 2em;
 }
+.system {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  box-sizing: border-box;
+  padding: 1em;
+  gap: 1em;
+  overflow: hidden;
+}
+.system-title {
+  font-size: 2em;
+  font-weight: bold;
+  text-align: center;
+}
+.system-list {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1em;
+}
+.system-item {
+  font-size: 1.5em;
+  padding: 0.6em 1.5em;
+}
+.system-back {
+  align-self: flex-start;
+  padding: 0.4em 1em;
+  text-decoration: none;
+}
+.system-doc {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
+  margin: 0;
+  white-space: pre;
+  font-size: 1.4em;
+  line-height: 1.4;
+  padding: 0.5em 1em 8em 1em;
+}
 .menu-title {
   font-size: 5em;
   font-weight: bold;

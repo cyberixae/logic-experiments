@@ -2,6 +2,7 @@ import { Screen } from './web/types'
 import { mountMenu } from './web/menu'
 import { mountCampaign } from './web/campaign'
 import { mountRandom } from './web/random'
+import { mountSystem } from './web/system'
 
 let cleanup: () => void = () => {}
 
@@ -28,6 +29,9 @@ const mount = (screen: Screen) => {
     case 'random':
       cleanup = mountRandom(body, navigate)
       break
+    case 'system':
+      cleanup = mountSystem(body, navigate)
+      break
   }
 }
 
@@ -35,7 +39,7 @@ const init = () => {
   const params = new URLSearchParams(window.location.search)
   const mode = params.get('mode')
 
-  if (mode === 'campaign' || mode === 'random') {
+  if (mode === 'campaign' || mode === 'random' || mode === 'system') {
     mount(mode)
   } else if (params.get('level') !== null) {
     // Legacy URL: ?level=ch0identity1 — jump straight into campaign

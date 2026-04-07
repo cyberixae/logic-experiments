@@ -8,9 +8,6 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 yarn build          # Compile TypeScript → lib/
 yarn build:web      # Bundle web interface → dist/lk.js + dist/lk.w.js (via esbuild)
 yarn dev            # Watch + serve web interface locally
-yarn rk             # Build + run RK sandbox demo
-yarn fk             # Build + run FK sandbox demo
-yarn la3            # Build + run LA3 sandbox demo
 yarn main           # Build + run interactive REPL
 yarn lint           # Lint all files with ESLint
 yarn prettify       # Format all files with Prettier
@@ -64,9 +61,9 @@ Template-based pretty-printer (`print.ts`) with customizable themes; block-based
 
 ### Entry points
 
-- `src/main.ts` — CLI REPL
-- `src/lk.ts` / `src/la3.ts` — Sandbox demos
-- `src/web.ts` — Web interface (bundled by esbuild into `dist/lk.js`)
+- `src/main.ts` — CLI REPL (commands include `systems` / `system <id>` to view system docs)
+- `src/web.ts` — Web interface (bundled by esbuild into `dist/lk.js`); system docs reachable via `?mode=system`
+- `src/help/` — Per-system documentation (`meta` + example proof) shared by REPL and web
 - `src/web/` — Web components (menus, challenge worker, game logic, etc.)
 - `src/solver/` — Brute-force proof search (`brute.ts`, `bruteStructure0.ts`)
 
