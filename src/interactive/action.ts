@@ -7,6 +7,8 @@ export type Action =
   | 'rightRotateLeft'
   | 'rightRotateRight'
   | 'rightConnective'
+  | 'prevBranch'
+  | 'nextBranch'
   | 'undo'
   | 'reset'
   | 'level'

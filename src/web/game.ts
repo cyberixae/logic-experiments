@@ -1,4 +1,4 @@
-import { reverse0, undo, reset } from '../interactive/event'
+import { reverse0, undo, reset, prevBranch, nextBranch } from '../interactive/event'
 import { activePath } from '../interactive/focus'
 import { Rule } from '../model/rule'
 import { AnySequent } from '../model/sequent'
@@ -27,6 +27,8 @@ export type AnyWorkspace = Workspace<
 export const qwertyKeyMap: Record<KeyboardEvent['code'], Action> = {
   Escape: 'menu',
   Backquote: 'level',
+  KeyW: 'prevBranch',
+  KeyO: 'nextBranch',
   KeyR: 'reset',
   KeyA: 'leftRotateLeft',
   KeyS: 'leftWeakening',
@@ -263,6 +265,12 @@ export const createDispatch =
         break
       case 'rightConnective':
         autoRule(workspace, keys(rightLogical))
+        break
+      case 'prevBranch':
+        workspace.applyEvent(prevBranch())
+        break
+      case 'nextBranch':
+        workspace.applyEvent(nextBranch())
         break
       case 'axiom':
         autoRule(workspace, keys(center))
