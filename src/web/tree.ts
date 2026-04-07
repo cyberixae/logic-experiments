@@ -52,24 +52,10 @@ export const renderDerivation = (
       )
     })
     node.appendChild(premises)
-
-    const conclusion = document.createElement('div')
-    conclusion.setAttribute('class', 'tree-conclusion')
-    conclusion.appendChild(renderInferenceLine(derivation.rule))
-    conclusion.appendChild(renderSequent(derivation, applicableRules, isActive))
-    node.appendChild(conclusion)
+    node.appendChild(renderInferenceLine(derivation.rule))
+    node.appendChild(renderSequent(derivation, applicableRules, isActive))
   } else {
     node.appendChild(renderSequent(derivation, applicableRules, isActive))
-  }
-
-  if (isActive) {
-    requestAnimationFrame(() => {
-      node.scrollIntoView({
-        behavior: 'smooth',
-        block: 'center',
-        inline: 'center',
-      })
-    })
   }
 
   if (currentPath.length === 0) {
@@ -80,4 +66,67 @@ export const renderDerivation = (
   }
 
   return node
+}
+
+// Post-order layout matching treeAuto in src/render/block.ts:
+// a node's inference line depends only on its OWN sequent and the
+// joined widths of its IMMEDIATE child sequents — not on grandchildren.
+// The whole subtree may still need a wider footprint to accommodate
+// deeper structure; that footprint never feeds back into the line width.
+type NodeWidths = { sequent: number; subtree: number }
+
+const LINE_PAD = 16 // px of slack on each side of the inference line
+
+const stabilizeWidths = (node: HTMLElement): NodeWidths => {
+  const sequent = node.querySelector(
+    ':scope > .tree-sequent',
+  ) as HTMLElement | null
+  const sequentWidth = sequent ? sequent.getBoundingClientRect().width : 0
+
+  const premises = node.querySelector(
+    ':scope > .tree-premises',
+  ) as HTMLElement | null
+  const inference = node.querySelector(
+    ':scope > .tree-inference',
+  ) as HTMLElement | null
+
+  let childSequentSum = 0
+  let childSubtreeSum = 0
+  let gap = 0
+  let count = 0
+  if (premises) {
+    const children = Array.from(premises.children) as HTMLElement[]
+    count = children.length
+    gap = parseFloat(getComputedStyle(premises).gap) || 0
+    for (const child of children) {
+      const cw = stabilizeWidths(child)
+      childSequentSum += cw.sequent
+      childSubtreeSum += cw.subtree
+    }
+  }
+  const totalGap = Math.max(0, count - 1) * gap
+
+  const lineWidth =
+    Math.max(sequentWidth, childSequentSum + totalGap) + LINE_PAD * 2
+  if (inference) {
+    inference.style.width = `${lineWidth}px`
+    inference.style.alignSelf = 'center'
+  }
+
+  const subtreeWidth = Math.max(lineWidth, childSubtreeSum + totalGap)
+  node.style.width = `${subtreeWidth}px`
+
+  return { sequent: sequentWidth, subtree: subtreeWidth }
+}
+
+export const layoutTree = (root: HTMLElement): void => {
+  stabilizeWidths(root)
+  const active = root.querySelector('.tree-active') as HTMLElement | null
+  if (active) {
+    active.scrollIntoView({
+      behavior: 'smooth',
+      block: 'center',
+      inline: 'center',
+    })
+  }
 }

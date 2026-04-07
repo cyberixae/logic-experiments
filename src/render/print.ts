@@ -82,11 +82,16 @@ export function printNullary<K extends NullaryTemplateId>(
 export function printUnary<K extends UnaryTemplateId>(
   key: K,
   activeConn = false,
+  markConnective = false,
 ): (a: Printer) => Printer {
   return (a) => (theme) => {
     const [s0, s1] = theme[key]
     return [
-      activeConn ? segment.active(s0) : segment.of(s0),
+      markConnective
+        ? segment.connective(s0, activeConn)
+        : activeConn
+          ? segment.active(s0)
+          : segment.of(s0),
       ...a(theme),
       segment.of(s1),
     ]
@@ -96,13 +101,18 @@ export function printUnary<K extends UnaryTemplateId>(
 export function printBinary<K extends BinaryTemplateId>(
   key: K,
   activeConn = false,
+  markConnective = false,
 ): (a: Printer, b: Printer) => Printer {
   return (a, b) => (theme) => {
     const [s0, s1, s2] = theme[key]
     return [
       segment.of(s0),
       ...a(theme),
-      activeConn ? segment.active(s1) : segment.of(s1),
+      markConnective
+        ? segment.connective(s1, activeConn)
+        : activeConn
+          ? segment.active(s1)
+          : segment.of(s1),
       ...b(theme),
       segment.of(s2),
     ]
@@ -201,7 +211,7 @@ export function fromNegation(
       implication: parenthesized,
     })
   }
-  return printUnary('negation', activeConnective)(expand(negand))
+  return printUnary('negation', activeConnective, true)(expand(negand))
 }
 
 export function fromConjunction(
@@ -221,7 +231,7 @@ export function fromConjunction(
       implication: parenthesized,
     })
   }
-  return printBinary('conjunction', activeConnective)(
+  return printBinary('conjunction', activeConnective, true)(
     expand(leftConjunct),
     expand(rightConjunct),
   )
@@ -244,7 +254,7 @@ export function fromDisjunction(
       implication: parenthesized,
     })
   }
-  return printBinary('disjunction', activeConnective)(
+  return printBinary('disjunction', activeConnective, true)(
     expand(leftDisjunct),
     expand(rightDisjunct),
   )
@@ -267,7 +277,7 @@ export function fromImplication(
       implication: parenthesized,
     })
   }
-  return printBinary('implication', activeConnective)(
+  return printBinary('implication', activeConnective, true)(
     expand(antecedent),
     expand(consequent),
   )

@@ -61,9 +61,24 @@ body {
   display: flex;
   flex-direction: column;
   overflow: auto;
-  align-items: center;
-  justify-content: end;
+  align-items: safe center;
+  justify-content: safe end;
   min-height: 0;
+  scroll-behavior: smooth;
+  padding: 8em 8em 6em 8em;
+  scroll-padding: 8em 8em 6em 8em;
+  scrollbar-width: none;
+  mask-image:
+    linear-gradient(to right, transparent, black 6em, black calc(100% - 6em), transparent),
+    linear-gradient(to bottom, transparent, black 6em, black calc(100% - 6em), transparent);
+  mask-composite: intersect;
+  -webkit-mask-image:
+    linear-gradient(to right, transparent, black 6em, black calc(100% - 6em), transparent),
+    linear-gradient(to bottom, transparent, black 6em, black calc(100% - 6em), transparent);
+  -webkit-mask-composite: source-in;
+}
+.playarea::-webkit-scrollbar {
+  display: none;
 }
 .rule {
   position: relative;
@@ -242,11 +257,6 @@ body {
   justify-content: center;
   align-items: flex-end;
 }
-.tree-conclusion {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
 .tree-inference {
   position: relative;
   align-self: stretch;
@@ -263,23 +273,26 @@ body {
 }
 .tree-sequent {
   white-space: nowrap;
-  padding: 0.1em 0;
+  padding: 0.1em 0.5em;
+  border-radius: 10px;
+  background-color: transparent;
 }
 .playarea > .tree-node {
   padding-bottom: 1.5em;
-  font-size: 2em;
+  font-size: calc(2em * var(--tree-zoom, 1));
 }
 .tree-active > .tree-sequent {
   background-color: #fcaa;
-  border-radius: 10px;
-  padding: 0.1em 0.5em;
 }
-.connective-active {
-  background-color: #d005;
+.connective {
   display: inline-block;
   width: 1.4em;
   height: 1.4em;
   margin: 0.2em 0.1em;
   text-align: center;
   border-radius: 10px;
+  background-color: transparent;
+}
+.connective.active {
+  background-color: #d005;
 }

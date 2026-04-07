@@ -1,16 +1,21 @@
 export type Segment = {
   text: string
   active: boolean
+  connective: boolean
 }
 
 export type Segments = Array<Segment>
 
 export function of(text: string): Segment {
-  return { text, active: false }
+  return { text, active: false, connective: false }
 }
 
 export function active(text: string): Segment {
-  return { text, active: true }
+  return { text, active: true, connective: false }
+}
+
+export function connective(text: string, active: boolean): Segment {
+  return { text, active, connective: true }
 }
 
 export function plain(segments: Segments): string {
@@ -29,11 +34,13 @@ function escape(text: string): string {
 
 export function html(segments: Segments): string {
   return segments
-    .map((s) =>
-      s.active
-        ? `<span class="connective-active">${escape(s.text)}</span>`
-        : escape(s.text),
-    )
+    .map((s) => {
+      if (s.connective) {
+        const cls = s.active ? 'connective active' : 'connective'
+        return `<span class="${cls}">${escape(s.text)}</span>`
+      }
+      return escape(s.text)
+    })
     .join('')
 }
 

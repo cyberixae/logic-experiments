@@ -1,4 +1,4 @@
-import { of, active, ansi, html, trim } from '../segment'
+import { of, active, connective, ansi, html, trim } from '../segment'
 
 describe('segment module', () => {
   describe('ansi', () => {
@@ -20,15 +20,21 @@ describe('segment module', () => {
       expect(html([of('hello')])).toBe('hello')
     })
 
-    it('active segment gets span', () => {
-      expect(html([active('∧')])).toBe(
-        '<span class="connective-active">∧</span>',
+    it('active connective gets span with active class', () => {
+      expect(html([connective('∧', true)])).toBe(
+        '<span class="connective active">∧</span>',
+      )
+    })
+
+    it('passive connective gets span without active class', () => {
+      expect(html([connective('∧', false)])).toBe(
+        '<span class="connective">∧</span>',
       )
     })
 
     it('mixed segments', () => {
-      expect(html([of('a'), active('∧'), of('b')])).toBe(
-        'a<span class="connective-active">∧</span>b',
+      expect(html([of('a'), connective('∧', true), of('b')])).toBe(
+        'a<span class="connective active">∧</span>b',
       )
     })
 
@@ -36,9 +42,9 @@ describe('segment module', () => {
       expect(html([of('<b>bold</b>')])).toBe('&lt;b&gt;bold&lt;/b&gt;')
     })
 
-    it('active segment text is escaped', () => {
-      expect(html([active('<b>')])).toBe(
-        '<span class="connective-active">&lt;b&gt;</span>',
+    it('connective text is escaped', () => {
+      expect(html([connective('<b>', true)])).toBe(
+        '<span class="connective active">&lt;b&gt;</span>',
       )
     })
 

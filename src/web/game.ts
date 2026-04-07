@@ -4,7 +4,7 @@ import { Rule } from '../model/rule'
 import { AnySequent } from '../model/sequent'
 import { fromDerivation } from '../render/print'
 import { RuleId } from '../model/rule'
-import { renderDerivation } from './tree'
+import { renderDerivation, layoutTree } from './tree'
 import { Configuration } from '../model/challenge'
 import {
   center,
@@ -134,9 +134,24 @@ export const createButton = (
   return el
 }
 
+let treeZoom = 1
+const ZOOM_MIN = 0.4
+const ZOOM_MAX = 2
+const ZOOM_STEP = 0.2
+
+let lastScrollTop = 0
+let lastScrollLeft = 0
+
 const createPlayArea = (workspace: AnyWorkspace): HTMLElement => {
   const panel = document.createElement('div')
   panel.setAttribute('class', 'playarea')
+  panel.style.setProperty('--tree-zoom', String(treeZoom))
+  panel.addEventListener('scroll', () => {
+    lastScrollTop = panel.scrollTop
+    lastScrollLeft = panel.scrollLeft
+  })
+  const startTop = lastScrollTop
+  const startLeft = lastScrollLeft
   const focus = workspace.currentConjecture()
   const tree = renderDerivation(
     focus.derivation,
@@ -144,6 +159,10 @@ const createPlayArea = (workspace: AnyWorkspace): HTMLElement => {
     workspace.applicableRules(),
   )
   panel.appendChild(tree)
+  requestAnimationFrame(() => {
+    panel.scrollTo({ top: startTop, left: startLeft, behavior: 'instant' })
+    layoutTree(tree)
+  })
   return panel
 }
 
@@ -203,6 +222,21 @@ export const createBench = (
   }
   panel.appendChild(createPanel('right', right, ls, rules, solved, apply))
   panel.appendChild(createPlayArea(workspace))
+  const zoomOut = createButton('−', false, () => {
+    treeZoom = Math.max(ZOOM_MIN, treeZoom - ZOOM_STEP)
+    rerender()
+  })
+  const zoomReset = createButton('⊙', false, () => {
+    treeZoom = 1
+    rerender()
+  })
+  const zoomIn = createButton('+', false, () => {
+    treeZoom = Math.min(ZOOM_MAX, treeZoom + ZOOM_STEP)
+    rerender()
+  })
+  controlsEl.appendChild(zoomOut)
+  controlsEl.appendChild(zoomReset)
+  controlsEl.appendChild(zoomIn)
   panel.appendChild(controlsEl)
   return panel
 }
