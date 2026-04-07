@@ -139,6 +139,42 @@ const ZOOM_MIN = 0.4
 const ZOOM_MAX = 2
 const ZOOM_STEP = 0.2
 
+const CHECK_STEP_MS = 120
+const CHECK_HOLD_MS = 260
+
+const runProofCheckSweep = (tree: HTMLElement): void => {
+  if (
+    typeof window !== 'undefined' &&
+    window.matchMedia &&
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  ) {
+    return
+  }
+  const nodes = Array.from(
+    tree.querySelectorAll('.tree-node'),
+  ) as HTMLElement[]
+  if (nodes.length === 0) return
+  const byDepth = new Map<number, HTMLElement[]>()
+  let maxDepth = 0
+  for (const n of nodes) {
+    const d = Number(n.dataset['leafDepth'] ?? '0')
+    if (d > maxDepth) maxDepth = d
+    const list = byDepth.get(d)
+    if (list) list.push(n)
+    else byDepth.set(d, [n])
+  }
+  for (let d = 0; d <= maxDepth; d++) {
+    const level = byDepth.get(d)
+    if (!level) continue
+    setTimeout(() => {
+      for (const n of level) n.classList.add('tree-checking')
+      setTimeout(() => {
+        for (const n of level) n.classList.remove('tree-checking')
+      }, CHECK_HOLD_MS)
+    }, d * CHECK_STEP_MS)
+  }
+}
+
 let lastScrollTop = 0
 
 const createPlayArea = (workspace: AnyWorkspace): HTMLElement => {
@@ -175,6 +211,12 @@ const createPlayArea = (workspace: AnyWorkspace): HTMLElement => {
       )
       tree.style.transformOrigin = 'center bottom'
       tree.style.transition = 'transform 1.2s ease-in-out'
+      const onZoomEnd = (e: TransitionEvent): void => {
+        if (e.propertyName !== 'transform') return
+        tree.removeEventListener('transitionend', onZoomEnd)
+        runProofCheckSweep(tree)
+      }
+      tree.addEventListener('transitionend', onZoomEnd)
       requestAnimationFrame(() => {
         tree.style.transform = `scale(${scale})`
         tree.scrollIntoView({

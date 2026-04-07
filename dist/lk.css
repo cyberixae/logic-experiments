@@ -285,6 +285,12 @@ body {
 .tree-active > .tree-sequent {
   background-color: #fcaa;
 }
+.tree-node > .tree-sequent {
+  transition: color 0.25s ease-out;
+}
+.tree-node.tree-checking > .tree-sequent {
+  color: #fff;
+}
 .connective {
   display: inline-block;
   width: 1.4em;

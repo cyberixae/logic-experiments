@@ -43,20 +43,28 @@ export const renderDerivation = (
   const node = document.createElement('div')
   node.setAttribute('class', 'tree-node' + (isActive ? ' tree-active' : ''))
 
+  let leafDepth = 0
   if (derivation.kind === 'transformation') {
     const premises = document.createElement('div')
     premises.setAttribute('class', 'tree-premises')
+    let maxChildDepth = -1
     derivation.deps.forEach((dep, i) => {
-      premises.appendChild(
-        renderDerivation(dep, activePath, applicableRules, [...currentPath, i]),
-      )
+      const child = renderDerivation(dep, activePath, applicableRules, [
+        ...currentPath,
+        i,
+      ])
+      const childDepth = Number(child.dataset['leafDepth'] ?? '0')
+      if (childDepth > maxChildDepth) maxChildDepth = childDepth
+      premises.appendChild(child)
     })
+    leafDepth = maxChildDepth < 0 ? 0 : maxChildDepth + 1
     node.appendChild(premises)
     node.appendChild(renderInferenceLine(derivation.rule))
     node.appendChild(renderSequent(derivation, applicableRules, isActive))
   } else {
     node.appendChild(renderSequent(derivation, applicableRules, isActive))
   }
+  node.dataset['leafDepth'] = String(leafDepth)
 
   if (currentPath.length === 0) {
     node.addEventListener('copy', (e) => {
