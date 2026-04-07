@@ -106,27 +106,34 @@ const stabilizeWidths = (node: HTMLElement): NodeWidths => {
   }
   const totalGap = Math.max(0, count - 1) * gap
 
-  const lineWidth =
-    Math.max(sequentWidth, childSequentSum + totalGap) + LINE_PAD * 2
+  const lineWidth = Math.ceil(
+    Math.max(sequentWidth, childSequentSum + totalGap) + LINE_PAD * 2,
+  )
   if (inference) {
     inference.style.width = `${lineWidth}px`
     inference.style.alignSelf = 'center'
   }
 
-  const subtreeWidth = Math.max(lineWidth, childSubtreeSum + totalGap)
+  const subtreeWidth = Math.ceil(
+    Math.max(lineWidth, childSubtreeSum + totalGap),
+  )
   node.style.width = `${subtreeWidth}px`
 
   return { sequent: sequentWidth, subtree: subtreeWidth }
 }
 
-export const layoutTree = (root: HTMLElement): void => {
+export const layoutTree = (
+  root: HTMLElement,
+  opts: { skipActiveScroll?: boolean } = {},
+): void => {
   stabilizeWidths(root)
+  if (opts.skipActiveScroll === true) return
   const active = root.querySelector('.tree-active') as HTMLElement | null
   if (active) {
     active.scrollIntoView({
       behavior: 'smooth',
       block: 'center',
-      inline: 'center',
+      inline: 'nearest',
     })
   }
 }

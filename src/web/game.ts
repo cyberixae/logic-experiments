@@ -140,7 +140,6 @@ const ZOOM_MAX = 2
 const ZOOM_STEP = 0.2
 
 let lastScrollTop = 0
-let lastScrollLeft = 0
 
 const createPlayArea = (workspace: AnyWorkspace): HTMLElement => {
   const panel = document.createElement('div')
@@ -148,20 +147,43 @@ const createPlayArea = (workspace: AnyWorkspace): HTMLElement => {
   panel.style.setProperty('--tree-zoom', String(treeZoom))
   panel.addEventListener('scroll', () => {
     lastScrollTop = panel.scrollTop
-    lastScrollLeft = panel.scrollLeft
   })
   const startTop = lastScrollTop
-  const startLeft = lastScrollLeft
   const focus = workspace.currentConjecture()
   const tree = renderDerivation(
     focus.derivation,
     activePath(focus),
     workspace.applicableRules(),
   )
+  const solved = workspace.isSolved()
+  tree.style.visibility = 'hidden'
   panel.appendChild(tree)
   requestAnimationFrame(() => {
-    panel.scrollTo({ top: startTop, left: startLeft, behavior: 'instant' })
-    layoutTree(tree)
+    panel.scrollTo({ top: startTop, behavior: 'instant' })
+    layoutTree(tree, { skipActiveScroll: solved })
+    tree.style.visibility = ''
+    if (solved) {
+      const treeRect = tree.getBoundingClientRect()
+      const areaRect = panel.getBoundingClientRect()
+      const fontPx = parseFloat(getComputedStyle(panel).fontSize)
+      const availW = areaRect.width - 2 * 8 * fontPx
+      const availH = areaRect.height - (8 + 6) * fontPx
+      const scale = Math.min(
+        1,
+        availW / treeRect.width,
+        availH / treeRect.height,
+      )
+      tree.style.transformOrigin = 'center bottom'
+      tree.style.transition = 'transform 1.2s ease-in-out'
+      requestAnimationFrame(() => {
+        tree.style.transform = `scale(${scale})`
+        tree.scrollIntoView({
+          behavior: 'smooth',
+          block: 'end',
+          inline: 'center',
+        })
+      })
+    }
   })
   return panel
 }
