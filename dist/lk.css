@@ -292,14 +292,10 @@ body {
   color: #fff;
 }
 .connective {
-  display: inline-block;
-  width: 1.4em;
-  height: 1.4em;
-  margin: 0.2em 0.1em;
   text-align: center;
-  border-radius: 10px;
+  border-radius: 6px;
   background-color: transparent;
 }
 .connective.active {
-  background-color: #d005;
+  background-color: #d003;
 }
