@@ -197,7 +197,12 @@ const createPlayArea = (workspace: AnyWorkspace): HTMLElement => {
   const startTop = lastScrollTop
   const focus = workspace.currentConjecture()
   const gaze = workspace.gaze()
-  const ghost = computeGhostChain(activeSequent(focus), gaze, workspace.gazeKind())
+  const ghost = computeGhostChain(
+    activeSequent(focus),
+    gaze,
+    workspace.gazeKind(),
+    workspace.availableRules(),
+  )
   const tree = renderDerivation(
     focus.derivation,
     activePath(focus),
