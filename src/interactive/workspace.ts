@@ -1,5 +1,5 @@
 import { RuleId } from '../model/rule'
-import { applyEvent, focus } from '../interactive/focus'
+import { applyEvent, activeSequent, focus } from '../interactive/focus'
 import { Event } from '../interactive/event'
 import { isProof, premise } from '../model/derivation'
 import { head, isNonEmptyArray, last, NonEmptyArray } from '../utils/array'
@@ -7,6 +7,8 @@ import { entries, get, keys } from '../utils/record'
 import { Focus, applicableRules } from './focus'
 import { Configuration } from '../model/challenge'
 import { AnySequent } from '../model/sequent'
+
+export type Gaze = { side: 'left' | 'right'; index: number }
 
 export class Workspace<
   K extends string,
@@ -16,6 +18,7 @@ export class Workspace<
   private conjectures: Partial<{ [P in K]: Focus<C[P]['goal']> }> = {}
   private theoremKeys: NonEmptyArray<K>
   selected: K
+  private _gaze: Gaze | null = null
 
   isSolved(): boolean {
     return isProof(this.currentConjecture().derivation)
@@ -76,5 +79,41 @@ export class Workspace<
     const cursor = this.currentConjecture()
     const update = applyEvent(cursor, ev)
     this.conjectures[this.selected] = update
+    this._gaze = null
+  }
+
+  gaze(): Gaze {
+    if (this._gaze) return this._gaze
+    return this.defaultGaze()
+  }
+
+  private defaultGaze(): Gaze {
+    const seq = activeSequent(this.currentConjecture())
+    if (seq.antecedent.length > 0) {
+      return { side: 'left', index: seq.antecedent.length - 1 }
+    }
+    if (seq.succedent.length > 0) {
+      return { side: 'right', index: 0 }
+    }
+    return { side: 'left', index: 0 }
+  }
+
+  moveGaze(direction: -1 | 1) {
+    const seq = activeSequent(this.currentConjecture())
+    const ant = seq.antecedent.length
+    const suc = seq.succedent.length
+    const total = ant + suc
+    if (total === 0) {
+      this._gaze = null
+      return
+    }
+    const current = this._gaze ?? this.defaultGaze()
+    const linear =
+      current.side === 'left' ? current.index : ant + current.index
+    const next = (linear + direction + total) % total
+    this._gaze =
+      next < ant
+        ? { side: 'left', index: next }
+        : { side: 'right', index: next - ant }
   }
 }

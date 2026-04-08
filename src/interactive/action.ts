@@ -14,3 +14,5 @@ export type Action =
   | 'level'
   | 'menu'
   | 'axiom'
+  | 'gazeLeft'
+  | 'gazeRight'

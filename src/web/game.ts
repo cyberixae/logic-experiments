@@ -47,6 +47,8 @@ export const qwertyKeyMap: Record<KeyboardEvent['code'], Action> = {
   Space: 'axiom',
   Enter: 'axiom',
   Backspace: 'undo',
+  ArrowLeft: 'gazeLeft',
+  ArrowRight: 'gazeRight',
 }
 
 const codeToLabel = (code: string): string => {
@@ -195,6 +197,7 @@ const createPlayArea = (workspace: AnyWorkspace): HTMLElement => {
     focus.derivation,
     activePath(focus),
     workspace.applicableRules(),
+    workspace.gaze(),
   )
   const solved = workspace.isSolved()
   const isFresh = focus.derivation.kind === 'premise'
@@ -406,6 +409,12 @@ export const createDispatch =
         break
       case 'undo':
         workspace.applyEvent(undo())
+        break
+      case 'gazeLeft':
+        workspace.moveGaze(-1)
+        break
+      case 'gazeRight':
+        workspace.moveGaze(1)
         break
     }
     rerender()

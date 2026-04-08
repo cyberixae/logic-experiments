@@ -364,3 +364,6 @@ body {
 .connective.active {
   background-color: #d003;
 }
+.gazed {
+  border-bottom: 0.15em solid #2a8;
+}

@@ -1,5 +1,11 @@
 import { AnyDerivation, Path } from '../model/derivation'
-import { basic, fromDerivation, fromRuleId, fromSequent } from '../render/print'
+import {
+  basic,
+  fromDerivation,
+  fromRuleId,
+  fromSequent,
+  GazeMark,
+} from '../render/print'
 import { html } from '../render/segment'
 import { RuleId } from '../model/rule'
 
@@ -10,11 +16,14 @@ const renderSequent = (
   derivation: AnyDerivation,
   ruleIds: ReadonlyArray<RuleId>,
   isActive: boolean,
+  gaze: GazeMark | null,
 ): HTMLElement => {
   const el = document.createElement('div')
   el.setAttribute('class', 'tree-sequent')
   el.innerHTML = html(
-    fromSequent(derivation.result, isActive ? ruleIds : [])(basic),
+    fromSequent(derivation.result, isActive ? ruleIds : [], isActive ? gaze : null)(
+      basic,
+    ),
   )
   return el
 }
@@ -35,6 +44,7 @@ export const renderDerivation = (
   derivation: AnyDerivation,
   activePath: Path,
   applicableRules: ReadonlyArray<RuleId>,
+  gaze: GazeMark | null = null,
   currentPath: Path = [],
 ): HTMLElement => {
   const isActive =
@@ -49,7 +59,7 @@ export const renderDerivation = (
     premises.setAttribute('class', 'tree-premises')
     let maxChildDepth = -1
     derivation.deps.forEach((dep, i) => {
-      const child = renderDerivation(dep, activePath, applicableRules, [
+      const child = renderDerivation(dep, activePath, applicableRules, gaze, [
         ...currentPath,
         i,
       ])
@@ -60,9 +70,9 @@ export const renderDerivation = (
     leafDepth = maxChildDepth < 0 ? 0 : maxChildDepth + 1
     node.appendChild(premises)
     node.appendChild(renderInferenceLine(derivation.rule))
-    node.appendChild(renderSequent(derivation, applicableRules, isActive))
+    node.appendChild(renderSequent(derivation, applicableRules, isActive, gaze))
   } else {
-    node.appendChild(renderSequent(derivation, applicableRules, isActive))
+    node.appendChild(renderSequent(derivation, applicableRules, isActive, gaze))
   }
   node.dataset['leafDepth'] = String(leafDepth)
 
