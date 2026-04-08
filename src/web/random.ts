@@ -52,7 +52,7 @@ const createControls = (
       actionKeyHint['reset'],
     ),
   )
-  panel.appendChild(createButton('new', false, onNew))
+  panel.appendChild(createButton('new', false, onNew, 'n'))
   panel.appendChild(
     createButton('menu', false, () => navigate('menu'), actionKeyHint['menu']),
   )
@@ -124,6 +124,10 @@ export const mountRandom = (
   rerender()
 
   const handleKey = (ev: KeyboardEvent) => {
+    if (ev.code === 'KeyN') {
+      onNew()
+      return
+    }
     if (ev.code === 'Slash' || ev.code === 'Equal') {
       zoomTreeOut()
       rerender()
