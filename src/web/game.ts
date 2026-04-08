@@ -143,12 +143,13 @@ export const createButton = (
   disabled: boolean,
   onClick?: () => void,
   hint?: string,
+  gazeHint = false,
 ): HTMLElement => {
   const el = document.createElement('pre')
   el.setAttribute('class', 'button' + (disabled ? ' disabled' : ''))
   if (!disabled && onClick) el.onclick = onClick
   if (hint !== undefined) {
-    el.appendChild(keyHintBadge(hint))
+    el.appendChild(keyHintBadge(hint, gazeHint))
     el.appendChild(document.createTextNode(' ' + label))
   } else {
     el.innerHTML = label
@@ -366,6 +367,30 @@ export const createBench = (
     treeZoom = Math.min(ZOOM_MAX, treeZoom + ZOOM_STEP)
     rerender()
   })
+  const seq = activeSequent(workspace.currentConjecture())
+  const gazeMovable = !solved && seq.antecedent.length + seq.succedent.length > 1
+  const gazeLeftBtn = createButton(
+    '←',
+    !gazeMovable,
+    () => {
+      workspace.moveGaze(-1)
+      rerender()
+    },
+    actionKeyHint['gazeLeft'],
+    true,
+  )
+  const gazeRightBtn = createButton(
+    '→',
+    !gazeMovable,
+    () => {
+      workspace.moveGaze(1)
+      rerender()
+    },
+    actionKeyHint['gazeRight'],
+    true,
+  )
+  controlsEl.appendChild(gazeLeftBtn)
+  controlsEl.appendChild(gazeRightBtn)
   controlsEl.appendChild(zoomOut)
   controlsEl.appendChild(zoomReset)
   controlsEl.appendChild(zoomIn)
