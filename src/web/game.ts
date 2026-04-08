@@ -5,7 +5,7 @@ import {
   prevBranch,
   nextBranch,
 } from '../interactive/event'
-import { activePath } from '../interactive/focus'
+import { activePath, activeSequent } from '../interactive/focus'
 import { Rule } from '../model/rule'
 import { AnySequent } from '../model/sequent'
 import { fromDerivation } from '../render/print'
@@ -49,6 +49,8 @@ export const qwertyKeyMap: Record<KeyboardEvent['code'], Action> = {
   Backspace: 'undo',
   ArrowLeft: 'gazeLeft',
   ArrowRight: 'gazeRight',
+  ArrowUp: 'gazeConnective',
+  ArrowDown: 'gazeWeakening',
 }
 
 const codeToLabel = (code: string): string => {
@@ -416,9 +418,58 @@ export const createDispatch =
       case 'gazeRight':
         workspace.moveGaze(1)
         break
+      case 'gazeConnective':
+        applyGazeRule(workspace, 'connective')
+        break
+      case 'gazeWeakening':
+        applyGazeRule(workspace, 'weakening')
+        break
     }
     rerender()
   }
+
+const applyGazeRule = (
+  workspace: AnyWorkspace,
+  kind: 'connective' | 'weakening',
+): void => {
+  const gaze = workspace.gaze()
+  const seq = activeSequent(workspace.currentConjecture())
+  const ant = seq.antecedent.length
+  const suc = seq.succedent.length
+  if (gaze.side === 'left') {
+    if (ant === 0) return
+    const activeIndex = ant - 1
+    if (gaze.index === activeIndex) {
+      // At active position — apply the rule directly
+      if (kind === 'connective') {
+        autoRule(workspace, keys(leftLogical))
+      } else {
+        workspace.applyEvent(reverse0('swl'))
+      }
+      return
+    }
+    // Not at active — rotate one step toward arrow
+    workspace.applyEventWithGaze(reverse0('sRotLB'), {
+      side: 'left',
+      index: gaze.index + 1,
+    })
+  } else {
+    if (suc === 0) return
+    const activeIndex = 0
+    if (gaze.index === activeIndex) {
+      if (kind === 'connective') {
+        autoRule(workspace, keys(rightLogical))
+      } else {
+        workspace.applyEvent(reverse0('swr'))
+      }
+      return
+    }
+    workspace.applyEventWithGaze(reverse0('sRotRB'), {
+      side: 'right',
+      index: gaze.index - 1,
+    })
+  }
+}
 
 export const setupGamepad = (
   dispatch: (action: Action) => void,

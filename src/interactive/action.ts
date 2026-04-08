@@ -16,3 +16,5 @@ export type Action =
   | 'axiom'
   | 'gazeLeft'
   | 'gazeRight'
+  | 'gazeConnective'
+  | 'gazeWeakening'

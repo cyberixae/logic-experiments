@@ -82,6 +82,13 @@ export class Workspace<
     this._gaze = null
   }
 
+  applyEventWithGaze(ev: Event, nextGaze: Gaze) {
+    const cursor = this.currentConjecture()
+    const update = applyEvent(cursor, ev)
+    this.conjectures[this.selected] = update
+    this._gaze = nextGaze
+  }
+
   gaze(): Gaze {
     if (this._gaze) return this._gaze
     return this.defaultGaze()
