@@ -126,16 +126,14 @@ const arrowToGaze: Partial<Record<Action, Action>> = {
 }
 
 export const ps5KeyMap: Record<number, Action> = {
-  12: 'leftWeakening',
-  14: 'leftRotateLeft',
-  15: 'leftRotateRight',
-  13: 'leftConnective',
-  3: 'rightWeakening',
-  2: 'rightRotateLeft',
-  1: 'rightRotateRight',
-  0: 'rightConnective',
-  5: 'axiom',
-  4: 'undo',
+  0: 'axiom', // Cross — confirm
+  1: 'undo', // Circle — cancel
+  2: 'gazeWeakening', // Square
+  3: 'gazeConnective', // Triangle
+  4: 'prevBranch', // L1
+  5: 'nextBranch', // R1
+  14: 'gazeLeft', // D-pad left
+  15: 'gazeRight', // D-pad right
 }
 
 export const createButton = (
