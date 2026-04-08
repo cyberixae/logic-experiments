@@ -231,10 +231,11 @@ export function fromConjunction(
       implication: parenthesized,
     })
   }
-  return printBinary('conjunction', activeConnective, true)(
-    expand(leftConjunct),
-    expand(rightConjunct),
-  )
+  return printBinary(
+    'conjunction',
+    activeConnective,
+    true,
+  )(expand(leftConjunct), expand(rightConjunct))
 }
 
 export function fromDisjunction(
@@ -254,10 +255,11 @@ export function fromDisjunction(
       implication: parenthesized,
     })
   }
-  return printBinary('disjunction', activeConnective, true)(
-    expand(leftDisjunct),
-    expand(rightDisjunct),
-  )
+  return printBinary(
+    'disjunction',
+    activeConnective,
+    true,
+  )(expand(leftDisjunct), expand(rightDisjunct))
 }
 
 export function fromImplication(
@@ -277,10 +279,11 @@ export function fromImplication(
       implication: parenthesized,
     })
   }
-  return printBinary('implication', activeConnective, true)(
-    expand(antecedent),
-    expand(consequent),
-  )
+  return printBinary(
+    'implication',
+    activeConnective,
+    true,
+  )(expand(antecedent), expand(consequent))
 }
 
 export function fromProp(

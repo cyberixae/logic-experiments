@@ -1,4 +1,10 @@
-import { reverse0, undo, reset, prevBranch, nextBranch } from '../interactive/event'
+import {
+  reverse0,
+  undo,
+  reset,
+  prevBranch,
+  nextBranch,
+} from '../interactive/event'
 import { activePath } from '../interactive/focus'
 import { Rule } from '../model/rule'
 import { AnySequent } from '../model/sequent'
@@ -152,9 +158,7 @@ const runProofCheckSweep = (tree: HTMLElement): void => {
   ) {
     return
   }
-  const nodes = Array.from(
-    tree.querySelectorAll('.tree-node'),
-  ) as HTMLElement[]
+  const nodes = Array.from(tree.querySelectorAll('.tree-node')) as HTMLElement[]
   if (nodes.length === 0) return
   const byDepth = new Map<number, HTMLElement[]>()
   let maxDepth = 0

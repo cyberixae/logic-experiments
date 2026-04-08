@@ -2,11 +2,11 @@
 
 body {
   background-color: #ffeedd;
-  font-family: "Noto Sans", "Noto Sans Math", sans-serif;
+  font-family: 'Noto Sans', 'Noto Sans Math', sans-serif;
   font-optical-sizing: auto;
   font-weight: 400;
   font-style: normal;
-  font-variation-settings: "wdth" 100;
+  font-variation-settings: 'wdth' 100;
   font-size: 1.2em;
   height: 100%;
   overflow: hidden;
@@ -69,12 +69,36 @@ body {
   scroll-padding: 8em 8em 6em 8em;
   scrollbar-width: none;
   mask-image:
-    linear-gradient(to right, transparent, black 6em, black calc(100% - 6em), transparent),
-    linear-gradient(to bottom, transparent, black 6em, black calc(100% - 6em), transparent);
+    linear-gradient(
+      to right,
+      transparent,
+      black 6em,
+      black calc(100% - 6em),
+      transparent
+    ),
+    linear-gradient(
+      to bottom,
+      transparent,
+      black 6em,
+      black calc(100% - 6em),
+      transparent
+    );
   mask-composite: intersect;
   -webkit-mask-image:
-    linear-gradient(to right, transparent, black 6em, black calc(100% - 6em), transparent),
-    linear-gradient(to bottom, transparent, black 6em, black calc(100% - 6em), transparent);
+    linear-gradient(
+      to right,
+      transparent,
+      black 6em,
+      black calc(100% - 6em),
+      transparent
+    ),
+    linear-gradient(
+      to bottom,
+      transparent,
+      black 6em,
+      black calc(100% - 6em),
+      transparent
+    );
   -webkit-mask-composite: source-in;
 }
 .playarea::-webkit-scrollbar {
