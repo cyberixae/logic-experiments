@@ -307,11 +307,9 @@ export function fromFormulas(formulas: Formulas): Printer {
 
 export type GazeMark = { side: 'left' | 'right'; index: number }
 
-const wrapGazed = (p: Printer): Printer => (t) => [
-  segment.raw('<span class="gazed">'),
-  ...p(t),
-  segment.raw('</span>'),
-]
+const wrapGazed =
+  (p: Printer): Printer =>
+  (t) => [segment.raw('<span class="gazed">'), ...p(t), segment.raw('</span>')]
 
 export function fromSequent(
   judgement: judge.AnySequent,
@@ -329,7 +327,9 @@ export function fromSequent(
 
   const antPrinters = antecedent.map((f, i) => {
     const p =
-      activeLeft && i === antecedent.length - 1 ? fromProp(f, true) : fromProp(f)
+      activeLeft && i === antecedent.length - 1
+        ? fromProp(f, true)
+        : fromProp(f)
     return gaze && gaze.side === 'left' && gaze.index === i ? wrapGazed(p) : p
   })
   const sucPrinters = succedent.map((f, i) => {

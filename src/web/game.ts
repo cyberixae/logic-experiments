@@ -446,7 +446,8 @@ export const createBench = (
     },
     '+',
   )
-  const gazeMovable = !solved && seq.antecedent.length + seq.succedent.length > 1
+  const gazeMovable =
+    !solved && seq.antecedent.length + seq.succedent.length > 1
   const gazeLeftBtn = createButton(
     '←',
     !gazeMovable,

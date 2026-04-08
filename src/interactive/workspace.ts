@@ -127,8 +127,7 @@ export class Workspace<
       return
     }
     const current = this._gaze ?? this.defaultGaze()
-    const linear =
-      current.side === 'left' ? current.index : ant + current.index
+    const linear = current.side === 'left' ? current.index : ant + current.index
     const next = (linear + direction + total) % total
     this._gaze =
       next < ant

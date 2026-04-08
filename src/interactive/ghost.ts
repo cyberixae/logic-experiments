@@ -102,4 +102,3 @@ export const computeGhostChain = (
   chain.push({ rule: final.id, sequent: final.next })
   return chain
 }
-

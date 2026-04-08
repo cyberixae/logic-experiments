@@ -22,9 +22,11 @@ const renderSequent = (
   const el = document.createElement('div')
   el.setAttribute('class', 'tree-sequent')
   el.innerHTML = html(
-    fromSequent(derivation.result, isActive ? ruleIds : [], isActive ? gaze : null)(
-      basic,
-    ),
+    fromSequent(
+      derivation.result,
+      isActive ? ruleIds : [],
+      isActive ? gaze : null,
+    )(basic),
   )
   return el
 }
