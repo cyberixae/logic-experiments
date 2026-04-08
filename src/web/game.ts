@@ -62,6 +62,10 @@ const codeToLabel = (code: string): string => {
     Enter: '↵',
     Backspace: '⌫',
     Escape: '\u238b',
+    ArrowLeft: '←',
+    ArrowRight: '→',
+    ArrowUp: '↑',
+    ArrowDown: '↓',
   }
   const char = special[code] ?? String()
   if (char) return char
@@ -107,11 +111,18 @@ const ruleAction: Partial<Record<RuleId, Action>> = {
   a3: 'axiom',
 }
 
-const keyHintBadge = (hint: string): HTMLElement => {
+const keyHintBadge = (hint: string, gaze = false): HTMLElement => {
   const badge = document.createElement('span')
-  badge.setAttribute('class', 'key-hint')
+  badge.setAttribute('class', gaze ? 'key-hint gaze' : 'key-hint')
   badge.textContent = hint
   return badge
+}
+
+const arrowToGaze: Partial<Record<Action, Action>> = {
+  leftConnective: 'gazeConnective',
+  rightConnective: 'gazeConnective',
+  leftWeakening: 'gazeWeakening',
+  rightWeakening: 'gazeWeakening',
 }
 
 export const ps5KeyMap: Record<number, Action> = {
@@ -282,6 +293,7 @@ const createPanel = <K extends RuleId>(
   rules: ReadonlyArray<RuleId>,
   solved: boolean,
   onApply: (key: RuleId) => void,
+  showGazeHints: boolean,
 ): HTMLElement => {
   const panel = document.createElement('div')
   panel.setAttribute('class', className)
@@ -295,6 +307,12 @@ const createPanel = <K extends RuleId>(
     const action = ruleAction[key]
     const hint = action !== undefined ? actionKeyHint[action] : undefined
     if (hint !== undefined) pre.appendChild(keyHintBadge(hint))
+    if (showGazeHints) {
+      const gazeAction = action !== undefined ? arrowToGaze[action] : undefined
+      const gazeHint =
+        gazeAction !== undefined ? actionKeyHint[gazeAction] : undefined
+      if (gazeHint !== undefined) pre.appendChild(keyHintBadge(gazeHint, true))
+    }
     panel.appendChild(pre)
   })
   return panel
@@ -319,17 +337,22 @@ export const createBench = (
     rerender()
   }
 
+  const gazeSide = workspace.gaze().side
   const panel = document.createElement('div')
   panel.setAttribute('class', 'bench')
-  panel.appendChild(createPanel('left', left, ls, rules, solved, apply))
+  panel.appendChild(
+    createPanel('left', left, ls, rules, solved, apply, gazeSide === 'left'),
+  )
   if (solved) {
     panel.appendChild(makeCongrats())
   } else {
     panel.appendChild(
-      createPanel('main', center, ls, rules, solved, applyCenter),
+      createPanel('main', center, ls, rules, solved, applyCenter, false),
     )
   }
-  panel.appendChild(createPanel('right', right, ls, rules, solved, apply))
+  panel.appendChild(
+    createPanel('right', right, ls, rules, solved, apply, gazeSide === 'right'),
+  )
   panel.appendChild(createPlayArea(workspace))
   const zoomOut = createButton('−', false, () => {
     treeZoom = Math.max(ZOOM_MIN, treeZoom - ZOOM_STEP)

@@ -126,13 +126,22 @@ body {
 }
 .left .rule .key-hint {
   position: absolute;
-  top: 20px;
+  top: 0;
   right: -20px;
+}
+.left .rule .key-hint.gaze {
+  top: 45px;
 }
 .right .rule .key-hint {
   position: absolute;
-  top: 20px;
+  top: 0;
   left: -20px;
+}
+.right .rule .key-hint.gaze {
+  top: 45px;
+}
+.key-hint.gaze {
+  background: #2a8;
 }
 .main .rule .key-hint {
   position: absolute;
