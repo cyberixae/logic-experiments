@@ -27,6 +27,8 @@
     "main": "yarn build && node ./lib/main.js",
     "brute": "yarn build && node scripts/brute.ts",
     "namegen": "node scripts/namegen.ts",
-    "prettify": "prettier . --write"
+    "prettify": "prettier . --write",
+    "format:check": "prettier . --check",
+    "ci": "yarn format:check && yarn lint && yarn typecheck && yarn test && yarn build:web"
   }
 }
