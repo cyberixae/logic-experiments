@@ -153,7 +153,6 @@ const CHECK_HOLD_MS = 260
 const runProofCheckSweep = (tree: HTMLElement): void => {
   if (
     typeof window !== 'undefined' &&
-    window.matchMedia &&
     window.matchMedia('(prefers-reduced-motion: reduce)').matches
   ) {
     return
@@ -169,7 +168,7 @@ const runProofCheckSweep = (tree: HTMLElement): void => {
     if (list) list.push(n)
     else byDepth.set(d, [n])
   }
-  for (let d = 0; d <= maxDepth; d++) {
+  for (let d = 0; d <= maxDepth; d += 1) {
     const level = byDepth.get(d)
     if (!level) continue
     setTimeout(() => {
