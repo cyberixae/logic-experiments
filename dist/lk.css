@@ -128,24 +128,41 @@ body {
   box-sizing: border-box;
   vertical-align: middle;
 }
-.left .rule .key-hint {
+.left .rule > .key-hint {
   position: absolute;
   top: 0;
   right: -20px;
 }
-.left .rule .key-hint.gaze {
+.left .rule .gaze-hint-stack {
+  position: absolute;
   top: 45px;
+  left: 100%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 5px;
 }
-.right .rule .key-hint {
+.right .rule > .key-hint {
   position: absolute;
   top: 0;
   left: -20px;
 }
-.right .rule .key-hint.gaze {
+.right .rule .gaze-hint-stack {
+  position: absolute;
   top: 45px;
+  right: 100%;
+  transform: translateX(50%);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 5px;
 }
 .key-hint.gaze {
   background: var(--gaze-color);
+}
+.key-hint.gaze.ghost {
+  opacity: 0.35;
 }
 .main .rule .key-hint {
   position: absolute;
@@ -163,7 +180,7 @@ body {
   top: 8px;
   left: -15px;
 }
-.button.disabled .key-hint {
+.button.disabled > .key-hint {
   visibility: hidden;
 }
 .button {

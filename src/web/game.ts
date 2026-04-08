@@ -111,18 +111,20 @@ const ruleAction: Partial<Record<RuleId, Action>> = {
   a3: 'axiom',
 }
 
-const keyHintBadge = (hint: string, gaze = false): HTMLElement => {
+const keyHintBadge = (
+  hint: string,
+  variant: 'arrow' | 'gaze' | 'gazeGhost' = 'arrow',
+): HTMLElement => {
   const badge = document.createElement('span')
-  badge.setAttribute('class', gaze ? 'key-hint gaze' : 'key-hint')
+  const cls =
+    variant === 'gaze'
+      ? 'key-hint gaze'
+      : variant === 'gazeGhost'
+        ? 'key-hint gaze ghost'
+        : 'key-hint'
+  badge.setAttribute('class', cls)
   badge.textContent = hint
   return badge
-}
-
-const arrowToGaze: Partial<Record<Action, Action>> = {
-  leftConnective: 'gazeConnective',
-  rightConnective: 'gazeConnective',
-  leftWeakening: 'gazeWeakening',
-  rightWeakening: 'gazeWeakening',
 }
 
 export const ps5KeyMap: Record<number, Action> = {
@@ -147,7 +149,7 @@ export const createButton = (
   el.setAttribute('class', 'button' + (disabled ? ' disabled' : ''))
   if (!disabled && onClick) el.onclick = onClick
   if (hint !== undefined) {
-    el.appendChild(keyHintBadge(hint, gazeHint))
+    el.appendChild(keyHintBadge(hint, gazeHint ? 'gaze' : 'arrow'))
     el.appendChild(document.createTextNode(' ' + label))
   } else {
     el.innerHTML = label
@@ -285,6 +287,34 @@ const createPlayArea = (workspace: AnyWorkspace): HTMLElement => {
   return panel
 }
 
+type GazeHintsForKind = {
+  immediateRule: RuleId | null
+  eventualRule: RuleId | null
+  hintChar: string
+}
+
+type GazeHintInfo = {
+  connective: GazeHintsForKind | null
+  weakening: GazeHintsForKind | null
+}
+
+const gazeHintBadgeForKind = (
+  key: RuleId,
+  hints: GazeHintsForKind | null,
+): HTMLElement | null => {
+  if (!hints) return null
+  if (key === hints.immediateRule) {
+    return keyHintBadge(hints.hintChar, 'gaze')
+  }
+  if (
+    key === hints.eventualRule &&
+    hints.eventualRule !== hints.immediateRule
+  ) {
+    return keyHintBadge(hints.hintChar, 'gazeGhost')
+  }
+  return null
+}
+
 const createPanel = <K extends RuleId>(
   className: string,
   ruleRecord: Record<K, Rule<AnySequent>>,
@@ -292,7 +322,7 @@ const createPanel = <K extends RuleId>(
   rules: ReadonlyArray<RuleId>,
   solved: boolean,
   onApply: (key: RuleId) => void,
-  showGazeHints: boolean,
+  gazeHints: GazeHintInfo,
 ): HTMLElement => {
   const panel = document.createElement('div')
   panel.setAttribute('class', className)
@@ -306,11 +336,15 @@ const createPanel = <K extends RuleId>(
     const action = ruleAction[key]
     const hint = action !== undefined ? actionKeyHint[action] : undefined
     if (hint !== undefined) pre.appendChild(keyHintBadge(hint))
-    if (showGazeHints) {
-      const gazeAction = action !== undefined ? arrowToGaze[action] : undefined
-      const gazeHint =
-        gazeAction !== undefined ? actionKeyHint[gazeAction] : undefined
-      if (gazeHint !== undefined) pre.appendChild(keyHintBadge(gazeHint, true))
+    const gazeBadges = [
+      gazeHintBadgeForKind(key, gazeHints.connective),
+      gazeHintBadgeForKind(key, gazeHints.weakening),
+    ].filter((b): b is HTMLElement => b !== null)
+    if (gazeBadges.length > 0) {
+      const stack = document.createElement('span')
+      stack.setAttribute('class', 'gaze-hint-stack')
+      for (const b of gazeBadges) stack.appendChild(b)
+      pre.appendChild(stack)
     }
     panel.appendChild(pre)
   })
@@ -336,21 +370,41 @@ export const createBench = (
     rerender()
   }
 
-  const gazeSide = workspace.gaze().side
+  const gaze = workspace.gaze()
+  const seq = activeSequent(workspace.currentConjecture())
+  const available = workspace.availableRules()
+  const buildKindHints = (
+    kind: 'connective' | 'weakening',
+    hintChar: string | undefined,
+  ): GazeHintsForKind | null => {
+    if (hintChar === undefined) return null
+    const chain = computeGhostChain(seq, gaze, kind, available)
+    if (!chain || chain.length === 0) return null
+    return {
+      immediateRule: chain[0]?.rule ?? null,
+      eventualRule: chain[chain.length - 1]?.rule ?? null,
+      hintChar,
+    }
+  }
+  const gazeHints: GazeHintInfo = {
+    connective: buildKindHints('connective', actionKeyHint['gazeConnective']),
+    weakening: buildKindHints('weakening', actionKeyHint['gazeWeakening']),
+  }
+
   const panel = document.createElement('div')
   panel.setAttribute('class', 'bench')
   panel.appendChild(
-    createPanel('left', left, ls, rules, solved, apply, gazeSide === 'left'),
+    createPanel('left', left, ls, rules, solved, apply, gazeHints),
   )
   if (solved) {
     panel.appendChild(makeCongrats())
   } else {
     panel.appendChild(
-      createPanel('main', center, ls, rules, solved, applyCenter, false),
+      createPanel('main', center, ls, rules, solved, applyCenter, gazeHints),
     )
   }
   panel.appendChild(
-    createPanel('right', right, ls, rules, solved, apply, gazeSide === 'right'),
+    createPanel('right', right, ls, rules, solved, apply, gazeHints),
   )
   panel.appendChild(createPlayArea(workspace))
   const zoomOut = createButton('−', false, () => {
@@ -365,7 +419,6 @@ export const createBench = (
     treeZoom = Math.min(ZOOM_MAX, treeZoom + ZOOM_STEP)
     rerender()
   })
-  const seq = activeSequent(workspace.currentConjecture())
   const gazeMovable = !solved && seq.antecedent.length + seq.succedent.length > 1
   const gazeLeftBtn = createButton(
     '←',
