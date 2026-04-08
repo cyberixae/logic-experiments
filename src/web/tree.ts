@@ -8,6 +8,7 @@ import {
 } from '../render/print'
 import { html } from '../render/segment'
 import { RuleId } from '../model/rule'
+import { GhostStep } from '../interactive/ghost'
 
 const equalPaths = (a: Path, b: Path): boolean =>
   a.length === b.length && a.every((v, i) => v === b[i])
@@ -28,6 +29,31 @@ const renderSequent = (
   return el
 }
 
+const renderGhost = (chain: GhostStep[]): HTMLElement => {
+  const wrap = document.createElement('div')
+  wrap.setAttribute('class', 'ghost-tree')
+  // Chain is ordered first-step → final-step. Visually, we want the
+  // final step at the top and the first step just above the active
+  // sequent at the bottom. Render in reverse order so the DOM order
+  // top-to-bottom matches.
+  for (let i = chain.length - 1; i >= 0; i -= 1) {
+    const step = chain[i]
+    if (!step) continue
+    const sequent = document.createElement('div')
+    sequent.setAttribute('class', 'tree-sequent ghost')
+    sequent.innerHTML = html(fromSequent(step.sequent, [], null)(basic))
+    wrap.appendChild(sequent)
+    const inference = document.createElement('div')
+    inference.setAttribute('class', 'tree-inference ghost')
+    const label = document.createElement('div')
+    label.setAttribute('class', 'tree-rule-label')
+    label.innerHTML = html(fromRuleId(step.rule)(basic))
+    inference.appendChild(label)
+    wrap.appendChild(inference)
+  }
+  return wrap
+}
+
 const renderInferenceLine = (ruleId: RuleId): HTMLElement => {
   const container = document.createElement('div')
   container.setAttribute('class', 'tree-inference')
@@ -45,6 +71,7 @@ export const renderDerivation = (
   activePath: Path,
   applicableRules: ReadonlyArray<RuleId>,
   gaze: GazeMark | null = null,
+  ghost: GhostStep[] | null = null,
   currentPath: Path = [],
 ): HTMLElement => {
   const isActive =
@@ -59,10 +86,14 @@ export const renderDerivation = (
     premises.setAttribute('class', 'tree-premises')
     let maxChildDepth = -1
     derivation.deps.forEach((dep, i) => {
-      const child = renderDerivation(dep, activePath, applicableRules, gaze, [
-        ...currentPath,
-        i,
-      ])
+      const child = renderDerivation(
+        dep,
+        activePath,
+        applicableRules,
+        gaze,
+        ghost,
+        [...currentPath, i],
+      )
       const childDepth = Number(child.dataset['leafDepth'] ?? '0')
       if (childDepth > maxChildDepth) maxChildDepth = childDepth
       premises.appendChild(child)
@@ -72,6 +103,9 @@ export const renderDerivation = (
     node.appendChild(renderInferenceLine(derivation.rule))
     node.appendChild(renderSequent(derivation, applicableRules, isActive, gaze))
   } else {
+    if (isActive && ghost && ghost.length > 0) {
+      node.appendChild(renderGhost(ghost))
+    }
     node.appendChild(renderSequent(derivation, applicableRules, isActive, gaze))
   }
   node.dataset['leafDepth'] = String(leafDepth)

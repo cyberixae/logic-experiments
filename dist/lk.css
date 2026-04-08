@@ -367,3 +367,23 @@ body {
 .gazed {
   border-bottom: 0.15em solid #2a8;
 }
+.tree-active {
+  position: relative;
+}
+.ghost-tree {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  opacity: 0.35;
+  pointer-events: none;
+}
+.tree-sequent.ghost {
+  background-color: transparent;
+}
+.tree-inference.ghost > .tree-rule-label {
+  opacity: 0.7;
+}

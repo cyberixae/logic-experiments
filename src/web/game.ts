@@ -22,6 +22,7 @@ import {
 } from '../rules'
 import { Workspace } from '../interactive/workspace'
 import { Action } from '../interactive/action'
+import { computeGhostChain } from '../interactive/ghost'
 import { Navigate } from './types'
 import { entries, keys } from '../utils/record'
 
@@ -195,11 +196,14 @@ const createPlayArea = (workspace: AnyWorkspace): HTMLElement => {
   })
   const startTop = lastScrollTop
   const focus = workspace.currentConjecture()
+  const gaze = workspace.gaze()
+  const ghost = computeGhostChain(activeSequent(focus), gaze, 'connective')
   const tree = renderDerivation(
     focus.derivation,
     activePath(focus),
     workspace.applicableRules(),
-    workspace.gaze(),
+    gaze,
+    ghost,
   )
   const solved = workspace.isSolved()
   const isFresh = focus.derivation.kind === 'premise'
