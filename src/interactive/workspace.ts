@@ -7,6 +7,7 @@ import { entries, get, keys } from '../utils/record'
 import { Focus, applicableRules } from './focus'
 import { Configuration } from '../model/challenge'
 import { AnySequent } from '../model/sequent'
+import { GhostKind } from './ghost'
 
 export type Gaze = { side: 'left' | 'right'; index: number }
 
@@ -19,6 +20,7 @@ export class Workspace<
   private theoremKeys: NonEmptyArray<K>
   selected: K
   private _gaze: Gaze | null = null
+  private _gazeKind: GhostKind = 'connective'
 
   isSolved(): boolean {
     return isProof(this.currentConjecture().derivation)
@@ -80,6 +82,7 @@ export class Workspace<
     const update = applyEvent(cursor, ev)
     this.conjectures[this.selected] = update
     this._gaze = null
+    this._gazeKind = 'connective'
   }
 
   applyEventWithGaze(ev: Event, nextGaze: Gaze) {
@@ -87,6 +90,14 @@ export class Workspace<
     const update = applyEvent(cursor, ev)
     this.conjectures[this.selected] = update
     this._gaze = nextGaze
+  }
+
+  gazeKind(): GhostKind {
+    return this._gazeKind
+  }
+
+  setGazeKind(kind: GhostKind) {
+    this._gazeKind = kind
   }
 
   gaze(): Gaze {
@@ -112,6 +123,7 @@ export class Workspace<
     const total = ant + suc
     if (total === 0) {
       this._gaze = null
+      this._gazeKind = 'connective'
       return
     }
     const current = this._gaze ?? this.defaultGaze()
@@ -122,5 +134,6 @@ export class Workspace<
       next < ant
         ? { side: 'left', index: next }
         : { side: 'right', index: next - ant }
+    this._gazeKind = 'connective'
   }
 }

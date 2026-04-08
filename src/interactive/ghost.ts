@@ -80,7 +80,7 @@ export const computeGhostChain = (
     if (g.side === 'right' && (suc === 0 || g.index === 0)) break
 
     const step = stepRotation(seq, g.side)
-    if (!step) return chain.length > 0 ? chain : null
+    if (!step) return null
     chain.push({ rule: step.id, sequent: step.next })
     seq = step.next
     g =
@@ -90,7 +90,7 @@ export const computeGhostChain = (
   }
 
   const final = stepFinal(seq, g.side, kind)
-  if (!final) return chain.length > 0 ? chain : null
+  if (!final) return null
   chain.push({ rule: final.id, sequent: final.next })
   return chain
 }

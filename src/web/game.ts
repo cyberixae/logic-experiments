@@ -197,7 +197,7 @@ const createPlayArea = (workspace: AnyWorkspace): HTMLElement => {
   const startTop = lastScrollTop
   const focus = workspace.currentConjecture()
   const gaze = workspace.gaze()
-  const ghost = computeGhostChain(activeSequent(focus), gaze, 'connective')
+  const ghost = computeGhostChain(activeSequent(focus), gaze, workspace.gazeKind())
   const tree = renderDerivation(
     focus.derivation,
     activePath(focus),
@@ -423,9 +423,11 @@ export const createDispatch =
         workspace.moveGaze(1)
         break
       case 'gazeConnective':
+        workspace.setGazeKind('connective')
         applyGazeRule(workspace, 'connective')
         break
       case 'gazeWeakening':
+        workspace.setGazeKind('weakening')
         applyGazeRule(workspace, 'weakening')
         break
     }
