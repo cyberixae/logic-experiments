@@ -225,6 +225,17 @@ body {
   display: flex;
   gap: 1em;
 }
+.congrabuttons .button {
+  position: relative;
+}
+.congrabuttons .button .key-hint {
+  position: absolute;
+  width: 30px;
+  height: 30px;
+  line-height: 30px;
+  top: 8px;
+  left: -15px;
+}
 .shroud {
   position: absolute;
   top: 0;

@@ -140,18 +140,31 @@ const createCongrats = (
   const buttons = document.createElement('div')
   buttons.setAttribute('class', 'congrabuttons')
   buttons.appendChild(
-    createButton('Prev Level', false, () =>
-      selectLevel(ws.previousConjectureId()),
+    createButton(
+      'Prev Level',
+      false,
+      () => selectLevel(ws.previousConjectureId()),
+      'p',
     ),
   )
   buttons.appendChild(
-    createButton('Play Again', false, () => {
-      ws.applyEvent(reset())
-      rerender()
-    }),
+    createButton(
+      'Play Again',
+      false,
+      () => {
+        ws.applyEvent(reset())
+        rerender()
+      },
+      'r',
+    ),
   )
   buttons.appendChild(
-    createButton('Next Level', false, () => selectLevel(ws.nextConjectureId())),
+    createButton(
+      'Next Level',
+      false,
+      () => selectLevel(ws.nextConjectureId()),
+      '␣',
+    ),
   )
   panel.appendChild(buttons)
 
@@ -223,6 +236,10 @@ export const mountCampaign = (
 
   const handleKey = (ev: KeyboardEvent) => {
     console.log(ev.code)
+    if (ev.code === 'KeyP' && ws.isSolved()) {
+      selectLevel(ws.previousConjectureId())
+      return
+    }
     if (ev.code === 'Slash' || ev.code === 'Equal') {
       zoomTreeOut()
       rerender()
