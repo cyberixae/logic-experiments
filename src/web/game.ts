@@ -161,7 +161,7 @@ let treeZoom = 1
 const ZOOM_MIN = 0.4
 const ZOOM_MAX = 2
 const ZOOM_STEP = 0.2
-const AUTO_ZOOM_MAX = 1.4
+const AUTO_ZOOM_MAX = 1.2
 const AUTO_ZOOM_PAD = 0.9
 
 const CHECK_STEP_MS = 120
