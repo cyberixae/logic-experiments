@@ -1,5 +1,9 @@
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Math&family=Noto+Sans:ital,wght@0,100..900;1,100..900&display=swap');
 
+:root {
+  --gaze-color: #2a8;
+}
+
 body {
   background-color: #ffeedd;
   font-family: 'Noto Sans', 'Noto Sans Math', sans-serif;
@@ -141,7 +145,7 @@ body {
   top: 45px;
 }
 .key-hint.gaze {
-  background: #2a8;
+  background: var(--gaze-color);
 }
 .main .rule .key-hint {
   position: absolute;
@@ -374,7 +378,7 @@ body {
   background-color: #d003;
 }
 .gazed {
-  border-bottom: 0.15em solid #2a8;
+  border-bottom: 0.15em solid var(--gaze-color);
 }
 .tree-active {
   position: relative;
