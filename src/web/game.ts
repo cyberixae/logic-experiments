@@ -161,6 +161,17 @@ let treeZoom = 1
 const ZOOM_MIN = 0.4
 const ZOOM_MAX = 2
 const ZOOM_STEP = 0.2
+
+let autoZoomedDerivation: unknown = null
+export const zoomTreeOut = (): void => {
+  treeZoom = Math.max(ZOOM_MIN, treeZoom - ZOOM_STEP)
+}
+export const zoomTreeReset = (): void => {
+  treeZoom = 1
+}
+export const zoomTreeIn = (): void => {
+  treeZoom = Math.min(ZOOM_MAX, treeZoom + ZOOM_STEP)
+}
 const AUTO_ZOOM_MAX = 1.2
 const AUTO_ZOOM_PAD = 0.9
 
@@ -229,7 +240,8 @@ const createPlayArea = (workspace: AnyWorkspace): HTMLElement => {
   requestAnimationFrame(() => {
     panel.scrollTo({ top: startTop, behavior: 'instant' })
     layoutTree(tree, { skipActiveScroll: solved })
-    if (isFresh && !solved) {
+    if (isFresh && !solved && autoZoomedDerivation !== focus.derivation) {
+      autoZoomedDerivation = focus.derivation
       const rootSequent = tree.querySelector(
         ':scope > .tree-sequent',
       ) as HTMLElement | null
@@ -407,18 +419,33 @@ export const createBench = (
     createPanel('right', right, ls, rules, solved, apply, gazeHints),
   )
   panel.appendChild(createPlayArea(workspace))
-  const zoomOut = createButton('−', false, () => {
-    treeZoom = Math.max(ZOOM_MIN, treeZoom - ZOOM_STEP)
-    rerender()
-  })
-  const zoomReset = createButton('⊙', false, () => {
-    treeZoom = 1
-    rerender()
-  })
-  const zoomIn = createButton('+', false, () => {
-    treeZoom = Math.min(ZOOM_MAX, treeZoom + ZOOM_STEP)
-    rerender()
-  })
+  const zoomOut = createButton(
+    '−',
+    false,
+    () => {
+      zoomTreeOut()
+      rerender()
+    },
+    '-',
+  )
+  const zoomReset = createButton(
+    '⊙',
+    false,
+    () => {
+      zoomTreeReset()
+      rerender()
+    },
+    '0',
+  )
+  const zoomIn = createButton(
+    '+',
+    false,
+    () => {
+      zoomTreeIn()
+      rerender()
+    },
+    '+',
+  )
   const gazeMovable = !solved && seq.antecedent.length + seq.succedent.length > 1
   const gazeLeftBtn = createButton(
     '←',

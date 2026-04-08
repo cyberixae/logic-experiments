@@ -14,6 +14,9 @@ import {
   createDispatch,
   setupGamepad,
   qwertyKeyMap,
+  zoomTreeIn,
+  zoomTreeOut,
+  zoomTreeReset,
 } from './game'
 import { Navigate } from './types'
 
@@ -220,6 +223,21 @@ export const mountCampaign = (
 
   const handleKey = (ev: KeyboardEvent) => {
     console.log(ev.code)
+    if (ev.code === 'Slash' || ev.code === 'Equal') {
+      zoomTreeOut()
+      rerender()
+      return
+    }
+    if (ev.code === 'Minus') {
+      zoomTreeIn()
+      rerender()
+      return
+    }
+    if (ev.code === 'Digit0') {
+      zoomTreeReset()
+      rerender()
+      return
+    }
     const action = qwertyKeyMap[ev.code]
     if (action) dispatch(action)
   }
