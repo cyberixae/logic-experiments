@@ -14,6 +14,7 @@ yarn prettify       # Format all files with Prettier
 yarn test           # Run Jest tests
 yarn typecheck      # Type-check without emitting
 yarn brute          # Run brute-force solver script
+yarn ci             # Run all checks (format, lint, typecheck, test, build:web)
 ```
 
 Run a single test file: `yarn jest src/render/__tests__/print.test.ts`
