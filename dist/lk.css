@@ -232,6 +232,7 @@ body {
   opacity: 0.8;
   text-wrap: nowrap;
   margin: 0;
+  text-transform: capitalize;
 }
 .button:hover {
   background-color: #fff;
