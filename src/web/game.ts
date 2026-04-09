@@ -319,8 +319,6 @@ const ruleConnectiveLabel: Partial<Record<RuleId, string>> = {
   cr: '∧',
   fcr: '∧',
   dl: '∨',
-  dl1: '∨',
-  dl2: '∨',
   dr: '∨',
   dr1: '∨',
   dr2: '∨',
