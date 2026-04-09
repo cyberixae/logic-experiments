@@ -12,6 +12,7 @@ import {
   createBench,
   createButton,
   createDispatch,
+  setDefaultRulesVisible,
   setupGamepad,
   qwertyKeyMap,
   zoomTreeIn,
@@ -175,6 +176,7 @@ export const mountCampaign = (
   container: HTMLElement,
   navigate: Navigate,
 ): (() => void) => {
+  setDefaultRulesVisible(true)
   const ws = new Workspace(challenges)
 
   const selectLevel = (id: string) => {

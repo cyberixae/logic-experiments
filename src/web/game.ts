@@ -162,6 +162,10 @@ export const createButton = (
 
 let rulesVisible = true
 
+export const setDefaultRulesVisible = (visible: boolean): void => {
+  rulesVisible = visible
+}
+
 let treeZoom = 1
 const ZOOM_MIN = 0.4
 const ZOOM_MAX = 2
@@ -535,8 +539,18 @@ export const createBench = (
     },
     actionKeyHint['toggleRules'],
   )
+  const axiomBtn = createButton(
+    'Axiom',
+    solved || !keys(center).some((k) => ls.includes(k)),
+    () => {
+      autoRule(workspace, keys(center))
+      rerender()
+    },
+    actionKeyHint['axiom'],
+  )
   gazeGroupCell.appendChild(rulesBtn)
   gazeGroupCell.appendChild(gazeGroup)
+  gazeGroupCell.appendChild(axiomBtn)
   const rightCell = document.createElement('div')
   rightCell.setAttribute('class', 'controls-cell controls-right')
   rightCell.appendChild(zoomOut)

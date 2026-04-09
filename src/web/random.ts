@@ -9,6 +9,7 @@ import {
   createBench,
   createButton,
   createDispatch,
+  setDefaultRulesVisible,
   setupGamepad,
   qwertyKeyMap,
   zoomTreeIn,
@@ -90,6 +91,7 @@ export const mountRandom = (
   container: HTMLElement,
   navigate: Navigate,
 ): (() => void) => {
+  setDefaultRulesVisible(false)
   const pool = new ChallengePool()
   let ws = newWorkspace(pool)
 
