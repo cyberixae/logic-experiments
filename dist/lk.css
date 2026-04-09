@@ -29,6 +29,18 @@ body {
     'left status right'
     'controls controls controls';
 }
+.bench.rules-hidden .left,
+.bench.rules-hidden .main,
+.bench.rules-hidden .right {
+  display: none;
+}
+.bench.rules-hidden {
+  grid-template-rows: 1fr min-content;
+  grid-template-columns: 1fr;
+  grid-template-areas:
+    'status'
+    'controls';
+}
 .controls {
   grid-area: controls;
   display: grid;
@@ -51,6 +63,8 @@ body {
   flex: 1;
   display: flex;
   justify-content: center;
+  align-items: center;
+  gap: 1em;
 }
 .gaze-group {
   display: flex;

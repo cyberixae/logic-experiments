@@ -52,6 +52,7 @@ export const qwertyKeyMap: Record<KeyboardEvent['code'], Action> = {
   ArrowRight: 'gazeRight',
   ArrowUp: 'gazeConnective',
   ArrowDown: 'gazeWeakening',
+  KeyI: 'toggleRules',
 }
 
 const codeToLabel = (code: string): string => {
@@ -158,6 +159,8 @@ export const createButton = (
   }
   return el
 }
+
+let rulesVisible = true
 
 let treeZoom = 1
 const ZOOM_MIN = 0.4
@@ -427,7 +430,7 @@ export const createBench = (
   }
 
   const panel = document.createElement('div')
-  panel.setAttribute('class', 'bench')
+  panel.setAttribute('class', 'bench' + (rulesVisible ? '' : ' rules-hidden'))
   panel.appendChild(
     createPanel('left', left, ls, rules, solved, apply, gazeHints),
   )
@@ -523,6 +526,16 @@ export const createBench = (
   gazeGroup.appendChild(gazeRightBtn)
   const gazeGroupCell = document.createElement('div')
   gazeGroupCell.setAttribute('class', 'gaze-group-cell')
+  const rulesBtn = createButton(
+    'Rules',
+    false,
+    () => {
+      rulesVisible = !rulesVisible
+      rerender()
+    },
+    actionKeyHint['toggleRules'],
+  )
+  gazeGroupCell.appendChild(rulesBtn)
   gazeGroupCell.appendChild(gazeGroup)
   const rightCell = document.createElement('div')
   rightCell.setAttribute('class', 'controls-cell controls-right')
@@ -561,6 +574,11 @@ export const createDispatch =
     }
     if (action === 'level') {
       onLevel?.()
+      return
+    }
+    if (action === 'toggleRules') {
+      rulesVisible = !rulesVisible
+      rerender()
       return
     }
     const workspace = getWorkspace()

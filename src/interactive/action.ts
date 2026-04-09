@@ -18,3 +18,4 @@ export type Action =
   | 'gazeRight'
   | 'gazeConnective'
   | 'gazeWeakening'
+  | 'toggleRules'
