@@ -1,6 +1,6 @@
 import * as array from '../utils/array'
 import * as seq from '../utils/seq'
-import { split } from '../utils/random'
+import { splitAt } from '../utils/number'
 import { isCountermodel, isModel, Valuation, valuations } from './valuation'
 
 export type ConnectiveType =
@@ -287,7 +287,7 @@ export const random =
       return atom('p')
     }
     const next = size - 1
-    const [left, right] = split(next)()
+    const [left, right] = splitAt(next, Math.random())
     if (rand < 0.3) {
       return conjunction(random(left)(), random(right)())
     }
