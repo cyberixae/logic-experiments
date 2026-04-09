@@ -156,7 +156,7 @@ const createCongrats = (
         ws.applyEvent(reset())
         rerender()
       },
-      'r',
+      actionKeyHint['reset'],
     ),
   )
   buttons.appendChild(
