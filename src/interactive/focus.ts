@@ -101,7 +101,6 @@ export const apply = <J extends AnySequent>(
   const openBefore = openBranches(s.derivation).length
   const openAfter = openBranches(derivation).length
   if (openAfter < openBefore) {
-    // Branch was closed — find nearest open branch without wrapping preference
     return forwardThenBackOpen(cursor)
   }
   // After branching rules, the branch index may point to a closed branch.
@@ -136,7 +135,13 @@ export const undo = <J extends AnySequent>(s: Focus<J>): Focus<J> => {
     if (!derivation) {
       return s
     }
-    return focus(derivation, s.branch)
+    const result = focus(derivation, s.branch)
+    const resultPath = activePath(result)
+    const resultDeriv = subDerivation(result.derivation, resultPath)
+    if (resultDeriv && resultDeriv.kind === 'transformation') {
+      return nextOpenForward(result)
+    }
+    return result
   }
   return s
 }
