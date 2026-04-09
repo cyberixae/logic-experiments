@@ -10,9 +10,9 @@ import {
   applyEvent,
   applicableRules,
 } from '../focus'
-import { premise, isProof } from '../../model/derivation'
+import { premise, isProof, subDerivation } from '../../model/derivation'
 import { sequent, conclusion } from '../../model/sequent'
-import { atom, implication, disjunction } from '../../model/prop'
+import { atom, implication, disjunction, conjunction } from '../../model/prop'
 import {
   reverse0 as ev0,
   reverse1 as ev1,
@@ -25,6 +25,7 @@ import { reverse0 } from '../../rules'
 
 const p = atom('p')
 const q = atom('q')
+const r = atom('r')
 
 describe('focus', () => {
   describe('focus constructor', () => {
@@ -215,6 +216,269 @@ describe('focus', () => {
       const f = focus(premise(conclusion(p)), 2)
       const result = applyEvent(f, evPrev())
       expect(result.branch).toBe(1)
+    })
+  })
+
+  describe('branch focus after closing', () => {
+    // (p ∨ q) ∨ r ⊢ p
+    // After two dl applications, 3 open branches:
+    //   [0] p ⊢ p, [1] q ⊢ p, [2] r ⊢ p
+    const buildThreeBranches = () => {
+      const goal = sequent([disjunction(disjunction(p, q), r)], [p])
+      const f = focus(premise(goal))
+      // dl on (p ∨ q) ∨ r gives: [0] p ∨ q ⊢ p, [1] r ⊢ p
+      const after1 = apply(f, reverse0.dl.tryReverse)
+      // dl on p ∨ q gives: [0] p ⊢ p, [1] q ⊢ p, [2] r ⊢ p
+      const after2 = apply(after1, reverse0.dl.tryReverse)
+      return after2
+    }
+
+    it('closing first branch advances forward', () => {
+      const f = buildThreeBranches()
+      // Close branch 0 (p ⊢ p) with identity
+      const afterI = apply(f, reverse0.i.tryReverse)
+      // Should move to next open branch, not wrap
+      const seq = activeSequent(afterI)
+      expect(seq).toEqual(sequent([q], [p]))
+    })
+
+    it('closing last open branch falls back to earlier branch', () => {
+      // (p ∨ p) ∨ q ⊢ p — after two dl: [0] p ⊢ p, [1] p ⊢ p, [2] q ⊢ p
+      const goal = sequent([disjunction(disjunction(p, p), q)], [p])
+      const f = focus(premise(goal))
+      const after1 = apply(f, reverse0.dl.tryReverse)
+      const after2 = apply(after1, reverse0.dl.tryReverse)
+      // Skip to branch 1, close it
+      const onBranch1 = focus(after2.derivation, 1)
+      expect(activeSequent(onBranch1)).toEqual(sequent([p], [p]))
+      const closed1 = apply(onBranch1, reverse0.i.tryReverse)
+      // Should advance forward to branch 2 (q ⊢ p)
+      expect(activeSequent(closed1)).toEqual(sequent([q], [p]))
+      // Now skip back to branch 0 and close it
+      const onBranch0 = focus(closed1.derivation, 0)
+      expect(activeSequent(onBranch0)).toEqual(sequent([p], [p]))
+      const closed0 = apply(onBranch0, reverse0.i.tryReverse)
+      // Only branch 2 (q ⊢ p) remains open — forward from 0 should find it
+      expect(activeSequent(closed0)).toEqual(sequent([q], [p]))
+      expect(isProof(closed0.derivation)).toBe(false)
+    })
+
+    it('closing last branch with no forward open falls backward', () => {
+      // q ∨ (p ∨ p) ⊢ p — after two dl: [0] q ⊢ p, [1] p ⊢ p, [2] p ⊢ p
+      const goal = sequent([disjunction(q, disjunction(p, p))], [p])
+      const f = focus(premise(goal))
+      const after1 = apply(f, reverse0.dl.tryReverse)
+      // Branch 0: q ⊢ p, Branch 1: p ∨ p ⊢ p — we're on branch 0
+      // Move to branch 1 and apply dl
+      const onBranch1 = focus(after1.derivation, 1)
+      const after2 = apply(onBranch1, reverse0.dl.tryReverse)
+      // Now: [0] q ⊢ p, [1] p ⊢ p, [2] p ⊢ p
+      // Close branch 2 (last)
+      const onBranch2 = focus(after2.derivation, 2)
+      expect(activeSequent(onBranch2)).toEqual(sequent([p], [p]))
+      const closed2 = apply(onBranch2, reverse0.i.tryReverse)
+      // No forward open branches from position 2 — should fall backward
+      // Branch 1 (p ⊢ p) is the nearest backward open branch
+      expect(activeSequent(closed2)).toEqual(sequent([p], [p]))
+      expect(isProof(closed2.derivation)).toBe(false)
+    })
+
+    it('closing rightmost open branch does not wrap forward', () => {
+      // p ∨ p ⊢ p — after dl, two branches: [0] p ⊢ p, [1] p ⊢ p
+      const goal = sequent([disjunction(p, p)], [p])
+      const f = focus(premise(goal))
+      const afterDl = apply(f, reverse0.dl.tryReverse)
+      // Close branch 0
+      const after1 = apply(afterDl, reverse0.i.tryReverse)
+      expect(activeSequent(after1)).toEqual(sequent([p], [p]))
+      // Close branch 1 (rightmost) — should not wrap to a closed branch
+      const after2 = apply(after1, reverse0.i.tryReverse)
+      // Proof is complete
+      expect(isProof(after2.derivation)).toBe(true)
+    })
+
+    it('closing middle branch advances to next open', () => {
+      // (p ∨ p) ∨ p ⊢ p — after two dl: 3 branches all p ⊢ p
+      const goal = sequent([disjunction(disjunction(p, p), p)], [p])
+      const f = focus(premise(goal))
+      const after1 = apply(f, reverse0.dl.tryReverse)
+      // branch 0: p ∨ p ⊢ p, branch 1: p ⊢ p
+      // apply dl on branch 0 to split further
+      const after2 = apply(after1, reverse0.dl.tryReverse)
+      // 3 branches: [0] p ⊢ p, [1] p ⊢ p, [2] p ⊢ p
+      // Close branch 0
+      const closed0 = apply(after2, reverse0.i.tryReverse)
+      // Now on branch 1 (middle). Close it.
+      const closed1 = apply(closed0, reverse0.i.tryReverse)
+      // Should advance forward to branch 2, not backward to closed 0
+      expect(activeSequent(closed1)).toEqual(sequent([p], [p]))
+      expect(isProof(closed1.derivation)).toBe(false)
+    })
+  })
+
+  describe('undo after branch switch', () => {
+    it('undo on current branch does not jump to closed branch', () => {
+      // p ∨ q ⊢ p — after dl: [0] p ⊢ p, [1] q ⊢ p
+      const goal = sequent([disjunction(p, q)], [p])
+      const f = focus(premise(goal))
+      const afterDl = apply(f, reverse0.dl.tryReverse)
+      // Close branch 0 with identity, auto-advances to branch 1
+      const afterI = apply(afterDl, reverse0.i.tryReverse)
+      expect(activeSequent(afterI)).toEqual(sequent([q], [p]))
+      // Undo should undo dl on current branch, not jump to closed branch 0
+      const afterUndo = undo(afterI)
+      // The active path should point to an open premise, not a closed branch
+      const undoneSeq = activeSequent(afterUndo)
+      expect(undoneSeq).toBeDefined()
+    })
+  })
+
+  describe('apply with branching rules landing on closed branch', () => {
+    it('advances to next open branch after branching rule', () => {
+      const goal = sequent([conjunction(p, q)], [p])
+      const f = focus(premise(goal))
+      const afterCl = apply(f, reverse0.cl.tryReverse)
+      const seq = activeSequent(afterCl)
+      expect(seq).toBeDefined()
+    })
+
+    it('nextOpenForward finds open branch when branching lands on closed', () => {
+      // p ∨ p ⊢ p — dl gives [0] p ⊢ p, [1] p ⊢ p
+      const goal = sequent([disjunction(p, p)], [p])
+      const f = focus(premise(goal))
+      const afterDl = apply(f, reverse0.dl.tryReverse)
+      // Close branch 0 — advances to branch 1
+      const afterClose = apply(afterDl, reverse0.i.tryReverse)
+      expect(activeSequent(afterClose)).toEqual(sequent([p], [p]))
+      // Undo on branch 1 undoes dl, collapsing the tree back
+      // This triggers nextOpenForward if undo restructure lands on closed
+      const afterUndo = undo(afterClose)
+      // Should land on an open branch
+      const undoneSeq = activeSequent(afterUndo)
+      expect(undoneSeq).toBeDefined()
+      expect(
+        afterUndo.derivation.kind === 'transformation' ||
+          afterUndo.derivation.kind === 'premise',
+      ).toBe(true)
+    })
+
+    it('branching with closed sibling uses nextOpenForward', () => {
+      // (p ∨ q) ∨ (p ∨ p) ⊢ p
+      // dl → [0] p ∨ q ⊢ p, [1] p ∨ p ⊢ p
+      // dl on [0] → [0] p ⊢ p, [1] q ⊢ p, [2] p ∨ p ⊢ p
+      // close [0] → on [1] q ⊢ p
+      // move to [2] (p ∨ p ⊢ p), apply dl → new branches appear
+      // branch index might land on closed [0]
+      const goal = sequent(
+        [disjunction(disjunction(p, q), disjunction(p, p))],
+        [p],
+      )
+      const f = focus(premise(goal))
+      const after1 = apply(f, reverse0.dl.tryReverse)
+      const after2 = apply(after1, reverse0.dl.tryReverse)
+      // [0] p ⊢ p, [1] q ⊢ p, [2] p ∨ p ⊢ p
+      // Close [0]
+      const closed0 = apply(after2, reverse0.i.tryReverse)
+      // Now on [1] q ⊢ p. Move to [2] (p ∨ p ⊢ p)
+      const onBranch2 = focus(closed0.derivation, closed0.branch + 1)
+      // Apply dl on p ∨ p to split into two new branches
+      const afterDl3 = apply(onBranch2, reverse0.dl.tryReverse)
+      // Should land on an open branch regardless of tree restructure
+      const seq = activeSequent(afterDl3)
+      expect(seq).toBeDefined()
+      // Should not be on a closed branch
+      const path = activePath(afterDl3)
+      const deriv = subDerivation(afterDl3.derivation, path)
+      expect(deriv?.kind).toBe('premise')
+    })
+
+    it('wrapping branch counter lands on closed branch after split', () => {
+      // p ∨ (p ∨ p) ⊢ p → dl → [0] p ⊢ p, [1] p ∨ p ⊢ p
+      // Close [0] → branch counter = 1, on p ∨ p ⊢ p
+      // Set branch counter to 3. After dl, branches = 3.
+      // mod(3, 3) = 0 → points to closed branch [0]
+      // nextOpenForward should find an open branch
+      const goal2 = sequent([disjunction(p, disjunction(p, p))], [p])
+      const f2 = focus(premise(goal2))
+      const afterDl2 = apply(f2, reverse0.dl.tryReverse)
+      // [0] p ⊢ p, [1] p ∨ p ⊢ p
+      // Close branch 0
+      const c0 = apply(afterDl2, reverse0.i.tryReverse)
+      // branch counter = 1, on p ∨ p ⊢ p
+      // Manually set branch to 3 (will mod to 1 in a 2-branch tree = p ∨ p ⊢ p)
+      const wrapped = focus(c0.derivation, 3)
+      expect(activeSequent(wrapped)).toEqual(
+        activeSequent(focus(c0.derivation, 1)),
+      )
+      // Apply dl: tree goes from 2 branches to 3.
+      // branch=3, mod(3,3)=0 → points to closed branch [0]
+      const afterSplit = apply(wrapped, reverse0.dl.tryReverse)
+      // nextOpenForward should find an open branch
+      const splitPath = activePath(afterSplit)
+      const splitDeriv = subDerivation(afterSplit.derivation, splitPath)
+      expect(splitDeriv?.kind).toBe('premise')
+    })
+  })
+
+  describe('forwardThenBackOpen fallback to backward', () => {
+    it('falls back to earlier branch when no forward open branch exists', () => {
+      // (p ∨ p) ∨ p ⊢ p — 3 branches after two dl
+      const goal = sequent([disjunction(disjunction(p, p), p)], [p])
+      const f = focus(premise(goal))
+      const after1 = apply(f, reverse0.dl.tryReverse)
+      const after2 = apply(after1, reverse0.dl.tryReverse)
+      // Close branches 0 and 1 (first two), leaving only branch 2
+      const closed0 = apply(after2, reverse0.i.tryReverse)
+      const closed1 = apply(closed0, reverse0.i.tryReverse)
+      // Now on branch 2 (last). Close it.
+      const closed2 = apply(closed1, reverse0.i.tryReverse)
+      // All branches closed — proof is complete
+      expect(isProof(closed2.derivation)).toBe(true)
+    })
+  })
+
+  describe('undo with branch restructure', () => {
+    it('undo after branching rule lands on open branch', () => {
+      // p ∨ q ⊢ p — after dl: [0] p ⊢ p, [1] q ⊢ p
+      const goal = sequent([disjunction(p, q)], [p])
+      const f = focus(premise(goal))
+      const afterDl = apply(f, reverse0.dl.tryReverse)
+      // Close branch 0 (p ⊢ p), auto-advances to branch 1 (q ⊢ p)
+      const afterI = apply(afterDl, reverse0.i.tryReverse)
+      // Undo from branch 1 undoes dl, collapsing both branches
+      const afterUndo = undo(afterI)
+      // Should land on an open premise
+      const undoneDerivation = afterUndo.derivation
+      expect(undoneDerivation.kind).toBe('premise')
+    })
+
+    it('undo on a closed branch reopens it', () => {
+      // p ⊢ p — apply i to close, then manually focus on it
+      const f = focus(premise(sequent([p], [p])))
+      const afterI = apply(f, reverse0.i.tryReverse)
+      // The branch is now closed; force focus on it
+      const onClosed = focus(afterI.derivation, 0)
+      const afterUndo = undo(onClosed)
+      expect(afterUndo.derivation.kind).toBe('premise')
+      expect(activeSequent(afterUndo)).toEqual(sequent([p], [p]))
+    })
+  })
+
+  describe('edge cases', () => {
+    it('activePath wraps with negative branch', () => {
+      const f = focus(premise(conclusion(p)), -1)
+      // Should not throw
+      const path = activePath(f)
+      expect(path).toBeDefined()
+    })
+
+    it('prev then activePath works', () => {
+      const f = focus(premise(conclusion(p)), 0)
+      const prevF = prev(f)
+      expect(prevF.branch).toBe(-1)
+      // activePath should handle negative branch via mod
+      const path = activePath(prevF)
+      expect(path).toBeDefined()
     })
   })
 })
