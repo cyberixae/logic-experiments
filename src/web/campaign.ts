@@ -81,7 +81,7 @@ const createListing = (
 
 const createControls = (
   ws: AnyWorkspace,
-  listingEl: HTMLElement,
+  _listingEl: HTMLElement,
   rerender: () => void,
   navigate: Navigate,
   showLevelButton: boolean,
