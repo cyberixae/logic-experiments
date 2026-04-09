@@ -68,6 +68,8 @@ body {
 .controls-right {
   display: flex;
   justify-content: flex-end;
+  align-items: end;
+  gap: 1em;
 }
 .main {
   grid-area: main;

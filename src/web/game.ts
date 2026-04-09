@@ -8,6 +8,7 @@ import {
 import { activePath, activeSequent } from '../interactive/focus'
 import { Rule } from '../model/rule'
 import { AnySequent } from '../model/sequent'
+import { branches } from '../model/derivation'
 import { fromDerivation } from '../render/print'
 import { RuleId } from '../model/rule'
 import { renderDerivation, layoutTree } from './tree'
@@ -571,8 +572,33 @@ export const createBench = (
   const centerCell = document.createElement('div')
   centerCell.setAttribute('class', 'controls-center')
 
+  const branchCount = branches(workspace.currentConjecture().derivation).length
+  const canSwitch = !solved && branchCount > 1
+  const prevBranchBtn = createButton(
+    '↰',
+    !canSwitch,
+    () => {
+      workspace.applyEvent(prevBranch())
+      rerender()
+    },
+    actionKeyHint['prevBranch'],
+  )
+  const nextBranchBtn = createButton(
+    '↱',
+    !canSwitch,
+    () => {
+      workspace.applyEvent(nextBranch())
+      rerender()
+    },
+    actionKeyHint['nextBranch'],
+  )
+  const branchGroup = makeGroup()
+  branchGroup.appendChild(prevBranchBtn)
+  branchGroup.appendChild(nextBranchBtn)
+
   const rightCell = document.createElement('div')
   rightCell.setAttribute('class', 'controls-right')
+  rightCell.appendChild(branchGroup)
   rightCell.appendChild(zoomGroup)
 
   const controlsBar = document.createElement('div')
