@@ -53,13 +53,36 @@ export const activeSequent = (s: AnyFocus): AnySequent => {
   return (derivation ?? s.derivation).result
 }
 
-const nextOpen = <J extends AnySequent>(s: Focus<J>): Focus<J> => {
+const nextOpenForward = <J extends AnySequent>(s: Focus<J>): Focus<J> => {
   const allPaths = branches(s.derivation)
   const open = new Set(openBranches(s.derivation).map((p) => p.join(',')))
   for (let i = 1; i <= allPaths.length; i += 1) {
     const candidate = array.mod(allPaths, s.branch + i)
     if (open.has(candidate.join(','))) {
       return focus(s.derivation, s.branch + i)
+    }
+  }
+  return next(s)
+}
+
+const forwardThenBackOpen = <J extends AnySequent>(s: Focus<J>): Focus<J> => {
+  const allPaths = branches(s.derivation)
+  const open = new Set(openBranches(s.derivation).map((p) => p.join(',')))
+  const normalized =
+    ((Math.floor(s.branch) % allPaths.length) + allPaths.length) %
+    allPaths.length
+  // Try forward without wrapping
+  for (let i = normalized + 1; i < allPaths.length; i += 1) {
+    const p = allPaths[i]
+    if (p && open.has(p.join(','))) {
+      return focus(s.derivation, s.branch + (i - normalized))
+    }
+  }
+  // Fall back to backward (any earlier branch)
+  for (let i = normalized - 1; i >= 0; i -= 1) {
+    const p = allPaths[i]
+    if (p && open.has(p.join(','))) {
+      return focus(s.derivation, s.branch + (i - normalized))
     }
   }
   return next(s)
@@ -78,14 +101,15 @@ export const apply = <J extends AnySequent>(
   const openBefore = openBranches(s.derivation).length
   const openAfter = openBranches(derivation).length
   if (openAfter < openBefore) {
-    return nextOpen(cursor)
+    // Branch was closed — find nearest open branch without wrapping preference
+    return forwardThenBackOpen(cursor)
   }
   // After branching rules, the branch index may point to a closed branch.
-  // Find the nearest open branch from the current position.
+  // Search forward to find one of the new branches.
   const curPath = activePath(cursor)
   const curDeriv = subDerivation(cursor.derivation, curPath)
   if (curDeriv && curDeriv.kind === 'transformation') {
-    return nextOpen(cursor)
+    return nextOpenForward(cursor)
   }
   return cursor
 }
