@@ -113,15 +113,17 @@ const ruleAction: Partial<Record<RuleId, Action>> = {
 
 const keyHintBadge = (
   hint: string,
-  variant: 'arrow' | 'gaze' | 'gazeGhost' = 'arrow',
+  variant: 'base' | 'hot' | 'cold' | 'coldGhost' = 'base',
 ): HTMLElement => {
   const badge = document.createElement('span')
   const cls =
-    variant === 'gaze'
-      ? 'key-hint gaze'
-      : variant === 'gazeGhost'
-        ? 'key-hint gaze ghost'
-        : 'key-hint'
+    variant === 'hot'
+      ? 'key-hint hot'
+      : variant === 'cold'
+        ? 'key-hint cold'
+        : variant === 'coldGhost'
+          ? 'key-hint cold ghost'
+          : 'key-hint'
   badge.setAttribute('class', cls)
   badge.textContent = hint
   return badge
@@ -143,13 +145,13 @@ export const createButton = (
   disabled: boolean,
   onClick?: () => void,
   hint?: string,
-  gazeHint = false,
+  hintVariant: 'base' | 'hot' | 'cold' = 'base',
 ): HTMLElement => {
   const el = document.createElement('pre')
   el.setAttribute('class', 'button' + (disabled ? ' disabled' : ''))
   if (!disabled && onClick) el.onclick = onClick
   if (hint !== undefined) {
-    el.appendChild(keyHintBadge(hint, gazeHint ? 'gaze' : 'arrow'))
+    el.appendChild(keyHintBadge(hint, hintVariant))
     el.appendChild(document.createTextNode(' ' + label))
   } else {
     el.innerHTML = label
@@ -316,13 +318,13 @@ const gazeHintBadgeForKind = (
 ): HTMLElement | null => {
   if (!hints) return null
   if (key === hints.immediateRule) {
-    return keyHintBadge(hints.hintChar, 'gaze')
+    return keyHintBadge(hints.hintChar, 'cold')
   }
   if (
     key === hints.eventualRule &&
     hints.eventualRule !== hints.immediateRule
   ) {
-    return keyHintBadge(hints.hintChar, 'gazeGhost')
+    return keyHintBadge(hints.hintChar, 'coldGhost')
   }
   return null
 }
@@ -347,7 +349,8 @@ const createPanel = <K extends RuleId>(
     pre.innerHTML = fromDerivation(rule.example)
     const action = ruleAction[key]
     const hint = action !== undefined ? actionKeyHint[action] : undefined
-    if (hint !== undefined) pre.appendChild(keyHintBadge(hint))
+    const ruleHintVariant = className === 'main' ? 'base' : 'hot'
+    if (hint !== undefined) pre.appendChild(keyHintBadge(hint, ruleHintVariant))
     const gazeBadges = [
       gazeHintBadgeForKind(key, gazeHints.connective),
       gazeHintBadgeForKind(key, gazeHints.weakening),
@@ -456,7 +459,6 @@ export const createBench = (
       rerender()
     },
     actionKeyHint['gazeLeft'],
-    true,
   )
   const gazeRightBtn = createButton(
     '→',
@@ -466,10 +468,12 @@ export const createBench = (
       rerender()
     },
     actionKeyHint['gazeRight'],
-    true,
   )
-  controlsEl.appendChild(gazeLeftBtn)
-  controlsEl.appendChild(gazeRightBtn)
+  const gazeGroup = document.createElement('div')
+  gazeGroup.setAttribute('class', 'gaze-group')
+  gazeGroup.appendChild(gazeLeftBtn)
+  gazeGroup.appendChild(gazeRightBtn)
+  controlsEl.appendChild(gazeGroup)
   controlsEl.appendChild(zoomOut)
   controlsEl.appendChild(zoomReset)
   controlsEl.appendChild(zoomIn)
