@@ -80,6 +80,13 @@ export const apply = <J extends AnySequent>(
   if (openAfter < openBefore) {
     return nextOpen(cursor)
   }
+  // After branching rules, the branch index may point to a closed branch.
+  // Find the nearest open branch from the current position.
+  const curPath = activePath(cursor)
+  const curDeriv = subDerivation(cursor.derivation, curPath)
+  if (curDeriv && curDeriv.kind === 'transformation') {
+    return nextOpen(cursor)
+  }
   return cursor
 }
 
