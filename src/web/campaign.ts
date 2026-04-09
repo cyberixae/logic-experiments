@@ -129,14 +129,10 @@ const createCongrats = (
   ws: AnyWorkspace,
   selectLevel: (id: string) => void,
   rerender: () => void,
-): HTMLElement => {
-  const panel = document.createElement('div')
-  panel.setAttribute('class', 'congrats-panel')
-
+): { hurray: HTMLElement; buttons: HTMLElement } => {
   const hurray = document.createElement('div')
   hurray.setAttribute('class', 'hurray')
   hurray.innerHTML = '\u{1F389} Conglaturations! \u{1F389}'
-  panel.appendChild(hurray)
 
   const buttons = document.createElement('div')
   buttons.setAttribute('class', 'congrabuttons')
@@ -167,9 +163,8 @@ const createCongrats = (
       '␣',
     ),
   )
-  panel.appendChild(buttons)
 
-  return panel
+  return { hurray, buttons }
 }
 
 export const mountCampaign = (

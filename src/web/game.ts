@@ -395,7 +395,7 @@ const createPanel = <K extends RuleId>(
 
 export const createBench = (
   workspace: AnyWorkspace,
-  makeCongrats: () => HTMLElement,
+  makeCongrats: () => { hurray: HTMLElement; buttons: HTMLElement },
   controlsEl: HTMLElement,
   rerender: () => void,
 ): HTMLElement => {
@@ -433,13 +433,15 @@ export const createBench = (
     weakening: buildKindHints('weakening', actionKeyHint['gazeWeakening']),
   }
 
+  const hideRules = !rulesVisible || solved
   const panel = document.createElement('div')
-  panel.setAttribute('class', 'bench' + (rulesVisible ? '' : ' rules-hidden'))
+  panel.setAttribute('class', 'bench' + (hideRules ? ' rules-hidden' : ''))
   panel.appendChild(
     createPanel('left', left, ls, rules, solved, apply, gazeHints),
   )
-  if (solved) {
-    panel.appendChild(makeCongrats())
+  const congrats = solved ? makeCongrats() : null
+  if (congrats) {
+    panel.appendChild(congrats.hurray)
   } else {
     panel.appendChild(
       createPanel('main', center, ls, rules, solved, applyCenter, gazeHints),
@@ -548,9 +550,13 @@ export const createBench = (
     },
     actionKeyHint['axiom'],
   )
-  gazeGroupCell.appendChild(rulesBtn)
-  gazeGroupCell.appendChild(gazeGroup)
-  gazeGroupCell.appendChild(axiomBtn)
+  if (congrats) {
+    gazeGroupCell.appendChild(congrats.buttons)
+  } else {
+    gazeGroupCell.appendChild(rulesBtn)
+    gazeGroupCell.appendChild(gazeGroup)
+    gazeGroupCell.appendChild(axiomBtn)
+  }
   const rightCell = document.createElement('div')
   rightCell.setAttribute('class', 'controls-cell controls-right')
   rightCell.appendChild(zoomOut)
