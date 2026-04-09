@@ -33,6 +33,7 @@ export type AnyWorkspace = Workspace<
 >
 
 export const qwertyKeyMap: Record<KeyboardEvent['code'], Action> = {
+  KeyQ: 'menu',
   Escape: 'menu',
   Backquote: 'level',
   KeyW: 'prevBranch',
