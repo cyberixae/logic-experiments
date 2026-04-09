@@ -37,7 +37,7 @@ export const qwertyKeyMap: Record<KeyboardEvent['code'], Action> = {
   Backquote: 'level',
   KeyW: 'prevBranch',
   KeyO: 'nextBranch',
-  KeyR: 'reset',
+  KeyY: 'reset',
   KeyA: 'leftRotateLeft',
   KeyS: 'leftWeakening',
   KeyF: 'leftConnective',
