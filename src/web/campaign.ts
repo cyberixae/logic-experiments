@@ -84,6 +84,8 @@ const createControls = (
   listingEl: HTMLElement,
   rerender: () => void,
   navigate: Navigate,
+  showLevelButton: boolean,
+  onLevel: () => void,
 ): HTMLElement => {
   const canUndo = activePath(ws.currentConjecture()).length > 0
   const panel = document.createElement('div')
@@ -92,14 +94,16 @@ const createControls = (
   panel.appendChild(
     createButton('menu', false, () => navigate('menu'), actionKeyHint['menu']),
   )
-  panel.appendChild(
-    createButton(
-      'level',
-      false,
-      () => listingEl.removeAttribute('style'),
-      actionKeyHint['level'],
-    ),
-  )
+  if (showLevelButton) {
+    panel.appendChild(
+      createButton(
+        'level',
+        false,
+        onLevel,
+        actionKeyHint['level'],
+      ),
+    )
+  }
   panel.appendChild(
     createButton(
       'reset',
@@ -172,6 +176,21 @@ export const mountCampaign = (
   navigate: Navigate,
 ): (() => void) => {
   setDefaultRulesVisible(true)
+  let levelPresses = 0
+  const toggleLevel = (listingEl: HTMLElement) => {
+    levelPresses += 1
+    if (levelPresses < 2) return
+    if (levelPresses === 2) {
+      rerender()
+      return
+    }
+    const isHidden = listingEl.style.display === 'none'
+    if (isHidden) {
+      listingEl.removeAttribute('style')
+    } else {
+      listingEl.setAttribute('style', 'display: none;')
+    }
+  }
   const ws = new Workspace(challenges)
 
   const selectLevel = (id: string) => {
@@ -192,7 +211,7 @@ export const mountCampaign = (
     container.innerHTML = ''
     listingEl = createListing(ws, selectLevel)
     container.appendChild(listingEl)
-    const controlsEl = createControls(ws, listingEl, rerender, navigate)
+    const controlsEl = createControls(ws, listingEl, rerender, navigate, levelPresses >= 2, () => toggleLevel(listingEl))
     const makeCongrats = () => createCongrats(ws, selectLevel, rerender)
     container.appendChild(createBench(ws, makeCongrats, controlsEl, rerender))
   }
@@ -219,7 +238,7 @@ export const mountCampaign = (
     rerender,
     navigate,
     onSolved,
-    () => listingEl.removeAttribute('style'),
+    () => toggleLevel(listingEl),
   )
 
   // Read initial level from URL
