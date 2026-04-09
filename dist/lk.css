@@ -216,7 +216,8 @@ body {
   top: 8px;
   left: -15px;
 }
-.button.disabled > .key-hint {
+.button.disabled > .key-hint,
+.button.disabled > .gaze-hint-stack {
   visibility: hidden;
 }
 .button {

@@ -8,7 +8,7 @@ import {
 import { activePath, activeSequent } from '../interactive/focus'
 import { Rule } from '../model/rule'
 import { AnySequent } from '../model/sequent'
-import { branches } from '../model/derivation'
+import { branches, subDerivation } from '../model/derivation'
 import { fromDerivation } from '../render/print'
 import { RuleId } from '../model/rule'
 import { renderDerivation, layoutTree } from './tree'
@@ -419,6 +419,10 @@ export const createBench = (
   const ls = workspace.applicableRules()
   const rules = workspace.availableRules()
   const solved = workspace.isSolved()
+  const focus = workspace.currentConjecture()
+  const activeDeriv = subDerivation(focus.derivation, activePath(focus))
+  const branchClosed = activeDeriv?.kind === 'transformation'
+  const inactive = solved || branchClosed
 
   const apply = (key: RuleId) => {
     if (isReverseId0(key)) workspace.applyEvent(reverse0(key))
@@ -454,18 +458,18 @@ export const createBench = (
   const panel = document.createElement('div')
   panel.setAttribute('class', 'bench' + (hideRules ? ' rules-hidden' : ''))
   panel.appendChild(
-    createPanel('left', left, ls, rules, solved, apply, gazeHints),
+    createPanel('left', left, ls, rules, inactive, apply, gazeHints),
   )
   const congrats = solved ? makeCongrats() : null
   if (congrats) {
     panel.appendChild(congrats.hurray)
   } else {
     panel.appendChild(
-      createPanel('main', center, ls, rules, solved, applyCenter, gazeHints),
+      createPanel('main', center, ls, rules, inactive, applyCenter, gazeHints),
     )
   }
   panel.appendChild(
-    createPanel('right', right, ls, rules, solved, apply, gazeHints),
+    createPanel('right', right, ls, rules, inactive, apply, gazeHints),
   )
   panel.appendChild(createPlayArea(workspace))
   const zoomOut = createButton(
@@ -496,7 +500,7 @@ export const createBench = (
     '+',
   )
   const gazeMovable =
-    !solved && seq.antecedent.length + seq.succedent.length > 1
+    !inactive && seq.antecedent.length + seq.succedent.length > 1
   const gazeLeftBtn = createButton(
     'Left',
     !gazeMovable,
@@ -517,7 +521,7 @@ export const createBench = (
   )
   const gazeWeakeningBtn = createButton(
     'Drop',
-    solved,
+    inactive,
     () => {
       workspace.setGazeKind('weakening')
       applyGazeRule(workspace, 'weakening')
@@ -528,7 +532,7 @@ export const createBench = (
   const connectiveRule = gazeHints.connective?.eventualRule ?? null
   const connectiveLabel =
     connectiveRule !== null ? (ruleConnectiveLabel[connectiveRule] ?? '') : ''
-  const connectiveDisabled = solved || connectiveLabel === ''
+  const connectiveDisabled = inactive || connectiveLabel === ''
   const gazeConnectiveBtn = createButton(
     'Destruct',
     connectiveDisabled,
@@ -556,7 +560,7 @@ export const createBench = (
   )
   const axiomBtn = createButton(
     'Axiom',
-    solved || !keys(center).some((k) => ls.includes(k)),
+    inactive || !keys(center).some((k) => ls.includes(k)),
     () => {
       autoRule(workspace, keys(center))
       rerender()
@@ -669,6 +673,21 @@ export const createDispatch =
     }
     if (workspace.isSolved()) {
       onSolved(action)
+      return
+    }
+    const focusState = workspace.currentConjecture()
+    const activeDeriv = subDerivation(
+      focusState.derivation,
+      activePath(focusState),
+    )
+    const onClosedBranch = activeDeriv?.kind === 'transformation'
+    if (
+      onClosedBranch &&
+      action !== 'prevBranch' &&
+      action !== 'nextBranch' &&
+      action !== 'undo'
+    ) {
+      rerender()
       return
     }
     switch (action) {
