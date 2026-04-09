@@ -510,9 +510,7 @@ export const createBench = (
   )
   const connectiveRule = gazeHints.connective?.eventualRule ?? null
   const connectiveLabel =
-    connectiveRule !== null
-      ? (ruleConnectiveLabel[connectiveRule] ?? '')
-      : ''
+    connectiveRule !== null ? (ruleConnectiveLabel[connectiveRule] ?? '') : ''
   const connectiveDisabled = solved || connectiveLabel === ''
   const gazeConnectiveBtn = createButton(
     'Destruct',

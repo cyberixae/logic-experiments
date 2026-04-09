@@ -72,10 +72,15 @@ const createCongrats = (
   const buttons = document.createElement('div')
   buttons.setAttribute('class', 'congrabuttons')
   buttons.appendChild(
-    createButton('Play Again', false, () => {
-      ws.applyEvent(reset())
-      rerender()
-    }, actionKeyHint['reset']),
+    createButton(
+      'Play Again',
+      false,
+      () => {
+        ws.applyEvent(reset())
+        rerender()
+      },
+      actionKeyHint['reset'],
+    ),
   )
   buttons.appendChild(createButton('New Challenge', false, onNew, 'n'))
 

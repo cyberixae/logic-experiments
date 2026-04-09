@@ -96,12 +96,7 @@ const createControls = (
   )
   if (showLevelButton) {
     panel.appendChild(
-      createButton(
-        'level',
-        false,
-        onLevel,
-        actionKeyHint['level'],
-      ),
+      createButton('level', false, onLevel, actionKeyHint['level']),
     )
   }
   panel.appendChild(
@@ -211,7 +206,14 @@ export const mountCampaign = (
     container.innerHTML = ''
     listingEl = createListing(ws, selectLevel)
     container.appendChild(listingEl)
-    const controlsEl = createControls(ws, listingEl, rerender, navigate, levelPresses >= 2, () => toggleLevel(listingEl))
+    const controlsEl = createControls(
+      ws,
+      listingEl,
+      rerender,
+      navigate,
+      levelPresses >= 2,
+      () => toggleLevel(listingEl),
+    )
     const makeCongrats = () => createCongrats(ws, selectLevel, rerender)
     container.appendChild(createBench(ws, makeCongrats, controlsEl, rerender))
   }
