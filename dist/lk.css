@@ -102,8 +102,8 @@ body {
   justify-content: safe end;
   min-height: 0;
   scroll-behavior: smooth;
-  padding: 8em 8em 6em 8em;
-  scroll-padding: 8em 8em 6em 8em;
+  padding: 8em 16em 6em 16em;
+  scroll-padding: 8em 16em 6em 16em;
   scrollbar-width: none;
   mask-image:
     linear-gradient(

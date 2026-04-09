@@ -220,6 +220,7 @@ const runProofCheckSweep = (tree: HTMLElement): void => {
 }
 
 let lastScrollTop = 0
+let lastScrollLeft = 0
 
 const createPlayArea = (workspace: AnyWorkspace): HTMLElement => {
   const panel = document.createElement('div')
@@ -227,8 +228,10 @@ const createPlayArea = (workspace: AnyWorkspace): HTMLElement => {
   panel.style.setProperty('--tree-zoom', String(treeZoom))
   panel.addEventListener('scroll', () => {
     lastScrollTop = panel.scrollTop
+    lastScrollLeft = panel.scrollLeft
   })
   const startTop = lastScrollTop
+  const startLeft = lastScrollLeft
   const focus = workspace.currentConjecture()
   const gaze = workspace.gaze()
   const ghost = computeGhostChain(
@@ -249,8 +252,20 @@ const createPlayArea = (workspace: AnyWorkspace): HTMLElement => {
   tree.style.visibility = 'hidden'
   panel.appendChild(tree)
   requestAnimationFrame(() => {
-    panel.scrollTo({ top: startTop, behavior: 'instant' })
-    layoutTree(tree, { skipActiveScroll: solved })
+    layoutTree(tree, { skipActiveScroll: true })
+    panel.scrollTo({ top: startTop, left: startLeft, behavior: 'instant' })
+    if (!solved) {
+      requestAnimationFrame(() => {
+        const active = tree.querySelector('.tree-active') as HTMLElement | null
+        if (active) {
+          active.scrollIntoView({
+            behavior: 'smooth',
+            block: 'center',
+            inline: 'nearest',
+          })
+        }
+      })
+    }
     if (isFresh && !solved && autoZoomedDerivation !== focus.derivation) {
       autoZoomedDerivation = focus.derivation
       const rootSequent = tree.querySelector(
@@ -272,7 +287,7 @@ const createPlayArea = (workspace: AnyWorkspace): HTMLElement => {
           if (Math.abs(target - treeZoom) > 0.01) {
             treeZoom = target
             panel.style.setProperty('--tree-zoom', String(treeZoom))
-            layoutTree(tree, { skipActiveScroll: solved })
+            layoutTree(tree, { skipActiveScroll: true })
           }
         }
       }

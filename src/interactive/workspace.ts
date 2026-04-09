@@ -82,16 +82,24 @@ export class Workspace<
     const cursor = this.currentConjecture()
     const update = applyEvent(cursor, ev)
     this.conjectures[this.selected] = update
-    const seq = activeSequent(update)
-    const sideLen =
-      oldGaze.side === 'left' ? seq.antecedent.length : seq.succedent.length
-    if (sideLen > 0) {
-      this._gaze = {
-        side: oldGaze.side,
-        index: Math.min(oldGaze.index, sideLen - 1),
-      }
-    } else {
+    if (
+      ev.kind === 'nextBranch' ||
+      ev.kind === 'prevBranch' ||
+      ev.kind === 'reset'
+    ) {
       this._gaze = null
+    } else {
+      const seq = activeSequent(update)
+      const sideLen =
+        oldGaze.side === 'left' ? seq.antecedent.length : seq.succedent.length
+      if (sideLen > 0) {
+        this._gaze = {
+          side: oldGaze.side,
+          index: Math.min(oldGaze.index, sideLen - 1),
+        }
+      } else {
+        this._gaze = null
+      }
     }
     this._gazeKind = 'connective'
   }

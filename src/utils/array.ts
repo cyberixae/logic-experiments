@@ -21,7 +21,8 @@ export const zip = <A, B>(a: Array<A>, b: Array<B>): Array<[A, B]> => {
 }
 
 export const mod = <T>(arr: NonEmptyArray<T>, index: number): T => {
-  return arr[Math.floor(index) % arr.length] as T
+  const len = arr.length
+  return arr[((Math.floor(index) % len) + len) % len] as T
 }
 
 export const replaceItem = <T>(
