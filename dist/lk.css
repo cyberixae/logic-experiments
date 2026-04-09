@@ -423,6 +423,16 @@ body {
 .tree-active > .tree-sequent {
   background-color: #fcaa;
 }
+.tree-closed-active {
+  position: relative;
+}
+.tree-closed-marker {
+  width: 2em;
+  height: 1.5em;
+  background-color: #fcaa;
+  border-radius: 10px;
+  margin: 0 auto;
+}
 .tree-node > .tree-sequent {
   transition: color 0.25s ease-out;
 }

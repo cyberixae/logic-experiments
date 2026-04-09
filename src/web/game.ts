@@ -256,7 +256,9 @@ const createPlayArea = (workspace: AnyWorkspace): HTMLElement => {
     panel.scrollTo({ top: startTop, left: startLeft, behavior: 'instant' })
     if (!solved) {
       requestAnimationFrame(() => {
-        const active = tree.querySelector('.tree-active') as HTMLElement | null
+        const active = tree.querySelector(
+          '.tree-active, .tree-closed-active',
+        ) as HTMLElement | null
         if (active) {
           active.scrollIntoView({
             behavior: 'smooth',

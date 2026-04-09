@@ -76,14 +76,24 @@ export const renderDerivation = (
   ghost: GhostStep[] | null = null,
   currentPath: Path = [],
 ): HTMLElement => {
-  const isActive =
-    derivation.kind === 'premise' && equalPaths(currentPath, activePath)
+  const isActive = equalPaths(currentPath, activePath)
+  const isOpenActive = isActive && derivation.kind === 'premise'
+  const isClosedActive = isActive && derivation.kind === 'transformation'
 
   const node = document.createElement('div')
-  node.setAttribute('class', 'tree-node' + (isActive ? ' tree-active' : ''))
+  const cls =
+    'tree-node' +
+    (isOpenActive ? ' tree-active' : '') +
+    (isClosedActive ? ' tree-closed-active' : '')
+  node.setAttribute('class', cls)
 
   let leafDepth = 0
   if (derivation.kind === 'transformation') {
+    if (isClosedActive) {
+      const marker = document.createElement('div')
+      marker.setAttribute('class', 'tree-closed-marker')
+      node.appendChild(marker)
+    }
     const premises = document.createElement('div')
     premises.setAttribute('class', 'tree-premises')
     let maxChildDepth = -1
@@ -103,12 +113,14 @@ export const renderDerivation = (
     leafDepth = maxChildDepth < 0 ? 0 : maxChildDepth + 1
     node.appendChild(premises)
     node.appendChild(renderInferenceLine(derivation.rule))
-    node.appendChild(renderSequent(derivation, applicableRules, isActive, gaze))
+    node.appendChild(renderSequent(derivation, applicableRules, false, null))
   } else {
-    if (isActive && ghost && ghost.length > 0) {
+    if (isOpenActive && ghost && ghost.length > 0) {
       node.appendChild(renderGhost(ghost))
     }
-    node.appendChild(renderSequent(derivation, applicableRules, isActive, gaze))
+    node.appendChild(
+      renderSequent(derivation, applicableRules, isOpenActive, gaze),
+    )
   }
   node.dataset['leafDepth'] = String(leafDepth)
 
