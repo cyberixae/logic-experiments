@@ -524,14 +524,12 @@ export const createBench = (
     },
     actionKeyHint['gazeConnective'],
   )
-  const gazeGroup = document.createElement('div')
-  gazeGroup.setAttribute('class', 'gaze-group')
-  gazeGroup.appendChild(gazeLeftBtn)
-  gazeGroup.appendChild(gazeWeakeningBtn)
-  gazeGroup.appendChild(gazeConnectiveBtn)
-  gazeGroup.appendChild(gazeRightBtn)
-  const gazeGroupCell = document.createElement('div')
-  gazeGroupCell.setAttribute('class', 'gaze-group-cell')
+  const makeGroup = (...cls: string[]): HTMLElement => {
+    const g = document.createElement('div')
+    g.setAttribute('class', ['controls-group', ...cls].join(' '))
+    return g
+  }
+
   const rulesBtn = createButton(
     'Rules',
     false,
@@ -550,23 +548,45 @@ export const createBench = (
     },
     actionKeyHint['axiom'],
   )
-  if (congrats) {
-    gazeGroupCell.appendChild(congrats.buttons)
-  } else {
-    gazeGroupCell.appendChild(rulesBtn)
-    gazeGroupCell.appendChild(gazeGroup)
-    gazeGroupCell.appendChild(axiomBtn)
-  }
+
+  const gazeGroup = makeGroup('gaze')
+  gazeGroup.appendChild(gazeLeftBtn)
+  gazeGroup.appendChild(gazeWeakeningBtn)
+  gazeGroup.appendChild(gazeConnectiveBtn)
+  gazeGroup.appendChild(gazeRightBtn)
+
+  const rulesGroup = makeGroup()
+  rulesGroup.appendChild(rulesBtn)
+
+  const axiomGroup = makeGroup()
+  axiomGroup.appendChild(axiomBtn)
+
+  const zoomGroup = makeGroup()
+  zoomGroup.appendChild(zoomOut)
+  zoomGroup.appendChild(zoomReset)
+  zoomGroup.appendChild(zoomIn)
+
+  controlsEl.setAttribute('class', 'controls-group')
+
+  const centerCell = document.createElement('div')
+  centerCell.setAttribute('class', 'controls-center')
+
   const rightCell = document.createElement('div')
-  rightCell.setAttribute('class', 'controls-cell controls-right')
-  rightCell.appendChild(zoomOut)
-  rightCell.appendChild(zoomReset)
-  rightCell.appendChild(zoomIn)
-  controlsEl.setAttribute('class', 'controls-left')
+  rightCell.setAttribute('class', 'controls-right')
+  rightCell.appendChild(zoomGroup)
+
   const controlsBar = document.createElement('div')
   controlsBar.setAttribute('class', 'controls')
+  if (congrats) {
+    congrats.buttons.setAttribute('class', 'congrabuttons controls-group')
+    centerCell.appendChild(congrats.buttons)
+  } else {
+    centerCell.appendChild(rulesGroup)
+    centerCell.appendChild(gazeGroup)
+    centerCell.appendChild(axiomGroup)
+  }
   controlsBar.appendChild(controlsEl)
-  controlsBar.appendChild(gazeGroupCell)
+  controlsBar.appendChild(centerCell)
   controlsBar.appendChild(rightCell)
   panel.appendChild(controlsBar)
   return panel
