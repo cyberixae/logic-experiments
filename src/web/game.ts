@@ -233,6 +233,7 @@ const createPlayArea = (workspace: AnyWorkspace): HTMLElement => {
   const startTop = lastScrollTop
   const startLeft = lastScrollLeft
   const focus = workspace.currentConjecture()
+  const solved = workspace.isSolved()
   const gaze = workspace.gaze()
   const ghost = computeGhostChain(
     activeSequent(focus),
@@ -242,12 +243,11 @@ const createPlayArea = (workspace: AnyWorkspace): HTMLElement => {
   )
   const tree = renderDerivation(
     focus.derivation,
-    activePath(focus),
+    solved ? [-1] : activePath(focus),
     workspace.applicableRules(),
     gaze,
     ghost,
   )
-  const solved = workspace.isSolved()
   const isFresh = focus.derivation.kind === 'premise'
   tree.style.visibility = 'hidden'
   panel.appendChild(tree)
