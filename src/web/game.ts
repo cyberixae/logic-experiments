@@ -53,7 +53,7 @@ export const qwertyKeyMap: Record<KeyboardEvent['code'], Action> = {
   ArrowRight: 'gazeRight',
   ArrowUp: 'gazeConnective',
   ArrowDown: 'gazeWeakening',
-  KeyI: 'toggleRules',
+  KeyR: 'toggleRules',
 }
 
 const codeToLabel = (code: string): string => {
