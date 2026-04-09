@@ -301,6 +301,26 @@ const createPlayArea = (workspace: AnyWorkspace): HTMLElement => {
   return panel
 }
 
+const ruleConnectiveLabel: Partial<Record<RuleId, string>> = {
+  nl: '¬',
+  nr: '¬',
+  cl: '∧',
+  cl1: '∧',
+  cl2: '∧',
+  cr: '∧',
+  fcr: '∧',
+  dl: '∨',
+  dl1: '∨',
+  dl2: '∨',
+  dr: '∨',
+  dr1: '∨',
+  dr2: '∨',
+  il: '→',
+  fil: '→',
+  ir: '→',
+  fdl: '∨',
+}
+
 type GazeHintsForKind = {
   immediateRule: RuleId | null
   eventualRule: RuleId | null
@@ -452,7 +472,7 @@ export const createBench = (
   const gazeMovable =
     !solved && seq.antecedent.length + seq.succedent.length > 1
   const gazeLeftBtn = createButton(
-    '←',
+    'Left',
     !gazeMovable,
     () => {
       workspace.moveGaze(-1)
@@ -461,7 +481,7 @@ export const createBench = (
     actionKeyHint['gazeLeft'],
   )
   const gazeRightBtn = createButton(
-    '→',
+    'Right',
     !gazeMovable,
     () => {
       workspace.moveGaze(1)
@@ -469,15 +489,53 @@ export const createBench = (
     },
     actionKeyHint['gazeRight'],
   )
+  const gazeWeakeningBtn = createButton(
+    'Drop',
+    solved,
+    () => {
+      workspace.setGazeKind('weakening')
+      applyGazeRule(workspace, 'weakening')
+      rerender()
+    },
+    actionKeyHint['gazeWeakening'],
+  )
+  const connectiveRule = gazeHints.connective?.eventualRule ?? null
+  const connectiveLabel =
+    connectiveRule !== null
+      ? (ruleConnectiveLabel[connectiveRule] ?? '')
+      : ''
+  const connectiveDisabled = solved || connectiveLabel === ''
+  const gazeConnectiveBtn = createButton(
+    'Destruct',
+    connectiveDisabled,
+    () => {
+      workspace.setGazeKind('connective')
+      applyGazeRule(workspace, 'connective')
+      rerender()
+    },
+    actionKeyHint['gazeConnective'],
+  )
   const gazeGroup = document.createElement('div')
   gazeGroup.setAttribute('class', 'gaze-group')
   gazeGroup.appendChild(gazeLeftBtn)
+  gazeGroup.appendChild(gazeWeakeningBtn)
+  gazeGroup.appendChild(gazeConnectiveBtn)
   gazeGroup.appendChild(gazeRightBtn)
-  controlsEl.appendChild(gazeGroup)
-  controlsEl.appendChild(zoomOut)
-  controlsEl.appendChild(zoomReset)
-  controlsEl.appendChild(zoomIn)
-  panel.appendChild(controlsEl)
+  const gazeGroupCell = document.createElement('div')
+  gazeGroupCell.setAttribute('class', 'gaze-group-cell')
+  gazeGroupCell.appendChild(gazeGroup)
+  const rightCell = document.createElement('div')
+  rightCell.setAttribute('class', 'controls-cell controls-right')
+  rightCell.appendChild(zoomOut)
+  rightCell.appendChild(zoomReset)
+  rightCell.appendChild(zoomIn)
+  controlsEl.setAttribute('class', 'controls-left')
+  const controlsBar = document.createElement('div')
+  controlsBar.setAttribute('class', 'controls')
+  controlsBar.appendChild(controlsEl)
+  controlsBar.appendChild(gazeGroupCell)
+  controlsBar.appendChild(rightCell)
+  panel.appendChild(controlsBar)
   return panel
 }
 

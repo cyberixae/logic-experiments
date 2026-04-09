@@ -31,16 +31,9 @@ const createControls = (
   panel.setAttribute('class', 'controls')
 
   panel.appendChild(
-    createButton(
-      'undo',
-      !canUndo,
-      () => {
-        ws.applyEvent({ kind: 'undo' })
-        rerender()
-      },
-      actionKeyHint['undo'],
-    ),
+    createButton('menu', false, () => navigate('menu'), actionKeyHint['menu']),
   )
+  panel.appendChild(createButton('new', false, onNew, 'n'))
   panel.appendChild(
     createButton(
       'reset',
@@ -52,9 +45,16 @@ const createControls = (
       actionKeyHint['reset'],
     ),
   )
-  panel.appendChild(createButton('new', false, onNew, 'n'))
   panel.appendChild(
-    createButton('menu', false, () => navigate('menu'), actionKeyHint['menu']),
+    createButton(
+      'undo',
+      !canUndo,
+      () => {
+        ws.applyEvent({ kind: 'undo' })
+        rerender()
+      },
+      actionKeyHint['undo'],
+    ),
   )
   return panel
 }

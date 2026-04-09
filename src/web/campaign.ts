@@ -89,14 +89,14 @@ const createControls = (
   panel.setAttribute('class', 'controls')
 
   panel.appendChild(
+    createButton('menu', false, () => navigate('menu'), actionKeyHint['menu']),
+  )
+  panel.appendChild(
     createButton(
-      'undo',
-      !canUndo,
-      () => {
-        ws.applyEvent({ kind: 'undo' })
-        rerender()
-      },
-      actionKeyHint['undo'],
+      'level',
+      false,
+      () => listingEl.removeAttribute('style'),
+      actionKeyHint['level'],
     ),
   )
   panel.appendChild(
@@ -112,14 +112,14 @@ const createControls = (
   )
   panel.appendChild(
     createButton(
-      'level',
-      false,
-      () => listingEl.removeAttribute('style'),
-      actionKeyHint['level'],
+      'undo',
+      !canUndo,
+      () => {
+        ws.applyEvent({ kind: 'undo' })
+        rerender()
+      },
+      actionKeyHint['undo'],
     ),
-  )
-  panel.appendChild(
-    createButton('menu', false, () => navigate('menu'), actionKeyHint['menu']),
   )
   return panel
 }

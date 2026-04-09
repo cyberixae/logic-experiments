@@ -27,16 +27,30 @@ body {
   grid-template-areas:
     'left main right'
     'left status right'
-    'left controls right';
+    'controls controls controls';
 }
 .controls {
   grid-area: controls;
-  display: flex;
-  justify-content: center;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
   align-items: center;
+  gap: 1em;
+}
+.controls-left {
   display: flex;
   flex-direction: row;
   gap: 1em;
+}
+.controls-right {
+  display: flex;
+  flex-direction: row;
+  gap: 1em;
+  justify-content: flex-end;
+}
+.gaze-group-cell {
+  flex: 1;
+  display: flex;
+  justify-content: center;
 }
 .gaze-group {
   display: flex;
