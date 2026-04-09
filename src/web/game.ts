@@ -719,21 +719,22 @@ const applyGazeRule = (
 ): void => {
   const gaze = workspace.gaze()
   const seq = activeSequent(workspace.currentConjecture())
+  const available = workspace.availableRules()
   const ant = seq.antecedent.length
   const suc = seq.succedent.length
   if (gaze.side === 'left') {
     if (ant === 0) return
     const activeIndex = ant - 1
     if (gaze.index === activeIndex) {
-      // At active position — apply the rule directly
       if (kind === 'connective') {
         autoRule(workspace, keys(leftLogical))
       } else {
+        if (!available.includes('swl')) return
         workspace.applyEvent(reverse0('swl'))
       }
       return
     }
-    // Not at active — rotate one step toward arrow
+    if (!available.includes('sRotLB')) return
     workspace.applyEventWithGaze(reverse0('sRotLB'), {
       side: 'left',
       index: gaze.index + 1,
@@ -745,10 +746,12 @@ const applyGazeRule = (
       if (kind === 'connective') {
         autoRule(workspace, keys(rightLogical))
       } else {
+        if (!available.includes('swr')) return
         workspace.applyEvent(reverse0('swr'))
       }
       return
     }
+    if (!available.includes('sRotRB')) return
     workspace.applyEventWithGaze(reverse0('sRotRB'), {
       side: 'right',
       index: gaze.index - 1,
