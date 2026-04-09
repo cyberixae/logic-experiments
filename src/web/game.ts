@@ -720,6 +720,8 @@ const applyGazeRule = (
   const gaze = workspace.gaze()
   const seq = activeSequent(workspace.currentConjecture())
   const available = workspace.availableRules()
+  const chain = computeGhostChain(seq, gaze, kind, available)
+  if (!chain || chain.length === 0) return
   const ant = seq.antecedent.length
   const suc = seq.succedent.length
   if (gaze.side === 'left') {
