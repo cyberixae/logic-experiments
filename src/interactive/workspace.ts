@@ -78,10 +78,21 @@ export class Workspace<
     return typeof s === 'string' && s in this.theorems
   }
   applyEvent(ev: Event) {
+    const oldGaze = this.gaze()
     const cursor = this.currentConjecture()
     const update = applyEvent(cursor, ev)
     this.conjectures[this.selected] = update
-    this._gaze = null
+    const seq = activeSequent(update)
+    const sideLen =
+      oldGaze.side === 'left' ? seq.antecedent.length : seq.succedent.length
+    if (sideLen > 0) {
+      this._gaze = {
+        side: oldGaze.side,
+        index: Math.min(oldGaze.index, sideLen - 1),
+      }
+    } else {
+      this._gaze = null
+    }
     this._gazeKind = 'connective'
   }
 
