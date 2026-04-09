@@ -53,6 +53,18 @@ export const activeSequent = (s: AnyFocus): AnySequent => {
   return (derivation ?? s.derivation).result
 }
 
+const nextOpen = <J extends AnySequent>(s: Focus<J>): Focus<J> => {
+  const allPaths = branches(s.derivation)
+  const open = new Set(openBranches(s.derivation).map((p) => p.join(',')))
+  for (let i = 1; i <= allPaths.length; i += 1) {
+    const candidate = array.mod(allPaths, s.branch + i)
+    if (open.has(candidate.join(','))) {
+      return focus(s.derivation, s.branch + i)
+    }
+  }
+  return next(s)
+}
+
 export const apply = <J extends AnySequent>(
   s: Focus<J>,
   edit: Edit,
@@ -66,7 +78,7 @@ export const apply = <J extends AnySequent>(
   const openBefore = openBranches(s.derivation).length
   const openAfter = openBranches(derivation).length
   if (openAfter < openBefore) {
-    return next(cursor)
+    return nextOpen(cursor)
   }
   return cursor
 }
