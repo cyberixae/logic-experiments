@@ -62,6 +62,26 @@ const zeta = {
   sRotRB: ruleSRotRB.apply,
 }
 
+export const rules = [
+  'i',
+  'f',
+  'v',
+  'swl',
+  'swr',
+  'sRotLF',
+  'sRotRF',
+  'sRotLB',
+  'sRotRB',
+  'nl',
+  'nr',
+  'cl',
+  'cr',
+  'dl',
+  'dr',
+  'il',
+  'ir',
+] as const
+
 export const name = 'RK'
 
 export const rk = {

@@ -1,28 +1,8 @@
-import { rk } from '../systems/rk'
+import { rk, rules } from '../systems/rk'
 import { sequent } from '../model/sequent'
 import { challenge } from '../model/challenge'
 
 const { a, o, z, i } = rk
-
-const rules = [
-  'i',
-  'f',
-  'v',
-  'swl',
-  'swr',
-  'sRotLF',
-  'sRotRF',
-  'sRotLB',
-  'sRotRB',
-  'nl',
-  'nr',
-  'cl',
-  'cr',
-  'dl',
-  'dr',
-  'il',
-  'ir',
-] as const
 
 const goal = sequent(
   [o.p2.disjunction(o.p0.falsum, a('p'))],
