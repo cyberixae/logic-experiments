@@ -26,6 +26,7 @@ import { Action } from '../interactive/action'
 import { computeGhostChain } from '../interactive/ghost'
 import { Navigate } from './types'
 import { entries, keys } from '../utils/record'
+import { isNonNullable } from '../utils/utils'
 
 export type AnyWorkspace = Workspace<
   string,
@@ -398,7 +399,7 @@ const createPanel = <K extends RuleId>(
     const gazeBadges = [
       gazeHintBadgeForKind(key, gazeHints.connective),
       gazeHintBadgeForKind(key, gazeHints.weakening),
-    ].filter((b): b is HTMLElement => b !== null)
+    ].filter(isNonNullable)
     if (gazeBadges.length > 0) {
       const stack = document.createElement('span')
       stack.setAttribute('class', 'gaze-hint-stack')
