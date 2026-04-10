@@ -193,6 +193,7 @@ export const matchRuleRaw = <R>(
   t: AnyTransformation,
   f: MatchRuleRaw<R>,
 ): R => {
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
   const u = t as AnyRule
   switch (u.rule) {
     case 'a1':

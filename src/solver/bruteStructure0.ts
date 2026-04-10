@@ -76,6 +76,7 @@ export const bruteStructure0 = <A extends AnySequent, R extends RuleId>(
   function* () {
     const result = buildStructurePath(d, rules, p)
     if (result !== null) {
+      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
       yield result as unknown as ProofUsing<A, R>
     }
   }
