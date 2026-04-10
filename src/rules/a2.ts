@@ -4,7 +4,8 @@ import {
   introduction,
   Derivation,
 } from '../model/derivation'
-import { Prop, Implication, equals, implication, atom } from '../model/prop'
+import { Prop, Implication, implication, atom } from '../model/prop'
+import * as t from '../model/template'
 import {
   Conclusion,
   conclusion,
@@ -13,6 +14,15 @@ import {
 } from '../model/sequent'
 import { Refinement } from '../utils/generic'
 import { Rule } from '../model/rule'
+
+export const P = t.Variable('P')
+export const Q = t.Variable('Q')
+export const R = t.Variable('R')
+
+export const Axiom2 = t.Implication(
+  t.Implication(P, t.Implication(Q, R)),
+  t.Implication(t.Implication(P, Q), t.Implication(P, R)),
+)
 
 export type Axiom2<
   P extends Prop,
@@ -23,54 +33,8 @@ export type Axiom2<
   Implication<Implication<P, Q>, Implication<P, R>>
 >
 export type AnyAxiom2 = Axiom2<Prop, Prop, Prop>
-export const isAxiom2: Refinement<Prop, AnyAxiom2> = (p): p is AnyAxiom2 => {
-  const piqiripiqipir = p
-  if (piqiripiqipir.kind !== 'implication') {
-    return false
-  }
-  const piqir = piqiripiqipir.antecedent
-  if (piqir.kind !== 'implication') {
-    return false
-  }
-  const p1 = piqir.antecedent
-  const qir = piqir.consequent
-  if (qir.kind !== 'implication') {
-    return false
-  }
-  const q1 = qir.antecedent
-  const r1 = qir.consequent
-
-  const piqipir = piqiripiqipir.consequent
-  if (piqipir.kind !== 'implication') {
-    return false
-  }
-  const piq = piqipir.antecedent
-  if (piq.kind !== 'implication') {
-    return false
-  }
-  const p2 = piq.antecedent
-  const q2 = piq.consequent
-  const pir = piqipir.consequent
-  if (pir.kind !== 'implication') {
-    return false
-  }
-  const p3 = pir.antecedent
-  const r2 = pir.consequent
-
-  if (!equals(p1, p2)) {
-    return false
-  }
-  if (!equals(p2, p3)) {
-    return false
-  }
-  if (!equals(q1, q2)) {
-    return false
-  }
-  if (!equals(r1, r2)) {
-    return false
-  }
-  return true
-}
+// (p → (q → r)) → ((p → q) → (p → r))
+export const isAxiom2: Refinement<Prop, AnyAxiom2> = t.match(Axiom2)
 export type A2Result<
   P extends Prop,
   Q extends Prop,

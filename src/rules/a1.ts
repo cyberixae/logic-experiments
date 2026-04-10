@@ -4,7 +4,8 @@ import {
   introduction,
   Derivation,
 } from '../model/derivation'
-import { Prop, Implication, equals, implication, atom } from '../model/prop'
+import { Prop, Implication, implication, atom } from '../model/prop'
+import * as t from '../model/template'
 import {
   Conclusion,
   conclusion,
@@ -14,24 +15,18 @@ import {
 import { Refinement } from '../utils/generic'
 import { Rule } from '../model/rule'
 
+export const P = t.Variable('P')
+export const Q = t.Variable('Q')
+
+export const Axiom1 = t.Implication(P, t.Implication(Q, P))
 export type Axiom1<P extends Prop, Q extends Prop> = Implication<
   P,
   Implication<Q, P>
 >
+
 export type AnyAxiom1 = Axiom1<Prop, Prop>
-export const isAxiom1: Refinement<Prop, AnyAxiom1> = (p): p is AnyAxiom1 => {
-  const piqip = p
-  if (piqip.kind !== 'implication') {
-    return false
-  }
-  const p1 = piqip.antecedent
-  const qip = piqip.consequent
-  if (qip.kind !== 'implication') {
-    return false
-  }
-  const p2 = qip.consequent
-  return equals(p1, p2)
-}
+// p → (q → p)
+export const isAxiom1: Refinement<Prop, AnyAxiom1> = t.match(Axiom1)
 
 export type A1Result<P extends Prop, Q extends Prop> = Conclusion<Axiom1<P, Q>>
 export type AnyA1Result = A1Result<Prop, Prop>

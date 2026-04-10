@@ -8,11 +8,11 @@ import {
   Prop,
   Implication,
   Negation,
-  equals,
   implication,
   negation,
   atom,
 } from '../model/prop'
+import * as t from '../model/template'
 import {
   Conclusion,
   AnySequent,
@@ -22,38 +22,21 @@ import {
 import { Refinement } from '../utils/generic'
 import { Rule } from '../model/rule'
 
+export const P = t.Variable('P')
+export const Q = t.Variable('Q')
+
+export const Axiom3 = t.Implication(
+  t.Implication(t.Negation(P), t.Negation(Q)),
+  t.Implication(Q, P),
+)
 export type Axiom3<P extends Prop, Q extends Prop> = Implication<
   Implication<Negation<P>, Negation<Q>>,
   Implication<Q, P>
 >
+
 export type AnyAxiom3 = Axiom3<Prop, Prop>
-export const isAxiom3: Refinement<Prop, AnyAxiom3> = (p): p is AnyAxiom3 => {
-  const npinqiqip = p
-  if (npinqiqip.kind !== 'implication') {
-    return false
-  }
-  const npinq = npinqiqip.antecedent
-  if (npinq.kind !== 'implication') {
-    return false
-  }
-  const np = npinq.antecedent
-  if (np.kind !== 'negation') {
-    return false
-  }
-  const p1 = np.negand
-  const nq = npinq.consequent
-  if (nq.kind !== 'negation') {
-    return false
-  }
-  const q1 = nq.negand
-  const qip = npinqiqip.consequent
-  if (qip.kind !== 'implication') {
-    return false
-  }
-  const q2 = qip.antecedent
-  const p2 = qip.consequent
-  return equals(p1, p2) && equals(q1, q2)
-}
+// (¬p → ¬q) → (q → p)
+export const isAxiom3: Refinement<Prop, AnyAxiom3> = t.match(Axiom3)
 export type A3Result<P extends Prop, Q extends Prop> = Conclusion<Axiom3<P, Q>>
 export type AnyA3Result = A3Result<Prop, Prop>
 export const isA3Result: Refinement<AnySequent, AnyA3Result> = (
