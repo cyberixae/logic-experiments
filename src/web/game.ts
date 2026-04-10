@@ -196,7 +196,7 @@ const runProofCheckSweep = (tree: HTMLElement): void => {
   ) {
     return
   }
-  const nodes = Array.from(tree.querySelectorAll('.tree-node')) as HTMLElement[]
+  const nodes = Array.from(tree.querySelectorAll<HTMLElement>('.tree-node'))
   if (nodes.length === 0) return
   const byDepth = new Map<number, HTMLElement[]>()
   let maxDepth = 0
@@ -256,9 +256,9 @@ const createPlayArea = (workspace: AnyWorkspace): HTMLElement => {
     panel.scrollTo({ top: startTop, left: startLeft, behavior: 'instant' })
     if (!solved) {
       requestAnimationFrame(() => {
-        const active = tree.querySelector(
+        const active = tree.querySelector<HTMLElement>(
           '.tree-active, .tree-closed-active',
-        ) as HTMLElement | null
+        )
         if (active) {
           active.scrollIntoView({
             behavior: 'smooth',
@@ -270,9 +270,9 @@ const createPlayArea = (workspace: AnyWorkspace): HTMLElement => {
     }
     if (isFresh && !solved && autoZoomedDerivation !== focus.derivation) {
       autoZoomedDerivation = focus.derivation
-      const rootSequent = tree.querySelector(
+      const rootSequent = tree.querySelector<HTMLElement>(
         ':scope > .tree-sequent',
-      ) as HTMLElement | null
+      )
       if (rootSequent) {
         const sequentRect = rootSequent.getBoundingClientRect()
         const areaRect = panel.getBoundingClientRect()

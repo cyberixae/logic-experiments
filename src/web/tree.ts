@@ -144,24 +144,20 @@ type NodeWidths = { sequent: number; subtree: number }
 const LINE_PAD = 16 // px of slack on each side of the inference line
 
 const stabilizeWidths = (node: HTMLElement): NodeWidths => {
-  const sequent = node.querySelector(
-    ':scope > .tree-sequent',
-  ) as HTMLElement | null
+  const sequent = node.querySelector<HTMLElement>(':scope > .tree-sequent')
   const sequentWidth = sequent ? sequent.getBoundingClientRect().width : 0
 
-  const premises = node.querySelector(
-    ':scope > .tree-premises',
-  ) as HTMLElement | null
-  const inference = node.querySelector(
-    ':scope > .tree-inference',
-  ) as HTMLElement | null
+  const premises = node.querySelector<HTMLElement>(':scope > .tree-premises')
+  const inference = node.querySelector<HTMLElement>(':scope > .tree-inference')
 
   let childSequentSum = 0
   let childSubtreeSum = 0
   let gap = 0
   let count = 0
   if (premises) {
-    const children = Array.from(premises.children) as HTMLElement[]
+    const children = Array.from(
+      premises.querySelectorAll<HTMLElement>(':scope > *'),
+    )
     count = children.length
     gap = parseFloat(getComputedStyle(premises).gap) || 0
     for (const child of children) {
@@ -194,7 +190,7 @@ export const layoutTree = (
 ): void => {
   stabilizeWidths(root)
   if (opts.skipActiveScroll === true) return
-  const active = root.querySelector('.tree-active') as HTMLElement | null
+  const active = root.querySelector<HTMLElement>('.tree-active')
   if (active) {
     active.scrollIntoView({
       behavior: 'smooth',
