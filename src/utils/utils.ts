@@ -5,6 +5,9 @@ export const assertEqual = <A, B>(a: A, b: B): A & B => {
   return assertNever(b as never)
 }
 
+export const isNonNullable = <T>(value: T): value is NonNullable<T> =>
+  value != null
+
 export function assertNever<N extends never>(
   _n: N,
   s: string = 'Unexpected value',
