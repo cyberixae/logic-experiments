@@ -23,6 +23,10 @@ export default defineConfig([
         },
       ],
       '@typescript-eslint/no-non-null-assertion': 'warn',
+      '@typescript-eslint/consistent-type-assertions': [
+        'warn',
+        { assertionStyle: 'never' },
+      ],
       'no-plusplus': 'warn',
     },
   },
@@ -31,6 +35,13 @@ export default defineConfig([
     rules: {
       '@typescript-eslint/no-require-imports': 'off',
       '@typescript-eslint/no-explicit-any': 'off',
+      '@typescript-eslint/consistent-type-assertions': 'off',
+    },
+  },
+  {
+    files: ['src/**/__tests__/**', 'src/utils/**'],
+    rules: {
+      '@typescript-eslint/consistent-type-assertions': 'off',
     },
   },
   {
