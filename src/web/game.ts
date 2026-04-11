@@ -560,6 +560,10 @@ export const createBench = (
     },
     actionKeyHint['toggleRules'],
   )
+  rulesBtn.classList.add('toggle')
+  const rulesLed = document.createElement('span')
+  rulesLed.setAttribute('class', 'led' + (rulesVisible ? ' on' : ''))
+  rulesBtn.appendChild(rulesLed)
   const axiomBtn = createButton(
     'Axiom',
     inactive || !keys(center).some((k) => ls.includes(k)),
