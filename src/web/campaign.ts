@@ -13,7 +13,9 @@ import {
   createButton,
   createDispatch,
   createPausePopup,
+  isGazeModeActive,
   setDefaultRulesVisible,
+  setGazeModeActive,
   setupGamepad,
   qwertyKeyMap,
   zoomTreeIn,
@@ -89,6 +91,7 @@ const createControls = (
   onLevel: () => void,
 ): HTMLElement => {
   const canUndo = activePath(ws.currentConjecture()).length > 0
+  const undoEnabled = canUndo || isGazeModeActive()
   const panel = document.createElement('div')
   panel.setAttribute('class', 'controls')
 
@@ -112,9 +115,13 @@ const createControls = (
   panel.appendChild(
     createButton(
       'undo',
-      !canUndo,
+      !undoEnabled,
       () => {
-        ws.applyEvent({ kind: 'undo' })
+        if (canUndo) {
+          ws.applyEvent({ kind: 'undo' })
+        } else {
+          setGazeModeActive(false)
+        }
         rerender()
       },
       actionKeyHint['undo'],

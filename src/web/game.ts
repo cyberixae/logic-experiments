@@ -762,6 +762,10 @@ export const createDispatch =
       if (!gazeModeActive) return
     } else if (RULE_APPLY_ACTIONS.has(action) && gazeModeActive) {
       gazeModeActive = false
+    } else if (action === 'undo' && gazeModeActive) {
+      if (activePath(getWorkspace().currentConjecture()).length === 0) {
+        gazeModeActive = false
+      }
     }
     if (action === 'menu') {
       if (onMenu) onMenu()
