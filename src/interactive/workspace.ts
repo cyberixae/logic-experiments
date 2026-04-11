@@ -119,6 +119,11 @@ export class Workspace<
     this._gazeKind = kind
   }
 
+  setGaze(gaze: Gaze) {
+    this._gaze = gaze
+    this._gazeKind = 'connective'
+  }
+
   gaze(): Gaze {
     if (this._gaze) return this._gaze
     return this.defaultGaze()

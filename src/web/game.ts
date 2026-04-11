@@ -170,6 +170,13 @@ export const setDefaultRulesVisible = (visible: boolean): void => {
   rulesVisible = visible
 }
 
+let gazeModeActive = false
+
+export const isGazeModeActive = (): boolean => gazeModeActive
+export const setGazeModeActive = (active: boolean): void => {
+  gazeModeActive = active
+}
+
 let treeZoom = 1
 const ZOOM_MIN = 0.4
 const ZOOM_MAX = 2
@@ -237,13 +244,15 @@ const createPlayArea = (workspace: AnyWorkspace): HTMLElement => {
   const startLeft = lastScrollLeft
   const focus = workspace.currentConjecture()
   const solved = workspace.isSolved()
-  const gaze = workspace.gaze()
-  const ghost = computeGhostChain(
-    activeSequent(focus),
-    gaze,
-    workspace.gazeKind(),
-    workspace.availableRules(),
-  )
+  const gaze = gazeModeActive ? workspace.gaze() : null
+  const ghost = gazeModeActive
+    ? computeGhostChain(
+        activeSequent(focus),
+        workspace.gaze(),
+        workspace.gazeKind(),
+        workspace.availableRules(),
+      )
+    : null
   const tree = renderDerivation(
     focus.derivation,
     solved ? [-1] : activePath(focus),
@@ -427,15 +436,16 @@ export const createBench = (
   const inactive = solved || branchClosed
 
   const apply = (key: RuleId) => {
+    if (gazeModeActive) gazeModeActive = false
     if (isReverseId0(key)) workspace.applyEvent(reverse0(key))
     rerender()
   }
   const applyCenter = (key: RuleId) => {
+    if (gazeModeActive) gazeModeActive = false
     if (isReverseId0(key)) workspace.applyEvent(reverse0(key))
     rerender()
   }
 
-  const gaze = workspace.gaze()
   const seq = activeSequent(workspace.currentConjecture())
   const available = workspace.availableRules()
   const buildKindHints = (
@@ -443,7 +453,7 @@ export const createBench = (
     hintChar: string | undefined,
   ): GazeHintsForKind | null => {
     if (hintChar === undefined) return null
-    const chain = computeGhostChain(seq, gaze, kind, available)
+    const chain = computeGhostChain(seq, workspace.gaze(), kind, available)
     if (!chain || chain.length === 0) return null
     return {
       immediateRule: chain[0]?.rule ?? null,
@@ -451,10 +461,15 @@ export const createBench = (
       hintChar,
     }
   }
-  const gazeHints: GazeHintInfo = {
-    connective: buildKindHints('connective', actionKeyHint['gazeConnective']),
-    weakening: buildKindHints('weakening', actionKeyHint['gazeWeakening']),
-  }
+  const gazeHints: GazeHintInfo = gazeModeActive
+    ? {
+        connective: buildKindHints(
+          'connective',
+          actionKeyHint['gazeConnective'],
+        ),
+        weakening: buildKindHints('weakening', actionKeyHint['gazeWeakening']),
+      }
+    : { connective: null, weakening: null }
 
   const hideRules = !rulesVisible || solved
   const panel = document.createElement('div')
@@ -503,27 +518,46 @@ export const createBench = (
   )
   const gazeMovable =
     !inactive && seq.antecedent.length + seq.succedent.length > 1
+  const leftDisabled = gazeModeActive
+    ? !gazeMovable
+    : inactive || seq.antecedent.length === 0
+  const rightDisabled = gazeModeActive
+    ? !gazeMovable
+    : inactive || seq.succedent.length === 0
   const gazeLeftBtn = createButton(
     'Left',
-    !gazeMovable,
+    leftDisabled,
     () => {
-      workspace.moveGaze(-1)
+      if (!gazeModeActive) {
+        gazeModeActive = true
+        workspace.setGaze({
+          side: 'left',
+          index: seq.antecedent.length - 1,
+        })
+      } else {
+        workspace.moveGaze(-1)
+      }
       rerender()
     },
     actionKeyHint['gazeLeft'],
   )
   const gazeRightBtn = createButton(
     'Right',
-    !gazeMovable,
+    rightDisabled,
     () => {
-      workspace.moveGaze(1)
+      if (!gazeModeActive) {
+        gazeModeActive = true
+        workspace.setGaze({ side: 'right', index: 0 })
+      } else {
+        workspace.moveGaze(1)
+      }
       rerender()
     },
     actionKeyHint['gazeRight'],
   )
   const gazeWeakeningBtn = createButton(
     'Drop',
-    inactive,
+    !gazeModeActive || inactive,
     () => {
       workspace.setGazeKind('weakening')
       applyGazeRule(workspace, 'weakening')
@@ -534,7 +568,8 @@ export const createBench = (
   const connectiveRule = gazeHints.connective?.eventualRule ?? null
   const connectiveLabel =
     connectiveRule !== null ? (ruleConnectiveLabel[connectiveRule] ?? '') : ''
-  const connectiveDisabled = inactive || connectiveLabel === ''
+  const connectiveDisabled =
+    !gazeModeActive || inactive || connectiveLabel === ''
   const gazeConnectiveBtn = createButton(
     'Destruct',
     connectiveDisabled,
@@ -574,7 +609,7 @@ export const createBench = (
     actionKeyHint['axiom'],
   )
 
-  const gazeGroup = makeGroup('gaze')
+  const gazeGroup = makeGroup(...(gazeModeActive ? ['gaze'] : []))
   gazeGroup.appendChild(gazeLeftBtn)
   gazeGroup.appendChild(gazeWeakeningBtn)
   gazeGroup.appendChild(gazeConnectiveBtn)
@@ -683,6 +718,17 @@ export const createPausePopup = (
   return shroud
 }
 
+const RULE_APPLY_ACTIONS: ReadonlySet<Action> = new Set<Action>([
+  'leftWeakening',
+  'leftConnective',
+  'leftRotateLeft',
+  'leftRotateRight',
+  'rightWeakening',
+  'rightConnective',
+  'rightRotateLeft',
+  'rightRotateRight',
+])
+
 export const createDispatch =
   (
     getWorkspace: () => AnyWorkspace,
@@ -693,6 +739,30 @@ export const createDispatch =
     onMenu?: () => void,
   ) =>
   (action: Action): void => {
+    if (action === 'gazeLeft' || action === 'gazeRight') {
+      if (!gazeModeActive) {
+        const workspace = getWorkspace()
+        const seq = activeSequent(workspace.currentConjecture())
+        if (action === 'gazeLeft') {
+          if (seq.antecedent.length === 0) return
+          gazeModeActive = true
+          workspace.setGaze({
+            side: 'left',
+            index: seq.antecedent.length - 1,
+          })
+        } else {
+          if (seq.succedent.length === 0) return
+          gazeModeActive = true
+          workspace.setGaze({ side: 'right', index: 0 })
+        }
+        rerender()
+        return
+      }
+    } else if (action === 'gazeConnective' || action === 'gazeWeakening') {
+      if (!gazeModeActive) return
+    } else if (RULE_APPLY_ACTIONS.has(action) && gazeModeActive) {
+      gazeModeActive = false
+    }
     if (action === 'menu') {
       if (onMenu) onMenu()
       else navigate('menu')

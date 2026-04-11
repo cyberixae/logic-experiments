@@ -3,11 +3,13 @@ import { mountMenu } from './web/menu'
 import { mountCampaign } from './web/campaign'
 import { mountRandom } from './web/random'
 import { mountSystem } from './web/system'
+import { setGazeModeActive } from './web/game'
 
 let cleanup: () => void = () => {}
 
 const navigate = (screen: Screen) => {
   cleanup()
+  if (screen === 'menu') setGazeModeActive(false)
   history.pushState(
     { screen },
     '',
@@ -54,5 +56,6 @@ document.addEventListener('DOMContentLoaded', init)
 window.addEventListener('popstate', (event) => {
   cleanup()
   const screen: Screen = event.state?.screen ?? 'menu'
+  if (screen === 'menu') setGazeModeActive(false)
   mount(screen)
 })
