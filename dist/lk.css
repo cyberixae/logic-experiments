@@ -313,12 +313,12 @@ body {
   background-color: #fff2;
   border: 4px solid #f80;
   border-radius: 20px;
-  padding: 2em 3em;
+  padding: 3em 4em;
   color: #fff;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1.5em;
+  gap: 2em;
 }
 .pause-title {
   font-size: 2em;
@@ -334,6 +334,7 @@ body {
   position: relative;
   padding: 0.6em 1.2em;
   color: #000;
+  opacity: 1;
 }
 .pause-buttons .button .key-hint {
   position: absolute;
