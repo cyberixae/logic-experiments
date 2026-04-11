@@ -239,7 +239,7 @@ body {
   margin: 0;
   text-transform: capitalize;
 }
-.button:hover {
+.button:not(.disabled):hover {
   background-color: #fff;
   opacity: 1;
 }
@@ -335,6 +335,9 @@ body {
   padding: 0.6em 1.2em;
   color: #000;
   opacity: 1;
+}
+.pause-buttons .button.disabled {
+  opacity: 0.5;
 }
 .pause-buttons .button .key-hint {
   position: absolute;
