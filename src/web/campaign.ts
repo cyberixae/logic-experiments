@@ -8,15 +8,17 @@ import { html, plain } from '../render/segment'
 import { Action } from '../interactive/action'
 import {
   AnyWorkspace,
-  actionKeyHint,
   createBench,
   createButton,
   createDispatch,
   createPausePopup,
+  getActionHint,
   isGazeModeActive,
+  kbdHint,
   setDefaultRulesVisible,
   setGazeModeActive,
   setupGamepad,
+  subscribeGamepad,
   qwertyKeyMap,
   zoomTreeIn,
   zoomTreeOut,
@@ -95,10 +97,10 @@ const createControls = (
   const panel = document.createElement('div')
   panel.setAttribute('class', 'controls')
 
-  panel.appendChild(createButton('menu', false, onMenu, actionKeyHint['menu']))
+  panel.appendChild(createButton('menu', false, onMenu, getActionHint('menu')))
   if (showLevelButton) {
     panel.appendChild(
-      createButton('level', false, onLevel, actionKeyHint['level']),
+      createButton('level', false, onLevel, getActionHint('level')),
     )
   }
   panel.appendChild(
@@ -113,7 +115,7 @@ const createControls = (
         }
         rerender()
       },
-      actionKeyHint['undo'],
+      getActionHint('undo'),
     ),
   )
   return panel
@@ -135,7 +137,7 @@ const createCongrats = (
       'Prev Level',
       false,
       () => selectLevel(ws.previousConjectureId()),
-      'p',
+      kbdHint('p'),
     ),
   )
   buttons.appendChild(
@@ -146,7 +148,7 @@ const createCongrats = (
         ws.applyEvent(reset())
         rerender()
       },
-      actionKeyHint['reset'],
+      getActionHint('reset'),
     ),
   )
   buttons.appendChild(
@@ -154,7 +156,7 @@ const createCongrats = (
       'Next Level',
       false,
       () => selectLevel(ws.nextConjectureId()),
-      '␣',
+      kbdHint('␣'),
     ),
   )
 
@@ -321,6 +323,7 @@ export const mountCampaign = (
   }
   document.addEventListener('keydown', handleKey)
   const cleanupGamepad = setupGamepad(dispatch)
+  const unsubscribeGamepad = subscribeGamepad(rerender)
 
   // Debug REPL
   const gen = repl(ws)
@@ -337,5 +340,6 @@ export const mountCampaign = (
   return () => {
     document.removeEventListener('keydown', handleKey)
     cleanupGamepad()
+    unsubscribeGamepad()
   }
 }

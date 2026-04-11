@@ -121,7 +121,7 @@ const keyHintBadge = (
   variant: 'base' | 'hot' | 'cold' | 'coldGhost' = 'base',
 ): HTMLElement => {
   const badge = document.createElement('span')
-  const cls =
+  const base =
     variant === 'hot'
       ? 'key-hint hot'
       : variant === 'cold'
@@ -129,6 +129,7 @@ const keyHintBadge = (
         : variant === 'coldGhost'
           ? 'key-hint cold ghost'
           : 'key-hint'
+  const cls = hint.length > 1 ? base + ' wide' : base
   badge.setAttribute('class', cls)
   badge.textContent = hint
   return badge
@@ -147,6 +148,52 @@ export const ps5KeyMap: Record<number, Action> = {
   14: 'gazeLeft', // D-pad left
   15: 'gazeRight', // D-pad right
 }
+
+const padIndexToLabel: Record<number, string> = {
+  0: '✕',
+  1: '◯',
+  4: 'L1',
+  5: 'R1',
+  6: 'L2',
+  7: 'R2',
+  9: '☰',
+  12: '↑',
+  13: '↓',
+  14: '←',
+  15: '→',
+}
+
+export const actionPadHint: Partial<Record<Action, string>> = {}
+for (const [idx, action] of Object.entries(ps5KeyMap)) {
+  const label = padIndexToLabel[Number(idx)]
+  if (label !== undefined && !(action in actionPadHint)) {
+    actionPadHint[action] = label
+  }
+}
+
+let gamepadActive = false
+const gamepadListeners = new Set<() => void>()
+
+export const isGamepadActive = (): boolean => gamepadActive
+
+export const subscribeGamepad = (cb: () => void): (() => void) => {
+  gamepadListeners.add(cb)
+  return () => {
+    gamepadListeners.delete(cb)
+  }
+}
+
+const setGamepadActive = (v: boolean): void => {
+  if (gamepadActive === v) return
+  gamepadActive = v
+  for (const cb of gamepadListeners) cb()
+}
+
+export const getActionHint = (action: Action): string | undefined =>
+  gamepadActive ? actionPadHint[action] : actionKeyHint[action]
+
+export const kbdHint = (s: string): string | undefined =>
+  gamepadActive ? undefined : s
 
 export const createButton = (
   label: string,
@@ -406,7 +453,7 @@ const createPanel = <K extends RuleId>(
     if (!disabled) pre.onclick = () => onApply(key)
     pre.innerHTML = fromDerivation(rule.example)
     const action = ruleAction[key]
-    const hint = action !== undefined ? actionKeyHint[action] : undefined
+    const hint = action !== undefined ? getActionHint(action) : undefined
     const ruleHintVariant = className === 'main' ? 'base' : 'hot'
     if (hint !== undefined) pre.appendChild(keyHintBadge(hint, ruleHintVariant))
     const gazeBadges = [
@@ -468,9 +515,9 @@ export const createBench = (
     ? {
         connective: buildKindHints(
           'connective',
-          actionKeyHint['gazeConnective'],
+          getActionHint('gazeConnective'),
         ),
-        weakening: buildKindHints('weakening', actionKeyHint['gazeWeakening']),
+        weakening: buildKindHints('weakening', getActionHint('gazeWeakening')),
       }
     : { connective: null, weakening: null }
 
@@ -499,7 +546,7 @@ export const createBench = (
       zoomTreeOut()
       rerender()
     },
-    '-',
+    kbdHint('-'),
   )
   const zoomReset = createButton(
     '⊙',
@@ -508,7 +555,7 @@ export const createBench = (
       zoomTreeReset()
       rerender()
     },
-    '0',
+    kbdHint('0'),
   )
   const zoomIn = createButton(
     '+',
@@ -517,7 +564,7 @@ export const createBench = (
       zoomTreeIn()
       rerender()
     },
-    '+',
+    kbdHint('+'),
   )
   const gazeMovable =
     !inactive && seq.antecedent.length + seq.succedent.length > 1
@@ -542,7 +589,7 @@ export const createBench = (
       }
       rerender()
     },
-    actionKeyHint['gazeLeft'],
+    getActionHint('gazeLeft'),
   )
   const gazeRightBtn = createButton(
     'Right',
@@ -556,7 +603,7 @@ export const createBench = (
       }
       rerender()
     },
-    actionKeyHint['gazeRight'],
+    getActionHint('gazeRight'),
   )
   const gazeWeakeningBtn = createButton(
     'Drop',
@@ -566,7 +613,7 @@ export const createBench = (
       applyGazeRule(workspace, 'weakening')
       rerender()
     },
-    actionKeyHint['gazeWeakening'],
+    getActionHint('gazeWeakening'),
   )
   const connectiveRule = gazeHints.connective?.eventualRule ?? null
   const connectiveLabel =
@@ -581,7 +628,7 @@ export const createBench = (
       applyGazeRule(workspace, 'connective')
       rerender()
     },
-    actionKeyHint['gazeConnective'],
+    getActionHint('gazeConnective'),
   )
   const makeGroup = (...cls: string[]): HTMLElement => {
     const g = document.createElement('div')
@@ -596,7 +643,7 @@ export const createBench = (
       rulesVisible = !rulesVisible
       rerender()
     },
-    actionKeyHint['toggleRules'],
+    getActionHint('toggleRules'),
   )
   rulesBtn.classList.add('toggle')
   const rulesLed = document.createElement('span')
@@ -609,7 +656,7 @@ export const createBench = (
       autoRule(workspace, keys(center))
       rerender()
     },
-    actionKeyHint['axiom'],
+    getActionHint('axiom'),
   )
 
   const gazeGroup = makeGroup(...(gazeModeActive ? ['gaze'] : []))
@@ -643,7 +690,7 @@ export const createBench = (
       workspace.applyEvent(prevBranch())
       rerender()
     },
-    actionKeyHint['prevBranch'],
+    getActionHint('prevBranch'),
   )
   const nextBranchBtn = createButton(
     '↱',
@@ -652,7 +699,7 @@ export const createBench = (
       workspace.applyEvent(nextBranch())
       rerender()
     },
-    actionKeyHint['nextBranch'],
+    getActionHint('nextBranch'),
   )
   const branchGroup = makeGroup()
   branchGroup.appendChild(prevBranchBtn)
@@ -714,7 +761,7 @@ export const createPausePopup = (
   const buttons = document.createElement('div')
   buttons.setAttribute('class', 'pause-buttons')
   buttons.appendChild(
-    createButton('Resume game', false, onResume, actionKeyHint['menu']),
+    createButton('Resume game', false, onResume, getActionHint('menu')),
   )
   const spacer = document.createElement('div')
   spacer.setAttribute('class', 'pause-buttons-spacer')
@@ -724,14 +771,16 @@ export const createPausePopup = (
       'Reset challenge',
       resetDisabled,
       onReset,
-      actionKeyHint['reset'],
+      getActionHint('reset'),
     ),
   )
   if (onFresh) {
-    buttons.appendChild(createButton('Fresh challenge', false, onFresh, 'n'))
+    buttons.appendChild(
+      createButton('Fresh challenge', false, onFresh, kbdHint('n')),
+    )
   }
   buttons.appendChild(
-    createButton('Exit to main menu', false, onExit, actionKeyHint['exit']),
+    createButton('Exit to main menu', false, onExit, getActionHint('exit')),
   )
   panel.appendChild(buttons)
   shroud.appendChild(panel)
@@ -956,14 +1005,34 @@ export const setupGamepad = (
   }
 
   const onConnected = () => {
+    if (active) return
     active = true
+    setGamepadActive(true)
     loop()
   }
 
+  const onDisconnected = () => {
+    const stillConnected = Array.from(navigator.getGamepads()).some(
+      (p) => p !== null,
+    )
+    if (!stillConnected) {
+      active = false
+      setGamepadActive(false)
+    }
+  }
+
   window.addEventListener('gamepadconnected', onConnected)
+  window.addEventListener('gamepaddisconnected', onDisconnected)
+
+  // Detect a pad that was already connected before mount.
+  const preExisting = Array.from(navigator.getGamepads()).some(
+    (p) => p !== null,
+  )
+  if (preExisting) onConnected()
 
   return () => {
     active = false
     window.removeEventListener('gamepadconnected', onConnected)
+    window.removeEventListener('gamepaddisconnected', onDisconnected)
   }
 }

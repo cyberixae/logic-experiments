@@ -5,15 +5,17 @@ import { ChallengePool } from './challenge-pool'
 import { Action } from '../interactive/action'
 import {
   AnyWorkspace,
-  actionKeyHint,
   createBench,
   createButton,
   createDispatch,
   createPausePopup,
+  getActionHint,
   isGazeModeActive,
+  kbdHint,
   setDefaultRulesVisible,
   setGazeModeActive,
   setupGamepad,
+  subscribeGamepad,
   qwertyKeyMap,
   zoomTreeIn,
   zoomTreeOut,
@@ -34,7 +36,7 @@ const createControls = (
   const panel = document.createElement('div')
   panel.setAttribute('class', 'controls')
 
-  panel.appendChild(createButton('menu', false, onMenu, actionKeyHint['menu']))
+  panel.appendChild(createButton('menu', false, onMenu, getActionHint('menu')))
   panel.appendChild(
     createButton(
       'undo',
@@ -47,7 +49,7 @@ const createControls = (
         }
         rerender()
       },
-      actionKeyHint['undo'],
+      getActionHint('undo'),
     ),
   )
   return panel
@@ -72,10 +74,10 @@ const createCongrats = (
         ws.applyEvent(reset())
         rerender()
       },
-      actionKeyHint['reset'],
+      getActionHint('reset'),
     ),
   )
-  buttons.appendChild(createButton('New Challenge', false, onNew, 'n'))
+  buttons.appendChild(createButton('New Challenge', false, onNew, kbdHint('n')))
 
   return { hurray, buttons }
 }
@@ -202,10 +204,12 @@ export const mountRandom = (
   }
   document.addEventListener('keydown', handleKey)
   const cleanupGamepad = setupGamepad(dispatch)
+  const unsubscribeGamepad = subscribeGamepad(rerender)
 
   return () => {
     document.removeEventListener('keydown', handleKey)
     cleanupGamepad()
+    unsubscribeGamepad()
     pool.cleanup()
   }
 }

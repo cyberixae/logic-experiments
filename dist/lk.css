@@ -204,6 +204,17 @@ body {
 .key-hint.cold.ghost {
   opacity: 0.35;
 }
+.key-hint.wide {
+  width: auto;
+  min-width: 40px;
+  padding: 0 8px;
+  border-radius: 999px;
+}
+.controls .button .key-hint.wide {
+  width: auto;
+  min-width: 30px;
+  padding: 0 7px;
+}
 .main .rule .key-hint {
   position: absolute;
   bottom: -20px;
