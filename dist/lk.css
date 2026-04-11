@@ -139,6 +139,12 @@ body {
 .playarea::-webkit-scrollbar {
   display: none;
 }
+.playarea.solved {
+  padding-bottom: 1em;
+  scroll-padding-bottom: 1em;
+  mask-image: none;
+  -webkit-mask-image: none;
+}
 .rule {
   position: relative;
   min-width: 260px;

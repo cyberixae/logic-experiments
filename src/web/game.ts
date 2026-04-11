@@ -226,7 +226,8 @@ let lastScrollLeft = 0
 
 const createPlayArea = (workspace: AnyWorkspace): HTMLElement => {
   const panel = document.createElement('div')
-  panel.setAttribute('class', 'playarea')
+  const solvedClass = workspace.isSolved() ? ' solved' : ''
+  panel.setAttribute('class', 'playarea' + solvedClass)
   panel.style.setProperty('--tree-zoom', String(treeZoom))
   panel.addEventListener('scroll', () => {
     lastScrollTop = panel.scrollTop
@@ -301,7 +302,7 @@ const createPlayArea = (workspace: AnyWorkspace): HTMLElement => {
       const areaRect = panel.getBoundingClientRect()
       const fontPx = parseFloat(getComputedStyle(panel).fontSize)
       const availW = areaRect.width - 2 * 8 * fontPx
-      const availH = areaRect.height - (8 + 6) * fontPx
+      const availH = (areaRect.height - (8 + 1) * fontPx) * 0.85
       const scale = Math.min(
         1,
         availW / treeRect.width,
