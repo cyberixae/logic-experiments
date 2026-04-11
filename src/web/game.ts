@@ -137,10 +137,13 @@ const keyHintBadge = (
 export const ps5KeyMap: Record<number, Action> = {
   0: 'axiom', // Cross — confirm
   1: 'undo', // Circle — cancel
-  2: 'gazeWeakening', // Square
-  3: 'gazeConnective', // Triangle
   4: 'prevBranch', // L1
   5: 'nextBranch', // R1
+  6: 'undo', // L2 — undo (alias)
+  7: 'axiom', // R2 — axiom (alias)
+  9: 'menu', // Options
+  12: 'gazeConnective', // D-pad up
+  13: 'gazeWeakening', // D-pad down
   14: 'gazeLeft', // D-pad left
   15: 'gazeRight', // D-pad right
 }
