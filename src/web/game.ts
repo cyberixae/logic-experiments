@@ -34,8 +34,9 @@ export type AnyWorkspace = Workspace<
 >
 
 export const qwertyKeyMap: Record<KeyboardEvent['code'], Action> = {
-  KeyQ: 'menu',
+  KeyM: 'menu',
   Escape: 'menu',
+  KeyX: 'exit',
   Backquote: 'level',
   KeyW: 'prevBranch',
   KeyO: 'nextBranch',
@@ -644,6 +645,40 @@ const autoRule = (workspace: AnyWorkspace, rules: RuleId[]) => {
   if (isReverseId0(first)) workspace.applyEvent(reverse0(first))
 }
 
+export const createPausePopup = (
+  onResume: () => void,
+  onExit: () => void,
+): HTMLElement => {
+  const shroud = document.createElement('div')
+  shroud.setAttribute('class', 'shroud pause-shroud')
+  shroud.onclick = (ev) => {
+    if (ev.target === shroud) {
+      ev.preventDefault()
+      onResume()
+    }
+  }
+  const panel = document.createElement('div')
+  panel.setAttribute('class', 'pause-popup')
+  panel.onclick = (ev) => {
+    ev.stopPropagation()
+  }
+  const title = document.createElement('div')
+  title.setAttribute('class', 'pause-title')
+  title.textContent = 'Paused'
+  panel.appendChild(title)
+  const buttons = document.createElement('div')
+  buttons.setAttribute('class', 'pause-buttons')
+  buttons.appendChild(
+    createButton('Resume game', false, onResume, actionKeyHint['menu']),
+  )
+  buttons.appendChild(
+    createButton('Exit to main menu', false, onExit, actionKeyHint['exit']),
+  )
+  panel.appendChild(buttons)
+  shroud.appendChild(panel)
+  return shroud
+}
+
 export const createDispatch =
   (
     getWorkspace: () => AnyWorkspace,
@@ -651,10 +686,12 @@ export const createDispatch =
     navigate: Navigate,
     onSolved: (action: Action) => void,
     onLevel?: () => void,
+    onMenu?: () => void,
   ) =>
   (action: Action): void => {
     if (action === 'menu') {
-      navigate('menu')
+      if (onMenu) onMenu()
+      else navigate('menu')
       return
     }
     if (action === 'level') {

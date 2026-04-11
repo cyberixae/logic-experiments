@@ -9,6 +9,7 @@ import {
   createBench,
   createButton,
   createDispatch,
+  createPausePopup,
   setDefaultRulesVisible,
   setupGamepad,
   qwertyKeyMap,
@@ -25,15 +26,13 @@ const createControls = (
   ws: AnyWorkspace,
   onNew: () => void,
   rerender: () => void,
-  navigate: Navigate,
+  onMenu: () => void,
 ): HTMLElement => {
   const canUndo = activePath(ws.currentConjecture()).length > 0
   const panel = document.createElement('div')
   panel.setAttribute('class', 'controls')
 
-  panel.appendChild(
-    createButton('menu', false, () => navigate('menu'), actionKeyHint['menu']),
-  )
+  panel.appendChild(createButton('menu', false, onMenu, actionKeyHint['menu']))
   panel.appendChild(createButton('new', false, onNew, 'n'))
   panel.appendChild(
     createButton(
@@ -100,11 +99,28 @@ export const mountRandom = (
     rerender()
   }
 
+  let pausePopupOpen = false
+  const togglePausePopup = () => {
+    pausePopupOpen = !pausePopupOpen
+    rerender()
+  }
+  const closePausePopup = () => {
+    pausePopupOpen = false
+    rerender()
+  }
+  const exitToMenu = () => {
+    pausePopupOpen = false
+    navigate('menu')
+  }
+
   const rerender = () => {
     container.innerHTML = ''
-    const controlsEl = createControls(ws, onNew, rerender, navigate)
+    const controlsEl = createControls(ws, onNew, rerender, togglePausePopup)
     const makeCongrats = () => createCongrats(ws, onNew, rerender)
     container.appendChild(createBench(ws, makeCongrats, controlsEl, rerender))
+    if (pausePopupOpen) {
+      container.appendChild(createPausePopup(closePausePopup, exitToMenu))
+    }
   }
 
   const onSolved = (action: Action) => {
@@ -121,7 +137,22 @@ export const mountRandom = (
     rerender()
   }
 
-  const dispatch = createDispatch(() => ws, rerender, navigate, onSolved)
+  const baseDispatch = createDispatch(
+    () => ws,
+    rerender,
+    navigate,
+    onSolved,
+    undefined,
+    togglePausePopup,
+  )
+  const dispatch = (action: Action) => {
+    if (action === 'exit') {
+      if (pausePopupOpen) exitToMenu()
+      return
+    }
+    if (pausePopupOpen && action !== 'menu') return
+    baseDispatch(action)
+  }
 
   rerender()
 

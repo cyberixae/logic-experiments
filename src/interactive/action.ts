@@ -13,6 +13,7 @@ export type Action =
   | 'reset'
   | 'level'
   | 'menu'
+  | 'exit'
   | 'axiom'
   | 'gazeLeft'
   | 'gazeRight'

@@ -281,6 +281,43 @@ body {
   align-items: center;
   justify-content: center;
 }
+.pause-shroud {
+  z-index: 2;
+}
+.pause-popup {
+  background-color: #fff2;
+  border: 4px solid #f80;
+  border-radius: 20px;
+  padding: 2em 3em;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5em;
+}
+.pause-title {
+  font-size: 2em;
+  font-weight: bold;
+}
+.pause-buttons {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 1em;
+}
+.pause-buttons .button {
+  position: relative;
+  padding: 0.6em 1.2em;
+  color: #000;
+}
+.pause-buttons .button .key-hint {
+  position: absolute;
+  width: 30px;
+  height: 30px;
+  line-height: 30px;
+  top: 8px;
+  left: -15px;
+}
 .level-select {
   position: absolute;
   width: 80%;

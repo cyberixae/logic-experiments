@@ -12,6 +12,7 @@ import {
   createBench,
   createButton,
   createDispatch,
+  createPausePopup,
   setDefaultRulesVisible,
   setupGamepad,
   qwertyKeyMap,
@@ -83,7 +84,7 @@ const createControls = (
   ws: AnyWorkspace,
   _listingEl: HTMLElement,
   rerender: () => void,
-  navigate: Navigate,
+  onMenu: () => void,
   showLevelButton: boolean,
   onLevel: () => void,
 ): HTMLElement => {
@@ -91,9 +92,7 @@ const createControls = (
   const panel = document.createElement('div')
   panel.setAttribute('class', 'controls')
 
-  panel.appendChild(
-    createButton('menu', false, () => navigate('menu'), actionKeyHint['menu']),
-  )
+  panel.appendChild(createButton('menu', false, onMenu, actionKeyHint['menu']))
   if (showLevelButton) {
     panel.appendChild(
       createButton('level', false, onLevel, actionKeyHint['level']),
@@ -202,6 +201,20 @@ export const mountCampaign = (
 
   let listingEl: HTMLElement = createListing(ws, selectLevel)
 
+  let pausePopupOpen = false
+  const togglePausePopup = () => {
+    pausePopupOpen = !pausePopupOpen
+    rerender()
+  }
+  const closePausePopup = () => {
+    pausePopupOpen = false
+    rerender()
+  }
+  const exitToMenu = () => {
+    pausePopupOpen = false
+    navigate('menu')
+  }
+
   const rerender = () => {
     container.innerHTML = ''
     listingEl = createListing(ws, selectLevel)
@@ -210,12 +223,15 @@ export const mountCampaign = (
       ws,
       listingEl,
       rerender,
-      navigate,
+      togglePausePopup,
       levelPresses >= 2,
       () => toggleLevel(listingEl),
     )
     const makeCongrats = () => createCongrats(ws, selectLevel, rerender)
     container.appendChild(createBench(ws, makeCongrats, controlsEl, rerender))
+    if (pausePopupOpen) {
+      container.appendChild(createPausePopup(closePausePopup, exitToMenu))
+    }
   }
 
   const onSolved = (action: Action) => {
@@ -235,13 +251,22 @@ export const mountCampaign = (
     rerender()
   }
 
-  const dispatch = createDispatch(
+  const baseDispatch = createDispatch(
     () => ws,
     rerender,
     navigate,
     onSolved,
     () => toggleLevel(listingEl),
+    togglePausePopup,
   )
+  const dispatch = (action: Action) => {
+    if (action === 'exit') {
+      if (pausePopupOpen) exitToMenu()
+      return
+    }
+    if (pausePopupOpen && action !== 'menu') return
+    baseDispatch(action)
+  }
 
   // Read initial level from URL
   const params = new URLSearchParams(window.location.search)
