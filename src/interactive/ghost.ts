@@ -6,8 +6,10 @@ import { Gaze } from './workspace'
 
 export type GhostStep = {
   rule: RuleId
-  // The sequent that becomes active after this step is committed.
-  sequent: AnySequent
+  // Sequents produced by this step. A single entry for linear rules; the
+  // final step may contain multiple entries when the rule branches
+  // (e.g. cr, dl, il).
+  sequents: AnySequent[]
 }
 
 export type GhostKind = 'connective' | 'weakening'
@@ -50,24 +52,24 @@ const stepFinal = (
   side: 'left' | 'right',
   kind: GhostKind,
   available: ReadonlySet<RuleId>,
-): { id: RuleId; next: AnySequent } | null => {
+): { id: RuleId; nexts: AnySequent[] } | null => {
   if (kind === 'weakening') {
     const rule = side === 'left' ? reverseStructure0.swl : reverseStructure0.swr
     if (!available.has(rule.id)) return null
     const t = rule.tryReverse(premise(seq))
     if (!t || t.kind !== 'transformation') return null
-    const dep = t.deps[0]
-    if (!dep) return null
-    return { id: rule.id, next: dep.result }
+    const nexts = t.deps.map((d) => d.result)
+    if (nexts.length === 0) return null
+    return { id: rule.id, nexts }
   }
   const id = findConnectiveRule(seq, side, available)
   if (!id) return null
   const rule = reverseLogic0[id]
   const t = rule.tryReverse(premise(seq))
   if (!t || t.kind !== 'transformation') return null
-  const dep = t.deps[0]
-  if (!dep) return null
-  return { id, next: dep.result }
+  const nexts = t.deps.map((d) => d.result)
+  if (nexts.length === 0) return null
+  return { id, nexts }
 }
 
 export const computeGhostChain = (
@@ -89,7 +91,7 @@ export const computeGhostChain = (
 
     const step = stepRotation(seq, g.side, available)
     if (!step) return null
-    chain.push({ rule: step.id, sequent: step.next })
+    chain.push({ rule: step.id, sequents: [step.next] })
     seq = step.next
     g =
       g.side === 'left'
@@ -99,6 +101,6 @@ export const computeGhostChain = (
 
   const final = stepFinal(seq, g.side, kind, available)
   if (!final) return null
-  chain.push({ rule: final.id, sequent: final.next })
+  chain.push({ rule: final.id, sequents: final.nexts })
   return chain
 }

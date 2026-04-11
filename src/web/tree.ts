@@ -36,10 +36,24 @@ const renderGhost = (chain: GhostStep[]): HTMLElement => {
   for (let i = chain.length - 1; i >= 0; i -= 1) {
     const step = chain[i]
     if (!step) continue
-    const sequent = document.createElement('div')
-    sequent.setAttribute('class', 'tree-sequent ghost')
-    sequent.innerHTML = html(fromSequent(step.sequent, null)(basic))
-    wrap.appendChild(sequent)
+    if (step.sequents.length <= 1) {
+      const only = step.sequents[0]
+      if (!only) continue
+      const sequent = document.createElement('div')
+      sequent.setAttribute('class', 'tree-sequent ghost')
+      sequent.innerHTML = html(fromSequent(only, null)(basic))
+      wrap.appendChild(sequent)
+    } else {
+      const premises = document.createElement('div')
+      premises.setAttribute('class', 'tree-premises ghost-premises')
+      for (const s of step.sequents) {
+        const sequent = document.createElement('div')
+        sequent.setAttribute('class', 'tree-sequent ghost')
+        sequent.innerHTML = html(fromSequent(s, null)(basic))
+        premises.appendChild(sequent)
+      }
+      wrap.appendChild(premises)
+    }
     const inference = document.createElement('div')
     inference.setAttribute('class', 'tree-inference ghost')
     const label = document.createElement('div')
