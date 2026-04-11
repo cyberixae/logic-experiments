@@ -996,7 +996,11 @@ export const setupGamepad = (
         const oldPress = oldPresses[index] ?? false
         const newPress = gp.buttons[index]?.pressed ?? false
         if (newPress !== oldPress) {
-          if (newPress) dispatch(action)
+          // Defer dispatch out of the RAF callback so the rerender it triggers
+          // runs as a task between frames. This matches keyboard event timing
+          // and prevents createPlayArea's hide-then-show layout pass from
+          // painting one frame with the tree hidden.
+          if (newPress) setTimeout(() => dispatch(action), 0)
           oldPresses[index] = newPress
         }
       }
