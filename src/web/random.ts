@@ -175,6 +175,10 @@ export const mountRandom = (
       resetFromPopup()
       return
     }
+    if (action === 'undo' && pausePopupOpen) {
+      closePausePopup()
+      return
+    }
     if (pausePopupOpen && action !== 'menu') return
     baseDispatch(action)
   }

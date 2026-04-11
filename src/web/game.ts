@@ -768,7 +768,7 @@ export const createPausePopup = (
   const buttons = document.createElement('div')
   buttons.setAttribute('class', 'pause-buttons')
   buttons.appendChild(
-    createButton('Resume game', false, onResume, getActionHint('menu')),
+    createButton('Resume game', false, onResume, dualHint('m', 'undo')),
   )
   const spacer = document.createElement('div')
   spacer.setAttribute('class', 'pause-buttons-spacer')

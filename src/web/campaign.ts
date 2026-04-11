@@ -284,6 +284,10 @@ export const mountCampaign = (
       resetFromPopup()
       return
     }
+    if (action === 'undo' && pausePopupOpen) {
+      closePausePopup()
+      return
+    }
     if (pausePopupOpen && action !== 'menu') return
     baseDispatch(action)
   }
