@@ -135,40 +135,88 @@ const keyHintBadge = (
   return badge
 }
 
-export const ps5KeyMap: Record<number, Action> = {
-  0: 'axiom', // Cross — confirm
-  1: 'undo', // Circle — cancel
+// Buttons whose meaning is the same in both gaze and hot mode.
+const ps5SharedKeyMap: Record<number, Action> = {
   4: 'prevBranch', // L1
   5: 'nextBranch', // R1
-  6: 'undo', // L2 — undo (alias)
-  7: 'axiom', // R2 — axiom (alias)
+  6: 'undo', // L2
+  7: 'axiom', // R2
   9: 'menu', // Options
+}
+
+// Gaze mode (default): D-pad navigates the cursor; face buttons confirm/cancel.
+export const ps5GazeKeyMap: Record<number, Action> = {
+  ...ps5SharedKeyMap,
+  0: 'axiom', // Cross — alias for muscle memory
+  1: 'undo', // Circle — alias
   12: 'gazeConnective', // D-pad up
   13: 'gazeWeakening', // D-pad down
   14: 'gazeLeft', // D-pad left
   15: 'gazeRight', // D-pad right
 }
 
+// Hot mode: D-pad applies left rules; face buttons apply right rules. Mirrors
+// the keyboard ASFG / HJL; row geometrically (up/down = connective/weakening on
+// both hands; horizontal = rotation, outer→inner).
+const ps5HotKeyMap: Record<number, Action> = {
+  ...ps5SharedKeyMap,
+  0: 'rightWeakening', // Cross   ↔ L
+  1: 'rightRotateRight', // Circle  ↔ ;/ö
+  2: 'rightRotateLeft', // Square  ↔ H
+  3: 'rightConnective', // Triangle ↔ J
+  12: 'leftConnective', // D-pad up    ↔ F
+  13: 'leftWeakening', // D-pad down  ↔ S
+  14: 'leftRotateLeft', // D-pad left  ↔ A
+  15: 'leftRotateRight', // D-pad right ↔ G
+}
+
 const padIndexToLabel: Record<number, string> = {
   0: '✕',
   1: '◯',
+  2: '□',
+  3: '△',
   4: 'L1',
   5: 'R1',
   6: 'L2',
   7: 'R2',
   9: '☰',
+  10: 'L3',
+  11: 'R3',
   12: '↑',
   13: '↓',
   14: '←',
   15: '→',
 }
 
-export const actionPadHint: Partial<Record<Action, string>> = {}
-for (const [idx, action] of Object.entries(ps5KeyMap)) {
-  const label = padIndexToLabel[Number(idx)]
-  if (label !== undefined && !(action in actionPadHint)) {
-    actionPadHint[action] = label
+const buildActionPadHint = (
+  keyMap: Record<number, Action>,
+): Partial<Record<Action, string>> => {
+  const hint: Partial<Record<Action, string>> = {}
+  for (const [idx, action] of Object.entries(keyMap)) {
+    const label = padIndexToLabel[Number(idx)]
+    if (label !== undefined && !(action in hint)) {
+      hint[action] = label
+    }
   }
+  return hint
+}
+
+const actionPadHintGaze = buildActionPadHint(ps5GazeKeyMap)
+const actionPadHintHot = buildActionPadHint(ps5HotKeyMap)
+
+let hotMode = false
+export const isHotMode = (): boolean => hotMode
+
+const activePadKeyMap = (): Record<number, Action> =>
+  hotMode ? ps5HotKeyMap : ps5GazeKeyMap
+
+const activeActionPadHint = (): Partial<Record<Action, string>> =>
+  hotMode ? actionPadHintHot : actionPadHintGaze
+
+const toggleHotMode = (): void => {
+  hotMode = !hotMode
+  if (hotMode) gazeModeActive = false
+  for (const cb of gamepadListeners) cb()
 }
 
 let gamepadActive = false
@@ -189,8 +237,15 @@ const setGamepadActive = (v: boolean): void => {
   for (const cb of gamepadListeners) cb()
 }
 
+// Called from input handlers so the hint display follows the device the player
+// is *currently* using, not just whether a controller is plugged in. A player
+// who flips between gamepad and keyboard gets hints for whichever they touched
+// last.
+export const markKeyboardInput = (): void => setGamepadActive(false)
+export const markGamepadInput = (): void => setGamepadActive(true)
+
 export const getActionHint = (action: Action): string | undefined =>
-  gamepadActive ? actionPadHint[action] : actionKeyHint[action]
+  gamepadActive ? activeActionPadHint()[action] : actionKeyHint[action]
 
 export const kbdHint = (s: string): string | undefined =>
   gamepadActive ? undefined : s
@@ -200,7 +255,7 @@ export const kbdHint = (s: string): string | undefined =>
 // but by `axiom` (R2/Cross) on the gamepad. Shows the literal in keyboard
 // mode, the pad hint for the given action in pad mode.
 export const dualHint = (kbd: string, padAction: Action): string | undefined =>
-  gamepadActive ? actionPadHint[padAction] : kbd
+  gamepadActive ? activeActionPadHint()[padAction] : kbd
 
 export const createButton = (
   label: string,
@@ -232,6 +287,10 @@ let gazeModeActive = false
 export const isGazeModeActive = (): boolean => gazeModeActive
 export const setGazeModeActive = (active: boolean): void => {
   gazeModeActive = active
+  if (active && hotMode) {
+    hotMode = false
+    for (const cb of gamepadListeners) cb()
+  }
 }
 
 let treeZoom = 1
@@ -586,7 +645,7 @@ export const createBench = (
     leftDisabled,
     () => {
       if (!gazeModeActive) {
-        gazeModeActive = true
+        setGazeModeActive(true)
         workspace.setGaze({
           side: 'left',
           index: seq.antecedent.length - 1,
@@ -603,7 +662,7 @@ export const createBench = (
     rightDisabled,
     () => {
       if (!gazeModeActive) {
-        gazeModeActive = true
+        setGazeModeActive(true)
         workspace.setGaze({ side: 'right', index: 0 })
       } else {
         workspace.moveGaze(1)
@@ -821,14 +880,14 @@ export const createDispatch =
         const seq = activeSequent(workspace.currentConjecture())
         if (action === 'gazeLeft') {
           if (seq.antecedent.length === 0) return
-          gazeModeActive = true
+          setGazeModeActive(true)
           workspace.setGaze({
             side: 'left',
             index: seq.antecedent.length - 1,
           })
         } else {
           if (seq.succedent.length === 0) return
-          gazeModeActive = true
+          setGazeModeActive(true)
           workspace.setGaze({ side: 'right', index: 0 })
         }
         rerender()
@@ -993,12 +1052,13 @@ export const setupGamepad = (
 ): (() => void) => {
   const oldPresses: Array<boolean> = []
   let active = false
+  let chordFired = false
 
   const loop = () => {
     if (!active) return
     const gp = navigator.getGamepads()[0]
     if (gp) {
-      for (const [button, action] of Object.entries(ps5KeyMap)) {
+      for (const [button, action] of Object.entries(activePadKeyMap())) {
         const index = Number(button)
         const oldPress = oldPresses[index] ?? false
         const newPress = gp.buttons[index]?.pressed ?? false
@@ -1007,10 +1067,24 @@ export const setupGamepad = (
           // runs as a task between frames. This matches keyboard event timing
           // and prevents createPlayArea's hide-then-show layout pass from
           // painting one frame with the tree hidden.
-          if (newPress) setTimeout(() => dispatch(action), 0)
+          if (newPress) {
+            markGamepadInput()
+            setTimeout(() => dispatch(action), 0)
+          }
           oldPresses[index] = newPress
         }
       }
+      // L3 + R3 chord toggles hot mode. Detected as "both pressed in the same
+      // poll frame"; chordFired latches until both buttons are released, so a
+      // single press of the chord doesn't fire repeatedly.
+      const l3 = gp.buttons[10]?.pressed ?? false
+      const r3 = gp.buttons[11]?.pressed ?? false
+      if (l3 && r3 && !chordFired) {
+        markGamepadInput()
+        setTimeout(toggleHotMode, 0)
+        chordFired = true
+      }
+      if (!l3 && !r3) chordFired = false
     }
     requestAnimationFrame(loop)
   }

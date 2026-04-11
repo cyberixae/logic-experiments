@@ -15,6 +15,7 @@ import {
   dualHint,
   getActionHint,
   isGazeModeActive,
+  markKeyboardInput,
   setDefaultRulesVisible,
   setGazeModeActive,
   setupGamepad,
@@ -302,6 +303,7 @@ export const mountCampaign = (
   rerender()
 
   const handleKey = (ev: KeyboardEvent) => {
+    markKeyboardInput()
     console.log(ev.code)
     if (ev.code === 'KeyP' && ws.isSolved()) {
       selectLevel(ws.previousConjectureId())

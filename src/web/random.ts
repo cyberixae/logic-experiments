@@ -12,6 +12,7 @@ import {
   dualHint,
   getActionHint,
   isGazeModeActive,
+  markKeyboardInput,
   setDefaultRulesVisible,
   setGazeModeActive,
   setupGamepad,
@@ -186,6 +187,7 @@ export const mountRandom = (
   rerender()
 
   const handleKey = (ev: KeyboardEvent) => {
+    markKeyboardInput()
     if (ev.code === 'KeyN') {
       onNew()
       return
