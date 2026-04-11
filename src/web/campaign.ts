@@ -12,9 +12,9 @@ import {
   createButton,
   createDispatch,
   createPausePopup,
+  dualHint,
   getActionHint,
   isGazeModeActive,
-  kbdHint,
   setDefaultRulesVisible,
   setGazeModeActive,
   setupGamepad,
@@ -137,7 +137,7 @@ const createCongrats = (
       'Prev Level',
       false,
       () => selectLevel(ws.previousConjectureId()),
-      kbdHint('p'),
+      dualHint('p', 'undo'),
     ),
   )
   buttons.appendChild(
@@ -156,7 +156,7 @@ const createCongrats = (
       'Next Level',
       false,
       () => selectLevel(ws.nextConjectureId()),
-      kbdHint('␣'),
+      dualHint('␣', 'axiom'),
     ),
   )
 

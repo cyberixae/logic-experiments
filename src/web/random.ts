@@ -9,9 +9,9 @@ import {
   createButton,
   createDispatch,
   createPausePopup,
+  dualHint,
   getActionHint,
   isGazeModeActive,
-  kbdHint,
   setDefaultRulesVisible,
   setGazeModeActive,
   setupGamepad,
@@ -77,7 +77,9 @@ const createCongrats = (
       getActionHint('reset'),
     ),
   )
-  buttons.appendChild(createButton('New Challenge', false, onNew, kbdHint('n')))
+  buttons.appendChild(
+    createButton('New Challenge', false, onNew, dualHint('n', 'axiom')),
+  )
 
   return { hurray, buttons }
 }

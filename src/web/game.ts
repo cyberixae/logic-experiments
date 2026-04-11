@@ -195,6 +195,13 @@ export const getActionHint = (action: Action): string | undefined =>
 export const kbdHint = (s: string): string | undefined =>
   gamepadActive ? undefined : s
 
+// For buttons whose primary trigger differs between keyboard and gamepad —
+// e.g. congrats-screen "New Challenge" is triggered by `'n'` on the keyboard
+// but by `axiom` (R2/Cross) on the gamepad. Shows the literal in keyboard
+// mode, the pad hint for the given action in pad mode.
+export const dualHint = (kbd: string, padAction: Action): string | undefined =>
+  gamepadActive ? actionPadHint[padAction] : kbd
+
 export const createButton = (
   label: string,
   disabled: boolean,
