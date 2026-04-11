@@ -339,6 +339,9 @@ body {
 .pause-buttons .button.disabled {
   opacity: 0.5;
 }
+.pause-buttons-spacer {
+  height: 1em;
+}
 .pause-buttons .button .key-hint {
   position: absolute;
   width: 30px;
