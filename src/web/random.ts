@@ -92,6 +92,7 @@ export const mountRandom = (
 
   const onNew = () => {
     ws = newWorkspace(pool)
+    setGazeModeActive(false)
     rerender()
   }
 
@@ -109,7 +110,10 @@ export const mountRandom = (
     navigate('menu')
   }
   const resetFromPopup = () => {
-    ws.applyEvent(reset())
+    if (activePath(ws.currentConjecture()).length > 0) {
+      ws.applyEvent(reset())
+    }
+    setGazeModeActive(false)
     pausePopupOpen = false
     rerender()
   }
@@ -121,12 +125,13 @@ export const mountRandom = (
     container.appendChild(createBench(ws, makeCongrats, controlsEl, rerender))
     if (pausePopupOpen) {
       const canReset = activePath(ws.currentConjecture()).length > 0
+      const resetEnabled = canReset || isGazeModeActive()
       container.appendChild(
         createPausePopup(
           closePausePopup,
           exitToMenu,
           resetFromPopup,
-          !canReset,
+          !resetEnabled,
         ),
       )
     }

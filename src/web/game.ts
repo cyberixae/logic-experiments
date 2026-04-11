@@ -770,7 +770,10 @@ export const createDispatch =
       }
     } else if (action === 'gazeConnective' || action === 'gazeWeakening') {
       if (!gazeModeActive) return
-    } else if (RULE_APPLY_ACTIONS.has(action) && gazeModeActive) {
+    } else if (
+      gazeModeActive &&
+      (RULE_APPLY_ACTIONS.has(action) || action === 'reset')
+    ) {
       gazeModeActive = false
     } else if (action === 'undo' && gazeModeActive) {
       if (activePath(getWorkspace().currentConjecture()).length === 0) {
