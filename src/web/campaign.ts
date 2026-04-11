@@ -103,17 +103,6 @@ const createControls = (
   }
   panel.appendChild(
     createButton(
-      'reset',
-      !canUndo,
-      () => {
-        ws.applyEvent(reset())
-        rerender()
-      },
-      actionKeyHint['reset'],
-    ),
-  )
-  panel.appendChild(
-    createButton(
       'undo',
       !undoEnabled,
       () => {
@@ -221,6 +210,11 @@ export const mountCampaign = (
     pausePopupOpen = false
     navigate('menu')
   }
+  const resetFromPopup = () => {
+    ws.applyEvent(reset())
+    pausePopupOpen = false
+    rerender()
+  }
 
   const rerender = () => {
     container.innerHTML = ''
@@ -237,7 +231,15 @@ export const mountCampaign = (
     const makeCongrats = () => createCongrats(ws, selectLevel, rerender)
     container.appendChild(createBench(ws, makeCongrats, controlsEl, rerender))
     if (pausePopupOpen) {
-      container.appendChild(createPausePopup(closePausePopup, exitToMenu))
+      const canReset = activePath(ws.currentConjecture()).length > 0
+      container.appendChild(
+        createPausePopup(
+          closePausePopup,
+          exitToMenu,
+          resetFromPopup,
+          !canReset,
+        ),
+      )
     }
   }
 
@@ -269,6 +271,10 @@ export const mountCampaign = (
   const dispatch = (action: Action) => {
     if (action === 'exit') {
       if (pausePopupOpen) exitToMenu()
+      return
+    }
+    if (action === 'reset' && pausePopupOpen) {
+      resetFromPopup()
       return
     }
     if (pausePopupOpen && action !== 'menu') return

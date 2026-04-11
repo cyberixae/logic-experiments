@@ -687,6 +687,8 @@ const autoRule = (workspace: AnyWorkspace, rules: RuleId[]) => {
 export const createPausePopup = (
   onResume: () => void,
   onExit: () => void,
+  onReset: () => void,
+  resetDisabled: boolean,
 ): HTMLElement => {
   const shroud = document.createElement('div')
   shroud.setAttribute('class', 'shroud pause-shroud')
@@ -709,6 +711,14 @@ export const createPausePopup = (
   buttons.setAttribute('class', 'pause-buttons')
   buttons.appendChild(
     createButton('Resume game', false, onResume, actionKeyHint['menu']),
+  )
+  buttons.appendChild(
+    createButton(
+      'Reset challenge',
+      resetDisabled,
+      onReset,
+      actionKeyHint['reset'],
+    ),
   )
   buttons.appendChild(
     createButton('Exit to main menu', false, onExit, actionKeyHint['exit']),
