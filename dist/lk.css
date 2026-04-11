@@ -300,14 +300,14 @@ body {
   right: 0;
   bottom: 0;
   left: 0;
-  z-index: 1;
+  z-index: 10;
   background-color: #000e;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 .pause-shroud {
-  z-index: 2;
+  z-index: 20;
 }
 .pause-popup {
   background-color: #fff2;
@@ -517,7 +517,10 @@ body {
 }
 .ghost-tree .connective,
 .ghost-tree .connective.active,
-.ghost-tree .parenthesis {
+.ghost-tree .parenthesis,
+.level-select .connective,
+.level-select .connective.active,
+.level-select .parenthesis {
   color: inherit;
 }
 .gazed {
