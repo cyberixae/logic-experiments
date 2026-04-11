@@ -26,7 +26,6 @@ const newWorkspace = (pool: ChallengePool): AnyWorkspace =>
 
 const createControls = (
   ws: AnyWorkspace,
-  onNew: () => void,
   rerender: () => void,
   onMenu: () => void,
 ): HTMLElement => {
@@ -36,7 +35,6 @@ const createControls = (
   panel.setAttribute('class', 'controls')
 
   panel.appendChild(createButton('menu', false, onMenu, actionKeyHint['menu']))
-  panel.appendChild(createButton('new', false, onNew, 'n'))
   panel.appendChild(
     createButton(
       'undo',
@@ -117,10 +115,14 @@ export const mountRandom = (
     pausePopupOpen = false
     rerender()
   }
+  const freshFromPopup = () => {
+    pausePopupOpen = false
+    onNew()
+  }
 
   const rerender = () => {
     container.innerHTML = ''
-    const controlsEl = createControls(ws, onNew, rerender, togglePausePopup)
+    const controlsEl = createControls(ws, rerender, togglePausePopup)
     const makeCongrats = () => createCongrats(ws, onNew, rerender)
     container.appendChild(createBench(ws, makeCongrats, controlsEl, rerender))
     if (pausePopupOpen) {
@@ -132,6 +134,7 @@ export const mountRandom = (
           exitToMenu,
           resetFromPopup,
           !resetEnabled,
+          freshFromPopup,
         ),
       )
     }
