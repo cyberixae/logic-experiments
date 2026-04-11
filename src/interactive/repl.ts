@@ -121,7 +121,7 @@ const status = (s: Focus<AnySequent>): Segments => {
   const rules = applicableRules(s)
   return [
     of('\n'),
-    ...fromSequent(activeSequent(s), rules)(basic),
+    ...fromSequent(activeSequent(s))(basic),
     of('\n\n' + fromFocus(s)),
     of('\nRules: ' + rules.join(', ')),
     of('\nProof: undo, reset'),

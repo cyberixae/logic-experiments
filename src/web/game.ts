@@ -246,7 +246,6 @@ const createPlayArea = (workspace: AnyWorkspace): HTMLElement => {
   const tree = renderDerivation(
     focus.derivation,
     solved ? [-1] : activePath(focus),
-    workspace.applicableRules(),
     gaze,
     ghost,
   )

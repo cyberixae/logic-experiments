@@ -500,9 +500,18 @@ body {
   text-align: center;
   border-radius: 6px;
   background-color: transparent;
+  color: #000b;
 }
 .connective.active {
-  background-color: #d003;
+  color: #0008;
+}
+.parenthesis {
+  color: #000b;
+}
+.ghost-tree .connective,
+.ghost-tree .connective.active,
+.ghost-tree .parenthesis {
+  color: inherit;
 }
 .gazed {
   border-bottom: 0.15em solid var(--gaze-color);

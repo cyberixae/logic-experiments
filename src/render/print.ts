@@ -13,7 +13,6 @@ import { AnySequent } from '../model/sequent'
 import { Formulas } from '../model/formulas'
 import * as rule from '../model/rule'
 import * as segment from './segment'
-import { leftLogical, rightLogical, rules as ruleRegistry } from '../rules'
 
 export type NullaryTemplate = [string]
 export const NullaryTemplateId = {
@@ -86,6 +85,9 @@ export function printUnary<K extends UnaryTemplateId>(
 ): (a: Printer) => Printer {
   return (a) => (theme) => {
     const [s0, s1] = theme[key]
+    if (key === 'parenthesis') {
+      return [segment.paren(s0), ...a(theme), segment.paren(s1)]
+    }
     return [
       markConnective
         ? segment.connective(s0, activeConn)
@@ -279,27 +281,16 @@ const wrapGazed =
 
 export function fromSequent(
   judgement: judge.AnySequent,
-  ruleIds: ReadonlyArray<rule.RuleId> = [],
   gaze: GazeMark | null = null,
 ): Printer {
   const { antecedent, succedent } = judgement
 
-  const activeLeft = ruleIds.some(
-    (id) => id in leftLogical && ruleRegistry[id].isResult(judgement),
-  )
-  const activeRight = ruleIds.some(
-    (id) => id in rightLogical && ruleRegistry[id].isResult(judgement),
-  )
-
   const antPrinters = antecedent.map((f, i) => {
-    const p =
-      activeLeft && i === antecedent.length - 1
-        ? fromProp(f, true)
-        : fromProp(f)
+    const p = fromProp(f, true)
     return gaze && gaze.side === 'left' && gaze.index === i ? wrapGazed(p) : p
   })
   const sucPrinters = succedent.map((f, i) => {
-    const p = activeRight && i === 0 ? fromProp(f, true) : fromProp(f)
+    const p = fromProp(f, true)
     return gaze && gaze.side === 'right' && gaze.index === i ? wrapGazed(p) : p
   })
 

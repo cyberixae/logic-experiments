@@ -15,18 +15,13 @@ const equalPaths = (a: Path, b: Path): boolean =>
 
 const renderSequent = (
   derivation: AnyDerivation,
-  ruleIds: ReadonlyArray<RuleId>,
   isActive: boolean,
   gaze: GazeMark | null,
 ): HTMLElement => {
   const el = document.createElement('div')
   el.setAttribute('class', 'tree-sequent')
   el.innerHTML = html(
-    fromSequent(
-      derivation.result,
-      isActive ? ruleIds : [],
-      isActive ? gaze : null,
-    )(basic),
+    fromSequent(derivation.result, isActive ? gaze : null)(basic),
   )
   return el
 }
@@ -43,7 +38,7 @@ const renderGhost = (chain: GhostStep[]): HTMLElement => {
     if (!step) continue
     const sequent = document.createElement('div')
     sequent.setAttribute('class', 'tree-sequent ghost')
-    sequent.innerHTML = html(fromSequent(step.sequent, [], null)(basic))
+    sequent.innerHTML = html(fromSequent(step.sequent, null)(basic))
     wrap.appendChild(sequent)
     const inference = document.createElement('div')
     inference.setAttribute('class', 'tree-inference ghost')
@@ -71,7 +66,6 @@ const renderInferenceLine = (ruleId: RuleId): HTMLElement => {
 export const renderDerivation = (
   derivation: AnyDerivation,
   activePath: Path,
-  applicableRules: ReadonlyArray<RuleId>,
   gaze: GazeMark | null = null,
   ghost: GhostStep[] | null = null,
   currentPath: Path = [],
@@ -98,14 +92,10 @@ export const renderDerivation = (
     premises.setAttribute('class', 'tree-premises')
     let maxChildDepth = -1
     derivation.deps.forEach((dep, i) => {
-      const child = renderDerivation(
-        dep,
-        activePath,
-        applicableRules,
-        gaze,
-        ghost,
-        [...currentPath, i],
-      )
+      const child = renderDerivation(dep, activePath, gaze, ghost, [
+        ...currentPath,
+        i,
+      ])
       const childDepth = Number(child.dataset['leafDepth'] ?? '0')
       if (childDepth > maxChildDepth) maxChildDepth = childDepth
       premises.appendChild(child)
@@ -113,14 +103,12 @@ export const renderDerivation = (
     leafDepth = maxChildDepth < 0 ? 0 : maxChildDepth + 1
     node.appendChild(premises)
     node.appendChild(renderInferenceLine(derivation.rule))
-    node.appendChild(renderSequent(derivation, applicableRules, false, null))
+    node.appendChild(renderSequent(derivation, false, null))
   } else {
     if (isOpenActive && ghost && ghost.length > 0) {
       node.appendChild(renderGhost(ghost))
     }
-    node.appendChild(
-      renderSequent(derivation, applicableRules, isOpenActive, gaze),
-    )
+    node.appendChild(renderSequent(derivation, isOpenActive, gaze))
   }
   node.dataset['leafDepth'] = String(leafDepth)
 

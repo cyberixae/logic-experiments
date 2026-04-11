@@ -2,6 +2,7 @@ export type Segment = {
   text: string
   active: boolean
   connective: boolean
+  parenthesis?: boolean
   raw?: boolean
 }
 
@@ -17,6 +18,10 @@ export function active(text: string): Segment {
 
 export function connective(text: string, active: boolean): Segment {
   return { text, active, connective: true }
+}
+
+export function paren(text: string): Segment {
+  return { text, active: false, connective: false, parenthesis: true }
 }
 
 export function raw(html: string): Segment {
@@ -48,6 +53,9 @@ export function html(segments: Segments): string {
       if (s.connective) {
         const cls = s.active ? 'connective active' : 'connective'
         return `<span class="${cls}">${escape(s.text)}</span>`
+      }
+      if (s.parenthesis === true) {
+        return `<span class="parenthesis">${escape(s.text)}</span>`
       }
       return escape(s.text)
     })

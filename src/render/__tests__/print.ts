@@ -495,24 +495,27 @@ describe('print module', () => {
       ).toEqual(['∧'])
     })
 
-    it('fromSequent marks left active connective for applicable rule', () => {
+    it('fromSequent marks outermost connective on left', () => {
       const seq = sequent([conjunction(atom('p'), atom('q'))], [])
-      expect(activeText(fromSequent(seq, ['cl'])(basic))).toEqual(['∧'])
+      expect(activeText(fromSequent(seq)(basic))).toEqual(['∧'])
     })
 
-    it('fromSequent marks right active connective for applicable rule', () => {
+    it('fromSequent marks outermost connective on right', () => {
       const seq = sequent([], [implication(atom('p'), atom('q'))])
-      expect(activeText(fromSequent(seq, ['ir'])(basic))).toEqual(['→'])
+      expect(activeText(fromSequent(seq)(basic))).toEqual(['→'])
     })
 
-    it('fromSequent no active when rule does not apply', () => {
-      const seq = sequent([implication(atom('p'), atom('q'))], [])
-      expect(activeText(fromSequent(seq, ['cl'])(basic))).toEqual([])
+    it('fromSequent marks every outermost connective', () => {
+      const seq = sequent(
+        [conjunction(atom('p'), atom('q')), disjunction(atom('r'), atom('s'))],
+        [implication(atom('p'), atom('q'))],
+      )
+      expect(activeText(fromSequent(seq)(basic))).toEqual(['∧', '∨', '→'])
     })
 
-    it('fromSequent no active with empty rules', () => {
-      const seq = sequent([conjunction(atom('p'), atom('q'))], [])
-      expect(activeText(fromSequent(seq, [])(basic))).toEqual([])
+    it('fromSequent no active for atoms', () => {
+      const seq = sequent([atom('p')], [atom('q')])
+      expect(activeText(fromSequent(seq)(basic))).toEqual([])
     })
   })
 
