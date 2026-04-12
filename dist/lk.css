@@ -53,6 +53,9 @@ body {
 .controls-group.gaze {
   border-bottom-color: var(--gaze-color);
 }
+.controls-group.hot {
+  border-bottom-color: #c33;
+}
 .controls-center {
   display: flex;
   flex-direction: row;

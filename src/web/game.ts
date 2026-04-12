@@ -605,7 +605,7 @@ export const createBench = (
     getActionHint('axiom'),
   )
 
-  const gazeGroup = makeGroup(...(isGazeModeActive() ? ['gaze'] : []))
+  const gazeGroup = makeGroup(isGazeModeActive() ? 'gaze' : 'hot')
   gazeGroup.appendChild(gazeLeftBtn)
   gazeGroup.appendChild(gazeWeakeningBtn)
   gazeGroup.appendChild(gazeConnectiveBtn)
