@@ -538,9 +538,9 @@ body {
 .parenthesis {
   color: #000b;
 }
-.ghost-tree .connective,
-.ghost-tree .connective.active,
-.ghost-tree .parenthesis,
+.ghost-node .connective,
+.ghost-node .connective.active,
+.ghost-node .parenthesis,
 .level-select .connective,
 .level-select .connective.active,
 .level-select .parenthesis {
@@ -549,20 +549,10 @@ body {
 .gazed {
   border-bottom: 0.15em solid var(--gaze-color);
 }
-.tree-active {
-  position: relative;
-}
-.ghost-tree {
-  position: absolute;
-  bottom: 100%;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+.tree-sequent.ghost,
+.tree-inference.ghost {
   opacity: 0.55;
   pointer-events: none;
-  color: #666;
   filter: grayscale(1) brightness(0.8) sepia(1) hue-rotate(180deg) saturate(6);
 }
 .tree-sequent.ghost {

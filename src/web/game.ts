@@ -8,7 +8,14 @@ import {
 import { activePath, activeSequent } from '../interactive/focus'
 import { Rule } from '../model/rule'
 import { AnySequent } from '../model/sequent'
-import { branches, subDerivation } from '../model/derivation'
+import {
+  AnyDerivation,
+  branches,
+  editDerivation,
+  premise,
+  subDerivation,
+  transformation,
+} from '../model/derivation'
 import { fromDerivation } from '../render/print'
 import { RuleId } from '../model/rule'
 import { renderDerivation, layoutTree } from './tree'
@@ -22,7 +29,7 @@ import {
 } from '../rules'
 import { AnyWorkspace } from '../interactive/workspace'
 import { Action } from '../interactive/action'
-import { computeGhostChain } from '../interactive/ghost'
+import { computeGhostChain, GhostStep } from '../interactive/ghost'
 import { Navigate } from './types'
 import { t } from './i18n'
 import { entries, keys } from '../utils/record'
@@ -54,6 +61,24 @@ export {
   setGazeModeActive,
   subscribeGamepad,
 } from './input-mode'
+
+const ghostToDerivation = (
+  chain: GhostStep[],
+  activeSequent: AnySequent,
+): AnyDerivation => {
+  let deps: AnyDerivation[] = []
+  for (let i = chain.length - 1; i >= 0; i -= 1) {
+    const step = chain[i]
+    if (!step) continue
+    if (deps.length === 0) {
+      deps = step.sequents.map((s) => premise(s))
+    }
+    const result = i === 0 ? activeSequent : chain[i - 1]?.sequents[0]
+    if (!result) continue
+    deps = [transformation(result, deps, step.rule)]
+  }
+  return deps[0] ?? premise(activeSequent)
+}
 
 const ruleAction: Partial<Record<RuleId, Action>> = {
   swl: 'leftWeakening',
@@ -197,7 +222,7 @@ const createPlayArea = (workspace: AnyWorkspace): HTMLElement => {
   const focus = workspace.currentConjecture()
   const solved = workspace.isSolved()
   const gaze = isGazeModeActive() ? workspace.gaze() : null
-  const ghost = isGazeModeActive()
+  const ghostChain = isGazeModeActive()
     ? computeGhostChain(
         activeSequent(focus),
         workspace.gaze(),
@@ -205,12 +230,23 @@ const createPlayArea = (workspace: AnyWorkspace): HTMLElement => {
         workspace.availableRules(),
       )
     : null
-  const tree = renderDerivation(
-    focus.derivation,
-    solved ? [-1] : activePath(focus),
-    gaze,
-    ghost,
-  )
+  const path = solved ? [-1] : activePath(focus)
+  let derivation = focus.derivation
+  let ghostPath: number[] | null = null
+  if (ghostChain !== null && ghostChain.length > 0) {
+    const edit = (leaf: AnyDerivation): AnyDerivation =>
+      ghostToDerivation(ghostChain, leaf.result)
+    const withGhost = editDerivation(
+      focus.derivation,
+      path,
+      edit as Parameters<typeof editDerivation>[2],
+    )
+    if (withGhost) {
+      derivation = withGhost
+      ghostPath = path
+    }
+  }
+  const tree = renderDerivation(derivation, path, gaze, [], ghostPath)
   const isFresh = focus.derivation.kind === 'premise'
   tree.style.visibility = 'hidden'
   panel.appendChild(tree)

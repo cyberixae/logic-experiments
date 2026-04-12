@@ -8,69 +8,34 @@ import {
 } from '../render/print'
 import { html } from '../render/segment'
 import { RuleId } from '../model/rule'
-import { GhostStep } from '../interactive/ghost'
 import { t } from './i18n'
 
 const equalPaths = (a: Path, b: Path): boolean =>
   a.length === b.length && a.every((v, i) => v === b[i])
 
+const startsWith = (path: Path, prefix: Path): boolean =>
+  path.length >= prefix.length && prefix.every((v, i) => v === path[i])
+
 const renderSequent = (
   derivation: AnyDerivation,
   isActive: boolean,
   gaze: GazeMark | null,
+  ghost: boolean = false,
 ): HTMLElement => {
   const el = document.createElement('div')
-  el.setAttribute('class', 'tree-sequent')
+  el.setAttribute('class', 'tree-sequent' + (ghost ? ' ghost' : ''))
   el.innerHTML = html(
     fromSequent(derivation.result, isActive ? gaze : null)(basic),
   )
   return el
 }
 
-const renderGhost = (chain: GhostStep[]): HTMLElement => {
-  const wrap = document.createElement('div')
-  wrap.setAttribute('class', 'ghost-tree')
-  // Chain is ordered first-step → final-step. Visually, we want the
-  // final step at the top and the first step just above the active
-  // sequent at the bottom. Render in reverse order so the DOM order
-  // top-to-bottom matches.
-  for (let i = chain.length - 1; i >= 0; i -= 1) {
-    const step = chain[i]
-    if (!step) continue
-    if (step.sequents.length <= 1) {
-      const only = step.sequents[0]
-      if (!only) continue
-      const sequent = document.createElement('div')
-      sequent.setAttribute('class', 'tree-sequent ghost')
-      sequent.innerHTML = html(fromSequent(only, null)(basic))
-      wrap.appendChild(sequent)
-    } else {
-      const premises = document.createElement('div')
-      premises.setAttribute('class', 'tree-premises ghost-premises')
-      for (const s of step.sequents) {
-        const sequent = document.createElement('div')
-        sequent.setAttribute('class', 'tree-sequent ghost')
-        sequent.innerHTML = html(fromSequent(s, null)(basic))
-        premises.appendChild(sequent)
-      }
-      wrap.appendChild(premises)
-    }
-    const inference = document.createElement('div')
-    inference.setAttribute('class', 'tree-inference ghost')
-    const label = document.createElement('div')
-    label.setAttribute('class', 'tree-rule-label')
-    label.innerHTML = html(
-      fromRuleId(step.rule, t('sideLeft'), t('sideRight'))(basic),
-    )
-    inference.appendChild(label)
-    wrap.appendChild(inference)
-  }
-  return wrap
-}
-
-const renderInferenceLine = (ruleId: RuleId): HTMLElement => {
+const renderInferenceLine = (
+  ruleId: RuleId,
+  ghost: boolean = false,
+): HTMLElement => {
   const container = document.createElement('div')
-  container.setAttribute('class', 'tree-inference')
+  container.setAttribute('class', 'tree-inference' + (ghost ? ' ghost' : ''))
 
   const label = document.createElement('div')
   label.setAttribute('class', 'tree-rule-label')
@@ -86,18 +51,33 @@ export const renderDerivation = (
   derivation: AnyDerivation,
   activePath: Path,
   gaze: GazeMark | null = null,
-  ghost: GhostStep[] | null = null,
   currentPath: Path = [],
+  ghostPath: Path | null = null,
 ): HTMLElement => {
-  const isActive = equalPaths(currentPath, activePath)
-  const isOpenActive = isActive && derivation.kind === 'premise'
-  const isClosedActive = isActive && derivation.kind === 'transformation'
+  // Ghost: nodes strictly deeper than ghostPath are fully ghost-styled.
+  // The node AT ghostPath is the "boundary": its sequent keeps active
+  // styling but its inference line and premises are ghost.
+  const isGhostBoundary =
+    ghostPath !== null && equalPaths(currentPath, ghostPath)
+  const isGhostNode =
+    ghostPath !== null &&
+    currentPath.length > ghostPath.length &&
+    startsWith(currentPath, ghostPath)
+  const ghost = isGhostBoundary || isGhostNode
+
+  const isActive = equalPaths(currentPath, activePath) || isGhostBoundary
+  const isOpenActive =
+    isActive && derivation.kind === 'premise' && !isGhostBoundary
+  const isClosedActive =
+    isActive && derivation.kind === 'transformation' && !isGhostBoundary
 
   const node = document.createElement('div')
   const cls =
     'tree-node' +
     (isOpenActive ? ' tree-active' : '') +
-    (isClosedActive ? ' tree-closed-active' : '')
+    (isClosedActive ? ' tree-closed-active' : '') +
+    (isGhostBoundary ? ' tree-active' : '') +
+    (isGhostNode ? ' ghost-node' : '')
   node.setAttribute('class', cls)
 
   let leafDepth = 0
@@ -111,23 +91,32 @@ export const renderDerivation = (
     premises.setAttribute('class', 'tree-premises')
     let maxChildDepth = -1
     derivation.deps.forEach((dep, i) => {
-      const child = renderDerivation(dep, activePath, gaze, ghost, [
-        ...currentPath,
-        i,
-      ])
+      const child = renderDerivation(
+        dep,
+        activePath,
+        gaze,
+        [...currentPath, i],
+        ghostPath,
+      )
       const childDepth = Number(child.dataset['leafDepth'] ?? '0')
       if (childDepth > maxChildDepth) maxChildDepth = childDepth
       premises.appendChild(child)
     })
     leafDepth = maxChildDepth < 0 ? 0 : maxChildDepth + 1
     node.appendChild(premises)
-    node.appendChild(renderInferenceLine(derivation.rule))
-    node.appendChild(renderSequent(derivation, false, null))
+    node.appendChild(
+      renderInferenceLine(derivation.rule, isGhostBoundary || isGhostNode),
+    )
+    node.appendChild(
+      renderSequent(
+        derivation,
+        isGhostBoundary || isOpenActive,
+        isGhostBoundary ? gaze : null,
+        isGhostNode,
+      ),
+    )
   } else {
-    if (isOpenActive && ghost && ghost.length > 0) {
-      node.appendChild(renderGhost(ghost))
-    }
-    node.appendChild(renderSequent(derivation, isOpenActive, gaze))
+    node.appendChild(renderSequent(derivation, isOpenActive, gaze, isGhostNode))
   }
   node.dataset['leafDepth'] = String(leafDepth)
 
