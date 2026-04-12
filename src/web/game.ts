@@ -344,6 +344,7 @@ const createPanel = <K extends RuleId>(
   ruleRecord: Record<K, Rule<AnySequent>>,
   ls: ReadonlyArray<RuleId>,
   rules: ReadonlyArray<RuleId>,
+  pinned: ReadonlyArray<RuleId>,
   solved: boolean,
   onApply: (key: RuleId) => void,
   gazeHints: GazeHintInfo,
@@ -353,8 +354,14 @@ const createPanel = <K extends RuleId>(
   entries(ruleRecord).forEach(([key, rule]) => {
     if (!rules.includes(key)) return
     const disabled = solved || !ls.includes(key)
+    const isPinned = pinned.includes(key)
     const pre = document.createElement('pre')
-    pre.setAttribute('class', 'rule button' + (disabled ? ' disabled' : ''))
+    pre.setAttribute(
+      'class',
+      'rule button' +
+        (disabled ? ' disabled' : '') +
+        (isPinned ? ' pinned' : ''),
+    )
     if (!disabled) pre.onclick = () => onApply(key)
     pre.innerHTML = fromDerivation(rule.example)
     const action = ruleAction[key]
@@ -427,21 +434,31 @@ export const createBench = (
     : { connective: null, weakening: null }
 
   const hideRules = !rulesVisible || solved
+  const pinned = workspace.pinnedRules()
   const panel = document.createElement('div')
   panel.setAttribute('class', 'bench' + (hideRules ? ' rules-hidden' : ''))
   panel.appendChild(
-    createPanel('left', left, ls, rules, inactive, apply, gazeHints),
+    createPanel('left', left, ls, rules, pinned, inactive, apply, gazeHints),
   )
   const congrats = solved ? makeCongrats() : null
   if (congrats) {
     panel.appendChild(congrats.hurray)
   } else {
     panel.appendChild(
-      createPanel('main', center, ls, rules, inactive, applyCenter, gazeHints),
+      createPanel(
+        'main',
+        center,
+        ls,
+        rules,
+        pinned,
+        inactive,
+        applyCenter,
+        gazeHints,
+      ),
     )
   }
   panel.appendChild(
-    createPanel('right', right, ls, rules, inactive, apply, gazeHints),
+    createPanel('right', right, ls, rules, pinned, inactive, apply, gazeHints),
   )
   panel.appendChild(createPlayArea(workspace))
   const zoomOut = createButton(

@@ -29,9 +29,9 @@ body {
     'left status right'
     'controls controls controls';
 }
-.bench.rules-hidden .left,
-.bench.rules-hidden .main,
-.bench.rules-hidden .right {
+.bench.rules-hidden .left .rule:not(.pinned),
+.bench.rules-hidden .main .rule:not(.pinned),
+.bench.rules-hidden .right .rule:not(.pinned) {
   display: none;
 }
 
