@@ -1,6 +1,7 @@
 import { reset } from '../interactive/event'
 import { activePath } from '../interactive/focus'
 import { challenges } from '../challenges'
+import { isTutorial } from '../model/challenge'
 import { basic, fromRuleId, fromSequent } from '../render/print'
 import { Workspace } from '../interactive/workspace'
 import { repl } from '../interactive/repl'
@@ -68,10 +69,17 @@ const createListing = (
     title.setAttribute('class', 'title')
     title.innerHTML = id
     item.appendChild(title)
+    const pinned = isTutorial(challenge) ? challenge.pinned : []
     const rules = document.createElement('div')
     rules.setAttribute('class', 'rules')
     rules.innerHTML = challenge.rules
-      .map((rule) => html(fromRuleId(rule)(basic)))
+      .map((rule) => {
+        const text = html(fromRuleId(rule)(basic))
+        if (pinned.includes(rule)) {
+          return `<span class="pinned">${text}</span>`
+        }
+        return text
+      })
       .join(', ')
     item.appendChild(rules)
     const goal = document.createElement('div')

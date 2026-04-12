@@ -37,6 +37,8 @@ export interface Tutorial<
   pinned: ReadonlyArray<S[number]>
 }
 export type AnyTutorial = Tutorial<AnySequent, ReadonlyArray<RuleId>>
+export const isTutorial = (c: Configuration<AnySequent>): c is AnyTutorial =>
+  'pinned' in c && Array.isArray(c.pinned)
 export const tutorial = <
   J extends AnySequent,
   const S extends ReadonlyArray<RuleId>,

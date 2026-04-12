@@ -400,6 +400,9 @@ body {
   text-align: right;
   padding-right: 1em;
 }
+.level .pinned {
+  color: #fc8;
+}
 
 .menu {
   width: 100vw;
