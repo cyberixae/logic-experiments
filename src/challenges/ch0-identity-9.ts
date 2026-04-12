@@ -1,10 +1,12 @@
 import { rk } from '../systems/rk'
 import { sequent } from '../model/sequent'
-import { challenge } from '../model/challenge'
+import { tutorial } from '../model/challenge'
 
 const { a, o, i } = rk
 
 const rules = ['i'] as const
+
+const pinned = ['i'] as const
 
 const goal = sequent(
   [
@@ -28,4 +30,4 @@ const solution = i.i(
   ),
 )
 
-export const ch0identity9 = challenge({ rules, goal, solution })
+export const ch0identity9 = tutorial({ rules, goal, solution, pinned })

@@ -1,6 +1,6 @@
 import { rk } from '../systems/rk'
 import { conclusion } from '../model/sequent'
-import { challenge } from '../model/challenge'
+import { tutorial } from '../model/challenge'
 
 const { a, o, z, i } = rk
 
@@ -18,6 +18,8 @@ const rules = [
   'dr',
   'ir',
 ] as const
+
+const pinned = ['dl', 'cr'] as const
 
 const goal = conclusion(
   o.p2.implication(
@@ -46,4 +48,4 @@ const solution = z.ir(
   ),
 )
 
-export const ch6branching9 = challenge({ rules, goal, solution })
+export const ch6branching9 = tutorial({ rules, goal, solution, pinned })

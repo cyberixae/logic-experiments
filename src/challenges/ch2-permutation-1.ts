@@ -1,6 +1,6 @@
 import { rk } from '../systems/rk'
 import { sequent } from '../model/sequent'
-import { challenge } from '../model/challenge'
+import { tutorial } from '../model/challenge'
 
 const { a, z, i } = rk
 
@@ -14,6 +14,8 @@ const rules = [
   'sRotRB',
 ] as const
 
+const pinned = ['sRotLF', 'sRotRF', 'sRotLB', 'sRotRB'] as const
+
 const goal = sequent([a('p'), a('p'), a('p'), a('q'), a('p'), a('p')], [a('q')])
 
 const solution = z.swl(
@@ -24,4 +26,4 @@ const solution = z.swl(
   ),
 )
 
-export const ch2permutation1 = challenge({ rules, goal, solution })
+export const ch2permutation1 = tutorial({ rules, goal, solution, pinned })
