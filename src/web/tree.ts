@@ -59,7 +59,9 @@ const renderGhost = (chain: GhostStep[]): HTMLElement => {
     inference.setAttribute('class', 'tree-inference ghost')
     const label = document.createElement('div')
     label.setAttribute('class', 'tree-rule-label')
-    label.innerHTML = html(fromRuleId(step.rule, t('sideLeft'), t('sideRight'))(basic))
+    label.innerHTML = html(
+      fromRuleId(step.rule, t('sideLeft'), t('sideRight'))(basic),
+    )
     inference.appendChild(label)
     wrap.appendChild(inference)
   }
@@ -72,7 +74,9 @@ const renderInferenceLine = (ruleId: RuleId): HTMLElement => {
 
   const label = document.createElement('div')
   label.setAttribute('class', 'tree-rule-label')
-  label.innerHTML = html(fromRuleId(ruleId, t('sideLeft'), t('sideRight'))(basic))
+  label.innerHTML = html(
+    fromRuleId(ruleId, t('sideLeft'), t('sideRight'))(basic),
+  )
   container.appendChild(label)
 
   return container
@@ -130,7 +134,10 @@ export const renderDerivation = (
   if (currentPath.length === 0) {
     node.addEventListener('copy', (e) => {
       e.preventDefault()
-      e.clipboardData?.setData('text/plain', fromDerivation(derivation, t('sideLeft'), t('sideRight')))
+      e.clipboardData?.setData(
+        'text/plain',
+        fromDerivation(derivation, t('sideLeft'), t('sideRight')),
+      )
     })
   }
 

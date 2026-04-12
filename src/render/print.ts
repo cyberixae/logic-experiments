@@ -310,11 +310,7 @@ export function right(label: string, n: string | null = null): string {
   return n != null ? label + n : label
 }
 
-export function fromRuleId(
-  s: rule.RuleId,
-  l = 'L',
-  r = 'R',
-): Printer {
+export function fromRuleId(s: rule.RuleId, l = 'L', r = 'R'): Printer {
   return (t) => [
     segment.of(
       rule.matchRuleId(s, {
