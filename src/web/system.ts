@@ -1,10 +1,10 @@
-import { Navigate } from './types'
+import { MountResult, Navigate } from './types'
 import { helpSystems, isHelpSystemId, renderSystemHelp } from '../help'
 
 export const mountSystem = (
   container: HTMLElement,
   _navigate: Navigate,
-): (() => void) => {
+): MountResult => {
   const render = () => {
     const params = new URLSearchParams(window.location.search)
     const id = params.get('id')
@@ -60,5 +60,5 @@ export const mountSystem = (
   }
 
   render()
-  return () => {}
+  return { cleanup: () => {}, rerender: render }
 }

@@ -12,7 +12,6 @@ import { branches, subDerivation } from '../model/derivation'
 import { fromDerivation } from '../render/print'
 import { RuleId } from '../model/rule'
 import { renderDerivation, layoutTree } from './tree'
-import { Configuration } from '../model/challenge'
 import {
   center,
   isReverseId0,
@@ -21,7 +20,7 @@ import {
   right,
   rightLogical,
 } from '../rules'
-import { Workspace } from '../interactive/workspace'
+import { AnyWorkspace } from '../interactive/workspace'
 import { Action } from '../interactive/action'
 import { computeGhostChain } from '../interactive/ghost'
 import { Navigate } from './types'
@@ -40,10 +39,7 @@ import {
   toggleHotMode,
 } from './input-mode'
 
-export type AnyWorkspace = Workspace<
-  string,
-  Record<string, Configuration<AnySequent>>
->
+export { AnyWorkspace }
 
 export {
   dualHint,

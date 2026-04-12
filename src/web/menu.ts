@@ -1,9 +1,10 @@
-import { Navigate } from './types'
+import { gameModes } from '../model/mode'
+import { MountResult, Navigate } from './types'
 
 export const mountMenu = (
   container: HTMLElement,
   navigate: Navigate,
-): (() => void) => {
+): MountResult => {
   const panel = document.createElement('div')
   panel.setAttribute('class', 'menu')
 
@@ -15,22 +16,18 @@ export const mountMenu = (
   const modes = document.createElement('div')
   modes.setAttribute('class', 'menu-modes')
 
-  const randomBtn = document.createElement('div')
-  randomBtn.setAttribute('class', 'button menu-mode')
-  randomBtn.innerHTML = 'Random'
-  randomBtn.onclick = () => navigate('random')
-  modes.appendChild(randomBtn)
-
-  const campaignBtn = document.createElement('div')
-  campaignBtn.setAttribute('class', 'button menu-mode')
-  campaignBtn.innerHTML = 'Campaign'
-  campaignBtn.onclick = () => navigate('campaign')
-  modes.appendChild(campaignBtn)
+  for (const mode of gameModes) {
+    const btn = document.createElement('div')
+    btn.setAttribute('class', 'button menu-mode')
+    btn.innerHTML = mode.charAt(0).toUpperCase() + mode.slice(1)
+    btn.onclick = () => navigate(mode)
+    modes.appendChild(btn)
+  }
 
   panel.appendChild(modes)
 
   container.innerHTML = ''
   container.appendChild(panel)
 
-  return () => {}
+  return { cleanup: () => {}, rerender: () => {} }
 }

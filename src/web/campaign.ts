@@ -1,11 +1,9 @@
 import { reset } from '../interactive/event'
 import { activePath } from '../interactive/focus'
-import { challenges } from '../challenges'
+import { Session } from '../interactive/session'
 import { isTutorial } from '../model/challenge'
 import { basic, fromRuleId, fromSequent } from '../render/print'
-import { Workspace } from '../interactive/workspace'
-import { repl } from '../interactive/repl'
-import { html, plain } from '../render/segment'
+import { html } from '../render/segment'
 import { Action } from '../interactive/action'
 import {
   AnyWorkspace,
@@ -26,7 +24,7 @@ import {
   zoomTreeOut,
   zoomTreeReset,
 } from './game'
-import { Navigate } from './types'
+import { MountResult, Navigate } from './types'
 
 const createListing = (
   ws: AnyWorkspace,
@@ -175,7 +173,8 @@ const createCongrats = (
 export const mountCampaign = (
   container: HTMLElement,
   navigate: Navigate,
-): (() => void) => {
+  session: Session,
+): MountResult => {
   setDefaultRulesVisible(false)
   let levelPresses = 0
   const toggleLevel = (listingEl: HTMLElement) => {
@@ -192,7 +191,7 @@ export const mountCampaign = (
       listingEl.setAttribute('style', 'display: none;')
     }
   }
-  const ws = new Workspace(challenges)
+  const ws = session.workspace
 
   const selectLevel = (id: string) => {
     if (ws.isConjectureId(id)) {
@@ -339,21 +338,11 @@ export const mountCampaign = (
   const cleanupGamepad = setupGamepad(dispatch)
   const unsubscribeGamepad = subscribeGamepad(rerender)
 
-  // Debug REPL
-  const gen = repl(ws)
-  gen.next('')
-  Object.assign(window, {
-    cmd: (input: string) => {
-      const result = gen.next(input)
-      console.log(plain(result.value))
-      rerender()
-      return result.done
-    },
-  })
-
-  return () => {
+  const cleanup = () => {
     document.removeEventListener('keydown', handleKey)
     cleanupGamepad()
     unsubscribeGamepad()
   }
+
+  return { cleanup, rerender }
 }

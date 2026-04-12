@@ -1,7 +1,6 @@
 import { reset } from '../interactive/event'
 import { activePath } from '../interactive/focus'
-import { Workspace } from '../interactive/workspace'
-import { ChallengePool } from './challenge-pool'
+import { Session } from '../interactive/session'
 import { Action } from '../interactive/action'
 import {
   AnyWorkspace,
@@ -22,16 +21,14 @@ import {
   zoomTreeOut,
   zoomTreeReset,
 } from './game'
-import { Navigate } from './types'
-
-const newWorkspace = (pool: ChallengePool): AnyWorkspace =>
-  new Workspace({ challenge: pool.take() })
+import { MountResult, Navigate } from './types'
 
 const createControls = (
-  ws: AnyWorkspace,
+  getWorkspace: () => AnyWorkspace,
   rerender: () => void,
   onMenu: () => void,
 ): HTMLElement => {
+  const ws = getWorkspace()
   const canUndo = activePath(ws.currentConjecture()).length > 0
   const undoEnabled = canUndo || isGazeModeActive()
   const panel = document.createElement('div')
@@ -57,10 +54,11 @@ const createControls = (
 }
 
 const createCongrats = (
-  ws: AnyWorkspace,
+  getWorkspace: () => AnyWorkspace,
   onNew: () => void,
   rerender: () => void,
 ): { hurray: HTMLElement; buttons: HTMLElement } => {
+  const ws = getWorkspace()
   const hurray = document.createElement('div')
   hurray.setAttribute('class', 'hurray')
   hurray.innerHTML = '\u{1F389} Conglaturations! \u{1F389}'
@@ -88,13 +86,15 @@ const createCongrats = (
 export const mountRandom = (
   container: HTMLElement,
   navigate: Navigate,
-): (() => void) => {
+  session: Session,
+  onNewChallenge: () => void,
+): MountResult => {
   setDefaultRulesVisible(false)
-  const pool = new ChallengePool()
-  let ws = newWorkspace(pool)
+
+  const getWorkspace = () => session.workspace
 
   const onNew = () => {
-    ws = newWorkspace(pool)
+    onNewChallenge()
     setGazeModeActive(false)
     rerender()
   }
@@ -113,6 +113,7 @@ export const mountRandom = (
     navigate('menu')
   }
   const resetFromPopup = () => {
+    const ws = getWorkspace()
     if (activePath(ws.currentConjecture()).length > 0) {
       ws.applyEvent(reset())
     }
@@ -126,9 +127,10 @@ export const mountRandom = (
   }
 
   const rerender = () => {
+    const ws = getWorkspace()
     container.innerHTML = ''
-    const controlsEl = createControls(ws, rerender, togglePausePopup)
-    const makeCongrats = () => createCongrats(ws, onNew, rerender)
+    const controlsEl = createControls(getWorkspace, rerender, togglePausePopup)
+    const makeCongrats = () => createCongrats(getWorkspace, onNew, rerender)
     container.appendChild(createBench(ws, makeCongrats, controlsEl, rerender))
     if (pausePopupOpen) {
       const canReset = activePath(ws.currentConjecture()).length > 0
@@ -146,6 +148,7 @@ export const mountRandom = (
   }
 
   const onSolved = (action: Action) => {
+    const ws = getWorkspace()
     switch (action) {
       case 'leftWeakening':
       case 'rightWeakening':
@@ -160,7 +163,7 @@ export const mountRandom = (
   }
 
   const baseDispatch = createDispatch(
-    () => ws,
+    getWorkspace,
     rerender,
     navigate,
     onSolved,
@@ -214,10 +217,11 @@ export const mountRandom = (
   const cleanupGamepad = setupGamepad(dispatch)
   const unsubscribeGamepad = subscribeGamepad(rerender)
 
-  return () => {
+  const cleanup = () => {
     document.removeEventListener('keydown', handleKey)
     cleanupGamepad()
     unsubscribeGamepad()
-    pool.cleanup()
   }
+
+  return { cleanup, rerender }
 }

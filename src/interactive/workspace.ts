@@ -9,6 +9,11 @@ import { Configuration, isTutorial } from '../model/challenge'
 import { AnySequent } from '../model/sequent'
 import { GhostKind } from './ghost'
 
+export type AnyWorkspace = Workspace<
+  string,
+  Record<string, Configuration<AnySequent>>
+>
+
 export type Gaze = { side: 'left' | 'right'; index: number }
 
 export class Workspace<
