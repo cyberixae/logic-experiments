@@ -27,9 +27,16 @@ const goal = conclusion(
 )
 
 const solution = z.ir(
-  z.swl(
-    o.p2.implication(a('p'), o.p2.implication(a('q'), o.p1.negation(a('p')))),
-    z.ir(i.i(a('p'))),
+  z.ir(
+    z.sRotLF(
+      z.swl(
+        o.p2.implication(
+          a('p'),
+          o.p2.implication(a('q'), o.p1.negation(a('p'))),
+        ),
+        i.i(a('p')),
+      ),
+    ),
   ),
 )
 

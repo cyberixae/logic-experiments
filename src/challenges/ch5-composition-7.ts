@@ -36,14 +36,19 @@ const goal = sequent(
   ],
 )
 
-const solution = z.cl(
-  z.dr(
-    z.swl(
-      o.p2.implication(a('r'), a('q')),
-      z.cl(
-        z.swr(
-          o.p2.implication(a('q'), a('r')),
-          z.dr(z.sRotLF(z.swl(a('p'), z.swr(a('p'), i.i(a('q')))))),
+const solution = z.dr(
+  z.ir(
+    z.swr(
+      a('r'),
+      z.dr(
+        z.sRotLF(
+          z.swl(
+            o.p2.conjunction(
+              o.p2.conjunction(a('p'), a('q')),
+              o.p2.implication(a('r'), a('q')),
+            ),
+            z.swr(a('p'), i.i(a('q'))),
+          ),
         ),
       ),
     ),

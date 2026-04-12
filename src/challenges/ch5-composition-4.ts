@@ -28,9 +28,13 @@ const goal = sequent(
 
 const solution = z.cl(
   z.dr(
-    z.swl(
-      a('s'),
-      z.cl(z.swr(a('s'), z.dr(z.swl(a('p'), z.swr(a('p'), i.i(a('r'))))))),
+    z.sRotLF(
+      z.sRotRF(
+        z.swl(
+          o.p2.conjunction(a('r'), a('p')),
+          z.swr(o.p2.disjunction(a('p'), a('r')), i.i(a('s'))),
+        ),
+      ),
     ),
   ),
 )

@@ -29,11 +29,13 @@ const goal = sequent(
   ],
 )
 
-const solution = z.swr(
-  o.p1.negation(o.p1.negation(a('p'))),
-  z.swr(
-    o.p1.negation(o.p1.negation(o.p1.negation(a('p')))),
-    z.nl(i.i(o.p1.negation(o.p1.negation(a('p'))))),
+const solution = z.sRotLF(
+  z.swl(
+    o.p1.negation(o.p1.negation(a('p'))),
+    z.swr(
+      o.p1.negation(o.p1.negation(a('p'))),
+      i.i(o.p1.negation(o.p1.negation(o.p1.negation(a('p'))))),
+    ),
   ),
 )
 

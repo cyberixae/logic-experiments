@@ -28,9 +28,10 @@ const pinned = ['f', 'v'] as const
 
 const goal = sequent([a('p'), o.p0.verum, a('q')], [a('r'), o.p0.verum, a('s')])
 
-const solution = z.sRotLF(
-  z.sRotRF(
-    z.swl(a('p'), z.swl(a('q'), z.swr(a('s'), z.swr(a('r'), i.i(o.p0.verum))))),
+const solution = z.sRotRF(
+  z.swl(
+    a('q'),
+    z.swl(o.p0.verum, z.swl(a('p'), z.swr(a('s'), z.swr(a('r'), i.v())))),
   ),
 )
 

@@ -32,11 +32,9 @@ const goal = sequent(
 )
 
 const solution = z.sRotLF(
-  z.sRotRF(
-    z.swl(
-      a('s'),
-      z.swl(a('r'), z.swr(a('p'), z.swr(a('q'), i.i(o.p0.falsum)))),
-    ),
+  z.swl(
+    a('s'),
+    z.swl(a('r'), z.swr(a('q'), z.swr(o.p0.falsum, z.swr(a('p'), i.f())))),
   ),
 )
 

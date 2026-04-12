@@ -30,8 +30,8 @@ const goal = sequent([a('s'), o.p0.falsum, a('s')], [a('r'), a('p'), a('r')])
 
 const solution = z.sRotLF(
   z.swl(
-    a('r'),
-    z.swl(a('s'), z.swr(a('s'), z.swr(o.p0.falsum, z.swr(a('r'), i.f())))),
+    a('s'),
+    z.swl(a('s'), z.swr(a('r'), z.swr(a('p'), z.swr(a('r'), i.f())))),
   ),
 )
 
