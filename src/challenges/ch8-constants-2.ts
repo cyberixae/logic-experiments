@@ -6,6 +6,8 @@ const { a, o, z, i } = rk
 
 const rules = [
   'i',
+  'f',
+  'v',
   'swl',
   'swr',
   'sRotLF',
@@ -22,7 +24,7 @@ const rules = [
   'ir',
 ] as const
 
-const pinned = ['i'] as const
+const pinned = ['f', 'v'] as const
 
 const goal = sequent(
   [a('s'), o.p0.falsum, a('r')],

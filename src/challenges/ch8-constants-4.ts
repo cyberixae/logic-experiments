@@ -26,10 +26,7 @@ const rules = [
 
 const pinned = ['f', 'v'] as const
 
-const goal = sequent(
-  [a('r'), o.p0.falsum, a('s')],
-  [a('s'), o.p0.falsum, a('r')],
-)
+const goal = sequent([a('s'), o.p0.falsum, a('s')], [a('r'), a('p'), a('r')])
 
 const solution = z.sRotLF(
   z.swl(
