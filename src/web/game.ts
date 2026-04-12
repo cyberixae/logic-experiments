@@ -24,6 +24,7 @@ import { AnyWorkspace } from '../interactive/workspace'
 import { Action } from '../interactive/action'
 import { computeGhostChain } from '../interactive/ghost'
 import { Navigate } from './types'
+import { t } from './i18n'
 import { entries, keys } from '../utils/record'
 import { isNonNullable } from '../utils/utils'
 import {
@@ -516,7 +517,7 @@ export const createBench = (
     ? !gazeMovable
     : inactive || seq.succedent.length === 0
   const gazeLeftBtn = createButton(
-    'Left',
+    t('left'),
     leftDisabled,
     () => {
       if (!isGazeModeActive()) {
@@ -533,7 +534,7 @@ export const createBench = (
     getActionHint('gazeLeft'),
   )
   const gazeRightBtn = createButton(
-    'Right',
+    t('right'),
     rightDisabled,
     () => {
       if (!isGazeModeActive()) {
@@ -547,7 +548,7 @@ export const createBench = (
     getActionHint('gazeRight'),
   )
   const gazeWeakeningBtn = createButton(
-    'Drop',
+    t('drop'),
     !isGazeModeActive() || inactive,
     () => {
       workspace.setGazeKind('weakening')
@@ -562,7 +563,7 @@ export const createBench = (
   const connectiveDisabled =
     !isGazeModeActive() || inactive || connectiveLabel === ''
   const gazeConnectiveBtn = createButton(
-    'Destruct',
+    t('destruct'),
     connectiveDisabled,
     () => {
       workspace.setGazeKind('connective')
@@ -579,7 +580,7 @@ export const createBench = (
 
   const allPinned = rules.every((r) => pinned.includes(r))
   const rulesBtn = createButton(
-    'Rules',
+    t('rules'),
     allPinned,
     () => {
       rulesVisible = !rulesVisible
@@ -592,7 +593,7 @@ export const createBench = (
   rulesLed.setAttribute('class', 'led' + (rulesVisible ? ' on' : ''))
   rulesBtn.appendChild(rulesLed)
   const axiomBtn = createButton(
-    'Axiom',
+    t('axiom'),
     inactive || !keys(center).some((k) => ls.includes(k)),
     () => {
       autoRule(workspace, keys(center))
@@ -698,19 +699,19 @@ export const createPausePopup = (
   }
   const title = document.createElement('div')
   title.setAttribute('class', 'pause-title')
-  title.textContent = 'Paused'
+  title.textContent = t('paused')
   panel.appendChild(title)
   const buttons = document.createElement('div')
   buttons.setAttribute('class', 'pause-buttons')
   buttons.appendChild(
-    createButton('Resume game', false, onResume, dualHint('m', 'undo')),
+    createButton(t('resumeGame'), false, onResume, dualHint('m', 'undo')),
   )
   const spacer = document.createElement('div')
   spacer.setAttribute('class', 'pause-buttons-spacer')
   buttons.appendChild(spacer)
   buttons.appendChild(
     createButton(
-      'Reset challenge',
+      t('resetChallenge'),
       resetDisabled,
       onReset,
       getActionHint('reset'),
@@ -718,11 +719,11 @@ export const createPausePopup = (
   )
   if (onFresh) {
     buttons.appendChild(
-      createButton('Fresh challenge', false, onFresh, kbdHint('n')),
+      createButton(t('freshChallenge'), false, onFresh, kbdHint('n')),
     )
   }
   buttons.appendChild(
-    createButton('Exit to main menu', false, onExit, getActionHint('exit')),
+    createButton(t('exitToMainMenu'), false, onExit, getActionHint('exit')),
   )
   panel.appendChild(buttons)
   shroud.appendChild(panel)

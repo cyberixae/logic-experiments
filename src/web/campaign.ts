@@ -25,6 +25,7 @@ import {
   zoomTreeReset,
 } from './game'
 import { MountResult, Navigate } from './types'
+import { t } from './i18n'
 
 const createListing = (
   ws: AnyWorkspace,
@@ -104,15 +105,17 @@ const createControls = (
   const panel = document.createElement('div')
   panel.setAttribute('class', 'controls')
 
-  panel.appendChild(createButton('menu', false, onMenu, getActionHint('menu')))
+  panel.appendChild(
+    createButton(t('menu'), false, onMenu, getActionHint('menu')),
+  )
   if (showLevelButton) {
     panel.appendChild(
-      createButton('level', false, onLevel, getActionHint('level')),
+      createButton(t('level'), false, onLevel, getActionHint('level')),
     )
   }
   panel.appendChild(
     createButton(
-      'undo',
+      t('undo'),
       !undoEnabled,
       () => {
         if (canUndo) {
@@ -135,13 +138,13 @@ const createCongrats = (
 ): { hurray: HTMLElement; buttons: HTMLElement } => {
   const hurray = document.createElement('div')
   hurray.setAttribute('class', 'hurray')
-  hurray.innerHTML = '\u{1F389} Conglaturations! \u{1F389}'
+  hurray.innerHTML = t('congratulations')
 
   const buttons = document.createElement('div')
   buttons.setAttribute('class', 'congrabuttons')
   buttons.appendChild(
     createButton(
-      'Prev Level',
+      t('prevLevel'),
       false,
       () => selectLevel(ws.previousConjectureId()),
       dualHint('p', 'undo'),
@@ -149,7 +152,7 @@ const createCongrats = (
   )
   buttons.appendChild(
     createButton(
-      'Play Again',
+      t('playAgain'),
       false,
       () => {
         ws.applyEvent(reset())
@@ -160,7 +163,7 @@ const createCongrats = (
   )
   buttons.appendChild(
     createButton(
-      'Next Level',
+      t('nextLevel'),
       false,
       () => selectLevel(ws.nextConjectureId()),
       dualHint('␣', 'axiom'),

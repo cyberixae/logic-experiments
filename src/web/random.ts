@@ -22,6 +22,7 @@ import {
   zoomTreeReset,
 } from './game'
 import { MountResult, Navigate } from './types'
+import { t } from './i18n'
 
 const createControls = (
   getWorkspace: () => AnyWorkspace,
@@ -34,10 +35,12 @@ const createControls = (
   const panel = document.createElement('div')
   panel.setAttribute('class', 'controls')
 
-  panel.appendChild(createButton('menu', false, onMenu, getActionHint('menu')))
+  panel.appendChild(
+    createButton(t('menu'), false, onMenu, getActionHint('menu')),
+  )
   panel.appendChild(
     createButton(
-      'undo',
+      t('undo'),
       !undoEnabled,
       () => {
         if (canUndo) {
@@ -61,13 +64,13 @@ const createCongrats = (
   const ws = getWorkspace()
   const hurray = document.createElement('div')
   hurray.setAttribute('class', 'hurray')
-  hurray.innerHTML = '\u{1F389} Conglaturations! \u{1F389}'
+  hurray.innerHTML = t('congratulations')
 
   const buttons = document.createElement('div')
   buttons.setAttribute('class', 'congrabuttons')
   buttons.appendChild(
     createButton(
-      'Play Again',
+      t('playAgain'),
       false,
       () => {
         ws.applyEvent(reset())
@@ -77,7 +80,7 @@ const createCongrats = (
     ),
   )
   buttons.appendChild(
-    createButton('New Challenge', false, onNew, dualHint('n', 'axiom')),
+    createButton(t('newChallenge'), false, onNew, dualHint('n', 'axiom')),
   )
 
   return { hurray, buttons }

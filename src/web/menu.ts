@@ -1,5 +1,11 @@
-import { gameModes } from '../model/mode'
+import { gameModes, GameMode } from '../model/mode'
 import { MountResult, Navigate } from './types'
+import { t } from './i18n'
+
+const modeLabel: Record<GameMode, () => string> = {
+  random: () => t('random'),
+  campaign: () => t('campaign'),
+}
 
 export const mountMenu = (
   container: HTMLElement,
@@ -10,7 +16,7 @@ export const mountMenu = (
 
   const title = document.createElement('div')
   title.setAttribute('class', 'menu-title')
-  title.innerHTML = 'LK'
+  title.innerHTML = t('title')
   panel.appendChild(title)
 
   const modes = document.createElement('div')
@@ -19,7 +25,7 @@ export const mountMenu = (
   for (const mode of gameModes) {
     const btn = document.createElement('div')
     btn.setAttribute('class', 'button menu-mode')
-    btn.innerHTML = mode.charAt(0).toUpperCase() + mode.slice(1)
+    btn.innerHTML = modeLabel[mode]()
     btn.onclick = () => navigate(mode)
     modes.appendChild(btn)
   }

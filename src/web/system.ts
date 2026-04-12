@@ -1,5 +1,6 @@
 import { MountResult, Navigate } from './types'
 import { helpSystems, isHelpSystemId, renderSystemHelp } from '../help'
+import { t } from './i18n'
 
 export const mountSystem = (
   container: HTMLElement,
@@ -17,7 +18,7 @@ export const mountSystem = (
       const back = document.createElement('a')
       back.setAttribute('class', 'button system-back')
       back.setAttribute('href', '?mode=system')
-      back.innerHTML = '&larr; Systems'
+      back.innerHTML = t('backToSystems')
       back.onclick = (e) => {
         e.preventDefault()
         history.pushState({ screen: 'system' }, '', '?mode=system')
@@ -32,7 +33,7 @@ export const mountSystem = (
     } else {
       const title = document.createElement('div')
       title.setAttribute('class', 'system-title')
-      title.innerHTML = 'Systems'
+      title.innerHTML = t('systems')
       panel.appendChild(title)
 
       const list = document.createElement('div')
