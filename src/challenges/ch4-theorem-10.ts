@@ -12,15 +12,18 @@ const rules = [
   'sRotRF',
   'sRotLB',
   'sRotRB',
+  'nl',
+  'nr',
+  'ir',
 ] as const
 
-const pinned = ['i'] as const
+const pinned = ['ir'] as const
 
 const goal = sequent(
-  [o.p2.conjunction(a('q'), a('r'))],
-  [o.p2.conjunction(a('q'), a('r'))],
+  [o.p2.implication(a('r'), a('p'))],
+  [o.p2.implication(a('r'), a('p'))],
 )
 
-const solution = i.i(o.p2.conjunction(a('q'), a('r')))
+const solution = i.i(o.p2.implication(a('r'), a('p')))
 
-export const ch0identity4 = tutorial({ rules, goal, solution, pinned })
+export const ch4theorem10 = tutorial({ rules, goal, solution, pinned })

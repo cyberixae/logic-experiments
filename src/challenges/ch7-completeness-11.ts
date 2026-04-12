@@ -12,9 +12,17 @@ const rules = [
   'sRotRF',
   'sRotLB',
   'sRotRB',
+  'nl',
+  'nr',
+  'cl',
+  'cr',
+  'dl',
+  'dr',
+  'il',
+  'ir',
 ] as const
 
-const pinned = ['i'] as const
+const pinned = ['il'] as const
 
 const goal = sequent(
   [
@@ -38,4 +46,4 @@ const solution = i.i(
   ),
 )
 
-export const ch0identity9 = tutorial({ rules, goal, solution, pinned })
+export const ch7completeness11 = tutorial({ rules, goal, solution, pinned })

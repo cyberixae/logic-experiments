@@ -1,13 +1,6 @@
 import { AnyChallenge } from '../model/challenge'
 import { ch0identity1 } from './ch0-identity-1'
 import { ch0identity2 } from './ch0-identity-2'
-import { ch0identity3 } from './ch0-identity-3'
-import { ch0identity4 } from './ch0-identity-4'
-import { ch0identity5 } from './ch0-identity-5'
-import { ch0identity6 } from './ch0-identity-6'
-import { ch0identity7 } from './ch0-identity-7'
-import { ch0identity8 } from './ch0-identity-8'
-import { ch0identity9 } from './ch0-identity-9'
 
 import { ch1weakening1 } from './ch1-weakening-1'
 import { ch1weakening2 } from './ch1-weakening-2'
@@ -38,6 +31,7 @@ import { ch3negation6 } from './ch3-negation-6'
 import { ch3negation7 } from './ch3-negation-7'
 import { ch3negation8 } from './ch3-negation-8'
 import { ch3negation9 } from './ch3-negation-9'
+import { ch3negation10 } from './ch3-negation-10'
 
 import { ch4theorem1 } from './ch4-theorem-1'
 import { ch4theorem2 } from './ch4-theorem-2'
@@ -48,6 +42,7 @@ import { ch4theorem6 } from './ch4-theorem-6'
 import { ch4theorem7 } from './ch4-theorem-7'
 import { ch4theorem8 } from './ch4-theorem-8'
 import { ch4theorem9 } from './ch4-theorem-9'
+import { ch4theorem10 } from './ch4-theorem-10'
 
 import { ch5composition1 } from './ch5-composition-1'
 import { ch5composition2 } from './ch5-composition-2'
@@ -58,6 +53,8 @@ import { ch5composition6 } from './ch5-composition-6'
 import { ch5composition7 } from './ch5-composition-7'
 import { ch5composition8 } from './ch5-composition-8'
 import { ch5composition9 } from './ch5-composition-9'
+import { ch5composition10 } from './ch5-composition-10'
+import { ch5composition11 } from './ch5-composition-11'
 
 import { ch6branching1 } from './ch6-branching-1'
 import { ch6branching2 } from './ch6-branching-2'
@@ -68,6 +65,7 @@ import { ch6branching6 } from './ch6-branching-6'
 import { ch6branching7 } from './ch6-branching-7'
 import { ch6branching8 } from './ch6-branching-8'
 import { ch6branching9 } from './ch6-branching-9'
+import { ch6branching10 } from './ch6-branching-10'
 
 import { ch7completeness1 } from './ch7-completeness-1'
 import { ch7completeness2 } from './ch7-completeness-2'
@@ -78,6 +76,8 @@ import { ch7completeness6 } from './ch7-completeness-6'
 import { ch7completeness7 } from './ch7-completeness-7'
 import { ch7completeness8 } from './ch7-completeness-8'
 import { ch7completeness9 } from './ch7-completeness-9'
+import { ch7completeness10 } from './ch7-completeness-10'
+import { ch7completeness11 } from './ch7-completeness-11'
 
 import { ch8constants1 } from './ch8-constants-1'
 import { ch8constants2 } from './ch8-constants-2'
@@ -100,13 +100,6 @@ import { ch9consolidation7 } from './ch9-consolidation-7'
 export const challenges = {
   ch0identity1,
   ch0identity2,
-  ch0identity3,
-  ch0identity4,
-  ch0identity5,
-  ch0identity6,
-  ch0identity7,
-  ch0identity8,
-  ch0identity9,
 
   ch1weakening1,
   ch1weakening2,
@@ -137,6 +130,7 @@ export const challenges = {
   ch3negation7,
   ch3negation8,
   ch3negation9,
+  ch3negation10,
 
   ch4theorem1,
   ch4theorem2,
@@ -147,6 +141,7 @@ export const challenges = {
   ch4theorem7,
   ch4theorem8,
   ch4theorem9,
+  ch4theorem10,
 
   ch5composition1,
   ch5composition2,
@@ -157,6 +152,8 @@ export const challenges = {
   ch5composition7,
   ch5composition8,
   ch5composition9,
+  ch5composition10,
+  ch5composition11,
 
   ch6branching1,
   ch6branching2,
@@ -167,6 +164,7 @@ export const challenges = {
   ch6branching7,
   ch6branching8,
   ch6branching9,
+  ch6branching10,
 
   ch7completeness1,
   ch7completeness2,
@@ -177,6 +175,8 @@ export const challenges = {
   ch7completeness7,
   ch7completeness8,
   ch7completeness9,
+  ch7completeness10,
+  ch7completeness11,
 
   ch8constants1,
   ch8constants2,

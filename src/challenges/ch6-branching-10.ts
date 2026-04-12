@@ -12,9 +12,16 @@ const rules = [
   'sRotRF',
   'sRotLB',
   'sRotRB',
+  'nl',
+  'nr',
+  'cl',
+  'cr',
+  'dl',
+  'dr',
+  'ir',
 ] as const
 
-const pinned = ['i'] as const
+const pinned = ['dl', 'cr'] as const
 
 const goal = sequent(
   [o.p2.disjunction(a('r'), a('s'))],
@@ -23,4 +30,4 @@ const goal = sequent(
 
 const solution = i.i(o.p2.disjunction(a('r'), a('s')))
 
-export const ch0identity5 = tutorial({ rules, goal, solution, pinned })
+export const ch6branching10 = tutorial({ rules, goal, solution, pinned })

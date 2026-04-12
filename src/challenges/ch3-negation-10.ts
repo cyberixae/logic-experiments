@@ -12,12 +12,14 @@ const rules = [
   'sRotRF',
   'sRotLB',
   'sRotRB',
+  'nl',
+  'nr',
 ] as const
 
-const pinned = ['i'] as const
+const pinned = ['nl', 'nr'] as const
 
 const goal = sequent([o.p1.negation(a('p'))], [o.p1.negation(a('p'))])
 
 const solution = i.i(o.p1.negation(a('p')))
 
-export const ch0identity3 = tutorial({ rules, goal, solution, pinned })
+export const ch3negation10 = tutorial({ rules, goal, solution, pinned })
