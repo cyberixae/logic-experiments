@@ -345,6 +345,7 @@ const createPanel = <K extends RuleId>(
   ls: ReadonlyArray<RuleId>,
   rules: ReadonlyArray<RuleId>,
   pinned: ReadonlyArray<RuleId>,
+  hideRules: boolean,
   solved: boolean,
   onApply: (key: RuleId) => void,
   gazeHints: GazeHintInfo,
@@ -367,7 +368,8 @@ const createPanel = <K extends RuleId>(
     const action = ruleAction[key]
     const hint = action !== undefined ? getActionHint(action) : undefined
     const ruleHintVariant = className === 'main' ? 'base' : 'hot'
-    if (hint !== undefined) pre.appendChild(keyHintBadge(hint, ruleHintVariant))
+    if (hint !== undefined && !hideRules)
+      pre.appendChild(keyHintBadge(hint, ruleHintVariant))
     const gazeBadges = [
       gazeHintBadgeForKind(key, gazeHints.connective),
       gazeHintBadgeForKind(key, gazeHints.weakening),
@@ -438,7 +440,17 @@ export const createBench = (
   const panel = document.createElement('div')
   panel.setAttribute('class', 'bench' + (hideRules ? ' rules-hidden' : ''))
   panel.appendChild(
-    createPanel('left', left, ls, rules, pinned, inactive, apply, gazeHints),
+    createPanel(
+      'left',
+      left,
+      ls,
+      rules,
+      pinned,
+      hideRules,
+      inactive,
+      apply,
+      gazeHints,
+    ),
   )
   const congrats = solved ? makeCongrats() : null
   if (congrats) {
@@ -451,6 +463,7 @@ export const createBench = (
         ls,
         rules,
         pinned,
+        hideRules,
         inactive,
         applyCenter,
         gazeHints,
@@ -458,7 +471,17 @@ export const createBench = (
     )
   }
   panel.appendChild(
-    createPanel('right', right, ls, rules, pinned, inactive, apply, gazeHints),
+    createPanel(
+      'right',
+      right,
+      ls,
+      rules,
+      pinned,
+      hideRules,
+      inactive,
+      apply,
+      gazeHints,
+    ),
   )
   panel.appendChild(createPlayArea(workspace))
   const zoomOut = createButton(
