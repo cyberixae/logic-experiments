@@ -145,10 +145,10 @@ export const renderDerivation = (
 }
 
 // Post-order layout matching treeAuto in src/render/block.ts:
-// a node's inference line depends only on its OWN sequent and the
-// joined widths of its IMMEDIATE child sequents — not on grandchildren.
-// The whole subtree may still need a wider footprint to accommodate
-// deeper structure; that footprint never feeds back into the line width.
+// Each child's sequent is centered within its subtree width.  The
+// inference line spans from the first child's sequent left edge to the
+// last child's sequent right edge.  Only the first and last child's
+// centering offsets matter for the span calculation.
 type NodeWidths = { sequent: number; subtree: number }
 
 const LINE_PAD = 16 // px of slack on each side of the inference line
@@ -160,8 +160,9 @@ const stabilizeWidths = (node: HTMLElement): NodeWidths => {
   const premises = node.querySelector<HTMLElement>(':scope > .tree-premises')
   const inference = node.querySelector<HTMLElement>(':scope > .tree-inference')
 
-  let childSequentSum = 0
   let childSubtreeSum = 0
+  let firstChildPad = 0
+  let lastChildPad = 0
   let gap = 0
   let count = 0
   if (premises) {
@@ -170,25 +171,41 @@ const stabilizeWidths = (node: HTMLElement): NodeWidths => {
     )
     count = children.length
     gap = parseFloat(getComputedStyle(premises).gap) || 0
-    for (const child of children) {
+    for (let i = 0; i < children.length; i += 1) {
+      const child = children[i]
+      if (!child) continue
       const cw = stabilizeWidths(child)
-      childSequentSum += cw.sequent
       childSubtreeSum += cw.subtree
+      const pad = (cw.subtree - cw.sequent) / 2
+      if (i === 0) firstChildPad = pad
+      lastChildPad = pad
     }
   }
   const totalGap = Math.max(0, count - 1) * gap
 
+  // The content span runs from the first child's sequent left edge to
+  // the last child's sequent right edge, accounting for the centering
+  // offset within each child's subtree block.
+  const contentSpan = childSubtreeSum + totalGap - firstChildPad - lastChildPad
   const lineWidth = Math.ceil(
-    Math.max(sequentWidth, childSequentSum + totalGap) + LINE_PAD * 2,
+    Math.max(sequentWidth, contentSpan) + LINE_PAD * 2,
   )
+
+  const premisesWidth = childSubtreeSum + totalGap
+  const subtreeWidth = Math.ceil(Math.max(lineWidth, premisesWidth))
+
   if (inference) {
     inference.style.width = `${lineWidth}px`
     inference.style.alignSelf = 'center'
+    // Center the line on the content (sequent edges), not on the node.
+    // When children have asymmetric subtree depths the content center
+    // differs from the node center by (firstChildPad - lastChildPad)/2.
+    const lineShift = (firstChildPad - lastChildPad) / 2
+    if (Math.abs(lineShift) > 0.5) {
+      inference.style.transform = `translateX(${lineShift}px)`
+    }
   }
 
-  const subtreeWidth = Math.ceil(
-    Math.max(lineWidth, childSubtreeSum + totalGap),
-  )
   node.style.width = `${subtreeWidth}px`
 
   return { sequent: sequentWidth, subtree: subtreeWidth }
