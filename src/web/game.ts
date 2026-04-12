@@ -361,7 +361,7 @@ const createPanel = <K extends RuleId>(
         (isPinned ? ' pinned' : ''),
     )
     if (!disabled) pre.onclick = () => onApply(key)
-    pre.innerHTML = fromDerivation(rule.example)
+    pre.innerHTML = fromDerivation(rule.example, t('sideLeft'), t('sideRight'))
     const action = ruleAction[key]
     const hint = action !== undefined ? getActionHint(action) : undefined
     const ruleHintVariant = className === 'main' ? 'base' : 'hot'

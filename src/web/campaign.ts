@@ -73,7 +73,7 @@ const createListing = (
     rules.setAttribute('class', 'rules')
     rules.innerHTML = challenge.rules
       .map((rule) => {
-        const text = html(fromRuleId(rule)(basic))
+        const text = html(fromRuleId(rule, t('sideLeft'), t('sideRight'))(basic))
         if (pinned.includes(rule)) {
           return `<span class="pinned">${text}</span>`
         }

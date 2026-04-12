@@ -9,6 +9,7 @@ import {
 import { html } from '../render/segment'
 import { RuleId } from '../model/rule'
 import { GhostStep } from '../interactive/ghost'
+import { t } from './i18n'
 
 const equalPaths = (a: Path, b: Path): boolean =>
   a.length === b.length && a.every((v, i) => v === b[i])
@@ -58,7 +59,7 @@ const renderGhost = (chain: GhostStep[]): HTMLElement => {
     inference.setAttribute('class', 'tree-inference ghost')
     const label = document.createElement('div')
     label.setAttribute('class', 'tree-rule-label')
-    label.innerHTML = html(fromRuleId(step.rule)(basic))
+    label.innerHTML = html(fromRuleId(step.rule, t('sideLeft'), t('sideRight'))(basic))
     inference.appendChild(label)
     wrap.appendChild(inference)
   }
@@ -71,7 +72,7 @@ const renderInferenceLine = (ruleId: RuleId): HTMLElement => {
 
   const label = document.createElement('div')
   label.setAttribute('class', 'tree-rule-label')
-  label.innerHTML = html(fromRuleId(ruleId)(basic))
+  label.innerHTML = html(fromRuleId(ruleId, t('sideLeft'), t('sideRight'))(basic))
   container.appendChild(label)
 
   return container
@@ -129,7 +130,7 @@ export const renderDerivation = (
   if (currentPath.length === 0) {
     node.addEventListener('copy', (e) => {
       e.preventDefault()
-      e.clipboardData?.setData('text/plain', fromDerivation(derivation))
+      e.clipboardData?.setData('text/plain', fromDerivation(derivation, t('sideLeft'), t('sideRight')))
     })
   }
 

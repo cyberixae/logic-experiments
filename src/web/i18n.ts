@@ -23,6 +23,8 @@ const en = {
   congratulations: '\u{1F389} Conglaturations! \u{1F389}',
   systems: 'Systems',
   backToSystems: '\u2190 Systems',
+  sideLeft: 'L',
+  sideRight: 'R',
 } as const
 
 const fi: Record<MessageKey, string> = {
@@ -50,6 +52,8 @@ const fi: Record<MessageKey, string> = {
   congratulations: '\u{1F389} Oneski olkoon! \u{1F389}',
   systems: 'Järjestelmät',
   backToSystems: '\u2190 Järjestelmät',
+  sideLeft: 'V',
+  sideRight: 'O',
 }
 
 type MessageKey = keyof typeof en

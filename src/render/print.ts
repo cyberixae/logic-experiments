@@ -303,52 +303,54 @@ export function fromSequent(
     )
 }
 
-export function left(n: string | null = null): string {
-  const l = 'L'
-  return n != null ? l + n : l
+export function left(label: string, n: string | null = null): string {
+  return n != null ? label + n : label
 }
-export function right(n: string | null = null): string {
-  const r = 'R'
-  return n != null ? r + n : r
+export function right(label: string, n: string | null = null): string {
+  return n != null ? label + n : label
 }
 
-export function fromRuleId(s: rule.RuleId): Printer {
+export function fromRuleId(
+  s: rule.RuleId,
+  l = 'L',
+  r = 'R',
+): Printer {
   return (t) => [
     segment.of(
       rule.matchRuleId(s, {
         i: () => 'I',
         f: () => '⊥',
         v: () => '⊤',
-        cl: () => t.conjunction.join(empty) + left(),
-        dr: () => t.disjunction.join(empty) + right(),
-        cl1: () => t.conjunction.join(empty) + left('\u2081'),
-        dr1: () => t.disjunction.join(empty) + right('\u2081'),
-        cl2: () => t.conjunction.join(empty) + left('\u2082'),
-        dr2: () => t.disjunction.join(empty) + right('\u2082'),
-        dl: () => t.disjunction.join(empty) + left(),
-        cr: () => t.conjunction.join(empty) + right(),
-        il: () => t.implication.join(empty) + left(),
-        ir: () => t.implication.join(empty) + right(),
-        nl: () => t.negation.join(empty) + left(),
-        nr: () => t.negation.join(empty) + right(),
-        swl: () => 'WL',
-        swr: () => 'WR',
-        scl: () => 'CL',
-        scr: () => 'CR',
-        sRotLF: () => '\u21B6L',
-        sRotRF: () => '\u21b7R',
-        sRotLB: () => '\u21b7L',
-        sRotRB: () => '\u21B6R',
-        sxl: () => 'XL',
-        sxr: () => 'XR',
+        cl: () => t.conjunction.join(empty) + left(l),
+        dr: () => t.disjunction.join(empty) + right(r),
+        cl1: () => t.conjunction.join(empty) + left(l, '\u2081'),
+        dr1: () => t.disjunction.join(empty) + right(r, '\u2081'),
+        cl2: () => t.conjunction.join(empty) + left(l, '\u2082'),
+        dr2: () => t.disjunction.join(empty) + right(r, '\u2082'),
+        dl: () => t.disjunction.join(empty) + left(l),
+        cr: () => t.conjunction.join(empty) + right(r),
+        il: () => t.implication.join(empty) + left(l),
+        ir: () => t.implication.join(empty) + right(r),
+        nl: () => t.negation.join(empty) + left(l),
+        nr: () => t.negation.join(empty) + right(r),
+        swl: () => 'W' + left(l),
+        swr: () => 'W' + right(r),
+        scl: () => 'C' + left(l),
+        scr: () => 'C' + right(r),
+        sRotLF: () => '\u21B6' + left(l),
+        sRotRF: () => '\u21b7' + right(r),
+        sRotLB: () => '\u21b7' + left(l),
+        sRotRB: () => '\u21B6' + right(r),
+        sxl: () => 'X' + left(l),
+        sxr: () => 'X' + right(r),
         a1: () => 'a1',
         a2: () => 'a2',
         a3: () => 'a3',
         cut: () => 'cut',
         fcut: () => 'fcut',
-        fcr: () => t.conjunction.join(empty) + right('ᶠ'),
-        fdl: () => t.disjunction.join(empty) + left('ᶠ'),
-        fil: () => t.implication.join(empty) + left('ᶠ'),
+        fcr: () => t.conjunction.join(empty) + right(r, 'ᶠ'),
+        fdl: () => t.disjunction.join(empty) + left(l, 'ᶠ'),
+        fil: () => t.implication.join(empty) + left(l, 'ᶠ'),
         mp: () => 'mp',
       }),
     ),
@@ -359,20 +361,28 @@ export function fromPremise({ result }: AnyPremise) {
   return segment.plain(fromSequent(result)(basic))
 }
 
-export function fromTransformation({ rule, deps, result }: AnyTransformation) {
+export function fromTransformation(
+  { rule, deps, result }: AnyTransformation,
+  l = 'L',
+  r = 'R',
+) {
   return block.treeAuto(
     segment.plain(fromSequent(result)(basic)),
-    deps.map(fromDerivation),
-    '(' + segment.plain(fromRuleId(rule)(basic)) + ')',
+    deps.map((d) => fromDerivation(d, l, r)),
+    '(' + segment.plain(fromRuleId(rule, l, r)(basic)) + ')',
   )
 }
 
-export function fromDerivation(treelike: AnyDerivation): string {
+export function fromDerivation(
+  treelike: AnyDerivation,
+  l = 'L',
+  r = 'R',
+): string {
   switch (treelike.kind) {
     case 'premise':
       return fromPremise(treelike)
     case 'transformation':
-      return fromTransformation(treelike)
+      return fromTransformation(treelike, l, r)
   }
 }
 
