@@ -176,7 +176,7 @@ export const mountCampaign = (
   container: HTMLElement,
   navigate: Navigate,
 ): (() => void) => {
-  setDefaultRulesVisible(true)
+  setDefaultRulesVisible(false)
   let levelPresses = 0
   const toggleLevel = (listingEl: HTMLElement) => {
     levelPresses += 1

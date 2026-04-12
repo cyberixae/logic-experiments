@@ -126,7 +126,7 @@ export const createButton = (
   return el
 }
 
-let rulesVisible = true
+let rulesVisible = false
 
 export const setDefaultRulesVisible = (visible: boolean): void => {
   rulesVisible = visible
