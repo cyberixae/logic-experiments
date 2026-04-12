@@ -12,10 +12,13 @@ const rules = [
   'sRotRF',
   'sRotLB',
   'sRotRB',
+  'nl',
+  'nr',
   'cl',
   'cr',
   'dl',
   'dr',
+  'ir',
 ] as const
 
 const pinned = ['dl', 'cr'] as const

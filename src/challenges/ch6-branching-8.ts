@@ -12,6 +12,8 @@ const rules = [
   'sRotRF',
   'sRotLB',
   'sRotRB',
+  'nl',
+  'nr',
   'cl',
   'cr',
   'dl',

@@ -5,6 +5,7 @@ import { tutorial } from '../model/challenge'
 const { a, o, z, i } = rk
 
 const rules = [
+  'i',
   'f',
   'v',
   'swl',
@@ -13,6 +14,14 @@ const rules = [
   'sRotRF',
   'sRotLB',
   'sRotRB',
+  'nl',
+  'nr',
+  'cl',
+  'cr',
+  'dl',
+  'dr',
+  'il',
+  'ir',
 ] as const
 
 const pinned = ['f', 'v'] as const
