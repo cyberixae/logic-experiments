@@ -29,3 +29,17 @@ export const challenge = <
 >(
   c: Challenge<J, S>,
 ) => c
+
+export interface Tutorial<
+  J extends AnySequent,
+  S extends ReadonlyArray<RuleId>,
+> extends Challenge<J, S> {
+  pinned: ReadonlyArray<S[number]>
+}
+export type AnyTutorial = Tutorial<AnySequent, ReadonlyArray<RuleId>>
+export const tutorial = <
+  J extends AnySequent,
+  const S extends ReadonlyArray<RuleId>,
+>(
+  t: Tutorial<J, S>,
+) => t
