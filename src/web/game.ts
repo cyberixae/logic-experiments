@@ -161,8 +161,7 @@ export const setDefaultRulesVisible = (visible: boolean): void => {
   autoZoomedDerivation = null
 }
 
-const isCompact = (): boolean =>
-  window.matchMedia('(max-width: 600px)').matches
+const isCompact = (): boolean => window.matchMedia('(max-width: 600px)').matches
 const BASE_ZOOM = isCompact() ? 0.6 : 1
 
 let treeZoom = BASE_ZOOM
@@ -316,8 +315,10 @@ const createPlayArea = (workspace: AnyWorkspace): HTMLElement => {
       const treeRect = tree.getBoundingClientRect()
       const areaRect = panel.getBoundingClientRect()
       const panelStyle = getComputedStyle(panel)
-      const padH = parseFloat(panelStyle.paddingLeft) + parseFloat(panelStyle.paddingRight)
-      const padV = parseFloat(panelStyle.paddingTop) + parseFloat(panelStyle.paddingBottom)
+      const padH =
+        parseFloat(panelStyle.paddingLeft) + parseFloat(panelStyle.paddingRight)
+      const padV =
+        parseFloat(panelStyle.paddingTop) + parseFloat(panelStyle.paddingBottom)
       const availW = areaRect.width - padH
       const availH = (areaRect.height - padV) * 0.85
       const scale = Math.min(
@@ -406,9 +407,7 @@ const createRuleCard = (
   const pre = document.createElement('pre')
   pre.setAttribute(
     'class',
-    'rule button' +
-      (disabled ? ' disabled' : '') +
-      (isPinned ? ' pinned' : ''),
+    'rule button' + (disabled ? ' disabled' : '') + (isPinned ? ' pinned' : ''),
   )
   pre.dataset['rule'] = key
   const group =
@@ -461,7 +460,16 @@ const createPanel = <K extends RuleId>(
     if (!rules.includes(key)) return
     const disabled = solved || !ls.includes(key)
     panel.appendChild(
-      createRuleCard(key, rule, disabled, pinned, hideRules, onApply, gazeHints, className),
+      createRuleCard(
+        key,
+        rule,
+        disabled,
+        pinned,
+        hideRules,
+        onApply,
+        gazeHints,
+        className,
+      ),
     )
   })
   return panel
@@ -582,7 +590,16 @@ export const createBench = (
     entries(center).forEach(([key, rule]) => {
       if (!rules.includes(key)) return
       const disabled = solved || !ls.includes(key)
-      const card = createRuleCard(key, rule, disabled, pinned, hideRules, applyCenter, gazeHints, 'main')
+      const card = createRuleCard(
+        key,
+        rule,
+        disabled,
+        pinned,
+        hideRules,
+        applyCenter,
+        gazeHints,
+        'main',
+      )
       sheetCenter.appendChild(card)
     })
     rulesSheet.appendChild(sheetCenter)
@@ -594,7 +611,16 @@ export const createBench = (
   entries(left).forEach(([key, rule]) => {
     if (!rules.includes(key)) return
     const disabled = inactive || !ls.includes(key)
-    const card = createRuleCard(key, rule, disabled, pinned, hideRules, apply, gazeHints, 'left')
+    const card = createRuleCard(
+      key,
+      rule,
+      disabled,
+      pinned,
+      hideRules,
+      apply,
+      gazeHints,
+      'left',
+    )
     leftCol.appendChild(card)
   })
   const rightCol = document.createElement('div')
@@ -602,7 +628,16 @@ export const createBench = (
   entries(right).forEach(([key, rule]) => {
     if (!rules.includes(key)) return
     const disabled = inactive || !ls.includes(key)
-    const card = createRuleCard(key, rule, disabled, pinned, hideRules, apply, gazeHints, 'right')
+    const card = createRuleCard(
+      key,
+      rule,
+      disabled,
+      pinned,
+      hideRules,
+      apply,
+      gazeHints,
+      'right',
+    )
     rightCol.appendChild(card)
   })
   sheetSides.appendChild(leftCol)
@@ -810,7 +845,16 @@ export const createBench = (
       const disabled = inactive || !ls.includes(key)
       const panelClass = key in left ? 'left' : key in right ? 'right' : 'main'
       const onApplyPinned = panelClass === 'main' ? applyCenter : apply
-      const card = createRuleCard(key, rule, disabled, pinned, false, onApplyPinned, gazeHints, panelClass)
+      const card = createRuleCard(
+        key,
+        rule,
+        disabled,
+        pinned,
+        false,
+        onApplyPinned,
+        gazeHints,
+        panelClass,
+      )
       pinnedStrip.appendChild(card)
     }
     panel.appendChild(pinnedStrip)

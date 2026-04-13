@@ -366,9 +366,7 @@ export function fromTransformation(
   return block.treeAuto(
     segment.plain(fromSequent(result)(basic)),
     deps.map((d) => fromDerivation(d, l, r, showLabel)),
-    showLabel
-      ? '(' + segment.plain(fromRuleId(rule, l, r)(basic)) + ')'
-      : null,
+    showLabel ? '(' + segment.plain(fromRuleId(rule, l, r)(basic)) + ')' : null,
   )
 }
 

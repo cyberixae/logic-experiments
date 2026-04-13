@@ -119,7 +119,8 @@ export function tree(
 ): string {
   const line1 = center(lineWidth)(spaced(branches, 2))
   const last = center(lineWidth)(lastLine(line1).trim())
-  const line2 = note !== null ? spaced([line(lineWidth), note]) : line(lineWidth)
+  const line2 =
+    note !== null ? spaced([line(lineWidth), note]) : line(lineWidth)
   const line3 = center(lineWidth)(root)
 
   const aligned = align(line1, pad(leftify(last, line2, line3)))

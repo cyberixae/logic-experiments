@@ -825,7 +825,7 @@ body {
     height: 2em;
     flex-shrink: 0;
     pointer-events: none;
-    background: linear-gradient(to bottom, transparent, #ffeeddF0);
+    background: linear-gradient(to bottom, transparent, #ffeeddf0);
   }
   .bench:not(.rules-hidden) .rules-sheet.gaze {
     border-top-color: var(--gaze-color);
