@@ -169,11 +169,16 @@ const setGamepadActive = (v: boolean): void => {
 // last.
 export const markKeyboardInput = (): void => {
   setGamepadActive(false)
-  document.documentElement.classList.add('keyboard-detected')
+  if (typeof document !== 'undefined') {
+    document.documentElement.classList.add('keyboard-detected')
+  }
 }
 
 // On non-mobile screens, assume keyboard is present from the start.
-if (!window.matchMedia('(max-width: 600px)').matches) {
+if (
+  typeof window !== 'undefined' &&
+  !window.matchMedia('(max-width: 600px)').matches
+) {
   document.documentElement.classList.add('keyboard-detected')
 }
 export const markGamepadInput = (): void => setGamepadActive(true)
