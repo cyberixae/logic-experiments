@@ -142,11 +142,12 @@ const createCongrats = (
   hurray.setAttribute('class', 'hurray')
   hurray.innerHTML = t('congratulations')
 
+  const compact = window.matchMedia('(max-width: 600px)').matches
   const buttons = document.createElement('div')
   buttons.setAttribute('class', 'congrabuttons')
   buttons.appendChild(
     createButton(
-      t('prevLevel'),
+      t(compact ? 'prevLevelShort' : 'prevLevel'),
       false,
       () => selectLevel(ws.previousConjectureId()),
       dualHint('p', 'undo'),
@@ -154,7 +155,7 @@ const createCongrats = (
   )
   buttons.appendChild(
     createButton(
-      t('playAgain'),
+      t(compact ? 'playAgainShort' : 'playAgain'),
       false,
       () => {
         ws.applyEvent(reset())
@@ -165,7 +166,7 @@ const createCongrats = (
   )
   buttons.appendChild(
     createButton(
-      t('nextLevel'),
+      t(compact ? 'nextLevelShort' : 'nextLevel'),
       false,
       () => selectLevel(ws.nextConjectureId()),
       dualHint('␣', 'axiom'),

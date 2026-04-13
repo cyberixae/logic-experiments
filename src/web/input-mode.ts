@@ -167,7 +167,15 @@ const setGamepadActive = (v: boolean): void => {
 // is *currently* using, not just whether a controller is plugged in. A player
 // who flips between gamepad and keyboard gets hints for whichever they touched
 // last.
-export const markKeyboardInput = (): void => setGamepadActive(false)
+export const markKeyboardInput = (): void => {
+  setGamepadActive(false)
+  document.documentElement.classList.add('keyboard-detected')
+}
+
+// On non-mobile screens, assume keyboard is present from the start.
+if (!window.matchMedia('(max-width: 600px)').matches) {
+  document.documentElement.classList.add('keyboard-detected')
+}
 export const markGamepadInput = (): void => setGamepadActive(true)
 
 // Lifecycle entry points used by setupGamepad on connect/disconnect.

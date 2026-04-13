@@ -24,8 +24,10 @@ import {
   isReverseId0,
   left,
   leftLogical,
+  leftStructural,
   right,
   rightLogical,
+  rightStructural,
 } from '../rules'
 import { AnyWorkspace } from '../interactive/workspace'
 import { Action } from '../interactive/action'
@@ -141,7 +143,10 @@ export const createButton = (
   if (!disabled && onClick) el.onclick = onClick
   if (hint !== undefined) {
     el.appendChild(keyHintBadge(hint, hintVariant))
-    el.appendChild(document.createTextNode(' ' + label))
+    const labelSpan = document.createElement('span')
+    labelSpan.setAttribute('class', 'button-label')
+    labelSpan.textContent = ' ' + label
+    el.appendChild(labelSpan)
   } else {
     el.innerHTML = label
   }
@@ -152,9 +157,15 @@ let rulesVisible = false
 
 export const setDefaultRulesVisible = (visible: boolean): void => {
   rulesVisible = visible
+  treeZoom = BASE_ZOOM
+  autoZoomedDerivation = null
 }
 
-let treeZoom = 1
+const isCompact = (): boolean =>
+  window.matchMedia('(max-width: 600px)').matches
+const BASE_ZOOM = isCompact() ? 0.6 : 1
+
+let treeZoom = BASE_ZOOM
 const ZOOM_MIN = 0.4
 const ZOOM_MAX = 2
 const ZOOM_STEP = 0.2
@@ -164,12 +175,12 @@ export const zoomTreeOut = (): void => {
   treeZoom = Math.max(ZOOM_MIN, treeZoom - ZOOM_STEP)
 }
 export const zoomTreeReset = (): void => {
-  treeZoom = 1
+  treeZoom = BASE_ZOOM
 }
 export const zoomTreeIn = (): void => {
   treeZoom = Math.min(ZOOM_MAX, treeZoom + ZOOM_STEP)
 }
-const AUTO_ZOOM_MAX = 1.2
+const AUTO_ZOOM_MAX = isCompact() ? 0.6 : 1.2
 const AUTO_ZOOM_PAD = 0.9
 
 const CHECK_STEP_MS = 120
@@ -267,7 +278,12 @@ const createPlayArea = (workspace: AnyWorkspace): HTMLElement => {
         }
       })
     }
-    if (isFresh && !solved && autoZoomedDerivation !== focus.derivation) {
+    if (
+      !isCompact() &&
+      isFresh &&
+      !solved &&
+      autoZoomedDerivation !== focus.derivation
+    ) {
       autoZoomedDerivation = focus.derivation
       const rootSequent = tree.querySelector<HTMLElement>(
         ':scope > .tree-sequent',
@@ -275,8 +291,10 @@ const createPlayArea = (workspace: AnyWorkspace): HTMLElement => {
       if (rootSequent) {
         const sequentRect = rootSequent.getBoundingClientRect()
         const areaRect = panel.getBoundingClientRect()
-        const fontPx = parseFloat(getComputedStyle(panel).fontSize)
-        const availW = areaRect.width - 2 * 8 * fontPx
+        const panelStyle = getComputedStyle(panel)
+        const padLeft = parseFloat(panelStyle.paddingLeft)
+        const padRight = parseFloat(panelStyle.paddingRight)
+        const availW = areaRect.width - padLeft - padRight
         if (sequentRect.width > 0 && availW > 0) {
           const target = Math.max(
             ZOOM_MIN,
@@ -294,12 +312,14 @@ const createPlayArea = (workspace: AnyWorkspace): HTMLElement => {
       }
     }
     tree.style.visibility = ''
-    if (solved) {
+    if (solved && !isCompact()) {
       const treeRect = tree.getBoundingClientRect()
       const areaRect = panel.getBoundingClientRect()
-      const fontPx = parseFloat(getComputedStyle(panel).fontSize)
-      const availW = areaRect.width - 2 * 8 * fontPx
-      const availH = (areaRect.height - (8 + 1) * fontPx) * 0.85
+      const panelStyle = getComputedStyle(panel)
+      const padH = parseFloat(panelStyle.paddingLeft) + parseFloat(panelStyle.paddingRight)
+      const padV = parseFloat(panelStyle.paddingTop) + parseFloat(panelStyle.paddingBottom)
+      const availW = areaRect.width - padH
+      const availH = (areaRect.height - padV) * 0.85
       const scale = Math.min(
         1,
         availW / treeRect.width,
@@ -372,6 +392,58 @@ const gazeHintBadgeForKind = (
   return null
 }
 
+const createRuleCard = (
+  key: RuleId,
+  rule: Rule<AnySequent>,
+  disabled: boolean,
+  pinned: ReadonlyArray<RuleId>,
+  hideRules: boolean,
+  onApply: (key: RuleId) => void,
+  gazeHints: GazeHintInfo,
+  panelClass: string,
+): HTMLElement => {
+  const isPinned = pinned.includes(key)
+  const pre = document.createElement('pre')
+  pre.setAttribute(
+    'class',
+    'rule button' +
+      (disabled ? ' disabled' : '') +
+      (isPinned ? ' pinned' : ''),
+  )
+  pre.dataset['rule'] = key
+  const group =
+    key in leftStructural || key in rightStructural
+      ? 'structural'
+      : key in leftLogical || key in rightLogical
+        ? 'logical'
+        : 'center'
+  pre.dataset['group'] = group
+  if (!disabled) pre.onclick = () => onApply(key)
+  const compact = window.matchMedia('(max-width: 600px)').matches
+  pre.innerHTML = fromDerivation(
+    rule.example,
+    t('sideLeft'),
+    t('sideRight'),
+    !compact,
+  )
+  const action = ruleAction[key]
+  const hint = action !== undefined ? getActionHint(action) : undefined
+  const ruleHintVariant = panelClass === 'main' ? 'base' : 'hot'
+  if (hint !== undefined && !hideRules)
+    pre.appendChild(keyHintBadge(hint, ruleHintVariant))
+  const gazeBadges = [
+    gazeHintBadgeForKind(key, gazeHints.connective),
+    gazeHintBadgeForKind(key, gazeHints.weakening),
+  ].filter(isNonNullable)
+  if (gazeBadges.length > 0) {
+    const stack = document.createElement('span')
+    stack.setAttribute('class', 'gaze-hint-stack')
+    for (const b of gazeBadges) stack.appendChild(b)
+    pre.appendChild(stack)
+  }
+  return pre
+}
+
 const createPanel = <K extends RuleId>(
   className: string,
   ruleRecord: Record<K, Rule<AnySequent>>,
@@ -388,32 +460,9 @@ const createPanel = <K extends RuleId>(
   entries(ruleRecord).forEach(([key, rule]) => {
     if (!rules.includes(key)) return
     const disabled = solved || !ls.includes(key)
-    const isPinned = pinned.includes(key)
-    const pre = document.createElement('pre')
-    pre.setAttribute(
-      'class',
-      'rule button' +
-        (disabled ? ' disabled' : '') +
-        (isPinned ? ' pinned' : ''),
+    panel.appendChild(
+      createRuleCard(key, rule, disabled, pinned, hideRules, onApply, gazeHints, className),
     )
-    if (!disabled) pre.onclick = () => onApply(key)
-    pre.innerHTML = fromDerivation(rule.example, t('sideLeft'), t('sideRight'))
-    const action = ruleAction[key]
-    const hint = action !== undefined ? getActionHint(action) : undefined
-    const ruleHintVariant = className === 'main' ? 'base' : 'hot'
-    if (hint !== undefined && !hideRules)
-      pre.appendChild(keyHintBadge(hint, ruleHintVariant))
-    const gazeBadges = [
-      gazeHintBadgeForKind(key, gazeHints.connective),
-      gazeHintBadgeForKind(key, gazeHints.weakening),
-    ].filter(isNonNullable)
-    if (gazeBadges.length > 0) {
-      const stack = document.createElement('span')
-      stack.setAttribute('class', 'gaze-hint-stack')
-      for (const b of gazeBadges) stack.appendChild(b)
-      pre.appendChild(stack)
-    }
-    panel.appendChild(pre)
   })
   return panel
 }
@@ -471,7 +520,13 @@ export const createBench = (
   const hideRules = !rulesVisible || solved
   const pinned = workspace.pinnedRules()
   const panel = document.createElement('div')
-  panel.setAttribute('class', 'bench' + (hideRules ? ' rules-hidden' : ''))
+  const hasPinned = !solved && pinned.length > 0
+  panel.setAttribute(
+    'class',
+    'bench' +
+      (hideRules ? ' rules-hidden' : '') +
+      (hasPinned ? ' has-pinned' : ''),
+  )
   panel.appendChild(
     createPanel(
       'left',
@@ -516,6 +571,44 @@ export const createBench = (
       gazeHints,
     ),
   )
+
+  // Mobile bottom sheet for rules
+  const rulesSheet = document.createElement('div')
+  const sheetMode = isGazeModeActive() ? 'gaze' : 'hot'
+  rulesSheet.setAttribute('class', 'rules-sheet ' + sheetMode)
+  if (!congrats) {
+    const sheetCenter = document.createElement('div')
+    sheetCenter.setAttribute('class', 'rules-sheet-center')
+    entries(center).forEach(([key, rule]) => {
+      if (!rules.includes(key)) return
+      const disabled = solved || !ls.includes(key)
+      const card = createRuleCard(key, rule, disabled, pinned, hideRules, applyCenter, gazeHints, 'main')
+      sheetCenter.appendChild(card)
+    })
+    rulesSheet.appendChild(sheetCenter)
+  }
+  const sheetSides = document.createElement('div')
+  sheetSides.setAttribute('class', 'rules-sheet-sides')
+  const leftCol = document.createElement('div')
+  leftCol.setAttribute('class', 'rules-sheet-col')
+  entries(left).forEach(([key, rule]) => {
+    if (!rules.includes(key)) return
+    const disabled = inactive || !ls.includes(key)
+    const card = createRuleCard(key, rule, disabled, pinned, hideRules, apply, gazeHints, 'left')
+    leftCol.appendChild(card)
+  })
+  const rightCol = document.createElement('div')
+  rightCol.setAttribute('class', 'rules-sheet-col')
+  entries(right).forEach(([key, rule]) => {
+    if (!rules.includes(key)) return
+    const disabled = inactive || !ls.includes(key)
+    const card = createRuleCard(key, rule, disabled, pinned, hideRules, apply, gazeHints, 'right')
+    rightCol.appendChild(card)
+  })
+  sheetSides.appendChild(leftCol)
+  sheetSides.appendChild(rightCol)
+  rulesSheet.appendChild(sheetSides)
+  panel.appendChild(rulesSheet)
   panel.appendChild(createPlayArea(workspace))
   const zoomOut = createButton(
     '−',
@@ -645,9 +738,11 @@ export const createBench = (
   gazeGroup.appendChild(gazeRightBtn)
 
   const rulesGroup = makeGroup()
+  rulesGroup.setAttribute('class', 'controls-group controls-rules')
   rulesGroup.appendChild(rulesBtn)
 
   const axiomGroup = makeGroup()
+  axiomGroup.setAttribute('class', 'controls-group controls-axiom')
   axiomGroup.appendChild(axiomBtn)
 
   const zoomGroup = makeGroup()
@@ -703,6 +798,24 @@ export const createBench = (
   controlsBar.appendChild(centerCell)
   controlsBar.appendChild(rightCell)
   panel.appendChild(controlsBar)
+
+  // Mobile pinned rules strip below gaze buttons
+  if (!solved && pinned.length > 0) {
+    const pinnedStrip = document.createElement('div')
+    pinnedStrip.setAttribute('class', 'pinned-strip')
+    const allRules = { ...left, ...center, ...right }
+    for (const key of pinned) {
+      const rule = allRules[key as keyof typeof allRules]
+      if (!rule || !rules.includes(key)) continue
+      const disabled = inactive || !ls.includes(key)
+      const panelClass = key in left ? 'left' : key in right ? 'right' : 'main'
+      const onApplyPinned = panelClass === 'main' ? applyCenter : apply
+      const card = createRuleCard(key, rule, disabled, pinned, false, onApplyPinned, gazeHints, panelClass)
+      pinnedStrip.appendChild(card)
+    }
+    panel.appendChild(pinnedStrip)
+  }
+
   return panel
 }
 
