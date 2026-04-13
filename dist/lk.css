@@ -564,3 +564,265 @@ body {
 .tree-inference.ghost > .tree-rule-label {
   opacity: 0.7;
 }
+
+/* === Mobile layout === */
+@media (max-width: 600px) {
+  body {
+    overflow-x: hidden;
+  }
+  .bench {
+    overflow-x: hidden;
+  }
+  /* Subtask 2: Shrink playarea padding & masks */
+  .playarea {
+    padding: 2em 1em 5em 1em;
+    scroll-padding: 2em 1em 5em 1em;
+    mask-image:
+      linear-gradient(
+        to right,
+        transparent,
+        black 1em,
+        black calc(100% - 1em),
+        transparent
+      ),
+      linear-gradient(
+        to bottom,
+        transparent,
+        black 1em,
+        black calc(100% - 1em),
+        transparent
+      );
+    -webkit-mask-image:
+      linear-gradient(
+        to right,
+        transparent,
+        black 1em,
+        black calc(100% - 1em),
+        transparent
+      ),
+      linear-gradient(
+        to bottom,
+        transparent,
+        black 1em,
+        black calc(100% - 1em),
+        transparent
+      );
+  }
+  .rule {
+    min-width: auto;
+  }
+
+  /* Remove hint space from button labels */
+  .controls .button .button-label {
+    margin-left: -0.5em;
+  }
+
+  /* Move control button hints to top edge */
+  .controls .button .key-hint {
+    top: -15px;
+    left: auto;
+    right: 20%;
+    transform: translateX(50%);
+  }
+
+  /* Keep keyboard hints inside rule cards */
+  .left .rule > .key-hint {
+    right: 0;
+  }
+  .right .rule > .key-hint {
+    left: 0;
+  }
+  .main .rule .key-hint {
+    bottom: 0;
+  }
+  .left .rule .gaze-hint-stack {
+    left: auto;
+    right: 0;
+    transform: none;
+  }
+  .right .rule .gaze-hint-stack {
+    right: auto;
+    left: 0;
+    transform: none;
+  }
+
+  /* Hide keyboard hints until a physical key is pressed */
+  .key-hint {
+    display: none;
+  }
+  .keyboard-detected .key-hint {
+    display: inline-block;
+  }
+
+  /* Subtask 3: Responsive controls bar */
+  .controls {
+    position: fixed;
+    bottom: 0.3em;
+    left: 0.3em;
+    right: 0.3em;
+    display: flex;
+    justify-content: center;
+    gap: 0.5em;
+    padding: 0;
+    z-index: 5;
+  }
+  .controls-group {
+    gap: 0.5em;
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+  .controls-center .controls-group.gaze,
+  .controls-center .controls-group.hot {
+    border-bottom: 0.5em solid rgba(0, 0, 0, 0.3);
+    padding-bottom: 0.5em;
+  }
+  .controls-center .controls-group.gaze {
+    border-bottom-color: var(--gaze-color);
+  }
+  .controls-center .controls-group.hot {
+    border-bottom-color: #c33;
+  }
+  .controls-center {
+    gap: 0.5em;
+  }
+  .controls-right {
+    display: none;
+  }
+
+  /* Top bar: menu/level/undo left, rules right */
+  .bench > .controls > .controls-group:first-child {
+    position: fixed;
+    top: 0.3em;
+    left: 0.3em;
+    z-index: 5;
+    flex-direction: column;
+  }
+  .controls-rules,
+  .controls-axiom {
+    position: fixed;
+    right: 0.3em;
+    z-index: 5;
+  }
+  .controls-rules {
+    top: 0.3em;
+  }
+  .controls-axiom {
+    top: 3.5em;
+  }
+
+  /* Subtask 4: Responsive menu & popups */
+  .menu-title {
+    font-size: 2.5em;
+  }
+  .menu-modes {
+    flex-direction: column;
+    align-items: center;
+  }
+  .level-select {
+    width: 95%;
+    height: 95%;
+    border-radius: 20px;
+    padding: 1em;
+  }
+  .levels {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5em;
+  }
+  .level {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid #fff4;
+    border-radius: 10px;
+    padding: 0.5em 0.8em;
+    line-height: 1.4em;
+  }
+  .level .title,
+  .level .rules,
+  .level .goal {
+    display: block;
+    padding: 0;
+    text-align: left;
+  }
+  .level .title {
+    font-weight: bold;
+  }
+  .level .rules {
+    font-size: 0.9em;
+    opacity: 0.8;
+  }
+  .level .goal {
+    margin-top: 0.2em;
+  }
+  .pause-popup {
+    padding: 1.5em 2em;
+  }
+
+  /* Subtask 5: Rule panels as bottom sheet on mobile */
+  .bench .left,
+  .bench .main,
+  .bench .right {
+    display: none;
+  }
+  .rules-sheet {
+    display: none;
+  }
+  .bench:not(.rules-hidden) .rules-sheet {
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    max-height: 45vh;
+    z-index: 10;
+    background-color: #ffeeddf0;
+    border-top: 0.5em solid rgba(0, 0, 0, 0.3);
+    padding: 0.5em;
+    gap: 0.5em;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+  .bench:not(.rules-hidden) .rules-sheet.gaze {
+    border-top-color: var(--gaze-color);
+  }
+  .bench:not(.rules-hidden) .rules-sheet.hot {
+    border-top-color: #c33;
+  }
+  .bench:not(.rules-hidden) .playarea {
+    max-height: 40vh;
+  }
+  .rules-sheet-center {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 0.5em;
+    margin-bottom: 0.5em;
+  }
+  .rules-sheet-center .rule[data-rule='f'] {
+    order: 99;
+    grid-column: 1;
+  }
+  .rules-sheet-center .rule[data-rule='v'] {
+    order: 100;
+    grid-column: 2;
+  }
+  .rules-sheet-sides {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 0.5em;
+  }
+  .rules-sheet-sides .rules-sheet-col {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5em;
+  }
+  .rules-sheet .rule {
+    min-width: 0;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+  }
+  .rules-sheet .rule[data-group='structural'] + .rule[data-group='logical'] {
+    margin-top: 0.5em;
+  }
+}

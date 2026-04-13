@@ -114,12 +114,12 @@ export function leftify(...lines: Array<string>) {
 export function tree(
   root: string,
   branches: Array<string>,
-  note: string,
+  note: string | null,
   lineWidth: number,
 ): string {
   const line1 = center(lineWidth)(spaced(branches, 2))
   const last = center(lineWidth)(lastLine(line1).trim())
-  const line2 = spaced([line(lineWidth), note])
+  const line2 = note !== null ? spaced([line(lineWidth), note]) : line(lineWidth)
   const line3 = center(lineWidth)(root)
 
   const aligned = align(line1, pad(leftify(last, line2, line3)))
@@ -137,7 +137,7 @@ function lastLine(block: string): string {
 export function treeAuto(
   root: string,
   branches: Array<string>,
-  note: string,
+  note: string | null,
 ): string {
   const branchBlock = spaced(branches, 2)
   const contentWidth = Math.max(

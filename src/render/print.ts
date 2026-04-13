@@ -361,11 +361,14 @@ export function fromTransformation(
   { rule, deps, result }: AnyTransformation,
   l = 'L',
   r = 'R',
+  showLabel = true,
 ) {
   return block.treeAuto(
     segment.plain(fromSequent(result)(basic)),
-    deps.map((d) => fromDerivation(d, l, r)),
-    '(' + segment.plain(fromRuleId(rule, l, r)(basic)) + ')',
+    deps.map((d) => fromDerivation(d, l, r, showLabel)),
+    showLabel
+      ? '(' + segment.plain(fromRuleId(rule, l, r)(basic)) + ')'
+      : null,
   )
 }
 
@@ -373,12 +376,13 @@ export function fromDerivation(
   treelike: AnyDerivation,
   l = 'L',
   r = 'R',
+  showLabel = true,
 ): string {
   switch (treelike.kind) {
     case 'premise':
       return fromPremise(treelike)
     case 'transformation':
-      return fromTransformation(treelike, l, r)
+      return fromTransformation(treelike, l, r, showLabel)
   }
 }
 
