@@ -11,6 +11,7 @@ import { AnySequent } from '../model/sequent'
 import {
   AnyDerivation,
   branches,
+  Derivation,
   Edit,
   editDerivation,
   premise,
@@ -65,10 +66,10 @@ export {
   subscribeGamepad,
 } from './input-mode'
 
-const ghostToDerivation = (
+const ghostToDerivation = <J extends AnySequent>(
   chain: GhostStep[],
-  activeSequent: AnySequent,
-): AnyDerivation => {
+  activeSequent: J,
+): Derivation<J> => {
   let deps: AnyDerivation[] = []
   for (let i = chain.length - 1; i >= 0; i -= 1) {
     const step = chain[i]
@@ -76,11 +77,14 @@ const ghostToDerivation = (
     if (deps.length === 0) {
       deps = step.sequents.map((s) => premise(s))
     }
-    const result = i === 0 ? activeSequent : chain[i - 1]?.sequents[0]
+    if (i === 0) {
+      return transformation(activeSequent, deps, step.rule)
+    }
+    const result = chain[i - 1]?.sequents[0]
     if (!result) continue
     deps = [transformation(result, deps, step.rule)]
   }
-  return deps[0] ?? premise(activeSequent)
+  return premise(activeSequent)
 }
 
 const ruleAction: Partial<Record<RuleId, Action>> = {
