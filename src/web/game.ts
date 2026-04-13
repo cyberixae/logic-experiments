@@ -11,6 +11,7 @@ import { AnySequent } from '../model/sequent'
 import {
   AnyDerivation,
   branches,
+  Edit,
   editDerivation,
   premise,
   subDerivation,
@@ -244,13 +245,8 @@ const createPlayArea = (workspace: AnyWorkspace): HTMLElement => {
   let derivation = focus.derivation
   let ghostPath: number[] | null = null
   if (ghostChain !== null && ghostChain.length > 0) {
-    const edit = (leaf: AnyDerivation): AnyDerivation =>
-      ghostToDerivation(ghostChain, leaf.result)
-    const withGhost = editDerivation(
-      focus.derivation,
-      path,
-      edit as Parameters<typeof editDerivation>[2],
-    )
+    const edit: Edit = (leaf) => ghostToDerivation(ghostChain, leaf.result)
+    const withGhost = editDerivation(focus.derivation, path, edit)
     if (withGhost) {
       derivation = withGhost
       ghostPath = path
@@ -838,10 +834,14 @@ export const createBench = (
   if (!solved && pinned.length > 0) {
     const pinnedStrip = document.createElement('div')
     pinnedStrip.setAttribute('class', 'pinned-strip')
-    const allRules = { ...left, ...center, ...right }
+    const allRules: Partial<Record<RuleId, Rule<AnySequent>>> = {
+      ...left,
+      ...center,
+      ...right,
+    }
     for (const key of pinned) {
-      const rule = allRules[key as keyof typeof allRules]
-      if (!rule || !rules.includes(key)) continue
+      const rule = allRules[key]
+      if (rule === undefined || !rules.includes(key)) continue
       const disabled = inactive || !ls.includes(key)
       const panelClass = key in left ? 'left' : key in right ? 'right' : 'main'
       const onApplyPinned = panelClass === 'main' ? applyCenter : apply

@@ -63,7 +63,6 @@ export const renderDerivation = (
     ghostPath !== null &&
     currentPath.length > ghostPath.length &&
     startsWith(currentPath, ghostPath)
-  const ghost = isGhostBoundary || isGhostNode
 
   const isActive = equalPaths(currentPath, activePath) || isGhostBoundary
   const isOpenActive =
