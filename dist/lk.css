@@ -407,6 +407,140 @@ body {
   color: #fc8;
 }
 
+.random-config {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-sizing: border-box;
+  padding: 2em;
+  gap: 1.5em;
+  overflow-y: auto;
+}
+.config-title {
+  font-size: 2em;
+  font-weight: bold;
+  text-align: center;
+}
+.config-columns {
+  display: flex;
+  gap: 3em;
+  align-items: flex-start;
+  width: 100%;
+}
+.config-settings {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5em;
+}
+.config-preview {
+  flex: 2 1 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5em;
+}
+.config-preview-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3em;
+  max-height: 70vh;
+  overflow-x: visible;
+  overflow-y: hidden;
+}
+.config-preview-item {
+  padding: 0.3em 0.5em;
+  display: flex;
+  align-items: baseline;
+  gap: 0.5em;
+}
+.config-preview-count {
+  min-width: 1.5em;
+  text-align: right;
+  opacity: 0.6;
+  flex-shrink: 0;
+}
+.config-preview-item.approximate {
+  opacity: 0.4;
+}
+.config-stats {
+  font-size: 0.85em;
+  opacity: 0.6;
+}
+.config-proof-tree {
+  flex: 2 1 0;
+  overflow: auto;
+  max-height: 80vh;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 1em;
+}
+.config-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5em;
+  width: 100%;
+  max-width: 400px;
+}
+.config-section-title {
+  font-size: 1.3em;
+  font-weight: bold;
+  border-bottom: 2px solid #0003;
+  padding-bottom: 0.3em;
+}
+.config-subsection-title {
+  font-size: 1.1em;
+  font-weight: bold;
+  margin-top: 0.5em;
+}
+.config-toggles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4em;
+  margin: 0.3em 0;
+}
+.config-toggles .button {
+  width: 2.5em;
+  height: 2.5em;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.config-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1em;
+}
+.config-label {
+  flex: 1;
+}
+.config-input {
+  width: 5em;
+  font-size: 1em;
+  padding: 0.3em 0.5em;
+  border: 2px solid #0003;
+  border-radius: 6px;
+  background: #fffc;
+  font-family: inherit;
+  text-align: right;
+}
+.config-input:focus {
+  outline: none;
+  border-color: #f80;
+}
+.config-buttons {
+  display: flex;
+  gap: 1em;
+}
+.config-buttons .button {
+  padding: 0.6em 2em;
+  min-width: 5em;
+}
+
 .menu {
   width: 100vw;
   height: 100vh;

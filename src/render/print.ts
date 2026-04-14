@@ -185,6 +185,12 @@ export function fromAtom({ value }: prop.Atom<string>): Printer {
   if (value === 's') {
     chr = '\u{1f986}'
   }
+  if (value === 'u') {
+    chr = '\u{1f413}'
+  }
+  if (value === 'v') {
+    chr = '\u{1f99a}'
+  }
   return print('atom')(printString(chr))
 }
 

@@ -299,3 +299,86 @@ export const random =
     }
     return negation(random(next)())
   }
+
+type WeightedChoice<T> = { weight: number; value: T }
+
+const pickWeighted = <T>(choices: Array<WeightedChoice<T>>): T | undefined => {
+  const total = choices.reduce((sum, c) => sum + c.weight, 0)
+  if (total <= 0) return undefined
+  let rand = Math.random() * total
+  for (const c of choices) {
+    rand -= c.weight
+    if (rand < 0) return c.value
+  }
+  const last = choices[choices.length - 1]
+  return last?.value
+}
+
+export const randomWeighted =
+  (
+    size: number,
+    connectives: {
+      negation: number
+      implication: number
+      conjunction: number
+      disjunction: number
+    },
+    symbols: {
+      p: number
+      q: number
+      r: number
+      s: number
+      u: number
+      v: number
+      falsum: number
+      verum: number
+    },
+  ): (() => Prop) =>
+  (): Prop => {
+    if (size < 1) {
+      const leaf = pickWeighted<Prop>([
+        { weight: symbols.p, value: atom('p') },
+        { weight: symbols.q, value: atom('q') },
+        { weight: symbols.r, value: atom('r') },
+        { weight: symbols.s, value: atom('s') },
+        { weight: symbols.u, value: atom('u') },
+        { weight: symbols.v, value: atom('v') },
+        { weight: symbols.falsum, value: falsum },
+        { weight: symbols.verum, value: verum },
+      ])
+      return leaf ?? atom('p')
+    }
+    const next = size - 1
+    const [left, right] = splitAt(next, Math.random())
+    const branch = pickWeighted<() => Prop>([
+      {
+        weight: connectives.conjunction,
+        value: () =>
+          conjunction(
+            randomWeighted(left, connectives, symbols)(),
+            randomWeighted(right, connectives, symbols)(),
+          ),
+      },
+      {
+        weight: connectives.disjunction,
+        value: () =>
+          disjunction(
+            randomWeighted(left, connectives, symbols)(),
+            randomWeighted(right, connectives, symbols)(),
+          ),
+      },
+      {
+        weight: connectives.implication,
+        value: () =>
+          implication(
+            randomWeighted(left, connectives, symbols)(),
+            randomWeighted(right, connectives, symbols)(),
+          ),
+      },
+      {
+        weight: connectives.negation,
+        value: () => negation(randomWeighted(next, connectives, symbols)()),
+      },
+    ])
+    return branch ? branch() : atom('p')
+  }

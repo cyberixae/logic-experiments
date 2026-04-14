@@ -28,6 +28,21 @@ const en = {
   backToSystems: '\u2190 Systems',
   sideLeft: 'L',
   sideRight: 'R',
+  randomConfig: 'Random',
+  formulaShape: 'Settings',
+  size: 'Formula Length',
+  connectives: 'Connectives',
+  symbols: 'Symbols',
+  negationWeight: 'Negation',
+  implicationWeight: 'Implication',
+  conjunctionWeight: 'Conjunction',
+  disjunctionWeight: 'Disjunction',
+  filter: 'Parameters',
+  bypassPercent: 'Unsolvability (%)',
+  targetNonStructural: 'Solution Size',
+  start: 'Start',
+  back: 'Back',
+  preview: 'Preview',
 } as const
 
 const fi: Record<MessageKey, string> = {
@@ -60,6 +75,21 @@ const fi: Record<MessageKey, string> = {
   backToSystems: '\u2190 Järjestelmät',
   sideLeft: 'V',
   sideRight: 'O',
+  randomConfig: 'Satunnainen',
+  formulaShape: 'Asetukset',
+  size: 'Kaavan pituus',
+  connectives: 'Konnektiivit',
+  symbols: 'Symbolit',
+  negationWeight: 'Negaatio',
+  implicationWeight: 'Implikaatio',
+  conjunctionWeight: 'Konjunktio',
+  disjunctionWeight: 'Disjunktio',
+  filter: 'Parametrit',
+  bypassPercent: 'Ratkeamattomuus (%)',
+  targetNonStructural: 'Ratkaisun koko',
+  start: 'Aloita',
+  back: 'Takaisin',
+  preview: 'Esikatselu',
 }
 
 type MessageKey = keyof typeof en
@@ -75,3 +105,24 @@ const locale = detectLocale()
 
 export const t = (key: MessageKey): string =>
   (messages[locale] ?? en)[key] ?? en[key]
+
+type StatsParams = {
+  formulas: number
+  rate: string
+  tautologies: number
+  solved: number
+  sinceUpdate: string
+}
+
+const statsFormatters: Record<string, (p: StatsParams) => string> = {
+  en: (p) =>
+    `Generated ${p.formulas} formulas (${p.rate}/s), ${p.tautologies} tautologies, ${p.solved} solved. Updated ${p.sinceUpdate}s ago.`,
+  fi: (p) =>
+    `Tuotettu ${p.formulas} kaavaa (${p.rate}/s), ${p.tautologies} tautologiaa, ${p.solved} ratkaisua. Päivitetty ${p.sinceUpdate}s sitten.`,
+}
+
+export const formatStats = (p: StatsParams): string => {
+  const fmt = statsFormatters[locale] ?? statsFormatters['en']
+  if (!fmt) return ''
+  return fmt(p)
+}

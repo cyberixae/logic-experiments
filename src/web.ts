@@ -8,6 +8,7 @@ import { mountMenu } from './web/menu'
 import { mountCampaign } from './web/campaign'
 import { mountRandom } from './web/random'
 import { mountSystem } from './web/system'
+import { mountRandomConfig } from './web/random-config'
 import { setGazeModeActive } from './web/game'
 import { ChallengePool } from './web/challenge-pool'
 import { plain } from './render/segment'
@@ -19,7 +20,7 @@ const session = new Session()
 
 const factory: WorkspaceFactory = {
   campaign: () => new Workspace(challenges),
-  random: () => new Workspace({ challenge: pool.take() }),
+  random: () => new Workspace({ challenge: pool.take().challenge }),
 }
 
 const gen = repl(session, factory)
@@ -71,6 +72,12 @@ const mount = (screen: Screen) => {
     case 'system':
       current = mountSystem(body, navigate)
       break
+    case 'random-config':
+      current = mountRandomConfig(body, navigate, (config) => {
+        pool.configure(config)
+        navigate('random')
+      })
+      break
   }
 }
 
@@ -104,6 +111,9 @@ const init = () => {
     enterMode(mode)
     currentScreen = mode
     mount(mode)
+  } else if (mode === 'random-config') {
+    currentScreen = 'random-config'
+    mount('random-config')
   } else if (mode === 'system') {
     currentScreen = 'system'
     mount('system')
