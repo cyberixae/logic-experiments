@@ -268,7 +268,6 @@ html.loading body {
   opacity: 0.8;
   text-wrap: nowrap;
   margin: 0;
-  text-transform: capitalize;
 }
 .button:not(.disabled):hover {
   background-color: #fff;
