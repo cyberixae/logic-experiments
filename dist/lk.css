@@ -18,7 +18,7 @@ body {
 }
 .bench {
   width: 100vw;
-  height: 100vh;
+  height: 100dvh;
   box-sizing: border-box;
   padding: 1em;
   display: grid;
@@ -717,8 +717,8 @@ body {
   }
   /* Subtask 2: Shrink playarea padding & masks */
   .playarea {
-    padding: 5em 1em 10em 1em;
-    scroll-padding: 5em 1em 10em 1em;
+    padding: 8em 1em 10em 1em;
+    scroll-padding: 8em 1em 10em 1em;
     mask-image:
       linear-gradient(
         to right,
@@ -941,7 +941,7 @@ body {
     left: 0;
     right: 0;
     bottom: 0;
-    max-height: 45vh;
+    max-height: 45dvh;
     z-index: 10;
     background-color: #ffeeddf0;
     border-top: 0.5em solid rgba(0, 0, 0, 0.3);
@@ -968,7 +968,9 @@ body {
     border-top-color: #c33;
   }
   .bench:not(.rules-hidden) .playarea {
-    max-height: 40vh;
+    max-height: 40dvh;
+    padding: 5em 1em 1em 1em;
+    scroll-padding: 5em 1em 1em 1em;
   }
   .rules-sheet-center {
     display: grid;
@@ -1070,5 +1072,22 @@ body {
   }
   .pinned-strip .rule .gaze-hint-stack .key-hint {
     position: static;
+  }
+
+  /* Fade tree behind gaze buttons when the rules sheet is closed */
+  .bench.rules-hidden::after {
+    content: '';
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 9em;
+    background: linear-gradient(to top, #ffeedd, #ffeedd 4.5em, transparent);
+    pointer-events: none;
+    z-index: 3;
+  }
+  .bench.rules-hidden.has-pinned::after {
+    height: 13.5em;
+    background: linear-gradient(to top, #ffeedd, #ffeedd 9em, transparent);
   }
 }
