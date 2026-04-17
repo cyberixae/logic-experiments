@@ -126,6 +126,7 @@ const init = () => {
     currentScreen = 'menu'
     mount('menu')
   }
+  document.documentElement.classList.remove('loading')
 }
 
 document.addEventListener('DOMContentLoaded', init)

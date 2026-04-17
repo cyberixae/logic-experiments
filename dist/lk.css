@@ -16,6 +16,9 @@ body {
   overflow: hidden;
   margin: 0;
 }
+html.loading body {
+  visibility: hidden;
+}
 .bench {
   width: 100vw;
   height: 100dvh;
