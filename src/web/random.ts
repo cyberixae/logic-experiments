@@ -57,28 +57,16 @@ const createControls = (
 }
 
 const createCongrats = (
-  getWorkspace: () => AnyWorkspace,
   onNew: () => void,
-  rerender: () => void,
+  onSettings: () => void,
 ): { hurray: HTMLElement; buttons: HTMLElement } => {
-  const ws = getWorkspace()
   const hurray = document.createElement('div')
   hurray.setAttribute('class', 'hurray')
   hurray.innerHTML = t('congratulations')
 
   const buttons = document.createElement('div')
   buttons.setAttribute('class', 'congrabuttons')
-  buttons.appendChild(
-    createButton(
-      t('playAgain'),
-      false,
-      () => {
-        ws.applyEvent(reset())
-        rerender()
-      },
-      getActionHint('reset'),
-    ),
-  )
+  buttons.appendChild(createButton(t('changeSettings'), false, onSettings))
   buttons.appendChild(
     createButton(t('newChallenge'), false, onNew, dualHint('n', 'axiom')),
   )
@@ -137,7 +125,7 @@ export const mountRandom = (
     const ws = getWorkspace()
     container.innerHTML = ''
     const controlsEl = createControls(getWorkspace, rerender, togglePausePopup)
-    const makeCongrats = () => createCongrats(getWorkspace, onNew, rerender)
+    const makeCongrats = () => createCongrats(onNew, openSettings)
     container.appendChild(createBench(ws, makeCongrats, controlsEl, rerender))
     if (pausePopupOpen) {
       const canReset = activePath(ws.currentConjecture()).length > 0
