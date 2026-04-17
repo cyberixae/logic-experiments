@@ -1034,11 +1034,19 @@ html.loading body {
   .has-pinned .controls {
     bottom: 6em;
   }
+  .has-pinned-many .controls {
+    bottom: 11.3em;
+  }
+  .has-pinned-many .playarea {
+    padding-bottom: 15.5em;
+    scroll-padding-bottom: 15.5em;
+  }
 
   /* Pinned rules strip below gaze buttons */
   .pinned-strip {
     display: grid;
     grid-template-columns: 1fr 1fr;
+    grid-auto-rows: 1fr;
     position: fixed;
     bottom: 0;
     left: 0;
@@ -1092,6 +1100,10 @@ html.loading body {
   .bench.rules-hidden.has-pinned::after {
     height: 13.5em;
     background: linear-gradient(to top, #ffeedd, #ffeedd 9em, transparent);
+  }
+  .bench.rules-hidden.has-pinned-many::after {
+    height: 19em;
+    background: linear-gradient(to top, #ffeedd, #ffeedd 14.5em, transparent);
   }
 
   /* === Random config on mobile === */

@@ -529,11 +529,13 @@ export const createBench = (
   const pinned = workspace.pinnedRules()
   const panel = document.createElement('div')
   const hasPinned = !solved && pinned.length > 0
+  const hasPinnedMany = !solved && pinned.length > 2
   panel.setAttribute(
     'class',
     'bench' +
       (hideRules ? ' rules-hidden' : '') +
-      (hasPinned ? ' has-pinned' : ''),
+      (hasPinned ? ' has-pinned' : '') +
+      (hasPinnedMany ? ' has-pinned-many' : ''),
   )
   panel.appendChild(
     createPanel(
