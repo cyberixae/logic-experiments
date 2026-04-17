@@ -316,6 +316,7 @@ export const mountCampaign = (
   rerender()
 
   const handleKey = (ev: KeyboardEvent) => {
+    if (ev.ctrlKey || ev.metaKey || ev.altKey) return
     markKeyboardInput()
     console.log(ev.code)
     if (ev.code === 'KeyP' && ws.isSolved()) {

@@ -193,6 +193,7 @@ export const mountRandom = (
   rerender()
 
   const handleKey = (ev: KeyboardEvent) => {
+    if (ev.ctrlKey || ev.metaKey || ev.altKey) return
     markKeyboardInput()
     if (ev.code === 'KeyN') {
       onNew()
