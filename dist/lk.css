@@ -151,6 +151,21 @@ html.loading body {
   mask-image: none;
   -webkit-mask-image: none;
 }
+.hud {
+  grid-area: status;
+  align-self: start;
+  justify-self: center;
+  z-index: 1;
+  font-variant-numeric: tabular-nums;
+  font-size: 1.6em;
+  opacity: 0.6;
+  pointer-events: none;
+  user-select: none;
+  margin-top: 1em;
+}
+.hud.solved {
+  margin-top: 0;
+}
 .rule {
   position: relative;
   min-width: 260px;
@@ -290,6 +305,14 @@ html.loading body {
   padding-top: 1em;
   z-index: 1;
   white-space: nowrap;
+}
+.par {
+  font-variant-numeric: tabular-nums;
+  opacity: 0.7;
+  margin-top: 0.3em;
+}
+.breakdown {
+  font-size: 0.7em;
 }
 .close {
   position: fixed;
@@ -755,6 +778,21 @@ html.loading body {
   }
   .rule {
     min-width: auto;
+  }
+
+  .hud {
+    position: fixed;
+    top: 0.5em;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 2;
+    align-self: auto;
+    justify-self: auto;
+    font-size: 1.2em;
+    margin-top: 0;
+  }
+  .hud.solved {
+    padding-left: 1em;
   }
 
   .hurray {

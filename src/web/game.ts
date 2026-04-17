@@ -30,6 +30,8 @@ import {
   right,
   rightLogical,
   rightStructural,
+  ruleCategory,
+  RuleCategory,
 } from '../rules'
 import { AnyWorkspace } from '../interactive/workspace'
 import { Action } from '../interactive/action'
@@ -475,6 +477,35 @@ const createPanel = <K extends RuleId>(
   return panel
 }
 
+const countRuleUsage = (d: AnyDerivation): Record<RuleCategory, number> => {
+  const counts: Record<RuleCategory, number> = {
+    axiom: 0,
+    structural: 0,
+    logical: 0,
+    meta: 0,
+  }
+  const walk = (node: AnyDerivation) => {
+    if (node.kind === 'premise') return
+    counts[ruleCategory[node.rule]] += 1
+    node.deps.forEach(walk)
+  }
+  walk(d)
+  return counts
+}
+
+const formatHudCounts = (counts: Record<RuleCategory, number>): string => {
+  const order: RuleCategory[] = ['axiom', 'structural', 'logical', 'meta']
+  let lastNonZero = -1
+  order.forEach((cat, i) => {
+    if (counts[cat] > 0) lastNonZero = i
+  })
+  const total = order.reduce((sum, cat) => sum + counts[cat], 0)
+  if (lastNonZero === -1) return '<b>0</b>'
+  const segments = order.slice(0, lastNonZero + 1).map((cat) => counts[cat])
+  if (segments.length === 1) return `<b>${total}</b>`
+  return `<b>${total}</b> <span class="breakdown">${segments.join('+')}</span>`
+}
+
 export const createBench = (
   workspace: AnyWorkspace,
   makeCongrats: () => { hurray: HTMLElement; buttons: HTMLElement },
@@ -581,6 +612,21 @@ export const createBench = (
       gazeHints,
     ),
   )
+
+  const hud = document.createElement('div')
+  hud.setAttribute('class', 'hud' + (solved ? ' solved' : ''))
+  const hudCounts = formatHudCounts(countRuleUsage(focus.derivation))
+  hud.innerHTML = solved ? t('score') + ' ' + hudCounts : hudCounts
+  if (solved) {
+    const solution = workspace.currentSolution()
+    const par = document.createElement('div')
+    par.setAttribute('class', 'par')
+    par.innerHTML = solution
+      ? t('par') + ' ' + formatHudCounts(countRuleUsage(solution))
+      : t('par') + ' 💀'
+    hud.appendChild(par)
+  }
+  panel.appendChild(hud)
 
   // Mobile bottom sheet for rules
   const rulesSheet = document.createElement('div')

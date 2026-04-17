@@ -8,7 +8,9 @@ import { Challenge, Configuration } from '../model/challenge'
 import { ConnectiveWeights, RandomConfig, SymbolWeights } from './config'
 
 export type GeneratedChallenge = {
-  challenge: Configuration<AnySequent, Array<RuleId>>
+  challenge: Configuration<AnySequent, Array<RuleId>> & {
+    solution?: ProofUsing<AnySequent, RuleId>
+  }
   nonStructuralCount: number
   bypassed: boolean
   formulasTried: number
@@ -225,7 +227,7 @@ export function* randomConfiguredStep(
     )
       continue
     return {
-      challenge: { rules, goal: proof.result },
+      challenge: { rules, goal: proof.result, solution: proof },
       nonStructuralCount,
       bypassed: false,
       formulasTried,

@@ -23,6 +23,8 @@ export interface Challenge<
   solution: ProofUsing<NoInfer<J>, S[number]>
 }
 export type AnyChallenge = Challenge<AnySequent, ReadonlyArray<RuleId>>
+export const isChallenge = (c: Configuration<AnySequent>): c is AnyChallenge =>
+  'solution' in c
 export const challenge = <
   J extends AnySequent,
   const S extends ReadonlyArray<RuleId>,

@@ -39,11 +39,13 @@ const en = {
   conjunctionWeight: 'Conjunction',
   disjunctionWeight: 'Disjunction',
   filter: 'Parameters',
-  bypassPercent: 'Unsolvability (%)',
+  bypassPercent: 'Chaoticity (💀%)',
   targetNonStructural: 'Solution Size',
   start: 'Start',
   back: 'Back',
   preview: 'Preview',
+  score: 'Score',
+  par: 'Par',
 } as const
 
 const fi: Record<MessageKey, string> = {
@@ -87,11 +89,13 @@ const fi: Record<MessageKey, string> = {
   conjunctionWeight: 'Konjunktio',
   disjunctionWeight: 'Disjunktio',
   filter: 'Parametrit',
-  bypassPercent: 'Ratkeamattomuus (%)',
+  bypassPercent: 'Kaoottisuus (💀%)',
   targetNonStructural: 'Ratkaisun koko',
   start: 'Aloita',
   back: 'Takaisin',
   preview: 'Esikatselu',
+  score: 'Pisteet',
+  par: 'Par',
 }
 
 type MessageKey = keyof typeof en

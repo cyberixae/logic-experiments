@@ -5,7 +5,8 @@ import { isProof, premise } from '../model/derivation'
 import { head, isNonEmptyArray, last, NonEmptyArray } from '../utils/array'
 import { entries, get, keys } from '../utils/record'
 import { Focus, applicableRules } from './focus'
-import { Configuration, isTutorial } from '../model/challenge'
+import { Configuration, isChallenge, isTutorial } from '../model/challenge'
+import { AnyDerivation } from '../model/derivation'
 import { AnySequent } from '../model/sequent'
 import { GhostKind } from './ghost'
 
@@ -63,6 +64,10 @@ export class Workspace<
 
   availableRules(): ReadonlyArray<RuleId> {
     return get(this.theorems, this.selected).rules
+  }
+  currentSolution(): AnyDerivation | undefined {
+    const conf = get(this.theorems, this.selected)
+    return isChallenge(conf) ? conf.solution : undefined
   }
   pinnedRules(): ReadonlyArray<RuleId> {
     const conf = get(this.theorems, this.selected)

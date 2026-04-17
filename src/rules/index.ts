@@ -231,3 +231,43 @@ const _side: { [K in RuleId]: Rule<AnySequent, K> } = {
   ...left,
   ...right,
 }
+
+export type RuleCategory = 'axiom' | 'structural' | 'logical' | 'meta'
+
+// Meta = reverse application requires player-supplied input (reverse1 ∪ reverseSplit2)
+export const ruleCategory: { [K in RuleId]: RuleCategory } = {
+  a1: 'axiom',
+  a2: 'axiom',
+  a3: 'axiom',
+  f: 'axiom',
+  i: 'axiom',
+  v: 'axiom',
+  scl: 'structural',
+  swl: 'structural',
+  sRotLB: 'structural',
+  sRotLF: 'structural',
+  sxl: 'structural',
+  scr: 'structural',
+  swr: 'structural',
+  sRotRB: 'structural',
+  sRotRF: 'structural',
+  sxr: 'structural',
+  nl: 'logical',
+  cl: 'logical',
+  cl1: 'logical',
+  cl2: 'logical',
+  dl: 'logical',
+  il: 'logical',
+  nr: 'logical',
+  dr: 'logical',
+  dr1: 'logical',
+  dr2: 'logical',
+  cr: 'logical',
+  ir: 'logical',
+  cut: 'meta',
+  fcut: 'meta',
+  mp: 'meta',
+  fcr: 'meta',
+  fdl: 'meta',
+  fil: 'meta',
+}
