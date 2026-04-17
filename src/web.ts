@@ -49,11 +49,19 @@ const navigate = (screen: Screen) => {
     enterMode(screen)
   }
   currentScreen = screen
-  history.pushState(
-    { screen },
-    '',
-    screen === 'menu' ? window.location.pathname : `?mode=${screen}`,
-  )
+  let url: string
+  if (screen === 'menu') {
+    url = window.location.pathname
+  } else {
+    const nextParams = new URLSearchParams()
+    nextParams.set('mode', screen)
+    if (screen === 'random' || screen === 'random-config') {
+      const existing = new URLSearchParams(window.location.search).get('config')
+      if (existing !== null) nextParams.set('config', existing)
+    }
+    url = `?${nextParams.toString()}`
+  }
+  history.pushState({ screen }, '', url)
   mount(screen)
 }
 

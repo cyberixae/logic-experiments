@@ -115,6 +115,10 @@ export const mountRandom = (
     pausePopupOpen = false
     navigate('menu')
   }
+  const openSettings = () => {
+    pausePopupOpen = false
+    navigate('random-config')
+  }
   const resetFromPopup = () => {
     const ws = getWorkspace()
     if (activePath(ws.currentConjecture()).length > 0) {
@@ -145,6 +149,7 @@ export const mountRandom = (
           resetFromPopup,
           !resetEnabled,
           freshFromPopup,
+          openSettings,
         ),
       )
     }

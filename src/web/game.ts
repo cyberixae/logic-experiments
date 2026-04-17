@@ -880,6 +880,7 @@ export const createPausePopup = (
   onReset: () => void,
   resetDisabled: boolean,
   onFresh?: () => void,
+  onSettings?: () => void,
 ): HTMLElement => {
   const shroud = document.createElement('div')
   shroud.setAttribute('class', 'shroud pause-shroud')
@@ -918,6 +919,9 @@ export const createPausePopup = (
     buttons.appendChild(
       createButton(t('freshChallenge'), false, onFresh, kbdHint('n')),
     )
+  }
+  if (onSettings) {
+    buttons.appendChild(createButton(t('changeSettings'), false, onSettings))
   }
   buttons.appendChild(
     createButton(t('exitToMainMenu'), false, onExit, getActionHint('exit')),
