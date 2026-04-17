@@ -1093,4 +1093,41 @@ html.loading body {
     height: 13.5em;
     background: linear-gradient(to top, #ffeedd, #ffeedd 9em, transparent);
   }
+
+  /* === Random config on mobile === */
+  .random-config {
+    height: 100dvh;
+    padding: 1em;
+    gap: 1em;
+  }
+  .config-title {
+    font-size: 1.5em;
+  }
+  .config-columns {
+    flex-direction: column;
+    gap: 1.5em;
+  }
+  .config-settings {
+    width: 100%;
+  }
+  .config-section {
+    max-width: none;
+  }
+  .config-preview {
+    width: 100%;
+  }
+  .config-preview-list {
+    max-height: none;
+  }
+  .config-buttons {
+    flex-direction: row;
+    justify-content: space-between;
+    width: 100%;
+  }
+  .config-buttons .button {
+    flex: 1;
+    min-width: 0;
+    padding: 0.6em 1em;
+    text-align: center;
+  }
 }
