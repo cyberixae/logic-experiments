@@ -8,7 +8,11 @@ import { mountMenu } from './web/menu'
 import { mountCampaign } from './web/campaign'
 import { mountRandom } from './web/random'
 import { mountSystem } from './web/system'
-import { mountRandomConfig } from './web/random-config'
+import {
+  mountRandomConfig,
+  parseConfigFromParams,
+  serializeConfigForUrl,
+} from './web/random-config'
 import { setGazeModeActive } from './web/game'
 import { ChallengePool } from './web/challenge-pool'
 import { plain } from './render/segment'
@@ -75,7 +79,14 @@ const mount = (screen: Screen) => {
     case 'random-config':
       current = mountRandomConfig(body, navigate, (config) => {
         pool.configure(config)
-        navigate('random')
+        current.cleanup()
+        currentScreen = 'random'
+        enterMode('random')
+        const params = new URLSearchParams()
+        params.set('mode', 'random')
+        params.set('config', serializeConfigForUrl(config))
+        history.pushState({ screen: 'random' }, '', `?${params.toString()}`)
+        mount('random')
       })
       break
   }
@@ -108,6 +119,9 @@ const init = () => {
   const mode = params.get('mode')
 
   if (mode === 'campaign' || mode === 'random') {
+    if (mode === 'random') {
+      pool.configure(parseConfigFromParams(params))
+    }
     enterMode(mode)
     currentScreen = mode
     mount(mode)

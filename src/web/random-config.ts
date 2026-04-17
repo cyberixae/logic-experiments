@@ -4,6 +4,60 @@ import {
   SymbolWeights,
   defaultRandomConfig,
 } from '../random/config'
+import { entries } from '../utils/record'
+
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === 'object' && value !== null && !Array.isArray(value)
+
+const pickNumber = (
+  source: Record<string, unknown>,
+  key: string,
+  fallback: number,
+): number => {
+  const value = source[key]
+  return typeof value === 'number' && Number.isFinite(value) ? value : fallback
+}
+
+const pickWeights = <K extends string>(
+  source: unknown,
+  defaults: Record<K, number>,
+): Record<K, number> => {
+  if (!isRecord(source)) return defaults
+  const result = { ...defaults }
+  for (const [key, fallback] of entries(defaults)) {
+    result[key] = pickNumber(source, key, fallback)
+  }
+  return result
+}
+
+export const parseConfigFromParams = (
+  params: URLSearchParams,
+): RandomConfig => {
+  const defaults = defaultRandomConfig()
+  const raw = params.get('config')
+  if (raw === null || raw === '') return defaults
+  let parsed: unknown
+  try {
+    parsed = JSON.parse(raw)
+  } catch {
+    return defaults
+  }
+  if (!isRecord(parsed)) return defaults
+  return {
+    size: pickNumber(parsed, 'size', defaults.size),
+    targetNonStructural: pickNumber(
+      parsed,
+      'targetNonStructural',
+      defaults.targetNonStructural,
+    ),
+    bypassPercent: pickNumber(parsed, 'bypassPercent', defaults.bypassPercent),
+    connectives: pickWeights(parsed['connectives'], defaults.connectives),
+    symbols: pickWeights(parsed['symbols'], defaults.symbols),
+  }
+}
+
+export const serializeConfigForUrl = (config: RandomConfig): string =>
+  JSON.stringify(config)
 import { MountResult, Navigate } from './types'
 import { t, formatStats } from './i18n'
 import * as prop from '../model/prop'
@@ -190,7 +244,15 @@ export const mountRandomConfig = (
   navigate: Navigate,
   onStart: (config: RandomConfig) => void,
 ): MountResult => {
-  const config = defaultRandomConfig()
+  const config = parseConfigFromParams(
+    new URLSearchParams(window.location.search),
+  )
+
+  const syncUrl = () => {
+    const params = new URLSearchParams(window.location.search)
+    params.set('config', serializeConfigForUrl(config))
+    history.replaceState(history.state, '', `?${params.toString()}`)
+  }
   let entries: Array<PreviewEntry> = []
   let totalFormulasTried = 0
   let totalTautologiesFound = 0
@@ -270,6 +332,7 @@ export const mountRandomConfig = (
   )
 
   const restartSearch = () => {
+    syncUrl()
     entries = []
     totalFormulasTried = 0
     totalTautologiesFound = 0
