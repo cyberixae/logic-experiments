@@ -174,13 +174,16 @@ export const markKeyboardInput = (): void => {
   }
 }
 
-// On non-mobile screens, assume keyboard is present from the start.
+// Capability check (not viewport), so it doesn't need re-evaluation on resize:
+// a device that advertises `(hover: hover) and (pointer: fine)` has a mouse
+// and a keyboard, so keyboard hints should be visible from the start.
 if (
   typeof window !== 'undefined' &&
-  !window.matchMedia('(max-width: 600px)').matches
+  window.matchMedia('(hover: hover) and (pointer: fine)').matches
 ) {
   document.documentElement.classList.add('keyboard-detected')
 }
+
 export const markGamepadInput = (): void => setGamepadActive(true)
 
 // Lifecycle entry points used by setupGamepad on connect/disconnect.
