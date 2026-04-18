@@ -46,6 +46,8 @@ const en = {
   preview: 'Preview',
   score: 'Score',
   par: 'Par',
+  statsTemplate:
+    'Generated {formulas} formulas ({rate}/s), {tautologies} tautologies, {solved} solved. Updated {sinceUpdate}s ago.',
 } as const
 
 const fi: Record<MessageKey, string> = {
@@ -96,6 +98,8 @@ const fi: Record<MessageKey, string> = {
   preview: 'Esikatselu',
   score: 'Pisteet',
   par: 'Par',
+  statsTemplate:
+    'Tuotettu {formulas} kaavaa ({rate}/s), {tautologies} tautologiaa, {solved} ratkaisua. Päivitetty {sinceUpdate}s sitten.',
 }
 
 type MessageKey = keyof typeof en
@@ -167,15 +171,15 @@ type StatsParams = {
   sinceUpdate: string
 }
 
-const statsFormatters: Record<string, (p: StatsParams) => string> = {
-  en: (p) =>
-    `Generated ${p.formulas} formulas (${p.rate}/s), ${p.tautologies} tautologies, ${p.solved} solved. Updated ${p.sinceUpdate}s ago.`,
-  fi: (p) =>
-    `Tuotettu ${p.formulas} kaavaa (${p.rate}/s), ${p.tautologies} tautologiaa, ${p.solved} ratkaisua. Päivitetty ${p.sinceUpdate}s sitten.`,
-}
-
 export const formatStats = (p: StatsParams): string => {
-  const fmt = statsFormatters[locale] ?? statsFormatters['en']
-  if (!fmt) return ''
-  return fmt(p)
+  const values: Record<string, string | number> = {
+    formulas: p.formulas,
+    rate: p.rate,
+    tautologies: p.tautologies,
+    solved: p.solved,
+    sinceUpdate: p.sinceUpdate,
+  }
+  return t('statsTemplate').replace(/\{(\w+)\}/g, (_, key) =>
+    String(values[key] ?? `{${key}}`),
+  )
 }

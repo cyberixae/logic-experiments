@@ -82,3 +82,4 @@ The utilities in `src/utils/` exist to give standard TypeScript/JavaScript opera
 - Strict TypeScript; all types use discriminated unions with type guards/refinements
 - No semicolons, single quotes (Prettier config)
 - Output goes to `lib/` (tsc) and `dist/` (esbuild)
+- Every user-facing string lives in `src/web/i18n.ts` and is retrieved via `t(key)`. For templated strings (embedded numbers, names), use `{placeholder}` tokens in the translation and substitute at the call site — do not define per-locale formatter functions that bypass the `Record<MessageKey, string>` contract.
