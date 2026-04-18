@@ -437,13 +437,25 @@ const createRuleCard = (
         : 'center'
   pre.dataset['group'] = group
   if (interactive && !disabled) pre.onclick = () => onApply(key)
-  const compact = window.matchMedia('(max-width: 600px)').matches
-  pre.innerHTML = fromDerivation(
+  const withLabel = fromDerivation(
     rule.example,
     t('sideLeft'),
     t('sideRight'),
-    !compact,
+    true,
   )
+  const withoutLabel = fromDerivation(
+    rule.example,
+    t('sideLeft'),
+    t('sideRight'),
+    false,
+  )
+  pre.innerHTML =
+    '<span class="rule-label long">' +
+    withLabel +
+    '</span>' +
+    '<span class="rule-label short">' +
+    withoutLabel +
+    '</span>'
   const action = ruleAction[key]
   const hint = action !== undefined ? getActionHint(action) : undefined
   const ruleHintVariant = panelClass === 'main' ? 'base' : 'hot'

@@ -395,6 +395,9 @@ html.loading body {
 .button-label.short {
   display: none;
 }
+.rule-label.short {
+  display: none;
+}
 .shroud {
   position: absolute;
   top: 0;
@@ -865,6 +868,12 @@ html.loading body {
     display: none;
   }
   .button-label.short {
+    display: inline;
+  }
+  .rule-label.long {
+    display: none;
+  }
+  .rule-label.short {
     display: inline;
   }
 
