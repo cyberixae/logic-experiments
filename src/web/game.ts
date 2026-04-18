@@ -38,6 +38,7 @@ import { Action } from '../interactive/action'
 import { computeGhostChain, GhostStep } from '../interactive/ghost'
 import { Navigate } from './types'
 import { t } from './i18n'
+import { createLangSwitcher } from './lang-switcher'
 import { entries, keys } from '../utils/record'
 import { isNonNullable } from '../utils/utils'
 import {
@@ -976,6 +977,7 @@ export const createPausePopup = (
   )
   panel.appendChild(buttons)
   shroud.appendChild(panel)
+  shroud.appendChild(createLangSwitcher())
   return shroud
 }
 

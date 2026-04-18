@@ -318,6 +318,64 @@ html.loading body {
   top: 0.4em;
   right: 1em;
 }
+.lang-switcher {
+  position: fixed;
+  top: 0.6em;
+  right: 1em;
+  z-index: 30;
+  color: #000;
+  user-select: none;
+  font-size: 1.1em;
+}
+.lang-switcher-button {
+  cursor: pointer;
+  padding: 0.7em 1.2em;
+  background-color: #fffc;
+  border: 2px solid #000;
+  border-radius: 10px;
+  min-width: 10em;
+  box-sizing: border-box;
+  white-space: nowrap;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5em;
+}
+.lang-switcher-button:hover {
+  background-color: #fff;
+}
+.lang-switcher-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 0.4em;
+  padding: 0 0 0.8em 0;
+  background-color: #fff;
+  border: 2px solid #000;
+  border-radius: 10px;
+  min-width: 100%;
+  box-sizing: border-box;
+  white-space: nowrap;
+  overflow: hidden;
+}
+.lang-switcher-menu[hidden] {
+  display: none;
+}
+.lang-switcher-item {
+  cursor: pointer;
+  padding: 0.7em 1.4em;
+}
+.lang-switcher-item:hover {
+  background-color: #ffeedd;
+}
+.lang-switcher-item.active {
+  font-weight: bold;
+}
+.lang-switcher-menu hr {
+  margin: 0;
+  border: none;
+  border-top: 1px solid #0003;
+}
 .congrabuttons {
   display: flex;
   gap: 1em;
@@ -446,7 +504,9 @@ html.loading body {
 .config-title {
   font-size: 2em;
   font-weight: bold;
-  text-align: center;
+  text-align: left;
+  align-self: stretch;
+  padding-left: 0.5em;
 }
 .config-columns {
   display: flex;

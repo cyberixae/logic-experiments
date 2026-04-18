@@ -107,12 +107,53 @@ const detectLocale = (): string => {
   return lang in messages ? lang : 'en'
 }
 
-let locale = detectLocale()
+const systemLocale = detectLocale()
+let locale = systemLocale
 
 export const setLocale = (raw: string | null): void => {
   if (raw === null || raw === '') return
   const normalized = raw.replace(/_/g, '-').split('-')[0]?.toLowerCase()
   if (normalized !== undefined && normalized in messages) locale = normalized
+}
+
+export const getLocale = (): string => locale
+
+export const getSystemLocale = (): string => systemLocale
+
+export const availableLocales: ReadonlyArray<string> = Object.keys(messages)
+
+const endonyms: Record<string, string> = {
+  en: 'English',
+  fi: 'Suomi',
+}
+
+export const endonymOf = (code: string): string => endonyms[code] ?? code
+
+let rerenderHook: () => void = () => {}
+
+export const onLocaleChange = (hook: () => void): void => {
+  rerenderHook = hook
+}
+
+export const changeLanguage = (raw: string): void => {
+  setLocale(raw)
+  const params = new URLSearchParams(window.location.search)
+  params.set('lang', locale)
+  history.replaceState(history.state, '', `?${params.toString()}`)
+  rerenderHook()
+}
+
+export const clearLangOverride = (): void => {
+  locale = systemLocale
+  const params = new URLSearchParams(window.location.search)
+  params.delete('lang')
+  const qs = params.toString()
+  history.replaceState(
+    history.state,
+    '',
+    qs ? `?${qs}` : window.location.pathname,
+  )
+  rerenderHook()
 }
 
 export const t = (key: MessageKey): string =>

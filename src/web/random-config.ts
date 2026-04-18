@@ -60,6 +60,7 @@ export const serializeConfigForUrl = (config: RandomConfig): string =>
   JSON.stringify(config)
 import { MountResult, Navigate } from './types'
 import { t, formatStats } from './i18n'
+import { createLangSwitcher } from './lang-switcher'
 import * as prop from '../model/prop'
 import { fromProp, fromAtom, basic } from '../render/print'
 import { html } from '../render/segment'
@@ -355,6 +356,8 @@ export const mountRandomConfig = (
 
     const layout = document.createElement('div')
     layout.className = 'random-config'
+
+    layout.appendChild(createLangSwitcher())
 
     const title = document.createElement('div')
     title.className = 'config-title'

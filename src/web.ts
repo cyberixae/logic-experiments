@@ -14,7 +14,7 @@ import {
   serializeConfigForUrl,
 } from './web/random-config'
 import { setGazeModeActive } from './web/game'
-import { setLocale } from './web/i18n'
+import { onLocaleChange, setLocale } from './web/i18n'
 import { ChallengePool } from './web/challenge-pool'
 import { plain } from './render/segment'
 import { includes } from './utils/array'
@@ -138,6 +138,7 @@ Object.assign(window, { cmd })
 const init = () => {
   const params = new URLSearchParams(window.location.search)
   setLocale(params.get('lang'))
+  onLocaleChange(() => current.rerender())
   const mode = params.get('mode')
 
   if (mode === 'campaign' || mode === 'random') {
