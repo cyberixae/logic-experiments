@@ -140,7 +140,7 @@ const keyHintBadge = (
 }
 
 export const createButton = (
-  label: string,
+  label: string | { long: string; short: string },
   disabled: boolean,
   onClick?: () => void,
   hint?: string,
@@ -151,12 +151,25 @@ export const createButton = (
   if (!disabled && onClick) el.onclick = onClick
   if (hint !== undefined) {
     el.appendChild(keyHintBadge(hint, hintVariant))
-    const labelSpan = document.createElement('span')
-    labelSpan.setAttribute('class', 'button-label')
-    labelSpan.textContent = ' ' + label
-    el.appendChild(labelSpan)
+  }
+  if (typeof label === 'string') {
+    if (hint !== undefined) {
+      const labelSpan = document.createElement('span')
+      labelSpan.setAttribute('class', 'button-label')
+      labelSpan.textContent = ' ' + label
+      el.appendChild(labelSpan)
+    } else {
+      el.innerHTML = label
+    }
   } else {
-    el.innerHTML = label
+    const longSpan = document.createElement('span')
+    longSpan.setAttribute('class', 'button-label long')
+    longSpan.textContent = (hint !== undefined ? ' ' : '') + label.long
+    el.appendChild(longSpan)
+    const shortSpan = document.createElement('span')
+    shortSpan.setAttribute('class', 'button-label short')
+    shortSpan.textContent = (hint !== undefined ? ' ' : '') + label.short
+    el.appendChild(shortSpan)
   }
   return el
 }

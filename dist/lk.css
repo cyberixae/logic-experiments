@@ -391,6 +391,9 @@ html.loading body {
   top: 8px;
   left: -15px;
 }
+.button-label.short {
+  display: none;
+}
 .shroud {
   position: absolute;
   top: 0;
@@ -855,6 +858,12 @@ html.loading body {
   }
   .congrabuttons .button .button-label {
     margin-left: -0.5em;
+  }
+  .button-label.long {
+    display: none;
+  }
+  .button-label.short {
+    display: inline;
   }
 
   /* Remove hint space from gaze button labels */
