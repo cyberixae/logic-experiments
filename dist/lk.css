@@ -941,6 +941,11 @@ html.loading body {
   .keyboard-detected .key-hint {
     display: inline-block;
   }
+  /* Gaze hints stay visible even without a physical keyboard: the arrow */
+  /* glyph matches the on-screen gaze direction buttons. */
+  .gaze-hint-stack .key-hint {
+    display: inline-block;
+  }
 
   /* Subtask 3: Responsive controls bar */
   .controls {
