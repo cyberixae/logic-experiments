@@ -405,12 +405,16 @@ const createRuleCard = (
   onApply: (key: RuleId) => void,
   gazeHints: GazeHintInfo,
   panelClass: string,
+  interactive: boolean,
 ): HTMLElement => {
   const isPinned = pinned.includes(key)
   const pre = document.createElement('pre')
   pre.setAttribute(
     'class',
-    'rule button' + (disabled ? ' disabled' : '') + (isPinned ? ' pinned' : ''),
+    'rule ' +
+      (interactive ? 'button' : 'hint') +
+      (disabled ? ' disabled' : '') +
+      (isPinned ? ' pinned' : ''),
   )
   pre.dataset['rule'] = key
   const group =
@@ -420,7 +424,7 @@ const createRuleCard = (
         ? 'logical'
         : 'center'
   pre.dataset['group'] = group
-  if (!disabled) pre.onclick = () => onApply(key)
+  if (interactive && !disabled) pre.onclick = () => onApply(key)
   const compact = window.matchMedia('(max-width: 600px)').matches
   pre.innerHTML = fromDerivation(
     rule.example,
@@ -462,6 +466,7 @@ const createPanel = <K extends RuleId>(
   entries(ruleRecord).forEach(([key, rule]) => {
     if (!rules.includes(key)) return
     const disabled = solved || !ls.includes(key)
+    const interactive = !(pinned.includes(key) && hideRules)
     panel.appendChild(
       createRuleCard(
         key,
@@ -472,6 +477,7 @@ const createPanel = <K extends RuleId>(
         onApply,
         gazeHints,
         className,
+        interactive,
       ),
     )
   })
@@ -639,6 +645,7 @@ export const createBench = (
     entries(center).forEach(([key, rule]) => {
       if (!rules.includes(key)) return
       const disabled = solved || !ls.includes(key)
+      const interactive = !(pinned.includes(key) && hideRules)
       const card = createRuleCard(
         key,
         rule,
@@ -648,6 +655,7 @@ export const createBench = (
         applyCenter,
         gazeHints,
         'main',
+        interactive,
       )
       sheetCenter.appendChild(card)
     })
@@ -660,6 +668,7 @@ export const createBench = (
   entries(left).forEach(([key, rule]) => {
     if (!rules.includes(key)) return
     const disabled = inactive || !ls.includes(key)
+    const interactive = !(pinned.includes(key) && hideRules)
     const card = createRuleCard(
       key,
       rule,
@@ -669,6 +678,7 @@ export const createBench = (
       apply,
       gazeHints,
       'left',
+      interactive,
     )
     leftCol.appendChild(card)
   })
@@ -677,6 +687,7 @@ export const createBench = (
   entries(right).forEach(([key, rule]) => {
     if (!rules.includes(key)) return
     const disabled = inactive || !ls.includes(key)
+    const interactive = !(pinned.includes(key) && hideRules)
     const card = createRuleCard(
       key,
       rule,
@@ -686,6 +697,7 @@ export const createBench = (
       apply,
       gazeHints,
       'right',
+      interactive,
     )
     rightCol.appendChild(card)
   })
@@ -907,6 +919,7 @@ export const createBench = (
         onApplyPinned,
         gazeHints,
         panelClass,
+        !hideRules,
       )
       pinnedStrip.appendChild(card)
     }

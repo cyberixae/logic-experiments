@@ -277,6 +277,21 @@ html.loading body {
   cursor: default;
   opacity: 0.5;
 }
+.rule.hint {
+  user-select: none;
+  cursor: default;
+  background-color: #d4b896;
+  border: 3px solid #8a6f4a;
+  border-radius: 6px;
+  display: inline-block;
+  text-align: center;
+  font-size: 1.2em;
+  padding: 0.6em;
+  text-wrap: nowrap;
+  margin: 0;
+  color: #3a2a14;
+  box-shadow: 1px 1px 0 rgba(80, 50, 20, 0.25);
+}
 .button.toggle {
   position: relative;
 }
