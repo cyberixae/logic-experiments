@@ -178,14 +178,13 @@ let rulesVisible = false
 
 export const setDefaultRulesVisible = (visible: boolean): void => {
   rulesVisible = visible
-  treeZoom = BASE_ZOOM
+  treeZoom = 1
   autoZoomedDerivation = null
 }
 
 const isCompact = (): boolean => window.matchMedia('(max-width: 600px)').matches
-const BASE_ZOOM = isCompact() ? 0.6 : 1
 
-let treeZoom = BASE_ZOOM
+let treeZoom = 1
 const ZOOM_MIN = 0.4
 const ZOOM_MAX = 2
 const ZOOM_STEP = 0.2
@@ -195,12 +194,12 @@ export const zoomTreeOut = (): void => {
   treeZoom = Math.max(ZOOM_MIN, treeZoom - ZOOM_STEP)
 }
 export const zoomTreeReset = (): void => {
-  treeZoom = BASE_ZOOM
+  treeZoom = 1
 }
 export const zoomTreeIn = (): void => {
   treeZoom = Math.min(ZOOM_MAX, treeZoom + ZOOM_STEP)
 }
-const AUTO_ZOOM_MAX = isCompact() ? 0.6 : 1.2
+const AUTO_ZOOM_MAX = 1.2
 const AUTO_ZOOM_PAD = 0.9
 
 const CHECK_STEP_MS = 120

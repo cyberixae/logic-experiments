@@ -100,6 +100,7 @@ html.loading body {
   padding-right: 1em;
 }
 .playarea {
+  --base-tree-zoom: 1;
   grid-column: 1 / -1;
   grid-row: 1 / 3;
   display: flex;
@@ -735,7 +736,7 @@ html.loading body {
 }
 .playarea > .tree-node {
   padding-bottom: 1.5em;
-  font-size: calc(2em * var(--tree-zoom, 1));
+  font-size: calc(2em * var(--base-tree-zoom, 1) * var(--tree-zoom, 1));
 }
 .tree-active > .tree-sequent {
   background-color: #fcaa;
@@ -805,6 +806,7 @@ html.loading body {
   }
   /* Subtask 2: Shrink playarea padding & masks */
   .playarea {
+    --base-tree-zoom: 0.6;
     padding: 8em 1em 10em 1em;
     scroll-padding: 8em 1em 10em 1em;
     mask-image: linear-gradient(
