@@ -14,6 +14,7 @@ import {
   serializeConfigForUrl,
 } from './web/random-config'
 import { setGazeModeActive } from './web/game'
+import { setLocale } from './web/i18n'
 import { ChallengePool } from './web/challenge-pool'
 import { plain } from './render/segment'
 import { includes } from './utils/array'
@@ -49,14 +50,18 @@ const navigate = (screen: Screen) => {
     enterMode(screen)
   }
   currentScreen = screen
+  const currentParams = new URLSearchParams(window.location.search)
+  const lang = currentParams.get('lang')
+  const nextParams = new URLSearchParams()
+  if (lang !== null) nextParams.set('lang', lang)
   let url: string
   if (screen === 'menu') {
-    url = window.location.pathname
+    const qs = nextParams.toString()
+    url = qs ? `?${qs}` : window.location.pathname
   } else {
-    const nextParams = new URLSearchParams()
     nextParams.set('mode', screen)
     if (screen === 'random' || screen === 'random-config') {
-      const existing = new URLSearchParams(window.location.search).get('config')
+      const existing = currentParams.get('config')
       if (existing !== null) nextParams.set('config', existing)
     }
     url = `?${nextParams.toString()}`
@@ -91,6 +96,8 @@ const mount = (screen: Screen) => {
         currentScreen = 'random'
         enterMode('random')
         const params = new URLSearchParams()
+        const lang = new URLSearchParams(window.location.search).get('lang')
+        if (lang !== null) params.set('lang', lang)
         params.set('mode', 'random')
         params.set('config', serializeConfigForUrl(config))
         history.pushState({ screen: 'random' }, '', `?${params.toString()}`)
@@ -106,10 +113,16 @@ const syncScreen = () => {
   current.cleanup()
   if (expected === 'menu') setGazeModeActive(false)
   currentScreen = expected
+  const lang = new URLSearchParams(window.location.search).get('lang')
+  const langSuffix = lang !== null ? `&lang=${encodeURIComponent(lang)}` : ''
+  const menuUrl =
+    lang !== null
+      ? `${window.location.pathname}?lang=${encodeURIComponent(lang)}`
+      : window.location.pathname
   history.pushState(
     { screen: expected },
     '',
-    expected === 'menu' ? window.location.pathname : `?mode=${expected}`,
+    expected === 'menu' ? menuUrl : `?mode=${expected}${langSuffix}`,
   )
   mount(expected)
 }
@@ -124,6 +137,7 @@ Object.assign(window, { cmd })
 
 const init = () => {
   const params = new URLSearchParams(window.location.search)
+  setLocale(params.get('lang'))
   const mode = params.get('mode')
 
   if (mode === 'campaign' || mode === 'random') {

@@ -107,7 +107,13 @@ const detectLocale = (): string => {
   return lang in messages ? lang : 'en'
 }
 
-const locale = detectLocale()
+let locale = detectLocale()
+
+export const setLocale = (raw: string | null): void => {
+  if (raw === null || raw === '') return
+  const normalized = raw.replace(/_/g, '-').split('-')[0]?.toLowerCase()
+  if (normalized !== undefined && normalized in messages) locale = normalized
+}
 
 export const t = (key: MessageKey): string =>
   (messages[locale] ?? en)[key] ?? en[key]
