@@ -23,6 +23,8 @@ import type { AnyFCut } from '../rules/fcut'
 import type { AnyFDL } from '../rules/fdl'
 import type { AnyFIL } from '../rules/fil'
 import type { AnyI } from '../rules/i'
+import type { AnyTSRotB } from '../rules/tsrotb'
+import type { AnyTSRotF } from '../rules/tsrotf'
 import type { AnyTSW } from '../rules/tsw'
 import type { AnyTSWA } from '../rules/tswa'
 import type { AnyTSWBA } from '../rules/tswba'
@@ -87,6 +89,8 @@ export type RuleId =
   | 'sxr'
   | 'tc'
   | 'td'
+  | 'tsrotb'
+  | 'tsrotf'
   | 'tsw'
   | 'tswa'
   | 'tswba'
@@ -135,6 +139,8 @@ export const ruleId: {
   sxr: 'sxr',
   tc: 'tc',
   td: 'td',
+  tsrotb: 'tsrotb',
+  tsrotf: 'tsrotf',
   tsw: 'tsw',
   tswa: 'tswa',
   tswba: 'tswba',
@@ -186,6 +192,8 @@ export type AnyRule =
   | AnySXR
   | AnyTC
   | AnyTD
+  | AnyTSRotB
+  | AnyTSRotF
   | AnyTSW
   | AnyTSWA
   | AnyTSWBA
@@ -233,6 +241,8 @@ export type MatchRuleRaw<R> = {
   sxr: (t: AnySXR) => R
   tc: (t: AnyTC) => R
   td: (t: AnyTD) => R
+  tsrotb: (t: AnyTSRotB) => R
+  tsrotf: (t: AnyTSRotF) => R
   tsw: (t: AnyTSW) => R
   tswa: (t: AnyTSWA) => R
   tswba: (t: AnyTSWBA) => R
@@ -321,6 +331,10 @@ export const matchRuleRaw = <R>(
       return f.tc(u)
     case 'td':
       return f.td(u)
+    case 'tsrotb':
+      return f.tsrotb(u)
+    case 'tsrotf':
+      return f.tsrotf(u)
     case 'tsw':
       return f.tsw(u)
     case 'tswa':

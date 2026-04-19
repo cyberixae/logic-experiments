@@ -23,7 +23,7 @@ const findConnectiveRule = (
 ): keyof typeof reverseLogic0 | null => {
   const candidates: ReadonlyArray<keyof typeof reverseLogic0> =
     side === 'left'
-      ? (['nl', 'cl', 'cl1', 'cl2', 'dl', 'il'] as const)
+      ? (['nl', 'cl', 'cl1', 'cl2', 'dl', 'il', 'tc', 'td'] as const)
       : (['nr', 'dr', 'dr1', 'dr2', 'cr', 'ir'] as const)
   for (const id of candidates) {
     if (!available.has(id)) continue
@@ -38,8 +38,16 @@ const stepRotation = (
   available: ReadonlySet<RuleId>,
 ): { id: RuleId; next: AnySequent } | null => {
   const rule =
-    side === 'left' ? reverseStructure0.sRotLB : reverseStructure0.sRotRB
-  if (!available.has(rule.id)) return null
+    side === 'left'
+      ? available.has('sRotLB')
+        ? reverseStructure0.sRotLB
+        : available.has('tsrotb')
+          ? reverseStructure0.tsrotb
+          : null
+      : available.has('sRotRB')
+        ? reverseStructure0.sRotRB
+        : null
+  if (!rule) return null
   const t = rule.tryReverse(premise(seq))
   if (!t || t.kind !== 'transformation') return null
   const dep = t.deps[0]
@@ -54,13 +62,30 @@ const stepFinal = (
   available: ReadonlySet<RuleId>,
 ): { id: RuleId; nexts: AnySequent[] } | null => {
   if (kind === 'weakening') {
-    const rule = side === 'left' ? reverseStructure0.swl : reverseStructure0.swr
-    if (!available.has(rule.id)) return null
-    const t = rule.tryReverse(premise(seq))
-    if (!t || t.kind !== 'transformation') return null
-    const nexts = t.deps.map((d) => d.result)
-    if (nexts.length === 0) return null
-    return { id: rule.id, nexts }
+    const leftCandidates: ReadonlyArray<keyof typeof reverseStructure0> = [
+      'swl',
+      'tsw',
+      'tswba',
+      'tswa',
+      'tswp',
+      'tswq',
+      'tswpp',
+      'tswpq',
+      'tswqp',
+      'tswqq',
+    ]
+    const candidates =
+      side === 'left' ? leftCandidates : (['swr'] as const)
+    for (const id of candidates) {
+      const rule = reverseStructure0[id]
+      if (!rule || !available.has(rule.id)) continue
+      const t = rule.tryReverse(premise(seq))
+      if (!t || t.kind !== 'transformation') continue
+      const nexts = t.deps.map((d) => d.result)
+      if (nexts.length === 0) continue
+      return { id: rule.id, nexts }
+    }
+    return null
   }
   const id = findConnectiveRule(seq, side, available)
   if (!id) return null

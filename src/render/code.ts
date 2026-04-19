@@ -122,6 +122,8 @@ export function fromTransformation(t: AnyTransformation): string {
     fdl: () => `z.fdl(${d.join(',')})`,
     fil: () => `z.fil(${d.join(',')})`,
     mp: () => `z.mp(${d.join(',')})`,
+    tsrotf: () => `ttr.tsrotf(${d.join(',')})`,
+    tsrotb: () => `ttr.tsrotb(${d.join(',')})`,
     tsw: ({ result }) =>
       `ttr.tsw(${fromProp(tuple.last(result.antecedent))},${d.join(',')})`,
     tswa: ({ result }) =>

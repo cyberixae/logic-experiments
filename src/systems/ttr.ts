@@ -1,5 +1,7 @@
 import { Atom, atom } from '../model/prop'
 import { ruleV } from '../rules/v'
+import { ruleTSRotB } from '../rules/tsrotb'
+import { ruleTSRotF } from '../rules/tsrotf'
 import { ruleTSW } from '../rules/tsw'
 import { ruleTSWA } from '../rules/tswa'
 import { ruleTSWBA } from '../rules/tswba'
@@ -23,6 +25,8 @@ const iota = {
 }
 
 const zeta = {
+  tsrotf: ruleTSRotF.apply,
+  tsrotb: ruleTSRotB.apply,
   tsw: ruleTSW.apply,
   tswa: ruleTSWA.apply,
   tswba: ruleTSWBA.apply,
@@ -38,6 +42,8 @@ const zeta = {
 
 export const rules = [
   'v',
+  'tsrotf',
+  'tsrotb',
   'tsw',
   'tswa',
   'tswba',

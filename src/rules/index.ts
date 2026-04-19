@@ -42,6 +42,8 @@ import { ruleSWR } from './swr'
 import { ruleSXL } from './sxl'
 import { ruleSXR } from './sxr'
 import { ruleV } from './v'
+import { ruleTSRotB } from './tsrotb'
+import { ruleTSRotF } from './tsrotf'
 import { ruleTSW } from './tsw'
 import { ruleTSWA } from './tswa'
 import { ruleTSWBA } from './tswba'
@@ -92,6 +94,8 @@ export const rules: {
   sxr: ruleSXR,
   tc: ruleTC,
   td: ruleTD,
+  tsrotb: ruleTSRotB,
+  tsrotf: ruleTSRotF,
   tsw: ruleTSW,
   tswa: ruleTSWA,
   tswba: ruleTSWBA,
@@ -148,6 +152,8 @@ export const reverseStructure0 = {
   sRotRB: ruleSRotRB,
   sxl: ruleSXL,
   sxr: ruleSXR,
+  tsrotb: ruleTSRotB,
+  tsrotf: ruleTSRotF,
   tsw: ruleTSW,
   tswa: ruleTSWA,
   tswba: ruleTSWBA,
@@ -217,6 +223,8 @@ export const leftStructural = {
   sRotLB: ruleSRotLB,
   sRotLF: ruleSRotLF,
   sxl: ruleSXL,
+  tsrotb: ruleTSRotB,
+  tsrotf: ruleTSRotF,
   tsw: ruleTSW,
   tswa: ruleTSWA,
   tswba: ruleTSWBA,
@@ -287,6 +295,8 @@ export const ruleCategory: { [K in RuleId]: RuleCategory } = {
   i: 'axiom',
   tc: 'logical',
   td: 'logical',
+  tsrotb: 'structural',
+  tsrotf: 'structural',
   tsw: 'structural',
   tswa: 'structural',
   tswba: 'structural',

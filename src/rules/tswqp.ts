@@ -26,15 +26,16 @@ export const isTSWQPResult: Refinement<AnySequent, TSWQPResult> = (
 export const isTSWQPResultDerivation = refineDerivation(isTSWQPResult)
 export type TSWQPDeps = [Derivation<Sequent<[Atom<'q'>], [Verum]>>]
 export type TSWQP = Transformation<TSWQPResult, TSWQPDeps, 'tswqp'>
-export const tswqp = <R extends TSWQPResult>(
+export const tswqp = <R extends TSWQPResult, D extends TSWQPDeps>(
   result: R,
-  deps: TSWQPDeps,
-): Transformation<R, TSWQPDeps, 'tswqp'> => transformation(result, deps, 'tswqp')
-export const applyTSWQP = (
-  dep: Derivation<Sequent<[Atom<'q'>], [Verum]>>,
-): TSWQP => {
+  deps: D,
+): Transformation<R, D, 'tswqp'> => transformation(result, deps, 'tswqp')
+export const applyTSWQP = <D extends TSWQPDeps>(
+  ...deps: D & TSWQPDeps
+): Transformation<TSWQPResult, D, 'tswqp'> => {
+  const [dep] = deps
   const δ = dep.result.succedent
-  return tswqp(sequent([qAtom, pAtom], δ), [dep])
+  return tswqp(sequent([qAtom, pAtom], δ), deps)
 }
 export const reverseTSWQP = <R extends TSWQPResult>(
   p: Derivation<R>,

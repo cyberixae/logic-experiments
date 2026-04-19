@@ -347,6 +347,8 @@ export function fromRuleId(s: rule.RuleId, l = 'L', r = 'R'): Printer {
         fdl: () => t.disjunction.join(empty) + left(l, 'ᶠ'),
         fil: () => t.implication.join(empty) + left(l, 'ᶠ'),
         mp: () => 'mp',
+        tsrotf: () => '\u21B6',
+        tsrotb: () => '\u21b7',
         tsw: () => 'W',
         tswa: () => 'Wᴬ',
         tswba: () => 'Wᴮᴬ',

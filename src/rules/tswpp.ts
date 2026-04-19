@@ -25,15 +25,16 @@ export const isTSWPPResult: Refinement<AnySequent, TSWPPResult> = (
 export const isTSWPPResultDerivation = refineDerivation(isTSWPPResult)
 export type TSWPPDeps = [Derivation<Sequent<[Atom<'p'>], [Verum]>>]
 export type TSWPP = Transformation<TSWPPResult, TSWPPDeps, 'tswpp'>
-export const tswpp = <R extends TSWPPResult>(
+export const tswpp = <R extends TSWPPResult, D extends TSWPPDeps>(
   result: R,
-  deps: TSWPPDeps,
-): Transformation<R, TSWPPDeps, 'tswpp'> => transformation(result, deps, 'tswpp')
-export const applyTSWPP = (
-  dep: Derivation<Sequent<[Atom<'p'>], [Verum]>>,
-): TSWPP => {
+  deps: D,
+): Transformation<R, D, 'tswpp'> => transformation(result, deps, 'tswpp')
+export const applyTSWPP = <D extends TSWPPDeps>(
+  ...deps: D & TSWPPDeps
+): Transformation<TSWPPResult, D, 'tswpp'> => {
+  const [dep] = deps
   const δ = dep.result.succedent
-  return tswpp(sequent([pAtom, pAtom], δ), [dep])
+  return tswpp(sequent([pAtom, pAtom], δ), deps)
 }
 export const reverseTSWPP = <R extends TSWPPResult>(
   p: Derivation<R>,

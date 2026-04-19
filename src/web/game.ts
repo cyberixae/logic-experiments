@@ -1197,42 +1197,16 @@ const applyGazeRule = (
   const available = workspace.availableRules()
   const chain = computeGhostChain(seq, gaze, kind, available)
   if (!chain || chain.length === 0) return
-  const ant = seq.antecedent.length
-  const suc = seq.succedent.length
-  if (gaze.side === 'left') {
-    if (ant === 0) return
-    const activeIndex = ant - 1
-    if (gaze.index === activeIndex) {
-      if (kind === 'connective') {
-        autoRule(workspace, keys(leftLogical))
-      } else {
-        if (!available.includes('swl')) return
-        workspace.applyEvent(reverse0('swl'))
-      }
-      return
-    }
-    if (!available.includes('sRotLB')) return
-    workspace.applyEventWithGaze(reverse0('sRotLB'), {
-      side: 'left',
-      index: gaze.index + 1,
-    })
+  const step = chain[0]
+  if (!step || !isReverseId0(step.rule)) return
+  if (chain.length > 1) {
+    const nextGaze =
+      gaze.side === 'left'
+        ? { side: 'left' as const, index: gaze.index + 1 }
+        : { side: 'right' as const, index: gaze.index - 1 }
+    workspace.applyEventWithGaze(reverse0(step.rule), nextGaze)
   } else {
-    if (suc === 0) return
-    const activeIndex = 0
-    if (gaze.index === activeIndex) {
-      if (kind === 'connective') {
-        autoRule(workspace, keys(rightLogical))
-      } else {
-        if (!available.includes('swr')) return
-        workspace.applyEvent(reverse0('swr'))
-      }
-      return
-    }
-    if (!available.includes('sRotRB')) return
-    workspace.applyEventWithGaze(reverse0('sRotRB'), {
-      side: 'right',
-      index: gaze.index - 1,
-    })
+    workspace.applyEvent(reverse0(step.rule))
   }
 }
 

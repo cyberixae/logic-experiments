@@ -24,13 +24,16 @@ export const isTSWQResult: Refinement<AnySequent, TSWQResult> = (
 export const isTSWQResultDerivation = refineDerivation(isTSWQResult)
 export type TSWQDeps = [Derivation<Sequent<[], [Verum]>>]
 export type TSWQ = Transformation<TSWQResult, TSWQDeps, 'tswq'>
-export const tswq = <R extends TSWQResult>(
+export const tswq = <R extends TSWQResult, D extends TSWQDeps>(
   result: R,
-  deps: TSWQDeps,
-): Transformation<R, TSWQDeps, 'tswq'> => transformation(result, deps, 'tswq')
-export const applyTSWQ = (dep: Derivation<Sequent<[], [Verum]>>): TSWQ => {
+  deps: D,
+): Transformation<R, D, 'tswq'> => transformation(result, deps, 'tswq')
+export const applyTSWQ = <D extends TSWQDeps>(
+  ...deps: D & TSWQDeps
+): Transformation<TSWQResult, D, 'tswq'> => {
+  const [dep] = deps
   const δ = dep.result.succedent
-  return tswq(sequent([qAtom], δ), [dep])
+  return tswq(sequent([qAtom], δ), deps)
 }
 export const reverseTSWQ = <R extends TSWQResult>(
   p: Derivation<R>,

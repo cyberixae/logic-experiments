@@ -24,13 +24,16 @@ export const isTSWPResult: Refinement<AnySequent, TSWPResult> = (
 export const isTSWPResultDerivation = refineDerivation(isTSWPResult)
 export type TSWPDeps = [Derivation<Sequent<[], [Verum]>>]
 export type TSWP = Transformation<TSWPResult, TSWPDeps, 'tswp'>
-export const tswp = <R extends TSWPResult>(
+export const tswp = <R extends TSWPResult, D extends TSWPDeps>(
   result: R,
-  deps: TSWPDeps,
-): Transformation<R, TSWPDeps, 'tswp'> => transformation(result, deps, 'tswp')
-export const applyTSWP = (dep: Derivation<Sequent<[], [Verum]>>): TSWP => {
+  deps: D,
+): Transformation<R, D, 'tswp'> => transformation(result, deps, 'tswp')
+export const applyTSWP = <D extends TSWPDeps>(
+  ...deps: D & TSWPDeps
+): Transformation<TSWPResult, D, 'tswp'> => {
+  const [dep] = deps
   const δ = dep.result.succedent
-  return tswp(sequent([pAtom], δ), [dep])
+  return tswp(sequent([pAtom], δ), deps)
 }
 export const reverseTSWP = <R extends TSWPResult>(
   p: Derivation<R>,
