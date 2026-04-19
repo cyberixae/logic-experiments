@@ -15,11 +15,15 @@ export const createLangSwitcher = (): HTMLElement => {
 
   const button = document.createElement('div')
   button.className = 'lang-switcher-button'
-  const label = document.createElement('span')
-  label.textContent = `\u{1F310} ${endonymOf(current)}`
+  const globe = document.createElement('span')
+  globe.textContent = '\u{1F310}'
+  const name = document.createElement('span')
+  name.className = 'lang-switcher-name'
+  name.textContent = endonymOf(current)
   const chevron = document.createElement('span')
   chevron.textContent = '\u25BE'
-  button.appendChild(label)
+  button.appendChild(globe)
+  button.appendChild(name)
   button.appendChild(chevron)
 
   const menu = document.createElement('div')

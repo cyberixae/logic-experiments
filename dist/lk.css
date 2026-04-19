@@ -867,6 +867,15 @@ html.loading body {
   .button-label.long {
     display: none;
   }
+  .lang-switcher-name {
+    display: none;
+  }
+  .lang-switcher-button {
+    min-width: unset;
+  }
+  .lang-switcher-menu {
+    min-width: 10em;
+  }
   .button-label.short {
     display: inline;
   }
