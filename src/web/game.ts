@@ -1104,7 +1104,6 @@ export const createDispatch =
       return
     }
     if (action === 'toggleRules') {
-      const ws = getWorkspace()
       rulesVisible = !rulesVisible
       rerender()
       return
