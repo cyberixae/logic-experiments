@@ -11,7 +11,10 @@ const challengesDir = path.join(__dirname, '../src/challenges')
 const fileMap = {}
 for (const f of fs.readdirSync(challengesDir)) {
   if (!f.endsWith('.ts') || f === 'index.ts' || f === 'ttr.ts') continue
-  const key = f.replace('.ts', '').replace(/-/g, '').toLowerCase()
+  const content = fs.readFileSync(path.join(challengesDir, f), 'utf8')
+  const match = content.match(/export const (\w+)\s*=/)
+  if (!match) continue
+  const key = match[1].replace(/_/g, '').toLowerCase()
   fileMap[key] = path.join(challengesDir, f)
 }
 
@@ -33,9 +36,9 @@ for (const [name, challenge] of Object.entries(allChallenges)) {
   }
 
   const [optimal] = found
-  if (equalsDerivation(solution, optimal)) continue
+  if (solution !== null && equalsDerivation(solution, optimal)) continue
 
-  const file = fileMap[name.toLowerCase()]
+  const file = fileMap[name.replace(/-/g, '').toLowerCase()]
   if (!file) {
     console.log(`${name}: source file not found`)
     missing += 1
