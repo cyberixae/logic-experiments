@@ -23,8 +23,17 @@ import type { AnyFCut } from '../rules/fcut'
 import type { AnyFDL } from '../rules/fdl'
 import type { AnyFIL } from '../rules/fil'
 import type { AnyI } from '../rules/i'
-import type { AnyTip } from '../rules/tip'
-import type { AnyTiq } from '../rules/tiq'
+import type { AnyTSW } from '../rules/tsw'
+import type { AnyTSWA } from '../rules/tswa'
+import type { AnyTSWBA } from '../rules/tswba'
+import type { AnyTSWP } from '../rules/tswp'
+import type { AnyTSWQ } from '../rules/tswq'
+import type { AnyTSWPP } from '../rules/tswpp'
+import type { AnyTSWPQ } from '../rules/tswpq'
+import type { AnyTSWQP } from '../rules/tswqp'
+import type { AnyTSWQQ } from '../rules/tswqq'
+import type { AnyTC } from '../rules/tc'
+import type { AnyTD } from '../rules/td'
 import type { AnyIL } from '../rules/il'
 import type { AnyIR } from '../rules/ir'
 import type { AnyMP } from '../rules/mp'
@@ -76,8 +85,17 @@ export type RuleId =
   | 'swr'
   | 'sxl'
   | 'sxr'
-  | 'tiq'
-  | 'tip'
+  | 'tc'
+  | 'td'
+  | 'tsw'
+  | 'tswa'
+  | 'tswba'
+  | 'tswp'
+  | 'tswq'
+  | 'tswpp'
+  | 'tswpq'
+  | 'tswqp'
+  | 'tswqq'
   | 'v'
 export const ruleId: {
   [K in RuleId]: K
@@ -115,8 +133,17 @@ export const ruleId: {
   swr: 'swr',
   sxl: 'sxl',
   sxr: 'sxr',
-  tiq: 'tiq',
-  tip: 'tip',
+  tc: 'tc',
+  td: 'td',
+  tsw: 'tsw',
+  tswa: 'tswa',
+  tswba: 'tswba',
+  tswp: 'tswp',
+  tswq: 'tswq',
+  tswpp: 'tswpp',
+  tswpq: 'tswpq',
+  tswqp: 'tswqp',
+  tswqq: 'tswqq',
   v: 'v',
 }
 
@@ -157,8 +184,17 @@ export type AnyRule =
   | AnySWR
   | AnySXL
   | AnySXR
-  | AnyTiq
-  | AnyTip
+  | AnyTC
+  | AnyTD
+  | AnyTSW
+  | AnyTSWA
+  | AnyTSWBA
+  | AnyTSWP
+  | AnyTSWQ
+  | AnyTSWPP
+  | AnyTSWPQ
+  | AnyTSWQP
+  | AnyTSWQQ
   | AnyV
 
 export type MatchRuleRaw<R> = {
@@ -195,8 +231,17 @@ export type MatchRuleRaw<R> = {
   swr: (t: AnySWR) => R
   sxl: (t: AnySXL) => R
   sxr: (t: AnySXR) => R
-  tiq: (t: AnyTiq) => R
-  tip: (t: AnyTip) => R
+  tc: (t: AnyTC) => R
+  td: (t: AnyTD) => R
+  tsw: (t: AnyTSW) => R
+  tswa: (t: AnyTSWA) => R
+  tswba: (t: AnyTSWBA) => R
+  tswp: (t: AnyTSWP) => R
+  tswq: (t: AnyTSWQ) => R
+  tswpp: (t: AnyTSWPP) => R
+  tswpq: (t: AnyTSWPQ) => R
+  tswqp: (t: AnyTSWQP) => R
+  tswqq: (t: AnyTSWQQ) => R
   v: (t: AnyV) => R
 }
 export const matchRuleRaw = <R>(
@@ -272,10 +317,28 @@ export const matchRuleRaw = <R>(
       return f.sxl(u)
     case 'sxr':
       return f.sxr(u)
-    case 'tiq':
-      return f.tiq(u)
-    case 'tip':
-      return f.tip(u)
+    case 'tc':
+      return f.tc(u)
+    case 'td':
+      return f.td(u)
+    case 'tsw':
+      return f.tsw(u)
+    case 'tswa':
+      return f.tswa(u)
+    case 'tswba':
+      return f.tswba(u)
+    case 'tswp':
+      return f.tswp(u)
+    case 'tswq':
+      return f.tswq(u)
+    case 'tswpp':
+      return f.tswpp(u)
+    case 'tswpq':
+      return f.tswpq(u)
+    case 'tswqp':
+      return f.tswqp(u)
+    case 'tswqq':
+      return f.tswqq(u)
     case 'v':
       return f.v(u)
   }

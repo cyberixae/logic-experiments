@@ -18,3 +18,4 @@ export const last = <L>(a: [...NonEmptyArray<unknown>, L]): L => {
 }
 export const isTupleOf0 = <A>(arr: Array<A>): arr is [] => arr.length === 0
 export const isTupleOf1 = <A>(arr: Array<A>): arr is [A] => arr.length === 1
+export const isTupleOf2 = <A>(arr: Array<A>): arr is [A, A] => arr.length === 2

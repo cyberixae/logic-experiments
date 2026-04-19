@@ -42,8 +42,17 @@ import { ruleSWR } from './swr'
 import { ruleSXL } from './sxl'
 import { ruleSXR } from './sxr'
 import { ruleV } from './v'
-import { ruleTip } from './tip'
-import { ruleTiq } from './tiq'
+import { ruleTSW } from './tsw'
+import { ruleTSWA } from './tswa'
+import { ruleTSWBA } from './tswba'
+import { ruleTSWP } from './tswp'
+import { ruleTSWQ } from './tswq'
+import { ruleTSWPP } from './tswpp'
+import { ruleTSWPQ } from './tswpq'
+import { ruleTSWQP } from './tswqp'
+import { ruleTSWQQ } from './tswqq'
+import { ruleTC } from './tc'
+import { ruleTD } from './td'
 
 export const rules: {
   [K in RuleId]: Rule<AnySequent, K>
@@ -81,8 +90,17 @@ export const rules: {
   swr: ruleSWR,
   sxl: ruleSXL,
   sxr: ruleSXR,
-  tiq: ruleTiq,
-  tip: ruleTip,
+  tc: ruleTC,
+  td: ruleTD,
+  tsw: ruleTSW,
+  tswa: ruleTSWA,
+  tswba: ruleTSWBA,
+  tswp: ruleTSWP,
+  tswq: ruleTSWQ,
+  tswpp: ruleTSWPP,
+  tswpq: ruleTSWPQ,
+  tswqp: ruleTSWQP,
+  tswqq: ruleTSWQQ,
   v: ruleV,
 }
 
@@ -96,8 +114,6 @@ export const reverseAxiom0 = {
   a1: ruleA1,
   a2: ruleA2,
   a3: ruleA3,
-  tip: ruleTip,
-  tiq: ruleTiq,
 } satisfies Partial<{
   [K in RuleId]: Rule<AnySequent, K> & { tryReverse: TryReverse0 }
 }>
@@ -115,6 +131,8 @@ export const reverseLogic0 = {
   dl: ruleDL,
   cr: ruleCR,
   il: ruleIL,
+  tc: ruleTC,
+  td: ruleTD,
 } satisfies Partial<{
   [K in RuleId]: Rule<AnySequent, K> & { tryReverse: TryReverse0 }
 }>
@@ -130,6 +148,15 @@ export const reverseStructure0 = {
   sRotRB: ruleSRotRB,
   sxl: ruleSXL,
   sxr: ruleSXR,
+  tsw: ruleTSW,
+  tswa: ruleTSWA,
+  tswba: ruleTSWBA,
+  tswp: ruleTSWP,
+  tswq: ruleTSWQ,
+  tswpp: ruleTSWPP,
+  tswpq: ruleTSWPQ,
+  tswqp: ruleTSWQP,
+  tswqq: ruleTSWQQ,
 } satisfies Partial<{
   [K in RuleId]: Rule<AnySequent, K> & { tryReverse: TryReverse0 }
 }>
@@ -181,8 +208,6 @@ export const center = {
   fcut: ruleFCut,
   i: ruleI,
   mp: ruleMP,
-  tiq: ruleTiq,
-  tip: ruleTip,
   v: ruleV,
 } satisfies Partial<{ [K in RuleId]: Rule<AnySequent, K> }>
 
@@ -192,6 +217,15 @@ export const leftStructural = {
   sRotLB: ruleSRotLB,
   sRotLF: ruleSRotLF,
   sxl: ruleSXL,
+  tsw: ruleTSW,
+  tswa: ruleTSWA,
+  tswba: ruleTSWBA,
+  tswp: ruleTSWP,
+  tswq: ruleTSWQ,
+  tswpp: ruleTSWPP,
+  tswpq: ruleTSWPQ,
+  tswqp: ruleTSWQP,
+  tswqq: ruleTSWQQ,
 } satisfies Partial<{ [K in RuleId]: Rule<AnySequent, K> }>
 
 export const leftLogical = {
@@ -203,6 +237,8 @@ export const leftLogical = {
   fdl: ruleFDL,
   il: ruleIL,
   fil: ruleFIL,
+  tc: ruleTC,
+  td: ruleTD,
 } satisfies Partial<{ [K in RuleId]: Rule<AnySequent, K> }>
 
 export const left = {
@@ -249,8 +285,17 @@ export const ruleCategory: { [K in RuleId]: RuleCategory } = {
   a3: 'axiom',
   f: 'axiom',
   i: 'axiom',
-  tiq: 'axiom',
-  tip: 'axiom',
+  tc: 'logical',
+  td: 'logical',
+  tsw: 'structural',
+  tswa: 'structural',
+  tswba: 'structural',
+  tswp: 'structural',
+  tswq: 'structural',
+  tswpp: 'structural',
+  tswpq: 'structural',
+  tswqp: 'structural',
+  tswqq: 'structural',
   v: 'axiom',
   scl: 'structural',
   swl: 'structural',

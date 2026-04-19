@@ -122,8 +122,20 @@ export function fromTransformation(t: AnyTransformation): string {
     fdl: () => `z.fdl(${d.join(',')})`,
     fil: () => `z.fil(${d.join(',')})`,
     mp: () => `z.mp(${d.join(',')})`,
-    tip: () => `ttr.tip()`,
-    tiq: () => `ttr.tiq()`,
+    tsw: ({ result }) =>
+      `ttr.tsw(${fromProp(tuple.last(result.antecedent))},${d.join(',')})`,
+    tswa: ({ result }) =>
+      `ttr.tswa(${fromProp(tuple.last(result.antecedent))},${d.join(',')})`,
+    tswba: ({ result }) =>
+      `ttr.tswba(${fromProp(tuple.last(result.antecedent))},${d.join(',')})`,
+    tswp: () => `ttr.tswp(${d.join(',')})`,
+    tswq: () => `ttr.tswq(${d.join(',')})`,
+    tswpp: () => `ttr.tswpp(${d.join(',')})`,
+    tswpq: () => `ttr.tswpq(${d.join(',')})`,
+    tswqp: () => `ttr.tswqp(${d.join(',')})`,
+    tswqq: () => `ttr.tswqq(${d.join(',')})`,
+    tc: () => `ttr.tc(${d.join(',')})`,
+    td: () => `ttr.td(${d.join(',')})`,
   })
 }
 
