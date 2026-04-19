@@ -8,6 +8,6 @@ const { a, i, z } = ttr
 const rules = ['v', 'tswa', 'tswba', 'tsrotf', 'tsrotb'] as const
 const pinned = ['tswa', 'tswba'] as const
 const goal = sequent([a('q'), a('p')], [verum])
-const solution = z.tswqp(z.tswq(i.v()))
+const solution = ttr.tswba(a('p'),ttr.tswa(a('q'),i.v()))
 
 export const ttrCh2_6 = tutorial({ rules, goal, solution, pinned })
