@@ -852,10 +852,9 @@ export const createBench = (
     return g
   }
 
-  const allPinned = rules.every((r) => pinned.includes(r))
   const rulesBtn = createButton(
     t('rules'),
-    allPinned,
+    false,
     () => {
       rulesVisible = !rulesVisible
       rerender()
@@ -1106,10 +1105,6 @@ export const createDispatch =
     }
     if (action === 'toggleRules') {
       const ws = getWorkspace()
-      const allPinned = ws
-        .availableRules()
-        .every((r) => ws.pinnedRules().includes(r))
-      if (allPinned) return
       rulesVisible = !rulesVisible
       rerender()
       return
