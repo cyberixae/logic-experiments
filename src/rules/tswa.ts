@@ -20,20 +20,22 @@ export const isTSWAResult: Refinement<AnySequent, AnyTSWAResult> = (
   tuple.isTupleOf1(s.succedent) &&
   equals(s.succedent[0], verum)
 export const isTSWAResultDerivation = refineDerivation(isTSWAResult)
-export type TSWADeps = [Derivation<Sequent<[], [Verum]>>]
+export type TSWADepItem = Derivation<Sequent<[], [Verum]>>
+export type TSWADeps<D extends TSWADepItem = TSWADepItem> = [D]
 export type TSWA<
   A extends Prop,
   R extends TSWAResult<A>,
-> = Transformation<R, TSWADeps, 'tswa'>
+  D extends TSWADepItem = TSWADepItem,
+> = Transformation<R, [D], 'tswa'>
 export type AnyTSWA = TSWA<Prop, AnyTSWAResult>
-export const tswa = <A extends Prop, R extends TSWAResult<A>>(
+export const tswa = <A extends Prop, R extends TSWAResult<A>, D extends TSWADepItem>(
   result: R,
-  deps: TSWADeps,
-): Transformation<R, TSWADeps, 'tswa'> => transformation(result, deps, 'tswa')
-export const applyTSWA = <A extends Prop>(
+  deps: [D],
+): Transformation<R, [D], 'tswa'> => transformation(result, deps, 'tswa')
+export const applyTSWA = <A extends Prop, D extends TSWADepItem>(
   a: A,
-  dep: Derivation<Sequent<[], [Verum]>>,
-): TSWA<A, TSWAResult<A>> => {
+  dep: D,
+): TSWA<A, TSWAResult<A>, D> => {
   const δ = dep.result.succedent
   return tswa(sequent([a], δ), [dep])
 }
