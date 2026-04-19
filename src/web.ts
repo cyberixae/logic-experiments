@@ -11,7 +11,7 @@ import { mountSystem } from './web/system'
 import {
   mountRandomConfig,
   parseConfigFromParams,
-  serializeConfigForUrl,
+  setConfigParams,
 } from './web/random-config'
 import { setGazeModeActive } from './web/game'
 import { onLocaleChange, setLocale } from './web/i18n'
@@ -61,8 +61,16 @@ const navigate = (screen: Screen) => {
   } else {
     nextParams.set('mode', screen)
     if (screen === 'random' || screen === 'random-config') {
-      const existing = currentParams.get('config')
-      if (existing !== null) nextParams.set('config', existing)
+      for (const key of [
+        'symbols',
+        'connectives',
+        'formula_size',
+        'proof_size',
+        'chaoticity',
+      ]) {
+        const val = currentParams.get(key)
+        if (val !== null) nextParams.set(key, val)
+      }
     }
     url = `?${nextParams.toString()}`
   }
@@ -99,7 +107,7 @@ const mount = (screen: Screen) => {
         const lang = new URLSearchParams(window.location.search).get('lang')
         if (lang !== null) params.set('lang', lang)
         params.set('mode', 'random')
-        params.set('config', serializeConfigForUrl(config))
+        setConfigParams(config, params)
         history.pushState({ screen: 'random' }, '', `?${params.toString()}`)
         mount('random')
       })

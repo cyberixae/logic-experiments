@@ -4,60 +4,97 @@ import {
   SymbolWeights,
   defaultRandomConfig,
 } from '../random/config'
-import { entries } from '../utils/record'
-
-const isRecord = (value: unknown): value is Record<string, unknown> =>
-  typeof value === 'object' && value !== null && !Array.isArray(value)
 
 const pickNumber = (
-  source: Record<string, unknown>,
+  params: URLSearchParams,
   key: string,
   fallback: number,
 ): number => {
-  const value = source[key]
-  return typeof value === 'number' && Number.isFinite(value) ? value : fallback
+  const raw = params.get(key)
+  if (raw === null || raw === '') return fallback
+  const value = parseFloat(raw)
+  return Number.isFinite(value) ? value : fallback
 }
 
-const pickWeights = <K extends string>(
-  source: unknown,
-  defaults: Record<K, number>,
-): Record<K, number> => {
-  if (!isRecord(source)) return defaults
-  const result = { ...defaults }
-  for (const [key, fallback] of entries(defaults)) {
-    result[key] = pickNumber(source, key, fallback)
-  }
-  return result
-}
+const atomKeys: ReadonlyArray<keyof SymbolWeights> = [
+  'p',
+  'q',
+  'r',
+  's',
+  'u',
+  'v',
+]
 
 export const parseConfigFromParams = (
   params: URLSearchParams,
 ): RandomConfig => {
   const defaults = defaultRandomConfig()
-  const raw = params.get('config')
-  if (raw === null || raw === '') return defaults
-  let parsed: unknown
-  try {
-    parsed = JSON.parse(raw)
-  } catch {
-    return defaults
+  const symbolsParam = params.get('symbols')
+  const connectivesParam = params.get('connectives')
+  const symbols = { ...defaults.symbols }
+  if (symbolsParam !== null) {
+    for (const key of atomKeys) {
+      symbols[key] = symbolsParam.includes(key) ? defaults.symbols[key] : 0
+    }
   }
-  if (!isRecord(parsed)) return defaults
+  if (connectivesParam !== null) {
+    symbols.falsum = connectivesParam.includes('f')
+      ? defaults.symbols.falsum
+      : 0
+    symbols.verum = connectivesParam.includes('v') ? defaults.symbols.verum : 0
+  }
+  const connectives = { ...defaults.connectives }
+  if (connectivesParam !== null) {
+    connectives.implication = connectivesParam.includes('i')
+      ? defaults.connectives.implication
+      : 0
+    connectives.conjunction = connectivesParam.includes('c')
+      ? defaults.connectives.conjunction
+      : 0
+    connectives.disjunction = connectivesParam.includes('d')
+      ? defaults.connectives.disjunction
+      : 0
+    connectives.negation = connectivesParam.includes('n')
+      ? defaults.connectives.negation
+      : 0
+  }
   return {
-    size: pickNumber(parsed, 'size', defaults.size),
+    size: pickNumber(params, 'formula_size', defaults.size),
     targetNonStructural: pickNumber(
-      parsed,
-      'targetNonStructural',
+      params,
+      'proof_size',
       defaults.targetNonStructural,
     ),
-    bypassPercent: pickNumber(parsed, 'bypassPercent', defaults.bypassPercent),
-    connectives: pickWeights(parsed['connectives'], defaults.connectives),
-    symbols: pickWeights(parsed['symbols'], defaults.symbols),
+    bypassPercent: pickNumber(params, 'chaoticity', defaults.bypassPercent),
+    connectives,
+    symbols,
   }
 }
 
-export const serializeConfigForUrl = (config: RandomConfig): string =>
-  JSON.stringify(config)
+export const setConfigParams = (
+  config: RandomConfig,
+  params: URLSearchParams,
+): void => {
+  const symbols = atomKeys.filter((k) => config.symbols[k] > 0).join('')
+  const connectives = [
+    config.connectives.implication > 0 ? 'i' : '',
+    config.connectives.conjunction > 0 ? 'c' : '',
+    config.connectives.disjunction > 0 ? 'd' : '',
+    config.connectives.negation > 0 ? 'n' : '',
+    config.symbols.falsum > 0 ? 'f' : '',
+    config.symbols.verum > 0 ? 'v' : '',
+  ].join('')
+  params.set('symbols', symbols)
+  params.set('connectives', connectives)
+  params.set('formula_size', String(config.size))
+  params.set(
+    'proof_size',
+    config.targetNonStructural === Infinity
+      ? ''
+      : String(config.targetNonStructural),
+  )
+  params.set('chaoticity', String(config.bypassPercent))
+}
 import { MountResult, Navigate } from './types'
 import { t, formatStats } from './i18n'
 import { createLangSwitcher } from './lang-switcher'
@@ -251,7 +288,7 @@ export const mountRandomConfig = (
 
   const syncUrl = () => {
     const params = new URLSearchParams(window.location.search)
-    params.set('config', serializeConfigForUrl(config))
+    setConfigParams(config, params)
     history.replaceState(history.state, '', `?${params.toString()}`)
   }
   let entries: Array<PreviewEntry> = []
