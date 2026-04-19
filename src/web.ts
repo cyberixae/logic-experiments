@@ -3,9 +3,11 @@ import { repl, WorkspaceFactory } from './interactive/repl'
 import { Session } from './interactive/session'
 import { Workspace } from './interactive/workspace'
 import { challenges } from './challenges'
+import { ttrChallenges } from './challenges/ttr'
 import { MountResult, Screen } from './web/types'
 import { mountMenu } from './web/menu'
 import { mountCampaign } from './web/campaign'
+import { mountTutorial } from './web/tutorial'
 import { mountRandom } from './web/random'
 import { mountSystem } from './web/system'
 import {
@@ -26,6 +28,7 @@ const session = new Session()
 const factory: WorkspaceFactory = {
   campaign: () => new Workspace(challenges),
   random: () => new Workspace({ challenge: pool.take().challenge }),
+  tutorial: () => new Workspace(ttrChallenges),
 }
 
 const gen = repl(session, factory)
@@ -88,6 +91,9 @@ const mount = (screen: Screen) => {
     case 'campaign':
       current = mountCampaign(body, navigate, session)
       break
+    case 'tutorial':
+      current = mountTutorial(body, navigate, session)
+      break
     case 'random':
       current = mountRandom(body, navigate, session, () => {
         const ws = factory['random']()
@@ -149,7 +155,7 @@ const init = () => {
   onLocaleChange(() => current.rerender())
   const mode = params.get('mode')
 
-  if (mode === 'campaign' || mode === 'random') {
+  if (mode === 'campaign' || mode === 'random' || mode === 'tutorial') {
     if (mode === 'random') {
       pool.configure(parseConfigFromParams(params))
     }

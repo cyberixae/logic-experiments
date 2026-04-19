@@ -23,6 +23,8 @@ import type { AnyFCut } from '../rules/fcut'
 import type { AnyFDL } from '../rules/fdl'
 import type { AnyFIL } from '../rules/fil'
 import type { AnyI } from '../rules/i'
+import type { AnyTip } from '../rules/tip'
+import type { AnyTiq } from '../rules/tiq'
 import type { AnyIL } from '../rules/il'
 import type { AnyIR } from '../rules/ir'
 import type { AnyMP } from '../rules/mp'
@@ -74,6 +76,8 @@ export type RuleId =
   | 'swr'
   | 'sxl'
   | 'sxr'
+  | 'tiq'
+  | 'tip'
   | 'v'
 export const ruleId: {
   [K in RuleId]: K
@@ -111,6 +115,8 @@ export const ruleId: {
   swr: 'swr',
   sxl: 'sxl',
   sxr: 'sxr',
+  tiq: 'tiq',
+  tip: 'tip',
   v: 'v',
 }
 
@@ -151,6 +157,8 @@ export type AnyRule =
   | AnySWR
   | AnySXL
   | AnySXR
+  | AnyTiq
+  | AnyTip
   | AnyV
 
 export type MatchRuleRaw<R> = {
@@ -187,6 +195,8 @@ export type MatchRuleRaw<R> = {
   swr: (t: AnySWR) => R
   sxl: (t: AnySXL) => R
   sxr: (t: AnySXR) => R
+  tiq: (t: AnyTiq) => R
+  tip: (t: AnyTip) => R
   v: (t: AnyV) => R
 }
 export const matchRuleRaw = <R>(
@@ -262,6 +272,10 @@ export const matchRuleRaw = <R>(
       return f.sxl(u)
     case 'sxr':
       return f.sxr(u)
+    case 'tiq':
+      return f.tiq(u)
+    case 'tip':
+      return f.tip(u)
     case 'v':
       return f.v(u)
   }

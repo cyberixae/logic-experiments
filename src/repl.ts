@@ -13,6 +13,7 @@ const main = () => {
   const factory = {
     campaign: () => new Workspace(challenges),
     random: () => new Workspace({ challenge: generate() }),
+    tutorial: () => new Workspace(challenges),
   }
   const rl = readline.createInterface({ input: process.stdin })
   const gen = repl(session, factory)

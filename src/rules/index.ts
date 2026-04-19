@@ -42,6 +42,8 @@ import { ruleSWR } from './swr'
 import { ruleSXL } from './sxl'
 import { ruleSXR } from './sxr'
 import { ruleV } from './v'
+import { ruleTip } from './tip'
+import { ruleTiq } from './tiq'
 
 export const rules: {
   [K in RuleId]: Rule<AnySequent, K>
@@ -79,6 +81,8 @@ export const rules: {
   swr: ruleSWR,
   sxl: ruleSXL,
   sxr: ruleSXR,
+  tiq: ruleTiq,
+  tip: ruleTip,
   v: ruleV,
 }
 
@@ -92,6 +96,8 @@ export const reverseAxiom0 = {
   a1: ruleA1,
   a2: ruleA2,
   a3: ruleA3,
+  tip: ruleTip,
+  tiq: ruleTiq,
 } satisfies Partial<{
   [K in RuleId]: Rule<AnySequent, K> & { tryReverse: TryReverse0 }
 }>
@@ -175,6 +181,8 @@ export const center = {
   fcut: ruleFCut,
   i: ruleI,
   mp: ruleMP,
+  tiq: ruleTiq,
+  tip: ruleTip,
   v: ruleV,
 } satisfies Partial<{ [K in RuleId]: Rule<AnySequent, K> }>
 
@@ -241,6 +249,8 @@ export const ruleCategory: { [K in RuleId]: RuleCategory } = {
   a3: 'axiom',
   f: 'axiom',
   i: 'axiom',
+  tiq: 'axiom',
+  tip: 'axiom',
   v: 'axiom',
   scl: 'structural',
   swl: 'structural',

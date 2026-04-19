@@ -173,27 +173,18 @@ export function printArray<K extends BinaryTemplateId>(
     isNonEmptyArray(ps) ? printNonEmptyArray(k)(ps) : printNothing
 }
 
+export function atomChar(value: string): string {
+  if (value === 'p') return '\u{1f427}'
+  if (value === 'q') return '\u{1f99c}'
+  if (value === 'r') return '\u{1f983}'
+  if (value === 's') return '\u{1f986}'
+  if (value === 'u') return '\u{1f413}'
+  if (value === 'v') return '\u{1f99a}'
+  return value
+}
+
 export function fromAtom({ value }: prop.Atom<string>): Printer {
-  let chr = value
-  if (value === 'p') {
-    chr = '\u{1f427}'
-  }
-  if (value === 'q') {
-    chr = '\u{1f99c}'
-  }
-  if (value === 'r') {
-    chr = '\u{1f983}'
-  }
-  if (value === 's') {
-    chr = '\u{1f986}'
-  }
-  if (value === 'u') {
-    chr = '\u{1f413}'
-  }
-  if (value === 'v') {
-    chr = '\u{1f99a}'
-  }
-  return print('atom')(printString(chr))
+  return print('atom')(printString(atomChar(value)))
 }
 
 export function fromFalsum(_falsum: prop.Falsum): Printer {
@@ -356,6 +347,8 @@ export function fromRuleId(s: rule.RuleId, l = 'L', r = 'R'): Printer {
         fdl: () => t.disjunction.join(empty) + left(l, 'ᶠ'),
         fil: () => t.implication.join(empty) + left(l, 'ᶠ'),
         mp: () => 'mp',
+        tip: () => atomChar('p') + 'I',
+        tiq: () => atomChar('q') + 'I',
       }),
     ),
   ]

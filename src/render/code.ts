@@ -122,6 +122,8 @@ export function fromTransformation(t: AnyTransformation): string {
     fdl: () => `z.fdl(${d.join(',')})`,
     fil: () => `z.fil(${d.join(',')})`,
     mp: () => `z.mp(${d.join(',')})`,
+    tip: () => `ttr.tip()`,
+    tiq: () => `ttr.tiq()`,
   })
 }
 

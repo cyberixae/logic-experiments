@@ -1,6 +1,7 @@
 const fs = require('fs')
 const path = require('path')
 const { challenges } = require('../lib/challenges/index')
+const { ttrChallenges } = require('../lib/challenges/ttr')
 const { bruteLimit } = require('../lib/solver/brute')
 const { fromDerivation } = require('../lib/render/code')
 const { equalsDerivation } = require('../lib/model/derivation')
@@ -9,17 +10,19 @@ const challengesDir = path.join(__dirname, '../src/challenges')
 
 const fileMap = {}
 for (const f of fs.readdirSync(challengesDir)) {
-  if (!f.endsWith('.ts') || f === 'index.ts') continue
+  if (!f.endsWith('.ts') || f === 'index.ts' || f === 'ttr.ts') continue
   const key = f.replace('.ts', '').replace(/-/g, '').toLowerCase()
   fileMap[key] = path.join(challengesDir, f)
 }
+
+const allChallenges = { ...challenges, ...ttrChallenges }
 
 const maxLimit = 12
 
 let updated = 0
 let missing = 0
 
-for (const [name, challenge] of Object.entries(challenges)) {
+for (const [name, challenge] of Object.entries(allChallenges)) {
   const { goal, rules, solution } = challenge as any
   const found = bruteLimit({ goal, rules }, maxLimit)
 

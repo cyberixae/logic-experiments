@@ -1,2 +1,2 @@
-export const gameModes = ['random', 'campaign'] as const
+export const gameModes = ['random', 'campaign', 'tutorial'] as const
 export type GameMode = (typeof gameModes)[number]

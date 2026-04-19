@@ -6,6 +6,7 @@ import { createLangSwitcher } from './lang-switcher'
 const modeLabel: Record<GameMode, () => string> = {
   random: () => t('random'),
   campaign: () => t('campaign'),
+  tutorial: () => t('tutorial'),
 }
 
 export const mountMenu = (

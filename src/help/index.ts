@@ -2,6 +2,7 @@ import * as print from '../render/print'
 import * as rk from './rk'
 import * as fk from './fk'
 import * as la3 from './la3'
+import * as ttr from './ttr'
 
 export const helpSystems = {
   rk: {
@@ -21,6 +22,12 @@ export const helpSystems = {
     name: la3.meta.name,
     meta: la3.meta,
     exampleProof: la3.exampleProof,
+  },
+  ttr: {
+    id: 'ttr',
+    name: ttr.meta.name,
+    meta: ttr.meta,
+    exampleProof: ttr.exampleProof,
   },
 } as const
 

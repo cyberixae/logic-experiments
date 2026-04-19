@@ -210,6 +210,8 @@ const modeStatus = (session: Session): Segments => {
     title = '\n[Campaign: ' + ws.selected + ']'
   } else if (session.mode === 'random') {
     title = '\n[Random]'
+  } else if (session.mode === 'tutorial') {
+    title = '\n[Tutorial: ' + ws.selected + ']'
   }
 
   const commands = ['help', 'undo', 'reset']
