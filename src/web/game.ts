@@ -182,8 +182,6 @@ export const setDefaultRulesVisible = (visible: boolean): void => {
   autoZoomedDerivation = null
 }
 
-const isCompact = (): boolean => window.matchMedia('(max-width: 600px)').matches
-
 let treeZoom = 1
 const ZOOM_MIN = 0.4
 const ZOOM_MAX = 2
@@ -292,12 +290,7 @@ const createPlayArea = (workspace: AnyWorkspace): HTMLElement => {
         }
       })
     }
-    if (
-      !isCompact() &&
-      isFresh &&
-      !solved &&
-      autoZoomedDerivation !== focus.derivation
-    ) {
+    if (isFresh && !solved && autoZoomedDerivation !== focus.derivation) {
       autoZoomedDerivation = focus.derivation
       const rootSequent = tree.querySelector<HTMLElement>(
         ':scope > .tree-sequent',
@@ -326,7 +319,7 @@ const createPlayArea = (workspace: AnyWorkspace): HTMLElement => {
       }
     }
     tree.style.visibility = ''
-    if (solved && !isCompact()) {
+    if (solved) {
       const treeRect = tree.getBoundingClientRect()
       const areaRect = panel.getBoundingClientRect()
       const panelStyle = getComputedStyle(panel)
