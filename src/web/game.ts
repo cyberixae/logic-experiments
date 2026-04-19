@@ -210,7 +210,7 @@ const runProofCheckSweep = (tree: HTMLElement): void => {
   ) {
     return
   }
-  const nodes = Array.from(tree.querySelectorAll<HTMLElement>('.tree-node'))
+  const nodes = [tree, ...Array.from(tree.querySelectorAll<HTMLElement>('.tree-node'))]
   if (nodes.length === 0) return
   const byDepth = new Map<number, HTMLElement[]>()
   let maxDepth = 0
@@ -336,12 +336,19 @@ const createPlayArea = (workspace: AnyWorkspace): HTMLElement => {
       )
       tree.style.transformOrigin = 'center bottom'
       tree.style.transition = 'transform 1.2s ease-in-out'
-      const onZoomEnd = (e: TransitionEvent): void => {
-        if (e.propertyName !== 'transform') return
-        tree.removeEventListener('transitionend', onZoomEnd)
-        runProofCheckSweep(tree)
+      const currentScale = tree.style.transform
+        ? parseFloat(tree.style.transform.replace('scale(', ''))
+        : 1
+      if (Math.abs(scale - currentScale) > 0.001) {
+        const onZoomEnd = (e: TransitionEvent): void => {
+          if (e.propertyName !== 'transform') return
+          tree.removeEventListener('transitionend', onZoomEnd)
+          runProofCheckSweep(tree)
+        }
+        tree.addEventListener('transitionend', onZoomEnd)
+      } else {
+        setTimeout(() => runProofCheckSweep(tree), 0)
       }
-      tree.addEventListener('transitionend', onZoomEnd)
       requestAnimationFrame(() => {
         tree.style.transform = `scale(${scale})`
         tree.scrollIntoView({
