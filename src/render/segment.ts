@@ -3,6 +3,7 @@ export type Segment = {
   active: boolean
   connective: boolean
   parenthesis?: boolean
+  turnstile?: boolean
   raw?: boolean
 }
 
@@ -22,6 +23,10 @@ export function connective(text: string, active: boolean): Segment {
 
 export function paren(text: string): Segment {
   return { text, active: false, connective: false, parenthesis: true }
+}
+
+export function turnstile(text: string): Segment {
+  return { text, active: false, connective: false, turnstile: true }
 }
 
 export function raw(html: string): Segment {
@@ -56,6 +61,9 @@ export function html(segments: Segments): string {
       }
       if (s.parenthesis === true) {
         return `<span class="parenthesis">${escape(s.text)}</span>`
+      }
+      if (s.turnstile === true) {
+        return `<span class="turnstile">${escape(s.text)}</span>`
       }
       return escape(s.text)
     })

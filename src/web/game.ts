@@ -200,8 +200,9 @@ export const zoomTreeIn = (): void => {
 const AUTO_ZOOM_MAX = 1.2
 const AUTO_ZOOM_PAD = 0.9
 
-const CHECK_STEP_MS = 120
-const CHECK_HOLD_MS = 260
+const CHECK_TOTAL_MS = 3000
+const CHECK_STEP_MIN_MS = 80
+const CHECK_STEP_MAX_MS = 600
 
 const runProofCheckSweep = (tree: HTMLElement): void => {
   if (
@@ -210,7 +211,10 @@ const runProofCheckSweep = (tree: HTMLElement): void => {
   ) {
     return
   }
-  const nodes = [tree, ...Array.from(tree.querySelectorAll<HTMLElement>('.tree-node'))]
+  const nodes = [
+    tree,
+    ...Array.from(tree.querySelectorAll<HTMLElement>('.tree-node')),
+  ]
   if (nodes.length === 0) return
   const byDepth = new Map<number, HTMLElement[]>()
   let maxDepth = 0
@@ -221,15 +225,36 @@ const runProofCheckSweep = (tree: HTMLElement): void => {
     if (list) list.push(n)
     else byDepth.set(d, [n])
   }
+  const stepMs = Math.min(
+    CHECK_STEP_MAX_MS,
+    Math.max(
+      CHECK_STEP_MIN_MS,
+      maxDepth > 0 ? CHECK_TOTAL_MS / maxDepth : CHECK_TOTAL_MS,
+    ),
+  )
+  const holdMs = stepMs * 0.67
   for (let d = 0; d <= maxDepth; d += 1) {
     const level = byDepth.get(d)
     if (!level) continue
+    const isRoot = d === maxDepth
+    const prevLevel = d > 0 ? byDepth.get(d - 1) : null
     setTimeout(() => {
       for (const n of level) n.classList.add('tree-checking')
       setTimeout(() => {
         for (const n of level) n.classList.remove('tree-checking')
-      }, CHECK_HOLD_MS)
-    }, d * CHECK_STEP_MS)
+        if (isRoot) {
+          tree.classList.add('tree-proven')
+        } else {
+          for (const n of level) n.classList.add('tree-verified')
+        }
+        if (prevLevel) {
+          for (const n of prevLevel) {
+            n.classList.remove('tree-verified')
+            n.classList.add('tree-faded')
+          }
+        }
+      }, holdMs)
+    }, d * stepMs)
   }
 }
 

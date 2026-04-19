@@ -208,7 +208,7 @@ html.loading body {
   background: #36c;
 }
 .key-hint.cold.ghost {
-  opacity: 0.35;
+  opacity: 0.2;
 }
 .key-hint.wide {
   width: auto;
@@ -757,8 +757,31 @@ html.loading body {
 .tree-node > .tree-sequent {
   transition: color 0.25s ease-out;
 }
-.tree-node.tree-checking > .tree-sequent {
+.turnstile {
+  transition: color 0.25s ease-out;
+}
+.tree-node.tree-checking > .tree-sequent .turnstile {
   color: #fff;
+}
+.tree-node.tree-verified > .tree-sequent,
+.tree-node.tree-faded > .tree-sequent,
+.tree-node.tree-proven > .tree-sequent {
+  filter: sepia(1) hue-rotate(100deg) saturate(3) brightness(0.85);
+  transition:
+    color 0.25s ease-out,
+    filter 0.6s ease-out,
+    opacity 0.3s ease-out;
+}
+.tree-node.tree-faded > .tree-sequent {
+  opacity: 0.2;
+}
+.tree-node.tree-verified > .tree-inference,
+.tree-node.tree-faded > .tree-inference,
+.tree-node.tree-proven > .tree-inference {
+  opacity: 0.2;
+}
+.tree-node > .tree-inference {
+  transition: opacity 0.3s ease-out;
 }
 .connective {
   text-align: center;

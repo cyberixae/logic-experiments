@@ -114,7 +114,9 @@ export function printBinary<K extends BinaryTemplateId>(
         ? segment.connective(s1, activeConn)
         : activeConn
           ? segment.active(s1)
-          : segment.of(s1),
+          : key === 'sequent'
+            ? segment.turnstile(s1)
+            : segment.of(s1),
       ...b(theme),
       segment.of(s2),
     ]
