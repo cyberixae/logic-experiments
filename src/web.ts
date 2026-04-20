@@ -7,6 +7,11 @@ import { MountResult, Screen } from './web/types'
 import { mountMenu } from './web/menu'
 import { mountCampaign } from './web/campaign'
 import { mountRandom } from './web/random'
+import { mountQuiz } from './web/quiz'
+import { mountQuizConfig } from './web/quiz-config'
+import { mountMatchIntro } from './web/match-intro'
+import { mountMatchCurated } from './web/match-curated'
+import { parseQuizConfigFromParams, setQuizConfigParams } from './quiz/config'
 import { mountSystem } from './web/system'
 import {
   mountRandomConfig,
@@ -26,6 +31,7 @@ const session = new Session()
 const factory: WorkspaceFactory = {
   campaign: () => new Workspace(challenges),
   random: () => new Workspace({ challenge: pool.take().challenge }),
+  match: () => new Workspace(challenges),
 }
 
 const gen = repl(session, factory)
@@ -46,7 +52,7 @@ const navigate = (screen: Screen) => {
     setGazeModeActive(false)
     session.returnToMenu()
   }
-  if (includes(gameModes, screen)) {
+  if (includes(gameModes, screen) && screen !== 'match') {
     enterMode(screen)
   }
   currentScreen = screen
@@ -67,6 +73,17 @@ const navigate = (screen: Screen) => {
         'formula_size',
         'proof_size',
         'chaoticity',
+      ]) {
+        const val = currentParams.get(key)
+        if (val !== null) nextParams.set(key, val)
+      }
+    }
+    if (screen === 'match' || screen === 'match-config') {
+      for (const key of [
+        'qsymbols',
+        'qconnectives',
+        'qvariables',
+        'qsequences',
       ]) {
         const val = currentParams.get(key)
         if (val !== null) nextParams.set(key, val)
@@ -96,6 +113,32 @@ const mount = (screen: Screen) => {
       break
     case 'system':
       current = mountSystem(body, navigate)
+      break
+    case 'match': {
+      const qConfig = parseQuizConfigFromParams(
+        new URLSearchParams(window.location.search),
+      )
+      current = mountQuiz(body, navigate, qConfig)
+      break
+    }
+    case 'match-config':
+      current = mountQuizConfig(body, navigate, (config) => {
+        current.cleanup()
+        currentScreen = 'match'
+        const params = new URLSearchParams()
+        const lang = new URLSearchParams(window.location.search).get('lang')
+        if (lang !== null) params.set('lang', lang)
+        params.set('mode', 'match')
+        setQuizConfigParams(config, params)
+        history.pushState({ screen: 'match' }, '', `?${params.toString()}`)
+        mount('match')
+      })
+      break
+    case 'match-intro':
+      current = mountMatchIntro(body, navigate)
+      break
+    case 'match-curated':
+      current = mountMatchCurated(body, navigate)
       break
     case 'random-config':
       current = mountRandomConfig(body, navigate, (config) => {
@@ -162,6 +205,18 @@ const init = () => {
   } else if (mode === 'system') {
     currentScreen = 'system'
     mount('system')
+  } else if (mode === 'match') {
+    currentScreen = 'match'
+    mount('match')
+  } else if (mode === 'match-config') {
+    currentScreen = 'match-config'
+    mount('match-config')
+  } else if (mode === 'match-intro') {
+    currentScreen = 'match-intro'
+    mount('match-intro')
+  } else if (mode === 'match-curated') {
+    currentScreen = 'match-curated'
+    mount('match-curated')
   } else if (params.get('level') !== null) {
     // Legacy URL: ?level=ch0identity1 — jump straight into campaign
     enterMode('campaign')
@@ -183,7 +238,7 @@ window.addEventListener('popstate', (event) => {
     setGazeModeActive(false)
     session.returnToMenu()
   }
-  if (includes(gameModes, screen)) {
+  if (includes(gameModes, screen) && screen !== 'match') {
     enterMode(screen)
   }
   currentScreen = screen
