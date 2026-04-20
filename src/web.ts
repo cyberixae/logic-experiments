@@ -7,6 +7,7 @@ import { MountResult, Screen } from './web/types'
 import { mountMenu } from './web/menu'
 import { mountCampaign } from './web/campaign'
 import { mountRandom } from './web/random'
+import { mountQuiz } from './web/quiz'
 import { mountSystem } from './web/system'
 import {
   mountRandomConfig,
@@ -26,6 +27,7 @@ const session = new Session()
 const factory: WorkspaceFactory = {
   campaign: () => new Workspace(challenges),
   random: () => new Workspace({ challenge: pool.take().challenge }),
+  quiz: () => new Workspace(challenges),
 }
 
 const gen = repl(session, factory)
@@ -46,7 +48,7 @@ const navigate = (screen: Screen) => {
     setGazeModeActive(false)
     session.returnToMenu()
   }
-  if (includes(gameModes, screen)) {
+  if (includes(gameModes, screen) && screen !== 'quiz') {
     enterMode(screen)
   }
   currentScreen = screen
@@ -96,6 +98,9 @@ const mount = (screen: Screen) => {
       break
     case 'system':
       current = mountSystem(body, navigate)
+      break
+    case 'quiz':
+      current = mountQuiz(body, navigate)
       break
     case 'random-config':
       current = mountRandomConfig(body, navigate, (config) => {
@@ -162,6 +167,9 @@ const init = () => {
   } else if (mode === 'system') {
     currentScreen = 'system'
     mount('system')
+  } else if (mode === 'quiz') {
+    currentScreen = 'quiz'
+    mount('quiz')
   } else if (params.get('level') !== null) {
     // Legacy URL: ?level=ch0identity1 — jump straight into campaign
     enterMode('campaign')
@@ -183,7 +191,7 @@ window.addEventListener('popstate', (event) => {
     setGazeModeActive(false)
     session.returnToMenu()
   }
-  if (includes(gameModes, screen)) {
+  if (includes(gameModes, screen) && screen !== 'quiz') {
     enterMode(screen)
   }
   currentScreen = screen

@@ -10,6 +10,7 @@ const generate = random(5, 0)
 const factory: WorkspaceFactory = {
   campaign: () => new Workspace(challenges),
   random: () => new Workspace({ challenge: generate() }),
+  quiz: () => new Workspace(challenges),
 }
 
 const createRepl = () => {

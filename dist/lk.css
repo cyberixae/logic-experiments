@@ -1281,3 +1281,56 @@ html.loading body {
     text-align: center;
   }
 }
+
+/* ── Quiz mode ──────────────────────────────────────────────────────────────── */
+.quiz-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2em;
+  padding: 1em;
+  min-height: 100%;
+}
+.quiz-question {
+  display: flex;
+  justify-content: center;
+  font-size: 1.5em;
+  padding: 1em;
+}
+.quiz-cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1em;
+  width: 100%;
+  max-width: 40em;
+}
+.quiz-card {
+  display: flex;
+  justify-content: center;
+  padding: 1em;
+  border: 2px solid #ccc;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1.1em;
+  transition: background-color 0.2s;
+  user-select: none;
+}
+.quiz-card:hover {
+  background-color: #f0f0f0;
+}
+.quiz-card-correct {
+  border-color: #2a2;
+  background-color: #afa;
+  cursor: default;
+}
+.quiz-card-correct:hover {
+  background-color: #afa;
+}
+.quiz-card-wrong {
+  border-color: #a22;
+  background-color: #faa;
+  cursor: default;
+}
+.quiz-card-wrong:hover {
+  background-color: #faa;
+}
