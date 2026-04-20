@@ -33,7 +33,14 @@ export const mountMenu = (
       const btn = document.createElement('div')
       btn.setAttribute('class', 'button menu-mode')
       btn.innerHTML = modeLabel[mode]()
-      btn.onclick = () => navigate(mode === 'random' ? 'random-config' : mode)
+      btn.onclick = () =>
+        navigate(
+          mode === 'random'
+            ? 'random-config'
+            : mode === 'quiz'
+              ? 'quiz-config'
+              : mode,
+        )
       modes.appendChild(btn)
     }
 

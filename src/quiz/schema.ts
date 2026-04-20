@@ -7,9 +7,21 @@ export type SchemaFormula =
   | { kind: 'falsum' }
   | { kind: 'verum' }
   | { kind: 'negation'; negand: SchemaFormula }
-  | { kind: 'implication'; antecedent: SchemaFormula; consequent: SchemaFormula }
-  | { kind: 'conjunction'; leftConjunct: SchemaFormula; rightConjunct: SchemaFormula }
-  | { kind: 'disjunction'; leftDisjunct: SchemaFormula; rightDisjunct: SchemaFormula }
+  | {
+      kind: 'implication'
+      antecedent: SchemaFormula
+      consequent: SchemaFormula
+    }
+  | {
+      kind: 'conjunction'
+      leftConjunct: SchemaFormula
+      rightConjunct: SchemaFormula
+    }
+  | {
+      kind: 'disjunction'
+      leftDisjunct: SchemaFormula
+      rightDisjunct: SchemaFormula
+    }
 
 // Items in a sequent context: formulas or sequence variables interleaved freely.
 // Generation constraint (not encoded in types):

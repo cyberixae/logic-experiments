@@ -47,6 +47,8 @@ const en = {
   preview: 'Preview',
   score: 'Score',
   par: 'Par',
+  variables: 'Variables',
+  sequences: 'Sequences',
   statsTemplate:
     'Generated {formulas} formulas ({rate}/s), {tautologies} tautologies, {solved} solved. Updated {sinceUpdate}s ago.',
 } as const
@@ -100,6 +102,8 @@ const fi: Record<MessageKey, string> = {
   preview: 'Esikatselu',
   score: 'Pisteet',
   par: 'Par',
+  variables: 'Muuttujat',
+  sequences: 'Jonot',
   statsTemplate:
     'Tuotettu {formulas} kaavaa ({rate}/s), {tautologies} tautologiaa, {solved} ratkaisua. Päivitetty {sinceUpdate}s sitten.',
 }
@@ -153,6 +157,8 @@ const es: Record<MessageKey, string> = {
   preview: 'Vista previa',
   score: 'Puntuación',
   par: 'Par',
+  variables: 'Variables',
+  sequences: 'Secuencias',
   statsTemplate:
     'Generadas {formulas} fórmulas ({rate}/s), {tautologies} tautologías, {solved} resueltas. Actualizado hace {sinceUpdate}s.',
 }
@@ -206,6 +212,8 @@ const cs: Record<MessageKey, string> = {
   preview: 'Náhled',
   score: 'Skóre',
   par: 'Par',
+  variables: 'Proměnné',
+  sequences: 'Sekvence',
   statsTemplate:
     'Vygenerováno {formulas} formulí ({rate}/s), {tautologies} tautologií, {solved} vyřešeno. Aktualizováno před {sinceUpdate}s.',
 }
@@ -259,6 +267,8 @@ const pl: Record<MessageKey, string> = {
   preview: 'Podgląd',
   score: 'Wynik',
   par: 'Par',
+  variables: 'Zmienne',
+  sequences: 'Sekwencje',
   statsTemplate:
     'Wygenerowano {formulas} formuł ({rate}/s), {tautologies} tautologii, {solved} rozwiązanych. Zaktualizowano {sinceUpdate}s temu.',
 }

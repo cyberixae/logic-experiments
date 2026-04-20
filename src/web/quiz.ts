@@ -1,7 +1,13 @@
 import { MountResult, Navigate } from './types'
 import { t } from './i18n'
-import { randomRuleSchemas, instantiate, InstantiatedSequent } from '../quiz/generate'
+import {
+  generateQuestion,
+  instantiate,
+  InstantiatedSequent,
+  QuizQuestion,
+} from '../quiz/generate'
 import { RuleSchema, SchemaContext, SchemaFormula } from '../quiz/schema'
+import { QuizConfig } from '../quiz/config'
 import { fromSequent, basic } from '../render/print'
 import { html } from '../render/segment'
 import { sequent } from '../model/sequent'
@@ -79,7 +85,10 @@ const renderSchemaContext = (ctx: SchemaContext): string => {
   return parts.join('<span class="connective">,</span> ')
 }
 
-const renderSchemaSequentHtml = (s: { antecedent: SchemaContext; succedent: SchemaContext }): string => {
+const renderSchemaSequentHtml = (s: {
+  antecedent: SchemaContext
+  succedent: SchemaContext
+}): string => {
   const ant = renderSchemaContext(s.antecedent)
   const suc = renderSchemaContext(s.succedent)
   return `${ant}<span class="turnstile"> ⊢ </span>${suc}`
@@ -172,16 +181,12 @@ const createSchemaCardEl = (schema: RuleSchema): HTMLElement => {
 
 // ── Quiz state ─────────────────────────────────────────────────────────────────
 
-type QuizState = {
-  schemas: RuleSchema[]
-  answerIndex: number
-  guessIndex: number | null
-}
+type QuizState = QuizQuestion & { guessIndex: number | null }
 
-const newState = (): QuizState => {
-  const schemas = randomRuleSchemas()
-  const answerIndex = Math.floor(Math.random() * schemas.length)
-  return { schemas, answerIndex, guessIndex: null }
+const newState = (config: QuizConfig): QuizState | null => {
+  const q = generateQuestion(config)
+  if (q === null) return null
+  return { ...q, guessIndex: null }
 }
 
 // ── Mount ──────────────────────────────────────────────────────────────────────
@@ -189,8 +194,9 @@ const newState = (): QuizState => {
 export const mountQuiz = (
   container: HTMLElement,
   navigate: Navigate,
+  config: QuizConfig,
 ): MountResult => {
-  let state = newState()
+  let state: QuizState | null = newState(config)
   let regenerateTimer: ReturnType<typeof setTimeout> | null = null
 
   const render = () => {
@@ -207,8 +213,16 @@ export const mountQuiz = (
     const menuBtn = document.createElement('div')
     menuBtn.setAttribute('class', 'button')
     menuBtn.textContent = t('menu')
-    menuBtn.onclick = () => navigate('menu')
+    menuBtn.onclick = () => navigate('quiz-config')
     panel.appendChild(menuBtn)
+
+    if (state === null) {
+      const msg = document.createElement('div')
+      msg.textContent = 'Enable at least one symbol to play.'
+      panel.appendChild(msg)
+      container.appendChild(panel)
+      return
+    }
 
     const answer = state.schemas[state.answerIndex]
     if (answer === undefined) return
@@ -241,12 +255,16 @@ export const mountQuiz = (
       card.setAttribute('class', cls)
       card.appendChild(createSchemaCardEl(schema))
 
-      if (state.guessIndex === null) {
+      if (state.guessIndex !== null) {
+        card.style.cursor = 'default'
+      } else {
+        const idx = i
         card.onclick = () => {
-          state = { ...state, guessIndex: i }
+          if (state === null) return
+          state = { ...state, guessIndex: idx }
           render()
           regenerateTimer = setTimeout(() => {
-            state = newState()
+            state = newState(config)
             render()
           }, 1500)
         }

@@ -8,6 +8,8 @@ import { mountMenu } from './web/menu'
 import { mountCampaign } from './web/campaign'
 import { mountRandom } from './web/random'
 import { mountQuiz } from './web/quiz'
+import { mountQuizConfig } from './web/quiz-config'
+import { parseQuizConfigFromParams, setQuizConfigParams } from './quiz/config'
 import { mountSystem } from './web/system'
 import {
   mountRandomConfig,
@@ -74,6 +76,17 @@ const navigate = (screen: Screen) => {
         if (val !== null) nextParams.set(key, val)
       }
     }
+    if (screen === 'quiz' || screen === 'quiz-config') {
+      for (const key of [
+        'qsymbols',
+        'qconnectives',
+        'qvariables',
+        'qsequences',
+      ]) {
+        const val = currentParams.get(key)
+        if (val !== null) nextParams.set(key, val)
+      }
+    }
     url = `?${nextParams.toString()}`
   }
   history.pushState({ screen }, '', url)
@@ -99,8 +112,25 @@ const mount = (screen: Screen) => {
     case 'system':
       current = mountSystem(body, navigate)
       break
-    case 'quiz':
-      current = mountQuiz(body, navigate)
+    case 'quiz': {
+      const qConfig = parseQuizConfigFromParams(
+        new URLSearchParams(window.location.search),
+      )
+      current = mountQuiz(body, navigate, qConfig)
+      break
+    }
+    case 'quiz-config':
+      current = mountQuizConfig(body, navigate, (config) => {
+        current.cleanup()
+        currentScreen = 'quiz'
+        const params = new URLSearchParams()
+        const lang = new URLSearchParams(window.location.search).get('lang')
+        if (lang !== null) params.set('lang', lang)
+        params.set('mode', 'quiz')
+        setQuizConfigParams(config, params)
+        history.pushState({ screen: 'quiz' }, '', `?${params.toString()}`)
+        mount('quiz')
+      })
       break
     case 'random-config':
       current = mountRandomConfig(body, navigate, (config) => {
@@ -170,6 +200,9 @@ const init = () => {
   } else if (mode === 'quiz') {
     currentScreen = 'quiz'
     mount('quiz')
+  } else if (mode === 'quiz-config') {
+    currentScreen = 'quiz-config'
+    mount('quiz-config')
   } else if (params.get('level') !== null) {
     // Legacy URL: ?level=ch0identity1 — jump straight into campaign
     enterMode('campaign')
