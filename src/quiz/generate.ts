@@ -548,7 +548,7 @@ export const generatePreviewSchemas = (config: QuizConfig, count: number): RuleS
   if (blocks === null) return []
   return Array.from({ length: count }, (_, i) => ({
     ...generateBaseSchema(blocks, config.premiseCounts, config.contextSize, config.formulaSize),
-    name: (['I', 'II', 'III', 'IV'][i] ?? `${i + 1}`),
+    name: `${i + 1}`,
   }))
 }
 
@@ -562,7 +562,7 @@ export const generateQuestion = (config: QuizConfig): QuizQuestion | null => {
   const answerIndex = all.indexOf(base)
 
   return {
-    schemas: all.map((s, i) => ({ ...s, name: (['I', 'II', 'III', 'IV'][i] ?? `${i + 1}`) })),
+    schemas: all.map((s, i) => ({ ...s, name: `${i + 1}` })),
     answerIndex,
   }
 }
