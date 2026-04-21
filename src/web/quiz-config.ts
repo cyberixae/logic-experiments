@@ -13,8 +13,21 @@ import {
   parseQuizConfigFromParams,
   setQuizConfigParams,
 } from '../quiz/config'
+import { fromSchemaRule } from '../quiz/render'
+import { RuleSchema } from '../quiz/schema'
 
 const ALL_PREMISE_COUNTS = [0, 1, 2] as const
+
+const emptySequent = { antecedent: [], succedent: [] }
+
+const premiseCountShape = (n: number): string => {
+  const schema: RuleSchema = {
+    name: '',
+    premises: Array.from({ length: n }, () => emptySequent),
+    conclusion: emptySequent,
+  }
+  return fromSchemaRule(schema, false)
+}
 
 const renderAtom = (name: string): string => html(fromAtom(atom(name))(basic))
 
@@ -215,19 +228,19 @@ export const mountQuizConfig = (
     const premisesToggles = document.createElement('div')
     premisesToggles.className = 'config-toggles'
     for (const n of ALL_PREMISE_COUNTS) {
-      premisesToggles.appendChild(
-        createToggle(
-          String(n),
-          false,
-          String(n),
-          () => config.premiseCounts.includes(n),
-          () => {
-            const idx = config.premiseCounts.indexOf(n)
-            if (idx === -1) config.premiseCounts.push(n)
-            else config.premiseCounts.splice(idx, 1)
-          },
-        ),
+      const btn = createToggle(
+        premiseCountShape(n),
+        false,
+        String(n),
+        () => config.premiseCounts.includes(n),
+        () => {
+          const idx = config.premiseCounts.indexOf(n)
+          if (idx === -1) config.premiseCounts.push(n)
+          else config.premiseCounts.splice(idx, 1)
+        },
       )
+      btn.classList.add('toggle-large')
+      premisesToggles.appendChild(btn)
     }
     premisesSection.appendChild(premisesToggles)
     settings.appendChild(premisesSection)

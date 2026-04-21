@@ -600,6 +600,10 @@ html.loading body {
   align-items: center;
   justify-content: center;
 }
+.config-toggles .toggle-large {
+  width: 5em;
+  height: 5em;
+}
 .config-row {
   display: flex;
   align-items: center;
