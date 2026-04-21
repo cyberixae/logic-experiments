@@ -7,6 +7,7 @@ import { fromSequent, basic, printString } from '../render/print'
 import { html } from '../render/segment'
 import { sequent } from '../model/sequent'
 import { layoutTree } from './tree'
+import { createPausePopup } from './game'
 
 const ZOOM_MIN = 0.4
 const ZOOM_MAX = 2
@@ -54,12 +55,14 @@ const renderQuestionTree = (instance: InstantiatedRule, label: string | null): H
 
 // ── Quiz state ─────────────────────────────────────────────────────────────────
 
-type QuizState = QuizQuestion & { guessIndex: number | null }
+type QuizState = QuizQuestion & { guessIndex: number | null; instance: InstantiatedRule }
 
 const newState = (config: QuizConfig): QuizState | null => {
   const q = generateQuestion(config)
   if (q === null) return null
-  return { ...q, guessIndex: null }
+  const answer = q.schemas[q.answerIndex]
+  if (answer === undefined) return null
+  return { ...q, guessIndex: null, instance: instantiate(answer, config.formulaSize) }
 }
 
 // ── Mount ──────────────────────────────────────────────────────────────────────
@@ -73,6 +76,7 @@ export const mountQuiz = (
   let zoom = 1
   let pendingAutoZoom = true
   let regenerateTimer: ReturnType<typeof setTimeout> | null = null
+  let pausePopupOpen = false
 
   const render = () => {
     if (regenerateTimer !== null) {
@@ -82,7 +86,7 @@ export const mountQuiz = (
     container.innerHTML = ''
 
     const answer = state?.schemas[state.answerIndex]
-    const instance = answer !== undefined ? instantiate(answer, config.formulaSize) : null
+    const instance = state?.instance ?? null
 
     if (instance !== null && answer !== undefined) {
       const questionArea = document.createElement('div')
@@ -128,7 +132,7 @@ export const mountQuiz = (
     const menuBtn = document.createElement('div')
     menuBtn.setAttribute('class', 'button quiz-menu-btn')
     menuBtn.textContent = t('menu')
-    menuBtn.onclick = () => navigate('quiz-config')
+    menuBtn.onclick = () => { pausePopupOpen = true; render() }
     panel.appendChild(menuBtn)
 
     if (state === null) {
@@ -210,6 +214,14 @@ export const mountQuiz = (
     }
     panel.appendChild(cardsArea)
     container.appendChild(panel)
+
+    if (pausePopupOpen) {
+      const resume = () => { pausePopupOpen = false; render() }
+      const exitToMenu = () => { pausePopupOpen = false; navigate('menu') }
+      const openSettings = () => { pausePopupOpen = false; navigate('quiz-config') }
+      const restart = () => { pausePopupOpen = false; state = newState(config); pendingAutoZoom = true; render() }
+      container.appendChild(createPausePopup(resume, exitToMenu, restart, false, undefined, openSettings))
+    }
   }
 
   render()
