@@ -178,13 +178,11 @@ export const mountQuiz = (
       const schema = state.schemas[i]
       if (schema === undefined) continue
       const card = document.createElement('pre')
-      let cls = 'quiz-card rule'
+      let cls = 'quiz-card rule button'
       if (state.guessIndex !== null) {
-        cls += ' hint'
         if (i === state.answerIndex) cls += ' quiz-card-correct'
         else if (i === state.guessIndex) cls += ' quiz-card-wrong'
-      } else {
-        cls += ' button'
+        else cls += ' disabled'
       }
       card.setAttribute('class', cls)
       card.innerHTML =
