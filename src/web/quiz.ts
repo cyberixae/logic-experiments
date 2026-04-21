@@ -94,7 +94,7 @@ export const mountQuiz = (
       questionArea.style.setProperty('--tree-zoom', String(zoom))
       const treeEl = renderQuestionTree(
         instance,
-        state !== null && state.guessIndex !== null ? answer.name : null,
+        state !== null && state.guessIndex !== null ? answer.name : '\u00a0?\u00a0',
       )
       questionArea.appendChild(treeEl)
       container.appendChild(questionArea)
