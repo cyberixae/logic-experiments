@@ -34,12 +34,12 @@ export type QuizConfig = {
 }
 
 export const defaultQuizConfig = (): QuizConfig => ({
-  symbols: ['p', 'q', 'r'],
+  symbols: [],
   connectives: ['implication', 'negation'],
   variables: [],
   sequences: [],
   formulaSize: 2,
-  premiseCounts: [0, 1, 2],
+  premiseCounts: [1],
   contextSize: 3,
 })
 
