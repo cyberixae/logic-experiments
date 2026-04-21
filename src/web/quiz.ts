@@ -1,8 +1,51 @@
 import { MountResult, Navigate } from './types'
 import { t } from './i18n'
-import { generateQuestion, instantiate, QuizQuestion } from '../quiz/generate'
-import { fromSchemaRule, fromInstantiatedRule } from '../quiz/render'
+import { generateQuestion, instantiate, InstantiatedRule, QuizQuestion } from '../quiz/generate'
+import { fromSchemaRule } from '../quiz/render'
 import { QuizConfig } from '../quiz/config'
+import { fromSequent, basic, printString } from '../render/print'
+import { html } from '../render/segment'
+import { sequent } from '../model/sequent'
+import { layoutTree } from './tree'
+
+// ── Question tree ──────────────────────────────────────────────────────────────
+
+const renderQuestionTree = (instance: InstantiatedRule, label: string | null): HTMLElement => {
+  const node = document.createElement('div')
+  node.setAttribute('class', 'tree-node')
+
+  if (instance.premises.length > 0) {
+    const premisesEl = document.createElement('div')
+    premisesEl.setAttribute('class', 'tree-premises')
+    for (const p of instance.premises) {
+      const pNode = document.createElement('div')
+      pNode.setAttribute('class', 'tree-node')
+      const pSeq = document.createElement('div')
+      pSeq.setAttribute('class', 'tree-sequent')
+      pSeq.innerHTML = html(fromSequent(sequent(p.antecedent, p.succedent))(basic))
+      pNode.appendChild(pSeq)
+      premisesEl.appendChild(pNode)
+    }
+    node.appendChild(premisesEl)
+  }
+
+  const inference = document.createElement('div')
+  inference.setAttribute('class', 'tree-inference')
+  if (label !== null) {
+    const labelEl = document.createElement('div')
+    labelEl.setAttribute('class', 'tree-rule-label')
+    labelEl.innerHTML = html(printString(label)(basic))
+    inference.appendChild(labelEl)
+  }
+  node.appendChild(inference)
+
+  const concSeq = document.createElement('div')
+  concSeq.setAttribute('class', 'tree-sequent')
+  concSeq.innerHTML = html(fromSequent(sequent(instance.conclusion.antecedent, instance.conclusion.succedent))(basic))
+  node.appendChild(concSeq)
+
+  return node
+}
 
 // ── Quiz state ─────────────────────────────────────────────────────────────────
 
@@ -31,6 +74,23 @@ export const mountQuiz = (
     }
     container.innerHTML = ''
 
+    const answer = state?.schemas[state.answerIndex]
+    const instance = answer !== undefined ? instantiate(answer) : null
+
+    if (instance !== null && answer !== undefined) {
+      const questionArea = document.createElement('div')
+      questionArea.setAttribute('class', 'quiz-question')
+      const treeEl = renderQuestionTree(
+        instance,
+        state !== null && state.guessIndex !== null ? answer.name : null,
+      )
+      questionArea.appendChild(treeEl)
+      container.appendChild(questionArea)
+      requestAnimationFrame(() => {
+        layoutTree(treeEl, { skipActiveScroll: true })
+      })
+    }
+
     const panel = document.createElement('div')
     panel.setAttribute('class', 'quiz-panel')
 
@@ -47,21 +107,6 @@ export const mountQuiz = (
       container.appendChild(panel)
       return
     }
-
-    const answer = state.schemas[state.answerIndex]
-    if (answer === undefined) return
-    const instance = instantiate(answer)
-
-    const questionArea = document.createElement('div')
-    questionArea.setAttribute('class', 'quiz-question')
-    const questionPre = document.createElement('pre')
-    questionPre.setAttribute('class', 'rule hint')
-    questionPre.innerHTML = fromInstantiatedRule(
-      instance,
-      state.guessIndex !== null ? answer.name : null,
-    )
-    questionArea.appendChild(questionPre)
-    panel.appendChild(questionArea)
 
     const cardsArea = document.createElement('div')
     cardsArea.setAttribute('class', 'quiz-cards')
