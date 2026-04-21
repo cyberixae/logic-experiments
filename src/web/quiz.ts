@@ -8,6 +8,7 @@ import { html } from '../render/segment'
 import { sequent } from '../model/sequent'
 import { layoutTree } from './tree'
 import { createPausePopup } from './game'
+import { qwertyKeyMap } from './input-mode'
 
 const ZOOM_MIN = 0.4
 const ZOOM_MAX = 2
@@ -226,8 +227,25 @@ export const mountQuiz = (
 
   render()
 
+  const handleKey = (ev: KeyboardEvent) => {
+    if (ev.ctrlKey || ev.metaKey || ev.altKey) return
+    const action = qwertyKeyMap[ev.code]
+    if (!action) return
+    if (action === 'menu') {
+      pausePopupOpen = !pausePopupOpen
+      render()
+    } else if (action === 'reset') {
+      pausePopupOpen = false; state = newState(config); pendingAutoZoom = true; render()
+    } else if (pausePopupOpen) {
+      if (action === 'undo') { pausePopupOpen = false; render() }
+      else if (action === 'exit') { pausePopupOpen = false; navigate('menu') }
+    }
+  }
+  document.addEventListener('keydown', handleKey)
+
   return {
     cleanup: () => {
+      document.removeEventListener('keydown', handleKey)
       if (regenerateTimer !== null) {
         clearTimeout(regenerateTimer)
         regenerateTimer = null
