@@ -258,6 +258,14 @@ html.loading body {
 .button:not(.disabled):hover {
   background-color: #fff;
 }
+.button.quiz-card-correct, .button.quiz-card-correct:hover {
+  border-color: #2a2;
+  background-color: #afa;
+}
+.button.quiz-card-wrong, .button.quiz-card-wrong:hover {
+  border-color: #a22;
+  background-color: #faa;
+}
 .button.disabled {
   cursor: default;
   opacity: 0.5;
@@ -888,14 +896,6 @@ html.loading body {
 .quiz-card {
   overflow-x: auto;
   max-width: calc(100vw - 3em);
-}
-.quiz-card-correct {
-  border-color: #2a2;
-  background-color: #afa;
-}
-.quiz-card-wrong {
-  border-color: #a22;
-  background-color: #faa;
 }
 
 /* === Mobile layout === */

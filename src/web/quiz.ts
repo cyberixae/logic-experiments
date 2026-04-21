@@ -39,7 +39,7 @@ const renderQuestionTree = (instance: InstantiatedRule, label: string | null): H
   if (label !== null) {
     const labelEl = document.createElement('div')
     labelEl.setAttribute('class', 'tree-rule-label')
-    labelEl.innerHTML = html(printString(label)(basic))
+    labelEl.innerHTML = html(printString('(' + label + ')')(basic))
     inference.appendChild(labelEl)
   }
   node.appendChild(inference)
