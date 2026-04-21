@@ -60,8 +60,7 @@ const randomInt = (min: number, max: number): number =>
 
 const randomLeaf = (blocks: Blocks): SchemaFormula => pick(blocks.leaves)
 
-const randomSchemaFormula = (blocks: Blocks, depth = 0): SchemaFormula => {
-  const maxDepth = 2
+const randomSchemaFormula = (blocks: Blocks, maxDepth: number, depth = 0): SchemaFormula => {
   const hasOps = blocks.binaryOps.length > 0 || blocks.hasNegation
   if (depth >= maxDepth || !hasOps || Math.random() < 0.5) {
     return randomLeaf(blocks)
@@ -72,24 +71,24 @@ const randomSchemaFormula = (blocks: Blocks, depth = 0): SchemaFormula => {
   const next = depth + 1
   switch (op) {
     case 'negation':
-      return { kind: 'negation', negand: randomSchemaFormula(blocks, next) }
+      return { kind: 'negation', negand: randomSchemaFormula(blocks, maxDepth, next) }
     case 'implication':
       return {
         kind: 'implication',
-        antecedent: randomSchemaFormula(blocks, next),
-        consequent: randomSchemaFormula(blocks, next),
+        antecedent: randomSchemaFormula(blocks, maxDepth, next),
+        consequent: randomSchemaFormula(blocks, maxDepth, next),
       }
     case 'conjunction':
       return {
         kind: 'conjunction',
-        leftConjunct: randomSchemaFormula(blocks, next),
-        rightConjunct: randomSchemaFormula(blocks, next),
+        leftConjunct: randomSchemaFormula(blocks, maxDepth, next),
+        rightConjunct: randomSchemaFormula(blocks, maxDepth, next),
       }
     default:
       return {
         kind: 'disjunction',
-        leftDisjunct: randomSchemaFormula(blocks, next),
-        rightDisjunct: randomSchemaFormula(blocks, next),
+        leftDisjunct: randomSchemaFormula(blocks, maxDepth, next),
+        rightDisjunct: randomSchemaFormula(blocks, maxDepth, next),
       }
   }
 }
@@ -100,10 +99,11 @@ const randomPremiseContext = (
   blocks: Blocks,
   seqVar: SequenceVar | null,
   contextSize: number,
+  formulaSize: number,
 ): SchemaContext => {
-  const count = randomInt(1, Math.max(1, contextSize))
+  const count = contextSize > 0 ? bellRandom(1, contextSize) : 0
   const items: SchemaFormula[] = Array.from({ length: count }, () =>
-    randomSchemaFormula(blocks),
+    randomSchemaFormula(blocks, formulaSize),
   )
   if (seqVar === null) return items
   const pos = randomInt(0, items.length)
@@ -116,14 +116,15 @@ const randomConclusionContext = (
   blocks: Blocks,
   knownSeqVars: SequenceVar[],
   contextSize: number,
+  formulaSize: number,
 ): SchemaContext => {
   const items: SchemaContextItem[] = []
-  const count = randomInt(1, Math.max(1, contextSize))
+  const count = contextSize > 0 ? bellRandom(1, contextSize) : 0
   for (let i = 0; i < count; i += 1) {
     if (isNonEmptyArray(knownSeqVars) && Math.random() < 0.5) {
       items.push(pick(knownSeqVars))
     } else {
-      items.push(randomSchemaFormula(blocks))
+      items.push(randomSchemaFormula(blocks, formulaSize))
     }
   }
   return items
@@ -144,6 +145,7 @@ const randomPremise = (
   blocks: Blocks,
   usedSeqVars: Set<string>,
   contextSize: number,
+  formulaSize: number,
 ): SchemaSequent => {
   const seqAnt =
     blocks.seqVars.length > 0 && Math.random() < 0.6
@@ -154,8 +156,8 @@ const randomPremise = (
       ? pickUnusedSeqVar(blocks.seqVars, usedSeqVars)
       : null
   return {
-    antecedent: randomPremiseContext(blocks, seqAnt, contextSize),
-    succedent: randomPremiseContext(blocks, seqSuc, contextSize),
+    antecedent: randomPremiseContext(blocks, seqAnt, contextSize, formulaSize),
+    succedent: randomPremiseContext(blocks, seqSuc, contextSize, formulaSize),
   }
 }
 
@@ -163,26 +165,27 @@ const randomConclusion = (
   blocks: Blocks,
   usedSeqVars: Set<string>,
   contextSize: number,
+  formulaSize: number,
 ): SchemaSequent => {
   const known = blocks.seqVars.filter((v) => usedSeqVars.has(v.name))
   return {
-    antecedent: randomConclusionContext(blocks, known, contextSize),
-    succedent: randomConclusionContext(blocks, known, contextSize),
+    antecedent: randomConclusionContext(blocks, known, contextSize, formulaSize),
+    succedent: randomConclusionContext(blocks, known, contextSize, formulaSize),
   }
 }
 
-const generateBaseSchema = (blocks: Blocks, premiseCounts: number[], contextSize: number): RuleSchema => {
+const generateBaseSchema = (blocks: Blocks, premiseCounts: number[], contextSize: number, formulaSize: number): RuleSchema => {
   const allowed = premiseCounts.length > 0 ? premiseCounts : [0, 1, 2]
   const premiseCount = allowed[Math.floor(Math.random() * allowed.length)] ?? 0
   const usedSeqVars = new Set<string>()
   const premises: SchemaSequent[] = []
   for (let i = 0; i < premiseCount; i += 1) {
-    premises.push(randomPremise(blocks, usedSeqVars, contextSize))
+    premises.push(randomPremise(blocks, usedSeqVars, contextSize, formulaSize))
   }
   return {
     name: '',
     premises,
-    conclusion: randomConclusion(blocks, usedSeqVars, contextSize),
+    conclusion: randomConclusion(blocks, usedSeqVars, contextSize, formulaSize),
   }
 }
 
@@ -455,6 +458,7 @@ const tryAddRemovePremise = (
   blocks: Blocks,
   premiseCounts: number[],
   contextSize: number,
+  formulaSize: number,
 ): RuleSchema | null => {
   const allowed = premiseCounts.length > 0 ? premiseCounts : [0, 1, 2]
   const canAdd = allowed.includes(rule.premises.length + 1)
@@ -463,7 +467,7 @@ const tryAddRemovePremise = (
   const doAdd = canAdd && (!canRemove || (rule.premises.length < 2 && Math.random() >= 0.5))
   if (doAdd) {
     const usedSeqVars = new Set(collectSeqVars(rule))
-    return { ...rule, premises: [...rule.premises, randomPremise(blocks, usedSeqVars, contextSize)] }
+    return { ...rule, premises: [...rule.premises, randomPremise(blocks, usedSeqVars, contextSize, formulaSize)] }
   }
   return { ...rule, premises: rule.premises.slice(0, -1) }
 }
@@ -501,7 +505,7 @@ const generateDistractors = (
     () => trySubstituteFormulaVar(base),
     () => trySubstituteSeqVar(base),
     () => trySubstituteConnective(base, config),
-    () => tryAddRemovePremise(base, blocks, config.premiseCounts, config.contextSize),
+    () => tryAddRemovePremise(base, blocks, config.premiseCounts, config.contextSize, config.formulaSize),
   ]
 
   let attempts = 0
@@ -521,7 +525,7 @@ const generateDistractors = (
 
   // Fill remaining slots with fresh schemas if mutations exhausted
   while (distractors.length < count) {
-    const fresh = generateBaseSchema(blocks, config.premiseCounts, config.contextSize)
+    const fresh = generateBaseSchema(blocks, config.premiseCounts, config.contextSize, config.formulaSize)
     const key = schemaKey(fresh)
     if (!used.has(key)) {
       used.add(key)
@@ -539,11 +543,20 @@ export type QuizQuestion = {
   answerIndex: number
 }
 
+export const generatePreviewSchemas = (config: QuizConfig, count: number): RuleSchema[] => {
+  const blocks = buildBlocks(config)
+  if (blocks === null) return []
+  return Array.from({ length: count }, (_, i) => ({
+    ...generateBaseSchema(blocks, config.premiseCounts, config.contextSize, config.formulaSize),
+    name: `R${i + 1}`,
+  }))
+}
+
 export const generateQuestion = (config: QuizConfig): QuizQuestion | null => {
   const blocks = buildBlocks(config)
   if (blocks === null) return null
 
-  const base = generateBaseSchema(blocks, config.premiseCounts, config.contextSize)
+  const base = generateBaseSchema(blocks, config.premiseCounts, config.contextSize, config.formulaSize)
   const distractors = generateDistractors(base, config, blocks, 3)
   const all = shuffle([base, ...distractors])
   const answerIndex = all.indexOf(base)

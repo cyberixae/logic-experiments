@@ -35,12 +35,12 @@ export type QuizConfig = {
 
 export const defaultQuizConfig = (): QuizConfig => ({
   symbols: [],
-  connectives: ['implication', 'negation'],
-  variables: [],
-  sequences: [],
-  formulaSize: 2,
+  connectives: [...ALL_CONNECTIVE_TYPES],
+  variables: [...ALL_VARIABLES],
+  sequences: [...ALL_SEQUENCES],
+  formulaSize: 1,
   premiseCounts: [1],
-  contextSize: 3,
+  contextSize: 2,
 })
 
 export const parseQuizConfigFromParams = (
@@ -82,7 +82,7 @@ export const parseQuizConfigFromParams = (
         ? [0, 1, 2].filter((n) => premisesParam.includes(String(n)))
         : defaults.premiseCounts,
     contextSize:
-      contextParam !== null ? Math.max(1, Math.min(6, parseInt(contextParam, 10) || defaults.contextSize)) : defaults.contextSize,
+      contextParam !== null ? Math.max(0, Math.min(6, parseInt(contextParam, 10) || defaults.contextSize)) : defaults.contextSize,
   }
 }
 

@@ -15,6 +15,7 @@ import {
 } from '../quiz/config'
 import { fromSchemaRule } from '../quiz/render'
 import { RuleSchema } from '../quiz/schema'
+import { generatePreviewSchemas } from '../quiz/generate'
 
 const ALL_PREMISE_COUNTS = [0, 1, 2] as const
 
@@ -95,13 +96,14 @@ const createSection = (title: string): HTMLElement => {
   const section = document.createElement('div')
   section.className = 'config-section'
   const heading = document.createElement('div')
-  heading.className = 'config-section-title'
+  heading.className = 'config-subsection-title'
   heading.textContent = title
   section.appendChild(heading)
   return section
 }
 
 let syncUrl = () => {}
+let renderPreview = () => {}
 
 export const mountQuizConfig = (
   container: HTMLElement,
@@ -116,6 +118,7 @@ export const mountQuizConfig = (
     const params = new URLSearchParams(window.location.search)
     setQuizConfigParams(config, params)
     history.replaceState(history.state, '', `?${params.toString()}`)
+    renderPreview()
   }
 
   const toggle = (arr: string[], value: string) => {
@@ -140,8 +143,19 @@ export const mountQuizConfig = (
     title.textContent = t('quiz')
     layout.appendChild(title)
 
+    const columns = document.createElement('div')
+    columns.className = 'config-columns'
+
     const settings = document.createElement('div')
     settings.className = 'config-settings'
+
+    const shapeSection = document.createElement('div')
+    shapeSection.className = 'config-section'
+
+    const settingsTitle = document.createElement('div')
+    settingsTitle.className = 'config-section-title'
+    settingsTitle.textContent = t('formulaShape')
+    shapeSection.appendChild(settingsTitle)
 
     // Symbols
     const symbolSection = createSection(t('symbols'))
@@ -159,7 +173,7 @@ export const mountQuizConfig = (
       )
     }
     symbolSection.appendChild(symbolToggles)
-    settings.appendChild(symbolSection)
+    shapeSection.appendChild(symbolSection)
 
     // Connectives
     const connLabel: Record<string, string> = {
@@ -185,7 +199,7 @@ export const mountQuizConfig = (
       )
     }
     connSection.appendChild(connToggles)
-    settings.appendChild(connSection)
+    shapeSection.appendChild(connSection)
 
     // Formula variables
     const varSection = createSection(t('variables'))
@@ -203,7 +217,7 @@ export const mountQuizConfig = (
       )
     }
     varSection.appendChild(varToggles)
-    settings.appendChild(varSection)
+    shapeSection.appendChild(varSection)
 
     // Sequence symbols
     const seqSection = createSection(t('sequences'))
@@ -221,7 +235,7 @@ export const mountQuizConfig = (
       )
     }
     seqSection.appendChild(seqToggles)
-    settings.appendChild(seqSection)
+    shapeSection.appendChild(seqSection)
 
     // Premises
     const premisesSection = createSection(t('premises'))
@@ -243,7 +257,7 @@ export const mountQuizConfig = (
       premisesToggles.appendChild(btn)
     }
     premisesSection.appendChild(premisesToggles)
-    settings.appendChild(premisesSection)
+    shapeSection.appendChild(premisesSection)
 
     // Formula size and context size
     const sizeSection = createSection(t('size'))
@@ -258,10 +272,12 @@ export const mountQuizConfig = (
     sizeSection.appendChild(
       createRow(
         t('contextSize'),
-        createNumberInput(config.contextSize, (v) => { config.contextSize = v }, 1, 6),
+        createNumberInput(config.contextSize, (v) => { config.contextSize = v }, 0, 6),
       ),
     )
-    settings.appendChild(sizeSection)
+    shapeSection.appendChild(sizeSection)
+
+    settings.appendChild(shapeSection)
 
     // Buttons
     const buttons = document.createElement('div')
@@ -278,7 +294,37 @@ export const mountQuizConfig = (
     buttons.appendChild(startBtn)
     settings.appendChild(buttons)
 
-    layout.appendChild(settings)
+    columns.appendChild(settings)
+
+    // Preview column
+    const previewCol = document.createElement('div')
+    previewCol.className = 'config-preview'
+
+    const previewTitle = document.createElement('div')
+    previewTitle.className = 'config-section-title'
+    previewTitle.textContent = t('preview')
+    previewCol.appendChild(previewTitle)
+
+    const previewCards = document.createElement('div')
+    previewCards.className = 'quiz-cards'
+    previewCol.appendChild(previewCards)
+
+    renderPreview = () => {
+      previewCards.innerHTML = ''
+      const schemas = generatePreviewSchemas(config, 6)
+      for (const schema of schemas) {
+        const card = document.createElement('pre')
+        card.className = 'quiz-card rule hint'
+        card.innerHTML =
+          '<span class="rule-label long">' + fromSchemaRule(schema, false) + '</span>' +
+          '<span class="rule-label short">' + fromSchemaRule(schema, false) + '</span>'
+        previewCards.appendChild(card)
+      }
+    }
+    renderPreview()
+
+    columns.appendChild(previewCol)
+    layout.appendChild(columns)
     container.appendChild(layout)
   }
 

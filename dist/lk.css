@@ -880,6 +880,11 @@ html.loading body {
   flex-direction: column;
   gap: 1.5em;
 }
+.config-preview .quiz-cards {
+  display: grid;
+  grid-template-columns: max-content;
+  gap: 1.5em;
+}
 .quiz-card {
   overflow-x: auto;
   max-width: calc(100vw - 3em);
