@@ -122,7 +122,13 @@ export const mountQuiz = (
         cls += ' button'
       }
       card.setAttribute('class', cls)
-      card.innerHTML = fromSchemaRule(schema)
+      card.innerHTML =
+        '<span class="rule-label long">' +
+        fromSchemaRule(schema, true) +
+        '</span>' +
+        '<span class="rule-label short">' +
+        fromSchemaRule(schema, false) +
+        '</span>'
 
       if (state.guessIndex === null) {
         const idx = i

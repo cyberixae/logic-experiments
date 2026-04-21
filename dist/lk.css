@@ -1306,13 +1306,19 @@ html.loading body {
 .quiz-question {
   --base-tree-zoom: 1;
   display: flex;
-  justify-content: center;
-  align-items: flex-end;
+  justify-content: safe center;
+  align-items: safe flex-end;
   height: 18em;
   box-sizing: border-box;
   padding: 6em 0.5em 2em 0.5em;
-  overflow: hidden auto;
+  overflow: auto;
   width: 100%;
+}
+.quiz-question {
+  scrollbar-width: none;
+}
+.quiz-question::-webkit-scrollbar {
+  display: none;
 }
 .quiz-question > .tree-node {
   font-size: calc(2em * var(--base-tree-zoom, 1) * var(--tree-zoom, 1));
@@ -1324,6 +1330,7 @@ html.loading body {
 }
 .quiz-card {
   overflow-x: auto;
+  max-width: calc(100vw - 3em);
 }
 .quiz-card-correct {
   border-color: #2a2;
