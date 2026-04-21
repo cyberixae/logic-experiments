@@ -8,6 +8,13 @@ import { html } from '../render/segment'
 import { sequent } from '../model/sequent'
 import { layoutTree } from './tree'
 
+const ZOOM_MIN = 0.4
+const ZOOM_MAX = 2
+const ZOOM_STEP = 0.2
+const AUTO_ZOOM_MIN = 0.8
+const AUTO_ZOOM_MAX = 1.2
+const AUTO_ZOOM_PAD = 0.9
+
 // ── Question tree ──────────────────────────────────────────────────────────────
 
 const renderQuestionTree = (instance: InstantiatedRule, label: string | null): HTMLElement => {
@@ -63,6 +70,8 @@ export const mountQuiz = (
   config: QuizConfig,
 ): MountResult => {
   let state: QuizState | null = newState(config)
+  let zoom = 1
+  let pendingAutoZoom = true
   let regenerateTimer: ReturnType<typeof setTimeout> | null = null
 
   const render = () => {
@@ -78,6 +87,7 @@ export const mountQuiz = (
     if (instance !== null && answer !== undefined) {
       const questionArea = document.createElement('div')
       questionArea.setAttribute('class', 'quiz-question')
+      questionArea.style.setProperty('--tree-zoom', String(zoom))
       const treeEl = renderQuestionTree(
         instance,
         state !== null && state.guessIndex !== null ? answer.name : null,
@@ -86,6 +96,29 @@ export const mountQuiz = (
       container.appendChild(questionArea)
       requestAnimationFrame(() => {
         layoutTree(treeEl, { skipActiveScroll: true })
+        if (pendingAutoZoom) {
+          pendingAutoZoom = false
+          const premiseSequents = Array.from(treeEl.querySelectorAll<HTMLElement>(':scope > .tree-premises > .tree-node > .tree-sequent'))
+          const conclusionSequent = treeEl.querySelector<HTMLElement>(':scope > .tree-sequent')
+          const sequents = [...premiseSequents, ...(conclusionSequent ? [conclusionSequent] : [])]
+          const widest = sequents.reduce<HTMLElement | null>((max, s) => max === null || s.getBoundingClientRect().width > max.getBoundingClientRect().width ? s : max, null)
+          const areaRect = questionArea.getBoundingClientRect()
+          const areaStyle = getComputedStyle(questionArea)
+          const availW = areaRect.width - parseFloat(areaStyle.paddingLeft) - parseFloat(areaStyle.paddingRight)
+          if (widest && widest.getBoundingClientRect().width > 0 && availW > 0) {
+            const target = Math.max(AUTO_ZOOM_MIN, Math.min(AUTO_ZOOM_MAX, (zoom * availW * AUTO_ZOOM_PAD) / widest.getBoundingClientRect().width))
+            if (Math.abs(target - zoom) > 0.01) {
+              zoom = target
+              questionArea.style.setProperty('--tree-zoom', String(zoom))
+              layoutTree(treeEl, { skipActiveScroll: true })
+            }
+          }
+        }
+        requestAnimationFrame(() => {
+          const treeWidth = treeEl.getBoundingClientRect().width
+          const areaWidth = questionArea.getBoundingClientRect().width
+          questionArea.scrollLeft = (treeWidth - areaWidth) / 2
+        })
       })
     }
 
@@ -105,6 +138,38 @@ export const mountQuiz = (
       container.appendChild(panel)
       return
     }
+
+    const zoomRow = document.createElement('div')
+    zoomRow.setAttribute('class', 'quiz-zoom')
+
+    const zoomOut = document.createElement('div')
+    zoomOut.setAttribute('class', 'button' + (zoom <= ZOOM_MIN ? ' disabled' : ''))
+    zoomOut.textContent = '−'
+    zoomOut.onclick = () => {
+      zoom = Math.max(ZOOM_MIN, zoom - ZOOM_STEP)
+      render()
+    }
+    zoomRow.appendChild(zoomOut)
+
+    const zoomReset = document.createElement('div')
+    zoomReset.setAttribute('class', 'button')
+    zoomReset.textContent = '⊙'
+    zoomReset.onclick = () => {
+      zoom = 1
+      render()
+    }
+    zoomRow.appendChild(zoomReset)
+
+    const zoomIn = document.createElement('div')
+    zoomIn.setAttribute('class', 'button' + (zoom >= ZOOM_MAX ? ' disabled' : ''))
+    zoomIn.textContent = '+'
+    zoomIn.onclick = () => {
+      zoom = Math.min(ZOOM_MAX, zoom + ZOOM_STEP)
+      render()
+    }
+    zoomRow.appendChild(zoomIn)
+
+    panel.appendChild(zoomRow)
 
     const cardsArea = document.createElement('div')
     cardsArea.setAttribute('class', 'quiz-cards')
@@ -138,6 +203,7 @@ export const mountQuiz = (
           render()
           regenerateTimer = setTimeout(() => {
             state = newState(config)
+            pendingAutoZoom = true
             render()
           }, 1500)
         }
