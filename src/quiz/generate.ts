@@ -166,8 +166,9 @@ const randomConclusion = (
   }
 }
 
-const generateBaseSchema = (blocks: Blocks): RuleSchema => {
-  const premiseCount = randomInt(0, 2)
+const generateBaseSchema = (blocks: Blocks, premiseCounts: number[]): RuleSchema => {
+  const allowed = premiseCounts.length > 0 ? premiseCounts : [0, 1, 2]
+  const premiseCount = allowed[Math.floor(Math.random() * allowed.length)] ?? 0
   const usedSeqVars = new Set<string>()
   const premises: SchemaSequent[] = []
   for (let i = 0; i < premiseCount; i += 1) {
@@ -447,19 +448,18 @@ const trySubstituteConnective = (
 const tryAddRemovePremise = (
   rule: RuleSchema,
   blocks: Blocks,
+  premiseCounts: number[],
 ): RuleSchema | null => {
-  if (rule.premises.length === 0) {
+  const allowed = premiseCounts.length > 0 ? premiseCounts : [0, 1, 2]
+  const canAdd = allowed.includes(rule.premises.length + 1)
+  const canRemove = allowed.includes(rule.premises.length - 1)
+  if (!canAdd && !canRemove) return null
+  const doAdd = canAdd && (!canRemove || (rule.premises.length < 2 && Math.random() >= 0.5))
+  if (doAdd) {
     const usedSeqVars = new Set(collectSeqVars(rule))
-    return { ...rule, premises: [randomPremise(blocks, usedSeqVars)] }
+    return { ...rule, premises: [...rule.premises, randomPremise(blocks, usedSeqVars)] }
   }
-  if (rule.premises.length >= 2 || Math.random() < 0.5) {
-    return { ...rule, premises: rule.premises.slice(0, -1) }
-  }
-  const usedSeqVars = new Set(collectSeqVars(rule))
-  return {
-    ...rule,
-    premises: [...rule.premises, randomPremise(blocks, usedSeqVars)],
-  }
+  return { ...rule, premises: rule.premises.slice(0, -1) }
 }
 
 const schemaKey = (rule: RuleSchema): string =>
@@ -495,7 +495,7 @@ const generateDistractors = (
     () => trySubstituteFormulaVar(base),
     () => trySubstituteSeqVar(base),
     () => trySubstituteConnective(base, config),
-    () => tryAddRemovePremise(base, blocks),
+    () => tryAddRemovePremise(base, blocks, config.premiseCounts),
   ]
 
   let attempts = 0
@@ -515,7 +515,7 @@ const generateDistractors = (
 
   // Fill remaining slots with fresh schemas if mutations exhausted
   while (distractors.length < count) {
-    const fresh = generateBaseSchema(blocks)
+    const fresh = generateBaseSchema(blocks, config.premiseCounts)
     const key = schemaKey(fresh)
     if (!used.has(key)) {
       used.add(key)
@@ -537,7 +537,7 @@ export const generateQuestion = (config: QuizConfig): QuizQuestion | null => {
   const blocks = buildBlocks(config)
   if (blocks === null) return null
 
-  const base = generateBaseSchema(blocks)
+  const base = generateBaseSchema(blocks, config.premiseCounts)
   const distractors = generateDistractors(base, config, blocks, 3)
   const all = shuffle([base, ...distractors])
   const answerIndex = all.indexOf(base)
@@ -553,12 +553,12 @@ export const generateQuestion = (config: QuizConfig): QuizQuestion | null => {
 type FormulaBinding = Map<string, Prop>
 type SequenceBinding = Map<string, Prop[]>
 
-const instantiateFormula = (f: SchemaFormula, fb: FormulaBinding): Prop => {
+const instantiateFormula = (f: SchemaFormula, fb: FormulaBinding, formulaSize: number): Prop => {
   switch (f.kind) {
     case 'var': {
       let val = fb.get(f.name)
       if (val === undefined) {
-        val = random(2)()
+        val = random(formulaSize)()
         fb.set(f.name, val)
       }
       return val
@@ -570,24 +570,24 @@ const instantiateFormula = (f: SchemaFormula, fb: FormulaBinding): Prop => {
     case 'verum':
       return { kind: 'verum' }
     case 'negation':
-      return { kind: 'negation', negand: instantiateFormula(f.negand, fb) }
+      return { kind: 'negation', negand: instantiateFormula(f.negand, fb, formulaSize) }
     case 'implication':
       return {
         kind: 'implication',
-        antecedent: instantiateFormula(f.antecedent, fb),
-        consequent: instantiateFormula(f.consequent, fb),
+        antecedent: instantiateFormula(f.antecedent, fb, formulaSize),
+        consequent: instantiateFormula(f.consequent, fb, formulaSize),
       }
     case 'conjunction':
       return {
         kind: 'conjunction',
-        leftConjunct: instantiateFormula(f.leftConjunct, fb),
-        rightConjunct: instantiateFormula(f.rightConjunct, fb),
+        leftConjunct: instantiateFormula(f.leftConjunct, fb, formulaSize),
+        rightConjunct: instantiateFormula(f.rightConjunct, fb, formulaSize),
       }
     case 'disjunction':
       return {
         kind: 'disjunction',
-        leftDisjunct: instantiateFormula(f.leftDisjunct, fb),
-        rightDisjunct: instantiateFormula(f.rightDisjunct, fb),
+        leftDisjunct: instantiateFormula(f.leftDisjunct, fb, formulaSize),
+        rightDisjunct: instantiateFormula(f.rightDisjunct, fb, formulaSize),
       }
   }
 }
@@ -596,18 +596,19 @@ const instantiateContext = (
   ctx: SchemaContext,
   fb: FormulaBinding,
   sb: SequenceBinding,
+  formulaSize: number,
 ): Prop[] => {
   const result: Prop[] = []
   for (const item of ctx) {
     if (item.kind === 'seq') {
       let val = sb.get(item.name)
       if (val === undefined) {
-        val = Array.from({ length: randomInt(0, 2) }, () => random(1)())
+        val = Array.from({ length: randomInt(0, 2) }, () => random(formulaSize)())
         sb.set(item.name, val)
       }
       result.push(...val)
     } else {
-      result.push(instantiateFormula(item, fb))
+      result.push(instantiateFormula(item, fb, formulaSize))
     }
   }
   return result
@@ -619,12 +620,12 @@ export type InstantiatedRule = {
   conclusion: InstantiatedSequent
 }
 
-export const instantiate = (schema: RuleSchema): InstantiatedRule => {
+export const instantiate = (schema: RuleSchema, formulaSize: number = 2): InstantiatedRule => {
   const fb: FormulaBinding = new Map()
   const sb: SequenceBinding = new Map()
   const instantiateSeq = (s: SchemaSequent): InstantiatedSequent => ({
-    antecedent: instantiateContext(s.antecedent, fb, sb),
-    succedent: instantiateContext(s.succedent, fb, sb),
+    antecedent: instantiateContext(s.antecedent, fb, sb, formulaSize),
+    succedent: instantiateContext(s.succedent, fb, sb, formulaSize),
   })
   return {
     premises: schema.premises.map(instantiateSeq),

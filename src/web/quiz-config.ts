@@ -14,6 +14,8 @@ import {
   setQuizConfigParams,
 } from '../quiz/config'
 
+const ALL_PREMISE_COUNTS = [0, 1, 2] as const
+
 const renderAtom = (name: string): string => html(fromAtom(atom(name))(basic))
 
 const createToggle = (
@@ -40,6 +42,40 @@ const createToggle = (
     syncUrl()
   }
   return btn
+}
+
+const createNumberInput = (
+  value: number,
+  onChange: (v: number) => void,
+  min: number = 1,
+  max: number = 10,
+): HTMLElement => {
+  const input = document.createElement('input')
+  input.type = 'number'
+  input.className = 'config-input'
+  input.value = String(value)
+  input.min = String(min)
+  input.max = String(max)
+  input.step = '1'
+  input.onchange = () => {
+    const parsed = parseInt(input.value, 10)
+    if (!isNaN(parsed) && parsed >= min && parsed <= max) {
+      onChange(parsed)
+      syncUrl()
+    }
+  }
+  return input
+}
+
+const createRow = (label: string, input: HTMLElement): HTMLElement => {
+  const row = document.createElement('div')
+  row.className = 'config-row'
+  const labelEl = document.createElement('label')
+  labelEl.className = 'config-label'
+  labelEl.textContent = label
+  row.appendChild(labelEl)
+  row.appendChild(input)
+  return row
 }
 
 const createSection = (title: string): HTMLElement => {
@@ -173,6 +209,37 @@ export const mountQuizConfig = (
     }
     seqSection.appendChild(seqToggles)
     settings.appendChild(seqSection)
+
+    // Premises
+    const premisesSection = createSection(t('premises'))
+    const premisesToggles = document.createElement('div')
+    premisesToggles.className = 'config-toggles'
+    for (const n of ALL_PREMISE_COUNTS) {
+      premisesToggles.appendChild(
+        createToggle(
+          String(n),
+          false,
+          String(n),
+          () => config.premiseCounts.includes(n),
+          () => {
+            const idx = config.premiseCounts.indexOf(n)
+            if (idx === -1) config.premiseCounts.push(n)
+            else config.premiseCounts.splice(idx, 1)
+          },
+        ),
+      )
+    }
+    premisesSection.appendChild(premisesToggles)
+    settings.appendChild(premisesSection)
+
+    // Formula size
+    const sizeSection = createSection(t('size'))
+    sizeSection.appendChild(
+      createNumberInput(config.formulaSize, (v) => {
+        config.formulaSize = v
+      }),
+    )
+    settings.appendChild(sizeSection)
 
     // Buttons
     const buttons = document.createElement('div')

@@ -49,6 +49,7 @@ const en = {
   par: 'Par',
   variables: 'Variables',
   sequences: 'Sequences',
+  premises: 'Premises',
   statsTemplate:
     'Generated {formulas} formulas ({rate}/s), {tautologies} tautologies, {solved} solved. Updated {sinceUpdate}s ago.',
 } as const
@@ -104,6 +105,7 @@ const fi: Record<MessageKey, string> = {
   par: 'Par',
   variables: 'Muuttujat',
   sequences: 'Jonot',
+  premises: 'Premissit',
   statsTemplate:
     'Tuotettu {formulas} kaavaa ({rate}/s), {tautologies} tautologiaa, {solved} ratkaisua. Päivitetty {sinceUpdate}s sitten.',
 }
@@ -159,6 +161,7 @@ const es: Record<MessageKey, string> = {
   par: 'Par',
   variables: 'Variables',
   sequences: 'Secuencias',
+  premises: 'Premisas',
   statsTemplate:
     'Generadas {formulas} fórmulas ({rate}/s), {tautologies} tautologías, {solved} resueltas. Actualizado hace {sinceUpdate}s.',
 }
@@ -214,6 +217,7 @@ const cs: Record<MessageKey, string> = {
   par: 'Par',
   variables: 'Proměnné',
   sequences: 'Sekvence',
+  premises: 'Premisy',
   statsTemplate:
     'Vygenerováno {formulas} formulí ({rate}/s), {tautologies} tautologií, {solved} vyřešeno. Aktualizováno před {sinceUpdate}s.',
 }
@@ -269,6 +273,7 @@ const pl: Record<MessageKey, string> = {
   par: 'Par',
   variables: 'Zmienne',
   sequences: 'Sekwencje',
+  premises: 'Przesłanki',
   statsTemplate:
     'Wygenerowano {formulas} formuł ({rate}/s), {tautologies} tautologii, {solved} rozwiązanych. Zaktualizowano {sinceUpdate}s temu.',
 }

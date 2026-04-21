@@ -82,7 +82,7 @@ export const mountQuiz = (
     container.innerHTML = ''
 
     const answer = state?.schemas[state.answerIndex]
-    const instance = answer !== undefined ? instantiate(answer) : null
+    const instance = answer !== undefined ? instantiate(answer, config.formulaSize) : null
 
     if (instance !== null && answer !== undefined) {
       const questionArea = document.createElement('div')

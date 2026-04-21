@@ -28,6 +28,8 @@ export type QuizConfig = {
   connectives: string[]
   variables: string[]
   sequences: string[]
+  formulaSize: number
+  premiseCounts: number[]
 }
 
 export const defaultQuizConfig = (): QuizConfig => ({
@@ -35,6 +37,8 @@ export const defaultQuizConfig = (): QuizConfig => ({
   connectives: ['implication', 'negation'],
   variables: [],
   sequences: [],
+  formulaSize: 2,
+  premiseCounts: [0, 1, 2],
 })
 
 export const parseQuizConfigFromParams = (
@@ -45,6 +49,8 @@ export const parseQuizConfigFromParams = (
   const connectivesParam = params.get('qconnectives')
   const variablesParam = params.get('qvariables')
   const sequencesParam = params.get('qsequences')
+  const sizeParam = params.get('qsize')
+  const premisesParam = params.get('qpremises')
   return {
     symbols:
       symbolsParam !== null
@@ -66,6 +72,12 @@ export const parseQuizConfigFromParams = (
             sequencesParam.includes(SEQ_ABBREV[s] ?? ''),
           )
         : defaults.sequences,
+    formulaSize:
+      sizeParam !== null ? Math.max(1, Math.min(10, parseInt(sizeParam, 10) || defaults.formulaSize)) : defaults.formulaSize,
+    premiseCounts:
+      premisesParam !== null
+        ? [0, 1, 2].filter((n) => premisesParam.includes(String(n)))
+        : defaults.premiseCounts,
   }
 }
 
@@ -83,4 +95,6 @@ export const setQuizConfigParams = (
     'qsequences',
     config.sequences.map((s) => SEQ_ABBREV[s] ?? '').join(''),
   )
+  params.set('qsize', String(config.formulaSize))
+  params.set('qpremises', config.premiseCounts.join(''))
 }
