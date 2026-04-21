@@ -92,7 +92,7 @@ export type StepProgress = {
   solved: number
 }
 
-const bellRandom = (min: number, max: number, center?: number): number => {
+export const bellRandom = (min: number, max: number, center?: number): number => {
   const mid = center ?? (min + max) / 2
   const stddev = Math.max(max - mid, mid - min) / 3
   let value: number

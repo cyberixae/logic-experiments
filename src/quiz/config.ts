@@ -30,6 +30,7 @@ export type QuizConfig = {
   sequences: string[]
   formulaSize: number
   premiseCounts: number[]
+  contextSize: number
 }
 
 export const defaultQuizConfig = (): QuizConfig => ({
@@ -39,6 +40,7 @@ export const defaultQuizConfig = (): QuizConfig => ({
   sequences: [],
   formulaSize: 2,
   premiseCounts: [0, 1, 2],
+  contextSize: 3,
 })
 
 export const parseQuizConfigFromParams = (
@@ -51,6 +53,7 @@ export const parseQuizConfigFromParams = (
   const sequencesParam = params.get('qsequences')
   const sizeParam = params.get('qsize')
   const premisesParam = params.get('qpremises')
+  const contextParam = params.get('qcontext')
   return {
     symbols:
       symbolsParam !== null
@@ -73,11 +76,13 @@ export const parseQuizConfigFromParams = (
           )
         : defaults.sequences,
     formulaSize:
-      sizeParam !== null ? Math.max(1, Math.min(10, parseInt(sizeParam, 10) || defaults.formulaSize)) : defaults.formulaSize,
+      sizeParam !== null ? Math.max(0, Math.min(10, parseInt(sizeParam, 10) || defaults.formulaSize)) : defaults.formulaSize,
     premiseCounts:
       premisesParam !== null
         ? [0, 1, 2].filter((n) => premisesParam.includes(String(n)))
         : defaults.premiseCounts,
+    contextSize:
+      contextParam !== null ? Math.max(1, Math.min(6, parseInt(contextParam, 10) || defaults.contextSize)) : defaults.contextSize,
   }
 }
 
@@ -97,4 +102,5 @@ export const setQuizConfigParams = (
   )
   params.set('qsize', String(config.formulaSize))
   params.set('qpremises', config.premiseCounts.join(''))
+  params.set('qcontext', String(config.contextSize))
 }

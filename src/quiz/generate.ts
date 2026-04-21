@@ -1,4 +1,5 @@
 import { random, Prop } from '../model/prop'
+import { bellRandom } from '../random/challenge'
 import { NonEmptyArray, isNonEmptyArray } from '../utils/array'
 import {
   SequenceVar,
@@ -98,8 +99,9 @@ const randomSchemaFormula = (blocks: Blocks, depth = 0): SchemaFormula => {
 const randomPremiseContext = (
   blocks: Blocks,
   seqVar: SequenceVar | null,
+  contextSize: number,
 ): SchemaContext => {
-  const count = randomInt(1, 3)
+  const count = randomInt(1, Math.max(1, contextSize))
   const items: SchemaFormula[] = Array.from({ length: count }, () =>
     randomSchemaFormula(blocks),
   )
@@ -113,9 +115,10 @@ const randomPremiseContext = (
 const randomConclusionContext = (
   blocks: Blocks,
   knownSeqVars: SequenceVar[],
+  contextSize: number,
 ): SchemaContext => {
   const items: SchemaContextItem[] = []
-  const count = randomInt(1, 3)
+  const count = randomInt(1, Math.max(1, contextSize))
   for (let i = 0; i < count; i += 1) {
     if (isNonEmptyArray(knownSeqVars) && Math.random() < 0.5) {
       items.push(pick(knownSeqVars))
@@ -140,6 +143,7 @@ const pickUnusedSeqVar = (
 const randomPremise = (
   blocks: Blocks,
   usedSeqVars: Set<string>,
+  contextSize: number,
 ): SchemaSequent => {
   const seqAnt =
     blocks.seqVars.length > 0 && Math.random() < 0.6
@@ -150,34 +154,35 @@ const randomPremise = (
       ? pickUnusedSeqVar(blocks.seqVars, usedSeqVars)
       : null
   return {
-    antecedent: randomPremiseContext(blocks, seqAnt),
-    succedent: randomPremiseContext(blocks, seqSuc),
+    antecedent: randomPremiseContext(blocks, seqAnt, contextSize),
+    succedent: randomPremiseContext(blocks, seqSuc, contextSize),
   }
 }
 
 const randomConclusion = (
   blocks: Blocks,
   usedSeqVars: Set<string>,
+  contextSize: number,
 ): SchemaSequent => {
   const known = blocks.seqVars.filter((v) => usedSeqVars.has(v.name))
   return {
-    antecedent: randomConclusionContext(blocks, known),
-    succedent: randomConclusionContext(blocks, known),
+    antecedent: randomConclusionContext(blocks, known, contextSize),
+    succedent: randomConclusionContext(blocks, known, contextSize),
   }
 }
 
-const generateBaseSchema = (blocks: Blocks, premiseCounts: number[]): RuleSchema => {
+const generateBaseSchema = (blocks: Blocks, premiseCounts: number[], contextSize: number): RuleSchema => {
   const allowed = premiseCounts.length > 0 ? premiseCounts : [0, 1, 2]
   const premiseCount = allowed[Math.floor(Math.random() * allowed.length)] ?? 0
   const usedSeqVars = new Set<string>()
   const premises: SchemaSequent[] = []
   for (let i = 0; i < premiseCount; i += 1) {
-    premises.push(randomPremise(blocks, usedSeqVars))
+    premises.push(randomPremise(blocks, usedSeqVars, contextSize))
   }
   return {
     name: '',
     premises,
-    conclusion: randomConclusion(blocks, usedSeqVars),
+    conclusion: randomConclusion(blocks, usedSeqVars, contextSize),
   }
 }
 
@@ -449,6 +454,7 @@ const tryAddRemovePremise = (
   rule: RuleSchema,
   blocks: Blocks,
   premiseCounts: number[],
+  contextSize: number,
 ): RuleSchema | null => {
   const allowed = premiseCounts.length > 0 ? premiseCounts : [0, 1, 2]
   const canAdd = allowed.includes(rule.premises.length + 1)
@@ -457,7 +463,7 @@ const tryAddRemovePremise = (
   const doAdd = canAdd && (!canRemove || (rule.premises.length < 2 && Math.random() >= 0.5))
   if (doAdd) {
     const usedSeqVars = new Set(collectSeqVars(rule))
-    return { ...rule, premises: [...rule.premises, randomPremise(blocks, usedSeqVars)] }
+    return { ...rule, premises: [...rule.premises, randomPremise(blocks, usedSeqVars, contextSize)] }
   }
   return { ...rule, premises: rule.premises.slice(0, -1) }
 }
@@ -495,7 +501,7 @@ const generateDistractors = (
     () => trySubstituteFormulaVar(base),
     () => trySubstituteSeqVar(base),
     () => trySubstituteConnective(base, config),
-    () => tryAddRemovePremise(base, blocks, config.premiseCounts),
+    () => tryAddRemovePremise(base, blocks, config.premiseCounts, config.contextSize),
   ]
 
   let attempts = 0
@@ -515,7 +521,7 @@ const generateDistractors = (
 
   // Fill remaining slots with fresh schemas if mutations exhausted
   while (distractors.length < count) {
-    const fresh = generateBaseSchema(blocks, config.premiseCounts)
+    const fresh = generateBaseSchema(blocks, config.premiseCounts, config.contextSize)
     const key = schemaKey(fresh)
     if (!used.has(key)) {
       used.add(key)
@@ -537,7 +543,7 @@ export const generateQuestion = (config: QuizConfig): QuizQuestion | null => {
   const blocks = buildBlocks(config)
   if (blocks === null) return null
 
-  const base = generateBaseSchema(blocks, config.premiseCounts)
+  const base = generateBaseSchema(blocks, config.premiseCounts, config.contextSize)
   const distractors = generateDistractors(base, config, blocks, 3)
   const all = shuffle([base, ...distractors])
   const answerIndex = all.indexOf(base)
@@ -558,7 +564,7 @@ const instantiateFormula = (f: SchemaFormula, fb: FormulaBinding, formulaSize: n
     case 'var': {
       let val = fb.get(f.name)
       if (val === undefined) {
-        val = random(formulaSize)()
+        val = random(bellRandom(0, formulaSize))()
         fb.set(f.name, val)
       }
       return val
@@ -603,7 +609,7 @@ const instantiateContext = (
     if (item.kind === 'seq') {
       let val = sb.get(item.name)
       if (val === undefined) {
-        val = Array.from({ length: randomInt(0, 2) }, () => random(formulaSize)())
+        val = Array.from({ length: randomInt(0, 2) }, () => random(bellRandom(0, formulaSize))())
         sb.set(item.name, val)
       }
       result.push(...val)

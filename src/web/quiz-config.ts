@@ -47,7 +47,7 @@ const createToggle = (
 const createNumberInput = (
   value: number,
   onChange: (v: number) => void,
-  min: number = 1,
+  min: number = 0,
   max: number = 10,
 ): HTMLElement => {
   const input = document.createElement('input')
@@ -232,12 +232,21 @@ export const mountQuizConfig = (
     premisesSection.appendChild(premisesToggles)
     settings.appendChild(premisesSection)
 
-    // Formula size
+    // Formula size and context size
     const sizeSection = createSection(t('size'))
     sizeSection.appendChild(
-      createNumberInput(config.formulaSize, (v) => {
-        config.formulaSize = v
-      }),
+      createRow(
+        t('size'),
+        createNumberInput(config.formulaSize, (v) => {
+          config.formulaSize = v
+        }),
+      ),
+    )
+    sizeSection.appendChild(
+      createRow(
+        t('contextSize'),
+        createNumberInput(config.contextSize, (v) => { config.contextSize = v }, 1, 6),
+      ),
     )
     settings.appendChild(sizeSection)
 
