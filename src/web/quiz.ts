@@ -14,20 +14,18 @@ const renderQuestionTree = (instance: InstantiatedRule, label: string | null): H
   const node = document.createElement('div')
   node.setAttribute('class', 'tree-node')
 
-  if (instance.premises.length > 0) {
-    const premisesEl = document.createElement('div')
-    premisesEl.setAttribute('class', 'tree-premises')
-    for (const p of instance.premises) {
-      const pNode = document.createElement('div')
-      pNode.setAttribute('class', 'tree-node')
-      const pSeq = document.createElement('div')
-      pSeq.setAttribute('class', 'tree-sequent')
-      pSeq.innerHTML = html(fromSequent(sequent(p.antecedent, p.succedent))(basic))
-      pNode.appendChild(pSeq)
-      premisesEl.appendChild(pNode)
-    }
-    node.appendChild(premisesEl)
+  const premisesEl = document.createElement('div')
+  premisesEl.setAttribute('class', 'tree-premises')
+  for (const p of instance.premises) {
+    const pNode = document.createElement('div')
+    pNode.setAttribute('class', 'tree-node')
+    const pSeq = document.createElement('div')
+    pSeq.setAttribute('class', 'tree-sequent')
+    pSeq.innerHTML = html(fromSequent(sequent(p.antecedent, p.succedent))(basic))
+    pNode.appendChild(pSeq)
+    premisesEl.appendChild(pNode)
   }
+  node.appendChild(premisesEl)
 
   const inference = document.createElement('div')
   inference.setAttribute('class', 'tree-inference')
@@ -95,7 +93,7 @@ export const mountQuiz = (
     panel.setAttribute('class', 'quiz-panel')
 
     const menuBtn = document.createElement('div')
-    menuBtn.setAttribute('class', 'button')
+    menuBtn.setAttribute('class', 'button quiz-menu-btn')
     menuBtn.textContent = t('menu')
     menuBtn.onclick = () => navigate('quiz-config')
     panel.appendChild(menuBtn)

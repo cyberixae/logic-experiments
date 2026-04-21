@@ -1285,6 +1285,12 @@ html.loading body {
 }
 
 /* ── Quiz mode ──────────────────────────────────────────────────────────────── */
+.quiz-menu-btn {
+  position: fixed;
+  top: 1em;
+  left: 1em;
+  z-index: 10;
+}
 .quiz-panel {
   display: flex;
   flex-direction: column;
@@ -1301,8 +1307,11 @@ html.loading body {
   --base-tree-zoom: 1;
   display: flex;
   justify-content: center;
-  padding: 2em 0.5em;
-  overflow-x: auto;
+  align-items: flex-end;
+  height: 18em;
+  box-sizing: border-box;
+  padding: 6em 0.5em 2em 0.5em;
+  overflow: hidden auto;
   width: 100%;
 }
 .quiz-question > .tree-node {
