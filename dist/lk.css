@@ -858,7 +858,7 @@ html.loading body {
   align-items: safe flex-end;
   height: 18em;
   box-sizing: border-box;
-  padding: 2em 0.5em;
+  padding: 2em 3em;
   overflow: auto;
   width: 100%;
 }
