@@ -254,28 +254,6 @@ export const mountQuizConfig = (
     seqSection.appendChild(seqToggles)
     ruleSection.appendChild(seqSection)
 
-    // Premises
-    const premisesSection = createSection(t('premises'))
-    const premisesToggles = document.createElement('div')
-    premisesToggles.className = 'config-toggles'
-    for (const n of ALL_PREMISE_COUNTS) {
-      const btn = createToggle(
-        premiseCountShape(n),
-        false,
-        String(n),
-        () => config.premiseCounts.includes(n),
-        () => {
-          const idx = config.premiseCounts.indexOf(n)
-          if (idx === -1) config.premiseCounts.push(n)
-          else config.premiseCounts.splice(idx, 1)
-        },
-      )
-      btn.classList.add('toggle-large')
-      premisesToggles.appendChild(btn)
-    }
-    premisesSection.appendChild(premisesToggles)
-    ruleSection.appendChild(premisesSection)
-
     // Formula size and context size
     const sizeSection = createSection(t('size'))
     sizeSection.appendChild(
@@ -293,6 +271,33 @@ export const mountQuizConfig = (
     ruleSection.appendChild(sizeSection)
 
     settings.appendChild(ruleSection)
+
+    // Premises section (standalone, before rule settings)
+    const premisesTopSection = document.createElement('div')
+    premisesTopSection.className = 'config-section'
+    const premisesTitle = document.createElement('div')
+    premisesTitle.className = 'config-section-title'
+    premisesTitle.textContent = t('premises')
+    premisesTopSection.appendChild(premisesTitle)
+    const premisesToggles = document.createElement('div')
+    premisesToggles.className = 'config-toggles'
+    for (const n of ALL_PREMISE_COUNTS) {
+      const btn = createToggle(
+        premiseCountShape(n),
+        false,
+        String(n),
+        () => config.premiseCounts.includes(n),
+        () => {
+          const idx = config.premiseCounts.indexOf(n)
+          if (idx === -1) config.premiseCounts.push(n)
+          else config.premiseCounts.splice(idx, 1)
+        },
+      )
+      btn.classList.add('toggle-large')
+      premisesToggles.appendChild(btn)
+    }
+    premisesTopSection.appendChild(premisesToggles)
+    settings.insertBefore(premisesTopSection, ruleSection)
 
     // Instantiation settings section
     const instSection = document.createElement('div')
