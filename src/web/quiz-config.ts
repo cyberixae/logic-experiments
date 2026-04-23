@@ -319,6 +319,21 @@ export const mountQuizConfig = (
     presetSection.appendChild(presetToggles)
     settings.insertBefore(presetSection, ruleSection)
 
+    // Buttons
+    const buttons = document.createElement('div')
+    buttons.className = 'config-buttons'
+    const backBtn = document.createElement('div')
+    backBtn.className = 'button'
+    backBtn.textContent = t('back')
+    backBtn.onclick = () => navigate('menu')
+    buttons.appendChild(backBtn)
+    const startBtn = document.createElement('div')
+    startBtn.className = 'button'
+    startBtn.textContent = t('start')
+    startBtn.onclick = () => onStart(config)
+    buttons.appendChild(startBtn)
+    settings.insertBefore(buttons, ruleSection)
+
     // Premises section (standalone, before rule settings)
     const premisesTopSection = document.createElement('div')
     premisesTopSection.className = 'config-section'
@@ -413,21 +428,6 @@ export const mountQuizConfig = (
     instSection.appendChild(instSizeSection)
 
     settings.appendChild(instSection)
-
-    // Buttons
-    const buttons = document.createElement('div')
-    buttons.className = 'config-buttons'
-    const backBtn = document.createElement('div')
-    backBtn.className = 'button'
-    backBtn.textContent = t('back')
-    backBtn.onclick = () => navigate('menu')
-    buttons.appendChild(backBtn)
-    const startBtn = document.createElement('div')
-    startBtn.className = 'button'
-    startBtn.textContent = t('start')
-    startBtn.onclick = () => onStart(config)
-    buttons.appendChild(startBtn)
-    settings.appendChild(buttons)
 
     columns.appendChild(settings)
 
