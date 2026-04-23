@@ -229,6 +229,20 @@ export const mountQuiz = (
 
   const handleKey = (ev: KeyboardEvent) => {
     if (ev.ctrlKey || ev.metaKey || ev.altKey) return
+    const digitMatch = ev.code.match(/^Digit([1-4])$/)
+    if (digitMatch && !pausePopupOpen && state !== null && state.guessIndex === null) {
+      const idx = parseInt(digitMatch[1]!) - 1
+      if (idx < state.schemas.length) {
+        state = { ...state, guessIndex: idx }
+        render()
+        regenerateTimer = setTimeout(() => {
+          state = newState(config)
+          pendingAutoZoom = true
+          render()
+        }, 1500)
+      }
+      return
+    }
     const action = qwertyKeyMap[ev.code]
     if (!action) return
     if (action === 'menu') {
