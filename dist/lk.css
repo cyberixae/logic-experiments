@@ -612,6 +612,14 @@ html.loading body {
   align-items: center;
   justify-content: center;
 }
+.preset-toggles {
+  display: grid;
+  grid-template-columns: repeat(5, 3.5em);
+}
+.preset-toggles .button {
+  width: 3.5em;
+  height: 3.5em;
+}
 .config-toggles .toggle-large {
   width: 5em;
   height: 5em;
