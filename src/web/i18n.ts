@@ -58,6 +58,7 @@ const en = {
   statsTemplate:
     'Generated {formulas} formulas ({rate}/s), {tautologies} tautologies, {solved} solved. Updated {sinceUpdate}s ago.',
   custom: 'Custom',
+  customChallenge: 'Custom Challenge',
   matchDone: 'Match Complete',
   matchScore: 'Score: {score} / {max}',
   matchFinalPreset: 'Final preset: {preset}',
@@ -123,6 +124,7 @@ const fi: Record<MessageKey, string> = {
   statsTemplate:
     'Tuotettu {formulas} kaavaa ({rate}/s), {tautologies} tautologiaa, {solved} ratkaisua. Päivitetty {sinceUpdate}s sitten.',
   custom: 'Muokattu',
+  customChallenge: 'Muokattu haaste',
   matchDone: 'Tunnistus valmis',
   matchScore: 'Pisteet: {score} / {max}',
   matchFinalPreset: 'Viimeinen esiasetus: {preset}',
@@ -188,6 +190,7 @@ const es: Record<MessageKey, string> = {
   statsTemplate:
     'Generadas {formulas} fórmulas ({rate}/s), {tautologies} tautologías, {solved} resueltas. Actualizado hace {sinceUpdate}s.',
   custom: 'Personalizado',
+  customChallenge: 'Desafío personalizado',
   matchDone: 'Prueba completa',
   matchScore: 'Puntuación: {score} / {max}',
   matchFinalPreset: 'Preajuste final: {preset}',
@@ -253,6 +256,7 @@ const cs: Record<MessageKey, string> = {
   statsTemplate:
     'Vygenerováno {formulas} formulí ({rate}/s), {tautologies} tautologií, {solved} vyřešeno. Aktualizováno před {sinceUpdate}s.',
   custom: 'Vlastní',
+  customChallenge: 'Vlastní výzva',
   matchDone: 'Kvíz dokončen',
   matchScore: 'Skóre: {score} / {max}',
   matchFinalPreset: 'Poslední předvolba: {preset}',
@@ -318,6 +322,7 @@ const pl: Record<MessageKey, string> = {
   statsTemplate:
     'Wygenerowano {formulas} formuł ({rate}/s), {tautologies} tautologii, {solved} rozwiązanych. Zaktualizowano {sinceUpdate}s temu.',
   custom: 'Niestandardowy',
+  customChallenge: 'Niestandardowe wyzwanie',
   matchDone: 'Quiz ukończony',
   matchScore: 'Wynik: {score} / {max}',
   matchFinalPreset: 'Ostatnie ustawienie wstępne: {preset}',

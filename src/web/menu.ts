@@ -38,7 +38,7 @@ export const mountMenu = (
           mode === 'random'
             ? 'random-config'
             : mode === 'match'
-              ? 'match-intro'
+              ? 'match-curated'
               : mode,
         )
       modes.appendChild(btn)

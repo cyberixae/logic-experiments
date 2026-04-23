@@ -12,6 +12,7 @@ import { fromSequent, basic, printString } from '../render/print'
 import { html } from '../render/segment'
 import { sequent } from '../model/sequent'
 import { layoutTree } from './tree'
+import { createPausePopup } from './game'
 import { qwertyKeyMap } from './input-mode'
 
 // ── Constants ──────────────────────────────────────────────────────────────────
@@ -142,6 +143,7 @@ export const mountMatchCurated = (
   let zoom = 1
   let pendingAutoZoom = true
   let regenerateTimer: ReturnType<typeof setTimeout> | null = null
+  let pausePopupOpen = false
 
   const render = () => {
     if (regenerateTimer !== null) {
@@ -289,7 +291,10 @@ export const mountMatchCurated = (
     const menuBtn = document.createElement('div')
     menuBtn.setAttribute('class', 'button quiz-menu-btn')
     menuBtn.textContent = t('menu')
-    menuBtn.onclick = () => navigate('menu')
+    menuBtn.onclick = () => {
+      pausePopupOpen = true
+      render()
+    }
     panel.appendChild(menuBtn)
 
     const progress = document.createElement('div')
@@ -336,6 +341,40 @@ export const mountMatchCurated = (
     }
     panel.appendChild(cardsArea)
     container.appendChild(panel)
+
+    if (pausePopupOpen) {
+      const resume = () => {
+        pausePopupOpen = false
+        render()
+      }
+      const reset = () => {
+        pausePopupOpen = false
+        session = newSession()
+        question = newQuestion(session.currentPreset)
+        zoom = 1
+        pendingAutoZoom = true
+        render()
+      }
+      const exitToMenu = () => {
+        pausePopupOpen = false
+        navigate('menu')
+      }
+      const customChallenge = () => {
+        pausePopupOpen = false
+        navigate('match-config')
+      }
+      container.appendChild(
+        createPausePopup(
+          resume,
+          exitToMenu,
+          reset,
+          false,
+          undefined,
+          undefined,
+          customChallenge,
+        ),
+      )
+    }
   }
 
   const guess = (idx: number) => {
@@ -374,6 +413,29 @@ export const mountMatchCurated = (
   const handleKey = (ev: KeyboardEvent) => {
     if (ev.ctrlKey || ev.metaKey || ev.altKey) return
     if (session.phase === 'done') return
+    const action = qwertyKeyMap[ev.code]
+    if (action === 'menu') {
+      pausePopupOpen = !pausePopupOpen
+      render()
+      return
+    }
+    if (pausePopupOpen) {
+      if (action === 'undo') {
+        pausePopupOpen = false
+        render()
+      } else if (action === 'reset') {
+        pausePopupOpen = false
+        session = newSession()
+        question = newQuestion(session.currentPreset)
+        zoom = 1
+        pendingAutoZoom = true
+        render()
+      } else if (action === 'exit') {
+        pausePopupOpen = false
+        navigate('menu')
+      }
+      return
+    }
     const digitMatch = ev.code.match(/^Digit([1-4])$/)
     if (digitMatch && question !== null && question.guessIndex === null) {
       const idxStr = digitMatch[1]
@@ -382,11 +444,7 @@ export const mountMatchCurated = (
       if (idx < question.schemas.length) {
         guess(idx)
       }
-      return
     }
-    const action = qwertyKeyMap[ev.code]
-    if (!action) return
-    if (action === 'exit') navigate('menu')
   }
   document.addEventListener('keydown', handleKey)
 
