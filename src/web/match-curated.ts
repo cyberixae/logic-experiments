@@ -58,7 +58,7 @@ const advancePreset = (current: number, correct: number): number => {
 }
 
 const totalScore = (results: RoundResult[]): number =>
-  results.reduce((sum, r) => sum + r.preset + 1, 0)
+  results.reduce((sum, r) => sum + (r.correct ? r.preset + 1 : 0), 0)
 
 // ── Question tree ──────────────────────────────────────────────────────────────
 
