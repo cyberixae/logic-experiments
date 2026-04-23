@@ -122,6 +122,7 @@ const createSection = (title: string): HTMLElement => {
 
 let syncUrl = () => {}
 let renderPreview = () => {}
+let renderPresetButtons = () => {}
 
 export const mountQuizConfig = (
   container: HTMLElement,
@@ -136,6 +137,7 @@ export const mountQuizConfig = (
     const params = new URLSearchParams(window.location.search)
     setQuizConfigParams(config, params)
     history.replaceState(history.state, '', `?${params.toString()}`)
+    renderPresetButtons()
     renderPreview()
   }
 
@@ -283,15 +285,37 @@ export const mountQuizConfig = (
     presetSection.appendChild(presetTitle)
     const presetToggles = document.createElement('div')
     presetToggles.className = 'config-toggles preset-toggles'
-    const activePreset = matchPreset(config)
+    const presetBtns: HTMLElement[] = []
     for (let i = 0; i < PRESETS.length; i++) {
       const idx = i
       const btn = document.createElement('pre')
-      btn.className = 'button' + (activePreset === idx ? ' active' : '')
+      btn.className = 'button'
       btn.textContent = String(idx)
-      btn.onclick = () => { Object.assign(config, PRESETS[idx]); syncUrl(); render() }
+      btn.onclick = () => {
+        const p = PRESETS[idx]!
+        Object.assign(config, {
+          ...p,
+          symbols: [...p.symbols],
+          connectives: [...p.connectives],
+          variables: [...p.variables],
+          sequences: [...p.sequences],
+          premiseCounts: [...p.premiseCounts],
+          instanceConnectives: [...p.instanceConnectives],
+          instanceSymbols: [...p.instanceSymbols],
+        })
+        syncUrl()
+        render()
+      }
       presetToggles.appendChild(btn)
+      presetBtns.push(btn)
     }
+    renderPresetButtons = () => {
+      const active = matchPreset(config)
+      for (let i = 0; i < presetBtns.length; i++) {
+        presetBtns[i]!.className = 'button' + (active === i ? ' active' : '')
+      }
+    }
+    renderPresetButtons()
     presetSection.appendChild(presetToggles)
     settings.insertBefore(presetSection, ruleSection)
 
