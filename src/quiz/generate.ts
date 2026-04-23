@@ -719,7 +719,7 @@ const matchSchemaSequent = (
   matchSchemaContext(schema.antecedent, 0, concrete.antecedent, 0, fb, sb) &&
   matchSchemaContext(schema.succedent, 0, concrete.succedent, 0, fb, sb)
 
-const canMatchInstance = (
+export const canMatchInstance = (
   schema: RuleSchema,
   instance: InstantiatedRule,
 ): boolean => {
