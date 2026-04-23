@@ -6,7 +6,7 @@ import { createLangSwitcher } from './lang-switcher'
 const modeLabel: Record<GameMode, () => string> = {
   random: () => t('random'),
   campaign: () => t('campaign'),
-  quiz: () => t('quiz'),
+  match: () => t('quiz'),
 }
 
 export const mountMenu = (
@@ -37,8 +37,8 @@ export const mountMenu = (
         navigate(
           mode === 'random'
             ? 'random-config'
-            : mode === 'quiz'
-              ? 'quiz-config'
+            : mode === 'match'
+              ? 'match-config'
               : mode,
         )
       modes.appendChild(btn)

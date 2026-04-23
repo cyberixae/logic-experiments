@@ -5,6 +5,6 @@ export type Screen =
   | 'menu'
   | 'system'
   | 'random-config'
-  | 'quiz-config'
+  | 'match-config'
 export type Navigate = (screen: Screen) => void
 export type MountResult = { cleanup: () => void; rerender: () => void }

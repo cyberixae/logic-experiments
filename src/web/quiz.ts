@@ -219,7 +219,7 @@ export const mountQuiz = (
     if (pausePopupOpen) {
       const resume = () => { pausePopupOpen = false; render() }
       const exitToMenu = () => { pausePopupOpen = false; navigate('menu') }
-      const openSettings = () => { pausePopupOpen = false; navigate('quiz-config') }
+      const openSettings = () => { pausePopupOpen = false; navigate('match-config') }
       const restart = () => { pausePopupOpen = false; state = newState(config); pendingAutoZoom = true; render() }
       container.appendChild(createPausePopup(resume, exitToMenu, restart, false, undefined, openSettings))
     }
