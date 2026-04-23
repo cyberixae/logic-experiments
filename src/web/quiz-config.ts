@@ -283,15 +283,13 @@ export const mountQuizConfig = (
     presetSection.appendChild(presetTitle)
     const presetToggles = document.createElement('div')
     presetToggles.className = 'config-toggles'
+    const activePreset = matchPreset(config)
     for (let i = 0; i < PRESETS.length; i++) {
       const idx = i
-      const btn = createToggle(
-        String(idx),
-        false,
-        String(idx),
-        () => matchPreset(config) === idx,
-        () => { Object.assign(config, PRESETS[idx]) },
-      )
+      const btn = document.createElement('pre')
+      btn.className = 'button' + (activePreset === idx ? ' active' : '')
+      btn.textContent = String(idx)
+      btn.onclick = () => { Object.assign(config, PRESETS[idx]); syncUrl(); render() }
       presetToggles.appendChild(btn)
     }
     presetSection.appendChild(presetToggles)

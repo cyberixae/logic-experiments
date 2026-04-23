@@ -258,6 +258,10 @@ html.loading body {
 .button:not(.disabled):hover {
   background-color: #fff;
 }
+.button.active, .button.active:hover {
+  background-color: #ddf;
+  border-color: #66c;
+}
 .button.quiz-card-correct, .button.quiz-card-correct:hover {
   border-color: #2a2;
   background-color: #afa;
