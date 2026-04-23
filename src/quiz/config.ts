@@ -38,6 +38,53 @@ export type QuizConfig = {
   instanceSymbols: string[]
 }
 
+const A = <T extends readonly unknown[]>(arr: T): T[number][] => [...arr]
+
+export const PRESETS: readonly QuizConfig[] = [
+  // 0: pure symbol matching
+  { symbols: A(ALL_SYMBOLS), connectives: [], variables: [], sequences: [], formulaSize: 1, premiseCounts: [0,1,2], contextSize: 2, instanceFormulaSize: 1, instanceSequenceSize: 2, instanceConnectives: [], instanceSymbols: [] },
+  // 1: symbols + connectives, no variables
+  { symbols: A(ALL_SYMBOLS), connectives: A(ALL_CONNECTIVE_TYPES), variables: [], sequences: [], formulaSize: 1, premiseCounts: [0,1,2], contextSize: 2, instanceFormulaSize: 1, instanceSequenceSize: 2, instanceConnectives: [], instanceSymbols: [] },
+  // 2: symbols + connectives + variables, inst symbols
+  { symbols: A(ALL_SYMBOLS), connectives: A(ALL_CONNECTIVE_TYPES), variables: A(ALL_VARIABLES), sequences: [], formulaSize: 1, premiseCounts: [0,1,2], contextSize: 2, instanceFormulaSize: 1, instanceSequenceSize: 2, instanceConnectives: [], instanceSymbols: A(ALL_INSTANCE_SYMBOLS) },
+  // 3: connectives + variables, no symbols
+  { symbols: [], connectives: A(ALL_CONNECTIVE_TYPES), variables: A(ALL_VARIABLES), sequences: [], formulaSize: 1, premiseCounts: [0,1,2], contextSize: 2, instanceFormulaSize: 1, instanceSequenceSize: 2, instanceConnectives: [], instanceSymbols: A(ALL_INSTANCE_SYMBOLS) },
+  // 4: variables only, inst connectives
+  { symbols: [], connectives: [], variables: A(ALL_VARIABLES), sequences: [], formulaSize: 1, premiseCounts: [0,1,2], contextSize: 2, instanceFormulaSize: 1, instanceSequenceSize: 2, instanceConnectives: A(ALL_CONNECTIVE_TYPES), instanceSymbols: A(ALL_INSTANCE_SYMBOLS) },
+  // 5: connectives + variables, inst connectives
+  { symbols: [], connectives: A(ALL_CONNECTIVE_TYPES), variables: A(ALL_VARIABLES), sequences: [], formulaSize: 1, premiseCounts: [0,1,2], contextSize: 2, instanceFormulaSize: 1, instanceSequenceSize: 2, instanceConnectives: A(ALL_CONNECTIVE_TYPES), instanceSymbols: A(ALL_INSTANCE_SYMBOLS) },
+  // 6: variables + sequences, short inst seq
+  { symbols: [], connectives: [], variables: A(ALL_VARIABLES), sequences: A(ALL_SEQUENCES), formulaSize: 1, premiseCounts: [0,1,2], contextSize: 2, instanceFormulaSize: 1, instanceSequenceSize: 1, instanceConnectives: [], instanceSymbols: A(ALL_INSTANCE_SYMBOLS) },
+  // 7: variables + sequences, longer inst seq
+  { symbols: [], connectives: [], variables: A(ALL_VARIABLES), sequences: A(ALL_SEQUENCES), formulaSize: 1, premiseCounts: [0,1,2], contextSize: 2, instanceFormulaSize: 1, instanceSequenceSize: 3, instanceConnectives: [], instanceSymbols: A(ALL_INSTANCE_SYMBOLS) },
+  // 8: connectives + variables + sequences, inst connectives
+  { symbols: [], connectives: A(ALL_CONNECTIVE_TYPES), variables: A(ALL_VARIABLES), sequences: A(ALL_SEQUENCES), formulaSize: 1, premiseCounts: [0,1,2], contextSize: 2, instanceFormulaSize: 1, instanceSequenceSize: 2, instanceConnectives: A(ALL_CONNECTIVE_TYPES), instanceSymbols: A(ALL_INSTANCE_SYMBOLS) },
+  // 9: full, larger formulas
+  { symbols: [], connectives: A(ALL_CONNECTIVE_TYPES), variables: A(ALL_VARIABLES), sequences: A(ALL_SEQUENCES), formulaSize: 2, premiseCounts: [0,1,2], contextSize: 3, instanceFormulaSize: 2, instanceSequenceSize: 3, instanceConnectives: A(ALL_CONNECTIVE_TYPES), instanceSymbols: A(ALL_INSTANCE_SYMBOLS) },
+]
+
+const sortedJoin = (arr: string[]): string => [...arr].sort().join(',')
+
+export const matchPreset = (config: QuizConfig): number | null => {
+  for (let i = 0; i < PRESETS.length; i++) {
+    const p = PRESETS[i]!
+    if (
+      sortedJoin(config.symbols) === sortedJoin(p.symbols) &&
+      sortedJoin(config.connectives) === sortedJoin(p.connectives) &&
+      sortedJoin(config.variables) === sortedJoin(p.variables) &&
+      sortedJoin(config.sequences) === sortedJoin(p.sequences) &&
+      config.formulaSize === p.formulaSize &&
+      sortedJoin(config.premiseCounts.map(String)) === sortedJoin(p.premiseCounts.map(String)) &&
+      config.contextSize === p.contextSize &&
+      config.instanceFormulaSize === p.instanceFormulaSize &&
+      config.instanceSequenceSize === p.instanceSequenceSize &&
+      sortedJoin(config.instanceConnectives) === sortedJoin(p.instanceConnectives) &&
+      sortedJoin(config.instanceSymbols) === sortedJoin(p.instanceSymbols)
+    ) return i
+  }
+  return null
+}
+
 export const defaultQuizConfig = (): QuizConfig => ({
   symbols: [],
   connectives: [...ALL_CONNECTIVE_TYPES],

@@ -16,6 +16,8 @@ import {
   ALL_SEQUENCES,
   parseQuizConfigFromParams,
   setQuizConfigParams,
+  PRESETS,
+  matchPreset,
 } from '../quiz/config'
 import { fromSchemaRule } from '../quiz/render'
 import { RuleSchema } from '../quiz/schema'
@@ -271,6 +273,29 @@ export const mountQuizConfig = (
     ruleSection.appendChild(sizeSection)
 
     settings.appendChild(ruleSection)
+
+    // Preset selector
+    const presetSection = document.createElement('div')
+    presetSection.className = 'config-section'
+    const presetTitle = document.createElement('div')
+    presetTitle.className = 'config-section-title'
+    presetTitle.textContent = t('presets')
+    presetSection.appendChild(presetTitle)
+    const presetToggles = document.createElement('div')
+    presetToggles.className = 'config-toggles'
+    for (let i = 0; i < PRESETS.length; i++) {
+      const idx = i
+      const btn = createToggle(
+        String(idx),
+        false,
+        String(idx),
+        () => matchPreset(config) === idx,
+        () => { Object.assign(config, PRESETS[idx]) },
+      )
+      presetToggles.appendChild(btn)
+    }
+    presetSection.appendChild(presetToggles)
+    settings.insertBefore(presetSection, ruleSection)
 
     // Premises section (standalone, before rule settings)
     const premisesTopSection = document.createElement('div')

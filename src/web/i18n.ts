@@ -54,6 +54,7 @@ const en = {
   ruleSettings: 'Rule Settings',
   instantiationSettings: 'Instantiation',
   sequenceSize: 'Sequence Length',
+  presets: 'Presets',
   statsTemplate:
     'Generated {formulas} formulas ({rate}/s), {tautologies} tautologies, {solved} solved. Updated {sinceUpdate}s ago.',
 } as const
@@ -114,6 +115,7 @@ const fi: Record<MessageKey, string> = {
   ruleSettings: 'Säännöt',
   instantiationSettings: 'Instantiointi',
   sequenceSize: 'Jonon pituus',
+  presets: 'Esiasetukset',
   statsTemplate:
     'Tuotettu {formulas} kaavaa ({rate}/s), {tautologies} tautologiaa, {solved} ratkaisua. Päivitetty {sinceUpdate}s sitten.',
 }
@@ -174,6 +176,7 @@ const es: Record<MessageKey, string> = {
   ruleSettings: 'Reglas',
   instantiationSettings: 'Instanciación',
   sequenceSize: 'Longitud de secuencia',
+  presets: 'Preajustes',
   statsTemplate:
     'Generadas {formulas} fórmulas ({rate}/s), {tautologies} tautologías, {solved} resueltas. Actualizado hace {sinceUpdate}s.',
 }
@@ -234,6 +237,7 @@ const cs: Record<MessageKey, string> = {
   ruleSettings: 'Pravidla',
   instantiationSettings: 'Instanciace',
   sequenceSize: 'Délka sekvence',
+  presets: 'Předvolby',
   statsTemplate:
     'Vygenerováno {formulas} formulí ({rate}/s), {tautologies} tautologií, {solved} vyřešeno. Aktualizováno před {sinceUpdate}s.',
 }
@@ -294,6 +298,7 @@ const pl: Record<MessageKey, string> = {
   ruleSettings: 'Reguły',
   instantiationSettings: 'Instancjacja',
   sequenceSize: 'Długość sekwencji',
+  presets: 'Ustawienia wstępne',
   statsTemplate:
     'Wygenerowano {formulas} formuł ({rate}/s), {tautologies} tautologii, {solved} rozwiązanych. Zaktualizowano {sinceUpdate}s temu.',
 }
