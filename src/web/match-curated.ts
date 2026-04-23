@@ -298,7 +298,7 @@ export const mountMatchCurated = (
     panel.appendChild(menuBtn)
 
     const progress = document.createElement('div')
-    progress.setAttribute('class', 'quiz-zoom')
+    progress.setAttribute('class', 'curated-progress')
     progress.textContent =
       String(session.roundsPlayed + 1) + ' / ' + String(TOTAL_ROUNDS)
     panel.appendChild(progress)

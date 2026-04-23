@@ -863,6 +863,12 @@ html.loading body {
   left: 1em;
   z-index: 10;
 }
+.curated-progress {
+  position: fixed;
+  bottom: 1em;
+  right: 1em;
+  z-index: 10;
+}
 .quiz-panel {
   display: flex;
   flex-direction: column;
@@ -942,6 +948,11 @@ html.loading body {
   }
   .quiz-zoom {
     display: none;
+  }
+  .curated-progress {
+    bottom: auto;
+    top: 0.3em;
+    right: 0.3em;
   }
   /* Subtask 2: Shrink playarea padding & masks */
   .playarea {
