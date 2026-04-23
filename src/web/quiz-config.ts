@@ -41,8 +41,20 @@ const renderAtom = (name: string): string => html(fromAtom(atom(name))(basic))
 const sequentText = (ant: Prop[], suc: Prop[]): string =>
   plain(fromSequent(sequent(ant, suc))(basic))
 
-const fromInstanceRule = (schema: RuleSchema, formulaSize: number, sequenceSize: number, connectives: string[], symbols: string[]): string => {
-  const inst = instantiate(schema, formulaSize, sequenceSize, connectives, symbols)
+const fromInstanceRule = (
+  schema: RuleSchema,
+  formulaSize: number,
+  sequenceSize: number,
+  connectives: string[],
+  symbols: string[],
+): string => {
+  const inst = instantiate(
+    schema,
+    formulaSize,
+    sequenceSize,
+    connectives,
+    symbols,
+  )
   return treeAuto(
     sequentText(inst.conclusion.antecedent, inst.conclusion.succedent),
     inst.premises.map((p) => sequentText(p.antecedent, p.succedent)),
@@ -263,13 +275,22 @@ export const mountQuizConfig = (
     sizeSection.appendChild(
       createRow(
         t('size'),
-        createNumberInput(config.formulaSize, (v) => { config.formulaSize = v }),
+        createNumberInput(config.formulaSize, (v) => {
+          config.formulaSize = v
+        }),
       ),
     )
     sizeSection.appendChild(
       createRow(
         t('contextSize'),
-        createNumberInput(config.contextSize, (v) => { config.contextSize = v }, 0, 6),
+        createNumberInput(
+          config.contextSize,
+          (v) => {
+            config.contextSize = v
+          },
+          0,
+          6,
+        ),
       ),
     )
     ruleSection.appendChild(sizeSection)
@@ -286,13 +307,14 @@ export const mountQuizConfig = (
     const presetToggles = document.createElement('div')
     presetToggles.className = 'config-toggles preset-toggles'
     const presetBtns: HTMLElement[] = []
-    for (let i = 0; i < PRESETS.length; i++) {
+    for (let i = 0; i < PRESETS.length; i += 1) {
       const idx = i
       const btn = document.createElement('pre')
       btn.className = 'button'
       btn.textContent = String(idx)
       btn.onclick = () => {
-        const p = PRESETS[idx]!
+        const p = PRESETS[idx]
+        if (p === undefined) return
         Object.assign(config, {
           ...p,
           symbols: [...p.symbols],
@@ -311,8 +333,10 @@ export const mountQuizConfig = (
     }
     renderPresetButtons = () => {
       const active = matchPreset(config)
-      for (let i = 0; i < presetBtns.length; i++) {
-        presetBtns[i]!.className = 'button' + (active === i ? ' active' : '')
+      for (let i = 0; i < presetBtns.length; i += 1) {
+        const btn = presetBtns[i]
+        if (btn !== undefined)
+          btn.className = 'button' + (active === i ? ' active' : '')
       }
     }
     renderPresetButtons()
@@ -416,13 +440,22 @@ export const mountQuizConfig = (
     instSizeSection.appendChild(
       createRow(
         t('size'),
-        createNumberInput(config.instanceFormulaSize, (v) => { config.instanceFormulaSize = v }),
+        createNumberInput(config.instanceFormulaSize, (v) => {
+          config.instanceFormulaSize = v
+        }),
       ),
     )
     instSizeSection.appendChild(
       createRow(
         t('sequenceSize'),
-        createNumberInput(config.instanceSequenceSize, (v) => { config.instanceSequenceSize = v }, 0, 6),
+        createNumberInput(
+          config.instanceSequenceSize,
+          (v) => {
+            config.instanceSequenceSize = v
+          },
+          0,
+          6,
+        ),
       ),
     )
     instSection.appendChild(instSizeSection)
@@ -454,14 +487,24 @@ export const mountQuizConfig = (
         const schemaCard = document.createElement('pre')
         schemaCard.className = 'quiz-card rule hint'
         schemaCard.innerHTML =
-          '<span class="rule-label long">' + fromSchemaRule(schema, false) + '</span>' +
-          '<span class="rule-label short">' + fromSchemaRule(schema, false) + '</span>'
+          '<span class="rule-label long">' +
+          fromSchemaRule(schema, false) +
+          '</span>' +
+          '<span class="rule-label short">' +
+          fromSchemaRule(schema, false) +
+          '</span>'
         row.appendChild(schemaCard)
 
-        for (let i = 0; i < 1; i++) {
+        for (let i = 0; i < 1; i += 1) {
           const instCard = document.createElement('pre')
           instCard.className = 'quiz-card rule'
-          const text = fromInstanceRule(schema, config.instanceFormulaSize, config.instanceSequenceSize, config.instanceConnectives, config.instanceSymbols)
+          const text = fromInstanceRule(
+            schema,
+            config.instanceFormulaSize,
+            config.instanceSequenceSize,
+            config.instanceConnectives,
+            config.instanceSymbols,
+          )
           instCard.textContent = text
           row.appendChild(instCard)
         }

@@ -1,6 +1,10 @@
 import { MountResult, Navigate } from './types'
 import { t } from './i18n'
-import { generateQuestion, InstantiatedRule, QuizQuestion } from '../quiz/generate'
+import {
+  generateQuestion,
+  InstantiatedRule,
+  QuizQuestion,
+} from '../quiz/generate'
 import { fromSchemaRule } from '../quiz/render'
 import { PRESETS } from '../quiz/config'
 import { fromSequent, basic, printString } from '../render/print'

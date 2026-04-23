@@ -1,4 +1,4 @@
-import { random, randomWeighted, Prop } from '../model/prop'
+import { randomWeighted, Prop } from '../model/prop'
 import { bellRandom } from '../random/challenge'
 import { NonEmptyArray, isNonEmptyArray } from '../utils/array'
 import {
@@ -60,7 +60,11 @@ const randomInt = (min: number, max: number): number =>
 
 const randomLeaf = (blocks: Blocks): SchemaFormula => pick(blocks.leaves)
 
-const randomSchemaFormula = (blocks: Blocks, maxDepth: number, depth = 0): SchemaFormula => {
+const randomSchemaFormula = (
+  blocks: Blocks,
+  maxDepth: number,
+  depth = 0,
+): SchemaFormula => {
   const hasOps = blocks.binaryOps.length > 0 || blocks.hasNegation
   if (depth >= maxDepth || !hasOps || Math.random() < 0.5) {
     return randomLeaf(blocks)
@@ -71,7 +75,10 @@ const randomSchemaFormula = (blocks: Blocks, maxDepth: number, depth = 0): Schem
   const next = depth + 1
   switch (op) {
     case 'negation':
-      return { kind: 'negation', negand: randomSchemaFormula(blocks, maxDepth, next) }
+      return {
+        kind: 'negation',
+        negand: randomSchemaFormula(blocks, maxDepth, next),
+      }
     case 'implication':
       return {
         kind: 'implication',
@@ -169,12 +176,22 @@ const randomConclusion = (
 ): SchemaSequent => {
   const known = blocks.seqVars.filter((v) => usedSeqVars.has(v.name))
   return {
-    antecedent: randomConclusionContext(blocks, known, contextSize, formulaSize),
+    antecedent: randomConclusionContext(
+      blocks,
+      known,
+      contextSize,
+      formulaSize,
+    ),
     succedent: randomConclusionContext(blocks, known, contextSize, formulaSize),
   }
 }
 
-const generateBaseSchema = (blocks: Blocks, premiseCounts: number[], contextSize: number, formulaSize: number): RuleSchema => {
+const generateBaseSchema = (
+  blocks: Blocks,
+  premiseCounts: number[],
+  contextSize: number,
+  formulaSize: number,
+): RuleSchema => {
   const allowed = premiseCounts.length > 0 ? premiseCounts : [0, 1, 2]
   const premiseCount = allowed[Math.floor(Math.random() * allowed.length)] ?? 0
   const usedSeqVars = new Set<string>()
@@ -464,10 +481,17 @@ const tryAddRemovePremise = (
   const canAdd = allowed.includes(rule.premises.length + 1)
   const canRemove = allowed.includes(rule.premises.length - 1)
   if (!canAdd && !canRemove) return null
-  const doAdd = canAdd && (!canRemove || (rule.premises.length < 2 && Math.random() >= 0.5))
+  const doAdd =
+    canAdd && (!canRemove || (rule.premises.length < 2 && Math.random() >= 0.5))
   if (doAdd) {
     const usedSeqVars = new Set(collectSeqVars(rule))
-    return { ...rule, premises: [...rule.premises, randomPremise(blocks, usedSeqVars, contextSize, formulaSize)] }
+    return {
+      ...rule,
+      premises: [
+        ...rule.premises,
+        randomPremise(blocks, usedSeqVars, contextSize, formulaSize),
+      ],
+    }
   }
   return { ...rule, premises: rule.premises.slice(0, -1) }
 }
@@ -506,7 +530,14 @@ const generateDistractors = (
     () => trySubstituteFormulaVar(base),
     () => trySubstituteSeqVar(base),
     () => trySubstituteConnective(base, config),
-    () => tryAddRemovePremise(base, blocks, config.premiseCounts, config.contextSize, config.formulaSize),
+    () =>
+      tryAddRemovePremise(
+        base,
+        blocks,
+        config.premiseCounts,
+        config.contextSize,
+        config.formulaSize,
+      ),
   ]
 
   let attempts = 0
@@ -529,7 +560,12 @@ const generateDistractors = (
   let fallbackAttempts = 0
   while (distractors.length < count && fallbackAttempts < 50) {
     fallbackAttempts += 1
-    const fresh = generateBaseSchema(blocks, config.premiseCounts, config.contextSize, config.formulaSize)
+    const fresh = generateBaseSchema(
+      blocks,
+      config.premiseCounts,
+      config.contextSize,
+      config.formulaSize,
+    )
     const key = schemaKey(fresh)
     if (!used.has(key) && !canMatchInstance(fresh, instance)) {
       used.add(key)
@@ -592,7 +628,9 @@ const matchSchemaFormula = (
     case 'verum':
       return p.kind === 'verum'
     case 'negation':
-      return p.kind === 'negation' && matchSchemaFormula(sf.negand, p.negand, fb)
+      return (
+        p.kind === 'negation' && matchSchemaFormula(sf.negand, p.negand, fb)
+      )
     case 'implication':
       return (
         p.kind === 'implication' &&
@@ -625,29 +663,45 @@ const matchSchemaContext = (
   sb: SequenceBinding,
 ): boolean => {
   if (ctxIdx === ctx.length) return propIdx === props.length
-  const item = ctx[ctxIdx]!
+  const item = ctx[ctxIdx]
+  if (item === undefined) return propIdx === props.length
   if (item.kind !== 'seq') {
     if (propIdx >= props.length) return false
+    const prop = props[propIdx]
+    if (prop === undefined) return false
     return (
-      matchSchemaFormula(item, props[propIdx]!, fb) &&
+      matchSchemaFormula(item, prop, fb) &&
       matchSchemaContext(ctx, ctxIdx + 1, props, propIdx + 1, fb, sb)
     )
   }
   const bound = sb.get(item.name)
   if (bound !== undefined) {
     if (propIdx + bound.length > props.length) return false
-    for (let i = 0; i < bound.length; i++) {
-      if (!propsEqual(bound[i]!, props[propIdx + i]!)) return false
+    for (let i = 0; i < bound.length; i += 1) {
+      const bi = bound[i]
+      const pi = props[propIdx + i]
+      if (bi === undefined || pi === undefined || !propsEqual(bi, pi))
+        return false
     }
-    return matchSchemaContext(ctx, ctxIdx + 1, props, propIdx + bound.length, fb, sb)
+    return matchSchemaContext(
+      ctx,
+      ctxIdx + 1,
+      props,
+      propIdx + bound.length,
+      fb,
+      sb,
+    )
   }
-  const minForRest = ctx.slice(ctxIdx + 1).filter((i) => i.kind !== 'seq').length
+  const minForRest = ctx
+    .slice(ctxIdx + 1)
+    .filter((i) => i.kind !== 'seq').length
   const maxLen = props.length - propIdx - minForRest
-  for (let len = 0; len <= maxLen; len++) {
+  for (let len = 0; len <= maxLen; len += 1) {
     const savedFb = new Map(fb)
     const savedSb = new Map(sb)
     sb.set(item.name, props.slice(propIdx, propIdx + len))
-    if (matchSchemaContext(ctx, ctxIdx + 1, props, propIdx + len, fb, sb)) return true
+    if (matchSchemaContext(ctx, ctxIdx + 1, props, propIdx + len, fb, sb))
+      return true
     fb.clear()
     for (const [k, v] of savedFb) fb.set(k, v)
     sb.clear()
@@ -665,13 +719,18 @@ const matchSchemaSequent = (
   matchSchemaContext(schema.antecedent, 0, concrete.antecedent, 0, fb, sb) &&
   matchSchemaContext(schema.succedent, 0, concrete.succedent, 0, fb, sb)
 
-const canMatchInstance = (schema: RuleSchema, instance: InstantiatedRule): boolean => {
+const canMatchInstance = (
+  schema: RuleSchema,
+  instance: InstantiatedRule,
+): boolean => {
   if (schema.premises.length !== instance.premises.length) return false
   const fb: FormulaBinding = new Map()
   const sb: SequenceBinding = new Map()
   for (let i = 0; i < schema.premises.length; i += 1) {
-    if (!matchSchemaSequent(schema.premises[i]!, instance.premises[i]!, fb, sb))
-      return false
+    const sp = schema.premises[i]
+    const ip = instance.premises[i]
+    if (sp === undefined || ip === undefined) return false
+    if (!matchSchemaSequent(sp, ip, fb, sb)) return false
   }
   return matchSchemaSequent(schema.conclusion, instance.conclusion, fb, sb)
 }
@@ -684,11 +743,19 @@ export type QuizQuestion = {
   instance: InstantiatedRule
 }
 
-export const generatePreviewSchemas = (config: QuizConfig, count: number): RuleSchema[] => {
+export const generatePreviewSchemas = (
+  config: QuizConfig,
+  count: number,
+): RuleSchema[] => {
   const blocks = buildBlocks(config)
   if (blocks === null) return []
   return Array.from({ length: count }, (_, i) => ({
-    ...generateBaseSchema(blocks, config.premiseCounts, config.contextSize, config.formulaSize),
+    ...generateBaseSchema(
+      blocks,
+      config.premiseCounts,
+      config.contextSize,
+      config.formulaSize,
+    ),
     name: `${i + 1}`,
   }))
 }
@@ -697,7 +764,12 @@ export const generateQuestion = (config: QuizConfig): QuizQuestion | null => {
   const blocks = buildBlocks(config)
   if (blocks === null) return null
 
-  const base = generateBaseSchema(blocks, config.premiseCounts, config.contextSize, config.formulaSize)
+  const base = generateBaseSchema(
+    blocks,
+    config.premiseCounts,
+    config.contextSize,
+    config.formulaSize,
+  )
   const instance = instantiate(
     base,
     config.instanceFormulaSize,
@@ -721,17 +793,41 @@ export const generateQuestion = (config: QuizConfig): QuizQuestion | null => {
 type FormulaBinding = Map<string, Prop>
 type SequenceBinding = Map<string, Prop[]>
 
-const makeRandomProp = (formulaSize: number, connectives: string[], symbols: string[]): Prop => {
+const makeRandomProp = (
+  formulaSize: number,
+  connectives: string[],
+  symbols: string[],
+): Prop => {
   const wc = (c: string) => (connectives.includes(c) ? 1 : 0)
   const ws = (s: string) => (symbols.includes(s) ? 1 : 0)
   return randomWeighted(
     bellRandom(0, formulaSize),
-    { negation: wc('negation'), implication: wc('implication'), conjunction: wc('conjunction'), disjunction: wc('disjunction') },
-    { p: ws('p'), q: ws('q'), r: ws('r'), s: ws('s'), u: ws('u'), v: ws('v'), falsum: wc('falsum'), verum: wc('verum') },
+    {
+      negation: wc('negation'),
+      implication: wc('implication'),
+      conjunction: wc('conjunction'),
+      disjunction: wc('disjunction'),
+    },
+    {
+      p: ws('p'),
+      q: ws('q'),
+      r: ws('r'),
+      s: ws('s'),
+      u: ws('u'),
+      v: ws('v'),
+      falsum: wc('falsum'),
+      verum: wc('verum'),
+    },
   )()
 }
 
-const instantiateFormula = (f: SchemaFormula, fb: FormulaBinding, formulaSize: number, connectives: string[], symbols: string[]): Prop => {
+const instantiateFormula = (
+  f: SchemaFormula,
+  fb: FormulaBinding,
+  formulaSize: number,
+  connectives: string[],
+  symbols: string[],
+): Prop => {
   switch (f.kind) {
     case 'var': {
       let val = fb.get(f.name)
@@ -748,24 +844,69 @@ const instantiateFormula = (f: SchemaFormula, fb: FormulaBinding, formulaSize: n
     case 'verum':
       return { kind: 'verum' }
     case 'negation':
-      return { kind: 'negation', negand: instantiateFormula(f.negand, fb, formulaSize, connectives, symbols) }
+      return {
+        kind: 'negation',
+        negand: instantiateFormula(
+          f.negand,
+          fb,
+          formulaSize,
+          connectives,
+          symbols,
+        ),
+      }
     case 'implication':
       return {
         kind: 'implication',
-        antecedent: instantiateFormula(f.antecedent, fb, formulaSize, connectives, symbols),
-        consequent: instantiateFormula(f.consequent, fb, formulaSize, connectives, symbols),
+        antecedent: instantiateFormula(
+          f.antecedent,
+          fb,
+          formulaSize,
+          connectives,
+          symbols,
+        ),
+        consequent: instantiateFormula(
+          f.consequent,
+          fb,
+          formulaSize,
+          connectives,
+          symbols,
+        ),
       }
     case 'conjunction':
       return {
         kind: 'conjunction',
-        leftConjunct: instantiateFormula(f.leftConjunct, fb, formulaSize, connectives, symbols),
-        rightConjunct: instantiateFormula(f.rightConjunct, fb, formulaSize, connectives, symbols),
+        leftConjunct: instantiateFormula(
+          f.leftConjunct,
+          fb,
+          formulaSize,
+          connectives,
+          symbols,
+        ),
+        rightConjunct: instantiateFormula(
+          f.rightConjunct,
+          fb,
+          formulaSize,
+          connectives,
+          symbols,
+        ),
       }
     case 'disjunction':
       return {
         kind: 'disjunction',
-        leftDisjunct: instantiateFormula(f.leftDisjunct, fb, formulaSize, connectives, symbols),
-        rightDisjunct: instantiateFormula(f.rightDisjunct, fb, formulaSize, connectives, symbols),
+        leftDisjunct: instantiateFormula(
+          f.leftDisjunct,
+          fb,
+          formulaSize,
+          connectives,
+          symbols,
+        ),
+        rightDisjunct: instantiateFormula(
+          f.rightDisjunct,
+          fb,
+          formulaSize,
+          connectives,
+          symbols,
+        ),
       }
   }
 }
@@ -784,12 +925,16 @@ const instantiateContext = (
     if (item.kind === 'seq') {
       let val = sb.get(item.name)
       if (val === undefined) {
-        val = Array.from({ length: bellRandom(0, sequenceSize) }, () => makeRandomProp(formulaSize, connectives, symbols))
+        val = Array.from({ length: bellRandom(0, sequenceSize) }, () =>
+          makeRandomProp(formulaSize, connectives, symbols),
+        )
         sb.set(item.name, val)
       }
       result.push(...val)
     } else {
-      result.push(instantiateFormula(item, fb, formulaSize, connectives, symbols))
+      result.push(
+        instantiateFormula(item, fb, formulaSize, connectives, symbols),
+      )
     }
   }
   return result
@@ -801,12 +946,34 @@ export type InstantiatedRule = {
   conclusion: InstantiatedSequent
 }
 
-export const instantiate = (schema: RuleSchema, formulaSize: number = 2, sequenceSize: number = 2, connectives: string[] = [], symbols: string[] = ['p', 'q', 'r', 's', 'u', 'v']): InstantiatedRule => {
+export const instantiate = (
+  schema: RuleSchema,
+  formulaSize: number = 2,
+  sequenceSize: number = 2,
+  connectives: string[] = [],
+  symbols: string[] = ['p', 'q', 'r', 's', 'u', 'v'],
+): InstantiatedRule => {
   const fb: FormulaBinding = new Map()
   const sb: SequenceBinding = new Map()
   const instantiateSeq = (s: SchemaSequent): InstantiatedSequent => ({
-    antecedent: instantiateContext(s.antecedent, fb, sb, formulaSize, sequenceSize, connectives, symbols),
-    succedent: instantiateContext(s.succedent, fb, sb, formulaSize, sequenceSize, connectives, symbols),
+    antecedent: instantiateContext(
+      s.antecedent,
+      fb,
+      sb,
+      formulaSize,
+      sequenceSize,
+      connectives,
+      symbols,
+    ),
+    succedent: instantiateContext(
+      s.succedent,
+      fb,
+      sb,
+      formulaSize,
+      sequenceSize,
+      connectives,
+      symbols,
+    ),
   })
   return {
     premises: schema.premises.map(instantiateSeq),

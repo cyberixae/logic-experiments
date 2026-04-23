@@ -258,15 +258,18 @@ html.loading body {
 .button:not(.disabled):hover {
   background-color: #fff;
 }
-.button.active, .button.active:hover {
+.button.active,
+.button.active:hover {
   background-color: #ffeedd;
   border-color: #f80;
 }
-.button.quiz-card-correct, .button.quiz-card-correct:hover {
+.button.quiz-card-correct,
+.button.quiz-card-correct:hover {
   border-color: #2a2;
   background-color: #afa;
 }
-.button.quiz-card-wrong, .button.quiz-card-wrong:hover {
+.button.quiz-card-wrong,
+.button.quiz-card-wrong:hover {
   border-color: #a22;
   background-color: #faa;
 }

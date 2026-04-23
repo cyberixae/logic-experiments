@@ -1,6 +1,10 @@
 import { MountResult, Navigate } from './types'
 import { t } from './i18n'
-import { generateQuestion, InstantiatedRule, QuizQuestion } from '../quiz/generate'
+import {
+  generateQuestion,
+  InstantiatedRule,
+  QuizQuestion,
+} from '../quiz/generate'
 import { fromSchemaRule } from '../quiz/render'
 import { QuizConfig } from '../quiz/config'
 import { fromSequent, basic, printString } from '../render/print'
@@ -19,7 +23,10 @@ const AUTO_ZOOM_PAD = 0.9
 
 // ── Question tree ──────────────────────────────────────────────────────────────
 
-const renderQuestionTree = (instance: InstantiatedRule, label: string | null): HTMLElement => {
+const renderQuestionTree = (
+  instance: InstantiatedRule,
+  label: string | null,
+): HTMLElement => {
   const node = document.createElement('div')
   node.setAttribute('class', 'tree-node')
 
@@ -30,7 +37,9 @@ const renderQuestionTree = (instance: InstantiatedRule, label: string | null): H
     pNode.setAttribute('class', 'tree-node')
     const pSeq = document.createElement('div')
     pSeq.setAttribute('class', 'tree-sequent')
-    pSeq.innerHTML = html(fromSequent(sequent(p.antecedent, p.succedent))(basic))
+    pSeq.innerHTML = html(
+      fromSequent(sequent(p.antecedent, p.succedent))(basic),
+    )
     pNode.appendChild(pSeq)
     premisesEl.appendChild(pNode)
   }
@@ -48,7 +57,11 @@ const renderQuestionTree = (instance: InstantiatedRule, label: string | null): H
 
   const concSeq = document.createElement('div')
   concSeq.setAttribute('class', 'tree-sequent')
-  concSeq.innerHTML = html(fromSequent(sequent(instance.conclusion.antecedent, instance.conclusion.succedent))(basic))
+  concSeq.innerHTML = html(
+    fromSequent(
+      sequent(instance.conclusion.antecedent, instance.conclusion.succedent),
+    )(basic),
+  )
   node.appendChild(concSeq)
 
   return node
@@ -93,7 +106,9 @@ export const mountQuiz = (
       questionArea.style.setProperty('--tree-zoom', String(zoom))
       const treeEl = renderQuestionTree(
         instance,
-        state !== null && state.guessIndex !== null ? answer.name : '\u00a0?\u00a0',
+        state !== null && state.guessIndex !== null
+          ? answer.name
+          : '\u00a0?\u00a0',
       )
       questionArea.appendChild(treeEl)
       container.appendChild(questionArea)
@@ -101,15 +116,46 @@ export const mountQuiz = (
         layoutTree(treeEl, { skipActiveScroll: true })
         if (pendingAutoZoom) {
           pendingAutoZoom = false
-          const premiseSequents = Array.from(treeEl.querySelectorAll<HTMLElement>(':scope > .tree-premises > .tree-node > .tree-sequent'))
-          const conclusionSequent = treeEl.querySelector<HTMLElement>(':scope > .tree-sequent')
-          const sequents = [...premiseSequents, ...(conclusionSequent ? [conclusionSequent] : [])]
-          const widest = sequents.reduce<HTMLElement | null>((max, s) => max === null || s.getBoundingClientRect().width > max.getBoundingClientRect().width ? s : max, null)
+          const premiseSequents = Array.from(
+            treeEl.querySelectorAll<HTMLElement>(
+              ':scope > .tree-premises > .tree-node > .tree-sequent',
+            ),
+          )
+          const conclusionSequent = treeEl.querySelector<HTMLElement>(
+            ':scope > .tree-sequent',
+          )
+          const sequents = [
+            ...premiseSequents,
+            ...(conclusionSequent ? [conclusionSequent] : []),
+          ]
+          const widest = sequents.reduce<HTMLElement | null>(
+            (max, s) =>
+              max === null ||
+              s.getBoundingClientRect().width >
+                max.getBoundingClientRect().width
+                ? s
+                : max,
+            null,
+          )
           const areaRect = questionArea.getBoundingClientRect()
           const areaStyle = getComputedStyle(questionArea)
-          const availW = areaRect.width - parseFloat(areaStyle.paddingLeft) - parseFloat(areaStyle.paddingRight)
-          if (widest && widest.getBoundingClientRect().width > 0 && availW > 0) {
-            const target = Math.max(AUTO_ZOOM_MIN, Math.min(AUTO_ZOOM_MAX, (zoom * availW * AUTO_ZOOM_PAD) / widest.getBoundingClientRect().width))
+          const availW =
+            areaRect.width -
+            parseFloat(areaStyle.paddingLeft) -
+            parseFloat(areaStyle.paddingRight)
+          if (
+            widest &&
+            widest.getBoundingClientRect().width > 0 &&
+            availW > 0
+          ) {
+            const target = Math.max(
+              AUTO_ZOOM_MIN,
+              Math.min(
+                AUTO_ZOOM_MAX,
+                (zoom * availW * AUTO_ZOOM_PAD) /
+                  widest.getBoundingClientRect().width,
+              ),
+            )
             if (Math.abs(target - zoom) > 0.01) {
               zoom = target
               questionArea.style.setProperty('--tree-zoom', String(zoom))
@@ -131,7 +177,10 @@ export const mountQuiz = (
     const menuBtn = document.createElement('div')
     menuBtn.setAttribute('class', 'button quiz-menu-btn')
     menuBtn.textContent = t('menu')
-    menuBtn.onclick = () => { pausePopupOpen = true; render() }
+    menuBtn.onclick = () => {
+      pausePopupOpen = true
+      render()
+    }
     panel.appendChild(menuBtn)
 
     if (state === null) {
@@ -146,7 +195,10 @@ export const mountQuiz = (
     zoomRow.setAttribute('class', 'quiz-zoom')
 
     const zoomOut = document.createElement('div')
-    zoomOut.setAttribute('class', 'button' + (zoom <= ZOOM_MIN ? ' disabled' : ''))
+    zoomOut.setAttribute(
+      'class',
+      'button' + (zoom <= ZOOM_MIN ? ' disabled' : ''),
+    )
     zoomOut.textContent = '−'
     zoomOut.onclick = () => {
       zoom = Math.max(ZOOM_MIN, zoom - ZOOM_STEP)
@@ -164,7 +216,10 @@ export const mountQuiz = (
     zoomRow.appendChild(zoomReset)
 
     const zoomIn = document.createElement('div')
-    zoomIn.setAttribute('class', 'button' + (zoom >= ZOOM_MAX ? ' disabled' : ''))
+    zoomIn.setAttribute(
+      'class',
+      'button' + (zoom >= ZOOM_MAX ? ' disabled' : ''),
+    )
     zoomIn.textContent = '+'
     zoomIn.onclick = () => {
       zoom = Math.min(ZOOM_MAX, zoom + ZOOM_STEP)
@@ -215,11 +270,34 @@ export const mountQuiz = (
     container.appendChild(panel)
 
     if (pausePopupOpen) {
-      const resume = () => { pausePopupOpen = false; render() }
-      const exitToMenu = () => { pausePopupOpen = false; navigate('menu') }
-      const openSettings = () => { pausePopupOpen = false; navigate('match-config') }
-      const restart = () => { pausePopupOpen = false; state = newState(config); pendingAutoZoom = true; render() }
-      container.appendChild(createPausePopup(resume, exitToMenu, restart, false, undefined, openSettings))
+      const resume = () => {
+        pausePopupOpen = false
+        render()
+      }
+      const exitToMenu = () => {
+        pausePopupOpen = false
+        navigate('menu')
+      }
+      const openSettings = () => {
+        pausePopupOpen = false
+        navigate('match-config')
+      }
+      const restart = () => {
+        pausePopupOpen = false
+        state = newState(config)
+        pendingAutoZoom = true
+        render()
+      }
+      container.appendChild(
+        createPausePopup(
+          resume,
+          exitToMenu,
+          restart,
+          false,
+          undefined,
+          openSettings,
+        ),
+      )
     }
   }
 
@@ -228,8 +306,15 @@ export const mountQuiz = (
   const handleKey = (ev: KeyboardEvent) => {
     if (ev.ctrlKey || ev.metaKey || ev.altKey) return
     const digitMatch = ev.code.match(/^Digit([1-4])$/)
-    if (digitMatch && !pausePopupOpen && state !== null && state.guessIndex === null) {
-      const idx = parseInt(digitMatch[1]!) - 1
+    if (
+      digitMatch &&
+      !pausePopupOpen &&
+      state !== null &&
+      state.guessIndex === null
+    ) {
+      const idxStr = digitMatch[1]
+      if (idxStr === undefined) return
+      const idx = parseInt(idxStr) - 1
       if (idx < state.schemas.length) {
         state = { ...state, guessIndex: idx }
         render()
@@ -247,10 +332,18 @@ export const mountQuiz = (
       pausePopupOpen = !pausePopupOpen
       render()
     } else if (action === 'reset') {
-      pausePopupOpen = false; state = newState(config); pendingAutoZoom = true; render()
+      pausePopupOpen = false
+      state = newState(config)
+      pendingAutoZoom = true
+      render()
     } else if (pausePopupOpen) {
-      if (action === 'undo') { pausePopupOpen = false; render() }
-      else if (action === 'exit') { pausePopupOpen = false; navigate('menu') }
+      if (action === 'undo') {
+        pausePopupOpen = false
+        render()
+      } else if (action === 'exit') {
+        pausePopupOpen = false
+        navigate('menu')
+      }
     }
   }
   document.addEventListener('keydown', handleKey)

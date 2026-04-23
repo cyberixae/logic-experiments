@@ -12,7 +12,14 @@ export const ALL_VARIABLES = ['A', 'B', 'C', 'D', 'E', 'F'] as const
 export const ALL_SEQUENCES = ['Γ', 'Δ', 'Σ', 'Π', 'Ξ', 'Ψ'] as const
 
 // URL abbreviations for sequences (capital letters to avoid collision with symbols)
-const SEQ_ABBREV: Record<string, string> = { Γ: 'G', Δ: 'D', Σ: 'S', Π: 'P', Ξ: 'X', Ψ: 'Y' }
+const SEQ_ABBREV: Record<string, string> = {
+  Γ: 'G',
+  Δ: 'D',
+  Σ: 'S',
+  Π: 'P',
+  Ξ: 'X',
+  Ψ: 'Y',
+}
 
 // URL abbreviations for connectives (matches random-config convention)
 const CONN_ABBREV: Record<string, string> = {
@@ -42,45 +49,169 @@ const A = <T extends readonly unknown[]>(arr: T): T[number][] => [...arr]
 
 export const PRESETS: readonly QuizConfig[] = [
   // 0: pure symbol matching
-  { symbols: A(ALL_SYMBOLS), connectives: [], variables: [], sequences: [], formulaSize: 1, premiseCounts: [0,1,2], contextSize: 2, instanceFormulaSize: 1, instanceSequenceSize: 2, instanceConnectives: [], instanceSymbols: [] },
+  {
+    symbols: A(ALL_SYMBOLS),
+    connectives: [],
+    variables: [],
+    sequences: [],
+    formulaSize: 1,
+    premiseCounts: [0, 1, 2],
+    contextSize: 2,
+    instanceFormulaSize: 1,
+    instanceSequenceSize: 2,
+    instanceConnectives: [],
+    instanceSymbols: [],
+  },
   // 1: symbols + connectives, no variables
-  { symbols: A(ALL_SYMBOLS), connectives: A(ALL_CONNECTIVE_TYPES), variables: [], sequences: [], formulaSize: 1, premiseCounts: [0,1,2], contextSize: 2, instanceFormulaSize: 1, instanceSequenceSize: 2, instanceConnectives: [], instanceSymbols: [] },
+  {
+    symbols: A(ALL_SYMBOLS),
+    connectives: A(ALL_CONNECTIVE_TYPES),
+    variables: [],
+    sequences: [],
+    formulaSize: 1,
+    premiseCounts: [0, 1, 2],
+    contextSize: 2,
+    instanceFormulaSize: 1,
+    instanceSequenceSize: 2,
+    instanceConnectives: [],
+    instanceSymbols: [],
+  },
   // 2: symbols + connectives + variables, inst symbols
-  { symbols: A(ALL_SYMBOLS), connectives: A(ALL_CONNECTIVE_TYPES), variables: A(ALL_VARIABLES), sequences: [], formulaSize: 1, premiseCounts: [0,1,2], contextSize: 2, instanceFormulaSize: 1, instanceSequenceSize: 2, instanceConnectives: [], instanceSymbols: A(ALL_INSTANCE_SYMBOLS) },
+  {
+    symbols: A(ALL_SYMBOLS),
+    connectives: A(ALL_CONNECTIVE_TYPES),
+    variables: A(ALL_VARIABLES),
+    sequences: [],
+    formulaSize: 1,
+    premiseCounts: [0, 1, 2],
+    contextSize: 2,
+    instanceFormulaSize: 1,
+    instanceSequenceSize: 2,
+    instanceConnectives: [],
+    instanceSymbols: A(ALL_INSTANCE_SYMBOLS),
+  },
   // 3: connectives + variables, no symbols
-  { symbols: [], connectives: A(ALL_CONNECTIVE_TYPES), variables: A(ALL_VARIABLES), sequences: [], formulaSize: 1, premiseCounts: [0,1,2], contextSize: 2, instanceFormulaSize: 1, instanceSequenceSize: 2, instanceConnectives: [], instanceSymbols: A(ALL_INSTANCE_SYMBOLS) },
+  {
+    symbols: [],
+    connectives: A(ALL_CONNECTIVE_TYPES),
+    variables: A(ALL_VARIABLES),
+    sequences: [],
+    formulaSize: 1,
+    premiseCounts: [0, 1, 2],
+    contextSize: 2,
+    instanceFormulaSize: 1,
+    instanceSequenceSize: 2,
+    instanceConnectives: [],
+    instanceSymbols: A(ALL_INSTANCE_SYMBOLS),
+  },
   // 4: variables only, inst connectives
-  { symbols: [], connectives: [], variables: A(ALL_VARIABLES), sequences: [], formulaSize: 1, premiseCounts: [0,1,2], contextSize: 2, instanceFormulaSize: 1, instanceSequenceSize: 2, instanceConnectives: A(ALL_CONNECTIVE_TYPES), instanceSymbols: A(ALL_INSTANCE_SYMBOLS) },
+  {
+    symbols: [],
+    connectives: [],
+    variables: A(ALL_VARIABLES),
+    sequences: [],
+    formulaSize: 1,
+    premiseCounts: [0, 1, 2],
+    contextSize: 2,
+    instanceFormulaSize: 1,
+    instanceSequenceSize: 2,
+    instanceConnectives: A(ALL_CONNECTIVE_TYPES),
+    instanceSymbols: A(ALL_INSTANCE_SYMBOLS),
+  },
   // 5: connectives + variables, inst connectives
-  { symbols: [], connectives: A(ALL_CONNECTIVE_TYPES), variables: A(ALL_VARIABLES), sequences: [], formulaSize: 1, premiseCounts: [0,1,2], contextSize: 2, instanceFormulaSize: 1, instanceSequenceSize: 2, instanceConnectives: A(ALL_CONNECTIVE_TYPES), instanceSymbols: A(ALL_INSTANCE_SYMBOLS) },
+  {
+    symbols: [],
+    connectives: A(ALL_CONNECTIVE_TYPES),
+    variables: A(ALL_VARIABLES),
+    sequences: [],
+    formulaSize: 1,
+    premiseCounts: [0, 1, 2],
+    contextSize: 2,
+    instanceFormulaSize: 1,
+    instanceSequenceSize: 2,
+    instanceConnectives: A(ALL_CONNECTIVE_TYPES),
+    instanceSymbols: A(ALL_INSTANCE_SYMBOLS),
+  },
   // 6: variables + sequences, short inst seq
-  { symbols: [], connectives: [], variables: A(ALL_VARIABLES), sequences: A(ALL_SEQUENCES), formulaSize: 1, premiseCounts: [0,1,2], contextSize: 2, instanceFormulaSize: 1, instanceSequenceSize: 1, instanceConnectives: [], instanceSymbols: A(ALL_INSTANCE_SYMBOLS) },
+  {
+    symbols: [],
+    connectives: [],
+    variables: A(ALL_VARIABLES),
+    sequences: A(ALL_SEQUENCES),
+    formulaSize: 1,
+    premiseCounts: [0, 1, 2],
+    contextSize: 2,
+    instanceFormulaSize: 1,
+    instanceSequenceSize: 1,
+    instanceConnectives: [],
+    instanceSymbols: A(ALL_INSTANCE_SYMBOLS),
+  },
   // 7: variables + sequences, longer inst seq
-  { symbols: [], connectives: [], variables: A(ALL_VARIABLES), sequences: A(ALL_SEQUENCES), formulaSize: 1, premiseCounts: [0,1,2], contextSize: 2, instanceFormulaSize: 1, instanceSequenceSize: 3, instanceConnectives: [], instanceSymbols: A(ALL_INSTANCE_SYMBOLS) },
+  {
+    symbols: [],
+    connectives: [],
+    variables: A(ALL_VARIABLES),
+    sequences: A(ALL_SEQUENCES),
+    formulaSize: 1,
+    premiseCounts: [0, 1, 2],
+    contextSize: 2,
+    instanceFormulaSize: 1,
+    instanceSequenceSize: 3,
+    instanceConnectives: [],
+    instanceSymbols: A(ALL_INSTANCE_SYMBOLS),
+  },
   // 8: connectives + variables + sequences, inst connectives
-  { symbols: [], connectives: A(ALL_CONNECTIVE_TYPES), variables: A(ALL_VARIABLES), sequences: A(ALL_SEQUENCES), formulaSize: 1, premiseCounts: [0,1,2], contextSize: 2, instanceFormulaSize: 1, instanceSequenceSize: 2, instanceConnectives: A(ALL_CONNECTIVE_TYPES), instanceSymbols: A(ALL_INSTANCE_SYMBOLS) },
+  {
+    symbols: [],
+    connectives: A(ALL_CONNECTIVE_TYPES),
+    variables: A(ALL_VARIABLES),
+    sequences: A(ALL_SEQUENCES),
+    formulaSize: 1,
+    premiseCounts: [0, 1, 2],
+    contextSize: 2,
+    instanceFormulaSize: 1,
+    instanceSequenceSize: 2,
+    instanceConnectives: A(ALL_CONNECTIVE_TYPES),
+    instanceSymbols: A(ALL_INSTANCE_SYMBOLS),
+  },
   // 9: full, larger formulas
-  { symbols: [], connectives: A(ALL_CONNECTIVE_TYPES), variables: A(ALL_VARIABLES), sequences: A(ALL_SEQUENCES), formulaSize: 2, premiseCounts: [0,1,2], contextSize: 3, instanceFormulaSize: 2, instanceSequenceSize: 3, instanceConnectives: A(ALL_CONNECTIVE_TYPES), instanceSymbols: A(ALL_INSTANCE_SYMBOLS) },
+  {
+    symbols: [],
+    connectives: A(ALL_CONNECTIVE_TYPES),
+    variables: A(ALL_VARIABLES),
+    sequences: A(ALL_SEQUENCES),
+    formulaSize: 2,
+    premiseCounts: [0, 1, 2],
+    contextSize: 3,
+    instanceFormulaSize: 2,
+    instanceSequenceSize: 3,
+    instanceConnectives: A(ALL_CONNECTIVE_TYPES),
+    instanceSymbols: A(ALL_INSTANCE_SYMBOLS),
+  },
 ]
 
 const sortedJoin = (arr: string[]): string => [...arr].sort().join(',')
 
 export const matchPreset = (config: QuizConfig): number | null => {
-  for (let i = 0; i < PRESETS.length; i++) {
-    const p = PRESETS[i]!
+  for (let i = 0; i < PRESETS.length; i += 1) {
+    const p = PRESETS[i]
+    if (p === undefined) continue
     if (
       sortedJoin(config.symbols) === sortedJoin(p.symbols) &&
       sortedJoin(config.connectives) === sortedJoin(p.connectives) &&
       sortedJoin(config.variables) === sortedJoin(p.variables) &&
       sortedJoin(config.sequences) === sortedJoin(p.sequences) &&
       config.formulaSize === p.formulaSize &&
-      sortedJoin(config.premiseCounts.map(String)) === sortedJoin(p.premiseCounts.map(String)) &&
+      sortedJoin(config.premiseCounts.map(String)) ===
+        sortedJoin(p.premiseCounts.map(String)) &&
       config.contextSize === p.contextSize &&
       config.instanceFormulaSize === p.instanceFormulaSize &&
       config.instanceSequenceSize === p.instanceSequenceSize &&
-      sortedJoin(config.instanceConnectives) === sortedJoin(p.instanceConnectives) &&
+      sortedJoin(config.instanceConnectives) ===
+        sortedJoin(p.instanceConnectives) &&
       sortedJoin(config.instanceSymbols) === sortedJoin(p.instanceSymbols)
-    ) return i
+    )
+      return i
   }
   return null
 }
@@ -136,20 +267,48 @@ export const parseQuizConfigFromParams = (
           )
         : defaults.sequences,
     formulaSize:
-      sizeParam !== null ? Math.max(0, Math.min(10, parseInt(sizeParam, 10) || defaults.formulaSize)) : defaults.formulaSize,
+      sizeParam !== null
+        ? Math.max(
+            0,
+            Math.min(10, parseInt(sizeParam, 10) || defaults.formulaSize),
+          )
+        : defaults.formulaSize,
     premiseCounts:
       premisesParam !== null
         ? [0, 1, 2].filter((n) => premisesParam.includes(String(n)))
         : defaults.premiseCounts,
     contextSize:
-      contextParam !== null ? Math.max(0, Math.min(6, parseInt(contextParam, 10) || defaults.contextSize)) : defaults.contextSize,
+      contextParam !== null
+        ? Math.max(
+            0,
+            Math.min(6, parseInt(contextParam, 10) || defaults.contextSize),
+          )
+        : defaults.contextSize,
     instanceFormulaSize:
-      instSizeParam !== null ? Math.max(0, Math.min(10, parseInt(instSizeParam, 10) || defaults.instanceFormulaSize)) : defaults.instanceFormulaSize,
+      instSizeParam !== null
+        ? Math.max(
+            0,
+            Math.min(
+              10,
+              parseInt(instSizeParam, 10) || defaults.instanceFormulaSize,
+            ),
+          )
+        : defaults.instanceFormulaSize,
     instanceSequenceSize:
-      instSeqSizeParam !== null ? Math.max(0, Math.min(6, parseInt(instSeqSizeParam, 10) || defaults.instanceSequenceSize)) : defaults.instanceSequenceSize,
+      instSeqSizeParam !== null
+        ? Math.max(
+            0,
+            Math.min(
+              6,
+              parseInt(instSeqSizeParam, 10) || defaults.instanceSequenceSize,
+            ),
+          )
+        : defaults.instanceSequenceSize,
     instanceConnectives:
       instConnParam !== null
-        ? ALL_CONNECTIVE_TYPES.filter((c) => instConnParam.includes(CONN_ABBREV[c] ?? ''))
+        ? ALL_CONNECTIVE_TYPES.filter((c) =>
+            instConnParam.includes(CONN_ABBREV[c] ?? ''),
+          )
         : defaults.instanceConnectives,
     instanceSymbols:
       instSymParam !== null
@@ -177,6 +336,9 @@ export const setQuizConfigParams = (
   params.set('qcontext', String(config.contextSize))
   params.set('qinstsize', String(config.instanceFormulaSize))
   params.set('qinstseq', String(config.instanceSequenceSize))
-  params.set('qinstconn', config.instanceConnectives.map((c) => CONN_ABBREV[c] ?? '').join(''))
+  params.set(
+    'qinstconn',
+    config.instanceConnectives.map((c) => CONN_ABBREV[c] ?? '').join(''),
+  )
   params.set('qinstsym', config.instanceSymbols.join(''))
 }

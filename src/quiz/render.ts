@@ -1,4 +1,9 @@
-import { SchemaFormula, SchemaContext, SchemaSequent, RuleSchema } from './schema'
+import {
+  SchemaFormula,
+  SchemaContext,
+  SchemaSequent,
+  RuleSchema,
+} from './schema'
 import {
   Printer,
   printUnary,
@@ -25,20 +30,23 @@ function fromSchemaFormula(f: SchemaFormula): Printer {
     case 'negation':
       return printUnary('negation', false, true)(expandSchema(3, f.negand))
     case 'conjunction':
-      return printBinary('conjunction', false, true)(
-        expandSchema(3, f.leftConjunct),
-        expandSchema(3, f.rightConjunct),
-      )
+      return printBinary(
+        'conjunction',
+        false,
+        true,
+      )(expandSchema(3, f.leftConjunct), expandSchema(3, f.rightConjunct))
     case 'disjunction':
-      return printBinary('disjunction', false, true)(
-        expandSchema(3, f.leftDisjunct),
-        expandSchema(3, f.rightDisjunct),
-      )
+      return printBinary(
+        'disjunction',
+        false,
+        true,
+      )(expandSchema(3, f.leftDisjunct), expandSchema(3, f.rightDisjunct))
     case 'implication':
-      return printBinary('implication', false, true)(
-        expandSchema(2, f.antecedent),
-        expandSchema(2, f.consequent),
-      )
+      return printBinary(
+        'implication',
+        false,
+        true,
+      )(expandSchema(2, f.antecedent), expandSchema(2, f.consequent))
   }
 }
 
@@ -75,7 +83,8 @@ export const fromSchemaContext = (ctx: SchemaContext): Printer =>
     ),
   )
 
-export const fromSchemaSequent = (s: SchemaSequent): Printer =>
+export const fromSchemaSequent =
+  (s: SchemaSequent): Printer =>
   (t) =>
     segment.trim(
       printBinary('sequent')(
