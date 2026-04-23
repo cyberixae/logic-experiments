@@ -259,8 +259,8 @@ html.loading body {
   background-color: #fff;
 }
 .button.active, .button.active:hover {
-  background-color: #ddf;
-  border-color: #66c;
+  background-color: #ffeedd;
+  border-color: #f80;
 }
 .button.quiz-card-correct, .button.quiz-card-correct:hover {
   border-color: #2a2;
