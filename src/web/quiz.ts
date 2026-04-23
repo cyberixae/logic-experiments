@@ -1,6 +1,6 @@
 import { MountResult, Navigate } from './types'
 import { t } from './i18n'
-import { generateQuestion, instantiate, InstantiatedRule, QuizQuestion } from '../quiz/generate'
+import { generateQuestion, InstantiatedRule, QuizQuestion } from '../quiz/generate'
 import { fromSchemaRule } from '../quiz/render'
 import { QuizConfig } from '../quiz/config'
 import { fromSequent, basic, printString } from '../render/print'
@@ -56,14 +56,12 @@ const renderQuestionTree = (instance: InstantiatedRule, label: string | null): H
 
 // ── Quiz state ─────────────────────────────────────────────────────────────────
 
-type QuizState = QuizQuestion & { guessIndex: number | null; instance: InstantiatedRule }
+type QuizState = QuizQuestion & { guessIndex: number | null }
 
 const newState = (config: QuizConfig): QuizState | null => {
   const q = generateQuestion(config)
   if (q === null) return null
-  const answer = q.schemas[q.answerIndex]
-  if (answer === undefined) return null
-  return { ...q, guessIndex: null, instance: instantiate(answer, config.instanceFormulaSize, config.instanceSequenceSize, config.instanceConnectives, config.instanceSymbols) }
+  return { ...q, guessIndex: null }
 }
 
 // ── Mount ──────────────────────────────────────────────────────────────────────

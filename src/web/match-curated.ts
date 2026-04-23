@@ -1,11 +1,6 @@
 import { MountResult, Navigate } from './types'
 import { t } from './i18n'
-import {
-  generateQuestion,
-  instantiate,
-  InstantiatedRule,
-  QuizQuestion,
-} from '../quiz/generate'
+import { generateQuestion, InstantiatedRule, QuizQuestion } from '../quiz/generate'
 import { fromSchemaRule } from '../quiz/render'
 import { PRESETS } from '../quiz/config'
 import { fromSequent, basic, printString } from '../render/print'
@@ -39,10 +34,7 @@ type CuratedSession = {
   phase: 'playing' | 'done'
 }
 
-type QuizState = QuizQuestion & {
-  guessIndex: number | null
-  instance: InstantiatedRule
-}
+type QuizState = QuizQuestion & { guessIndex: number | null }
 
 // ── Session helpers ────────────────────────────────────────────────────────────
 
@@ -117,19 +109,7 @@ const newQuestion = (presetIndex: number): QuizState | null => {
   if (config === undefined) return null
   const q = generateQuestion(config)
   if (q === null) return null
-  const answer = q.schemas[q.answerIndex]
-  if (answer === undefined) return null
-  return {
-    ...q,
-    guessIndex: null,
-    instance: instantiate(
-      answer,
-      config.instanceFormulaSize,
-      config.instanceSequenceSize,
-      config.instanceConnectives,
-      config.instanceSymbols,
-    ),
-  }
+  return { ...q, guessIndex: null }
 }
 
 // ── Mount ──────────────────────────────────────────────────────────────────────

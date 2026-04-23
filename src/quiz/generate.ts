@@ -497,6 +497,7 @@ const generateDistractors = (
   config: QuizConfig,
   blocks: Blocks,
   count: number,
+  instance: InstantiatedRule,
 ): RuleSchema[] => {
   const used = new Set([schemaKey(base)])
   const distractors: RuleSchema[] = []
@@ -517,6 +518,7 @@ const generateDistractors = (
       if (result === null) continue
       const key = schemaKey(result)
       if (used.has(key)) continue
+      if (canMatchInstance(result, instance)) continue
       used.add(key)
       distractors.push(result)
       break
@@ -524,10 +526,12 @@ const generateDistractors = (
   }
 
   // Fill remaining slots with fresh schemas if mutations exhausted
-  while (distractors.length < count) {
+  let fallbackAttempts = 0
+  while (distractors.length < count && fallbackAttempts < 50) {
+    fallbackAttempts += 1
     const fresh = generateBaseSchema(blocks, config.premiseCounts, config.contextSize, config.formulaSize)
     const key = schemaKey(fresh)
-    if (!used.has(key)) {
+    if (!used.has(key) && !canMatchInstance(fresh, instance)) {
       used.add(key)
       distractors.push(fresh)
     }
@@ -536,11 +540,148 @@ const generateDistractors = (
   return distractors
 }
 
+// ── Schema-to-instance unification ────────────────────────────────────────────
+
+const propsEqual = (a: Prop, b: Prop): boolean => {
+  if (a.kind !== b.kind) return false
+  switch (a.kind) {
+    case 'atom':
+      return b.kind === 'atom' && a.value === b.value
+    case 'falsum':
+    case 'verum':
+      return true
+    case 'negation':
+      return b.kind === 'negation' && propsEqual(a.negand, b.negand)
+    case 'implication':
+      return (
+        b.kind === 'implication' &&
+        propsEqual(a.antecedent, b.antecedent) &&
+        propsEqual(a.consequent, b.consequent)
+      )
+    case 'conjunction':
+      return (
+        b.kind === 'conjunction' &&
+        propsEqual(a.leftConjunct, b.leftConjunct) &&
+        propsEqual(a.rightConjunct, b.rightConjunct)
+      )
+    case 'disjunction':
+      return (
+        b.kind === 'disjunction' &&
+        propsEqual(a.leftDisjunct, b.leftDisjunct) &&
+        propsEqual(a.rightDisjunct, b.rightDisjunct)
+      )
+  }
+}
+
+const matchSchemaFormula = (
+  sf: SchemaFormula,
+  p: Prop,
+  fb: FormulaBinding,
+): boolean => {
+  switch (sf.kind) {
+    case 'var': {
+      const bound = fb.get(sf.name)
+      if (bound !== undefined) return propsEqual(bound, p)
+      fb.set(sf.name, p)
+      return true
+    }
+    case 'atom':
+      return p.kind === 'atom' && p.value === sf.value
+    case 'falsum':
+      return p.kind === 'falsum'
+    case 'verum':
+      return p.kind === 'verum'
+    case 'negation':
+      return p.kind === 'negation' && matchSchemaFormula(sf.negand, p.negand, fb)
+    case 'implication':
+      return (
+        p.kind === 'implication' &&
+        matchSchemaFormula(sf.antecedent, p.antecedent, fb) &&
+        matchSchemaFormula(sf.consequent, p.consequent, fb)
+      )
+    case 'conjunction':
+      return (
+        p.kind === 'conjunction' &&
+        matchSchemaFormula(sf.leftConjunct, p.leftConjunct, fb) &&
+        matchSchemaFormula(sf.rightConjunct, p.rightConjunct, fb)
+      )
+    case 'disjunction':
+      return (
+        p.kind === 'disjunction' &&
+        matchSchemaFormula(sf.leftDisjunct, p.leftDisjunct, fb) &&
+        matchSchemaFormula(sf.rightDisjunct, p.rightDisjunct, fb)
+      )
+  }
+}
+
+// Backtracking match: try to unify a schema context against a concrete prop list.
+// The seq-var loop saves/restores both bindings on failure, so inner calls don't need to.
+const matchSchemaContext = (
+  ctx: SchemaContext,
+  ctxIdx: number,
+  props: Prop[],
+  propIdx: number,
+  fb: FormulaBinding,
+  sb: SequenceBinding,
+): boolean => {
+  if (ctxIdx === ctx.length) return propIdx === props.length
+  const item = ctx[ctxIdx]!
+  if (item.kind !== 'seq') {
+    if (propIdx >= props.length) return false
+    return (
+      matchSchemaFormula(item, props[propIdx]!, fb) &&
+      matchSchemaContext(ctx, ctxIdx + 1, props, propIdx + 1, fb, sb)
+    )
+  }
+  const bound = sb.get(item.name)
+  if (bound !== undefined) {
+    if (propIdx + bound.length > props.length) return false
+    for (let i = 0; i < bound.length; i++) {
+      if (!propsEqual(bound[i]!, props[propIdx + i]!)) return false
+    }
+    return matchSchemaContext(ctx, ctxIdx + 1, props, propIdx + bound.length, fb, sb)
+  }
+  const minForRest = ctx.slice(ctxIdx + 1).filter((i) => i.kind !== 'seq').length
+  const maxLen = props.length - propIdx - minForRest
+  for (let len = 0; len <= maxLen; len++) {
+    const savedFb = new Map(fb)
+    const savedSb = new Map(sb)
+    sb.set(item.name, props.slice(propIdx, propIdx + len))
+    if (matchSchemaContext(ctx, ctxIdx + 1, props, propIdx + len, fb, sb)) return true
+    fb.clear()
+    for (const [k, v] of savedFb) fb.set(k, v)
+    sb.clear()
+    for (const [k, v] of savedSb) sb.set(k, v)
+  }
+  return false
+}
+
+const matchSchemaSequent = (
+  schema: SchemaSequent,
+  concrete: InstantiatedSequent,
+  fb: FormulaBinding,
+  sb: SequenceBinding,
+): boolean =>
+  matchSchemaContext(schema.antecedent, 0, concrete.antecedent, 0, fb, sb) &&
+  matchSchemaContext(schema.succedent, 0, concrete.succedent, 0, fb, sb)
+
+const canMatchInstance = (schema: RuleSchema, instance: InstantiatedRule): boolean => {
+  if (schema.premises.length !== instance.premises.length) return false
+  const fb: FormulaBinding = new Map()
+  const sb: SequenceBinding = new Map()
+  for (let i = 0; i < schema.premises.length; i += 1) {
+    if (!matchSchemaSequent(schema.premises[i]!, instance.premises[i]!, fb, sb))
+      return false
+  }
+  return matchSchemaSequent(schema.conclusion, instance.conclusion, fb, sb)
+}
+
 // ── Public API ─────────────────────────────────────────────────────────────────
 
 export type QuizQuestion = {
   schemas: RuleSchema[]
   answerIndex: number
+  instance: InstantiatedRule
 }
 
 export const generatePreviewSchemas = (config: QuizConfig, count: number): RuleSchema[] => {
@@ -557,13 +698,21 @@ export const generateQuestion = (config: QuizConfig): QuizQuestion | null => {
   if (blocks === null) return null
 
   const base = generateBaseSchema(blocks, config.premiseCounts, config.contextSize, config.formulaSize)
-  const distractors = generateDistractors(base, config, blocks, 3)
+  const instance = instantiate(
+    base,
+    config.instanceFormulaSize,
+    config.instanceSequenceSize,
+    config.instanceConnectives,
+    config.instanceSymbols,
+  )
+  const distractors = generateDistractors(base, config, blocks, 3, instance)
   const all = shuffle([base, ...distractors])
   const answerIndex = all.indexOf(base)
 
   return {
     schemas: all.map((s, i) => ({ ...s, name: `${i + 1}` })),
     answerIndex,
+    instance,
   }
 }
 
