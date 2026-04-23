@@ -1,9 +1,12 @@
 import { MountResult, Navigate } from './types'
 import { t } from './i18n'
 import { createLangSwitcher } from './lang-switcher'
-import { fromAtom, basic } from '../render/print'
-import { html } from '../render/segment'
+import { fromAtom, fromSequent, basic } from '../render/print'
+import { Prop } from '../model/prop'
+import { plain, html } from '../render/segment'
+import { treeAuto } from '../render/block'
 import { atom } from '../model/prop'
+import { sequent } from '../model/sequent'
 import {
   QuizConfig,
   ALL_SYMBOLS,
@@ -15,7 +18,7 @@ import {
 } from '../quiz/config'
 import { fromSchemaRule } from '../quiz/render'
 import { RuleSchema } from '../quiz/schema'
-import { generatePreviewSchemas } from '../quiz/generate'
+import { generatePreviewSchemas, instantiate } from '../quiz/generate'
 
 const ALL_PREMISE_COUNTS = [0, 1, 2] as const
 
@@ -31,6 +34,18 @@ const premiseCountShape = (n: number): string => {
 }
 
 const renderAtom = (name: string): string => html(fromAtom(atom(name))(basic))
+
+const sequentText = (ant: Prop[], suc: Prop[]): string =>
+  plain(fromSequent(sequent(ant, suc))(basic))
+
+const fromInstanceRule = (schema: RuleSchema, formulaSize: number): string => {
+  const inst = instantiate(schema, formulaSize)
+  return treeAuto(
+    sequentText(inst.conclusion.antecedent, inst.conclusion.succedent),
+    inst.premises.map((p) => sequentText(p.antecedent, p.succedent)),
+    null,
+  )
+}
 
 const createToggle = (
   content: string,
@@ -306,19 +321,32 @@ export const mountQuizConfig = (
     previewCol.appendChild(previewTitle)
 
     const previewCards = document.createElement('div')
-    previewCards.className = 'quiz-cards'
+    previewCards.className = 'preview-rows'
     previewCol.appendChild(previewCards)
 
     renderPreview = () => {
       previewCards.innerHTML = ''
       const schemas = generatePreviewSchemas(config, 6)
       for (const schema of schemas) {
-        const card = document.createElement('pre')
-        card.className = 'quiz-card rule hint'
-        card.innerHTML =
+        const row = document.createElement('div')
+        row.className = 'preview-row'
+
+        const schemaCard = document.createElement('pre')
+        schemaCard.className = 'quiz-card rule hint'
+        schemaCard.innerHTML =
           '<span class="rule-label long">' + fromSchemaRule(schema, false) + '</span>' +
           '<span class="rule-label short">' + fromSchemaRule(schema, false) + '</span>'
-        previewCards.appendChild(card)
+        row.appendChild(schemaCard)
+
+        for (let i = 0; i < 1; i++) {
+          const instCard = document.createElement('pre')
+          instCard.className = 'quiz-card rule'
+          const text = fromInstanceRule(schema, config.formulaSize)
+          instCard.textContent = text
+          row.appendChild(instCard)
+        }
+
+        previewCards.appendChild(row)
       }
     }
     renderPreview()

@@ -888,10 +888,24 @@ html.loading body {
   flex-direction: column;
   gap: 1.5em;
 }
-.config-preview .quiz-cards {
-  display: grid;
-  grid-template-columns: max-content;
+.preview-rows {
+  display: flex;
+  flex-direction: column;
   gap: 1.5em;
+}
+.preview-row {
+  display: flex;
+  flex-direction: row;
+  gap: 1em;
+  align-items: center;
+}
+.preview-row .quiz-card:not(.hint) {
+  min-width: unset;
+  font-size: 1.4em;
+  margin: 0;
+  flex: 1;
+  display: flex;
+  justify-content: center;
 }
 .quiz-card {
   overflow-x: auto;
