@@ -51,6 +51,9 @@ const en = {
   sequences: 'Sequences',
   premises: 'Premises',
   contextSize: 'Context Size',
+  ruleSettings: 'Rule Settings',
+  instantiationSettings: 'Instantiation',
+  sequenceSize: 'Sequence Length',
   statsTemplate:
     'Generated {formulas} formulas ({rate}/s), {tautologies} tautologies, {solved} solved. Updated {sinceUpdate}s ago.',
 } as const
@@ -108,6 +111,9 @@ const fi: Record<MessageKey, string> = {
   sequences: 'Jonot',
   premises: 'Premissit',
   contextSize: 'Kontekstin koko',
+  ruleSettings: 'Säännöt',
+  instantiationSettings: 'Instantiointi',
+  sequenceSize: 'Jonon pituus',
   statsTemplate:
     'Tuotettu {formulas} kaavaa ({rate}/s), {tautologies} tautologiaa, {solved} ratkaisua. Päivitetty {sinceUpdate}s sitten.',
 }
@@ -165,6 +171,9 @@ const es: Record<MessageKey, string> = {
   sequences: 'Secuencias',
   premises: 'Premisas',
   contextSize: 'Tamaño de contexto',
+  ruleSettings: 'Reglas',
+  instantiationSettings: 'Instanciación',
+  sequenceSize: 'Longitud de secuencia',
   statsTemplate:
     'Generadas {formulas} fórmulas ({rate}/s), {tautologies} tautologías, {solved} resueltas. Actualizado hace {sinceUpdate}s.',
 }
@@ -222,6 +231,9 @@ const cs: Record<MessageKey, string> = {
   sequences: 'Sekvence',
   premises: 'Premisy',
   contextSize: 'Velikost kontextu',
+  ruleSettings: 'Pravidla',
+  instantiationSettings: 'Instanciace',
+  sequenceSize: 'Délka sekvence',
   statsTemplate:
     'Vygenerováno {formulas} formulí ({rate}/s), {tautologies} tautologií, {solved} vyřešeno. Aktualizováno před {sinceUpdate}s.',
 }
@@ -279,6 +291,9 @@ const pl: Record<MessageKey, string> = {
   sequences: 'Sekwencje',
   premises: 'Przesłanki',
   contextSize: 'Rozmiar kontekstu',
+  ruleSettings: 'Reguły',
+  instantiationSettings: 'Instancjacja',
+  sequenceSize: 'Długość sekwencji',
   statsTemplate:
     'Wygenerowano {formulas} formuł ({rate}/s), {tautologies} tautologii, {solved} rozwiązanych. Zaktualizowano {sinceUpdate}s temu.',
 }

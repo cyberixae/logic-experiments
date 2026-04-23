@@ -1,17 +1,18 @@
-export const ALL_SYMBOLS = ['p', 'q', 'r', 's'] as const
+export const ALL_SYMBOLS = ['p', 'q', 'r', 's', 'u', 'v'] as const
+export const ALL_INSTANCE_SYMBOLS = ALL_SYMBOLS
 export const ALL_CONNECTIVE_TYPES = [
-  'negation',
   'implication',
   'conjunction',
   'disjunction',
+  'negation',
   'falsum',
   'verum',
 ] as const
-export const ALL_VARIABLES = ['A', 'B', 'C', 'D'] as const
-export const ALL_SEQUENCES = ['Γ', 'Δ', 'Σ', 'Π'] as const
+export const ALL_VARIABLES = ['A', 'B', 'C', 'D', 'E', 'F'] as const
+export const ALL_SEQUENCES = ['Γ', 'Δ', 'Σ', 'Π', 'Ξ', 'Ψ'] as const
 
 // URL abbreviations for sequences (capital letters to avoid collision with symbols)
-const SEQ_ABBREV: Record<string, string> = { Γ: 'G', Δ: 'D', Σ: 'S', Π: 'P' }
+const SEQ_ABBREV: Record<string, string> = { Γ: 'G', Δ: 'D', Σ: 'S', Π: 'P', Ξ: 'X', Ψ: 'Y' }
 
 // URL abbreviations for connectives (matches random-config convention)
 const CONN_ABBREV: Record<string, string> = {
@@ -31,6 +32,10 @@ export type QuizConfig = {
   formulaSize: number
   premiseCounts: number[]
   contextSize: number
+  instanceFormulaSize: number
+  instanceSequenceSize: number
+  instanceConnectives: string[]
+  instanceSymbols: string[]
 }
 
 export const defaultQuizConfig = (): QuizConfig => ({
@@ -41,6 +46,10 @@ export const defaultQuizConfig = (): QuizConfig => ({
   formulaSize: 1,
   premiseCounts: [1],
   contextSize: 2,
+  instanceFormulaSize: 2,
+  instanceSequenceSize: 2,
+  instanceConnectives: [...ALL_CONNECTIVE_TYPES],
+  instanceSymbols: [...ALL_INSTANCE_SYMBOLS],
 })
 
 export const parseQuizConfigFromParams = (
@@ -54,6 +63,10 @@ export const parseQuizConfigFromParams = (
   const sizeParam = params.get('qsize')
   const premisesParam = params.get('qpremises')
   const contextParam = params.get('qcontext')
+  const instSizeParam = params.get('qinstsize')
+  const instSeqSizeParam = params.get('qinstseq')
+  const instConnParam = params.get('qinstconn')
+  const instSymParam = params.get('qinstsym')
   return {
     symbols:
       symbolsParam !== null
@@ -83,6 +96,18 @@ export const parseQuizConfigFromParams = (
         : defaults.premiseCounts,
     contextSize:
       contextParam !== null ? Math.max(0, Math.min(6, parseInt(contextParam, 10) || defaults.contextSize)) : defaults.contextSize,
+    instanceFormulaSize:
+      instSizeParam !== null ? Math.max(0, Math.min(10, parseInt(instSizeParam, 10) || defaults.instanceFormulaSize)) : defaults.instanceFormulaSize,
+    instanceSequenceSize:
+      instSeqSizeParam !== null ? Math.max(0, Math.min(6, parseInt(instSeqSizeParam, 10) || defaults.instanceSequenceSize)) : defaults.instanceSequenceSize,
+    instanceConnectives:
+      instConnParam !== null
+        ? ALL_CONNECTIVE_TYPES.filter((c) => instConnParam.includes(CONN_ABBREV[c] ?? ''))
+        : defaults.instanceConnectives,
+    instanceSymbols:
+      instSymParam !== null
+        ? ALL_INSTANCE_SYMBOLS.filter((s) => instSymParam.includes(s))
+        : defaults.instanceSymbols,
   }
 }
 
@@ -103,4 +128,8 @@ export const setQuizConfigParams = (
   params.set('qsize', String(config.formulaSize))
   params.set('qpremises', config.premiseCounts.join(''))
   params.set('qcontext', String(config.contextSize))
+  params.set('qinstsize', String(config.instanceFormulaSize))
+  params.set('qinstseq', String(config.instanceSequenceSize))
+  params.set('qinstconn', config.instanceConnectives.map((c) => CONN_ABBREV[c] ?? '').join(''))
+  params.set('qinstsym', config.instanceSymbols.join(''))
 }

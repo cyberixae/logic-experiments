@@ -1,4 +1,4 @@
-import { random, Prop } from '../model/prop'
+import { random, randomWeighted, Prop } from '../model/prop'
 import { bellRandom } from '../random/challenge'
 import { NonEmptyArray, isNonEmptyArray } from '../utils/array'
 import {
@@ -572,12 +572,22 @@ export const generateQuestion = (config: QuizConfig): QuizQuestion | null => {
 type FormulaBinding = Map<string, Prop>
 type SequenceBinding = Map<string, Prop[]>
 
-const instantiateFormula = (f: SchemaFormula, fb: FormulaBinding, formulaSize: number): Prop => {
+const makeRandomProp = (formulaSize: number, connectives: string[], symbols: string[]): Prop => {
+  const wc = (c: string) => (connectives.includes(c) ? 1 : 0)
+  const ws = (s: string) => (symbols.includes(s) ? 1 : 0)
+  return randomWeighted(
+    bellRandom(0, formulaSize),
+    { negation: wc('negation'), implication: wc('implication'), conjunction: wc('conjunction'), disjunction: wc('disjunction') },
+    { p: ws('p'), q: ws('q'), r: ws('r'), s: ws('s'), u: ws('u'), v: ws('v'), falsum: wc('falsum'), verum: wc('verum') },
+  )()
+}
+
+const instantiateFormula = (f: SchemaFormula, fb: FormulaBinding, formulaSize: number, connectives: string[], symbols: string[]): Prop => {
   switch (f.kind) {
     case 'var': {
       let val = fb.get(f.name)
       if (val === undefined) {
-        val = random(bellRandom(0, formulaSize))()
+        val = makeRandomProp(formulaSize, connectives, symbols)
         fb.set(f.name, val)
       }
       return val
@@ -589,24 +599,24 @@ const instantiateFormula = (f: SchemaFormula, fb: FormulaBinding, formulaSize: n
     case 'verum':
       return { kind: 'verum' }
     case 'negation':
-      return { kind: 'negation', negand: instantiateFormula(f.negand, fb, formulaSize) }
+      return { kind: 'negation', negand: instantiateFormula(f.negand, fb, formulaSize, connectives, symbols) }
     case 'implication':
       return {
         kind: 'implication',
-        antecedent: instantiateFormula(f.antecedent, fb, formulaSize),
-        consequent: instantiateFormula(f.consequent, fb, formulaSize),
+        antecedent: instantiateFormula(f.antecedent, fb, formulaSize, connectives, symbols),
+        consequent: instantiateFormula(f.consequent, fb, formulaSize, connectives, symbols),
       }
     case 'conjunction':
       return {
         kind: 'conjunction',
-        leftConjunct: instantiateFormula(f.leftConjunct, fb, formulaSize),
-        rightConjunct: instantiateFormula(f.rightConjunct, fb, formulaSize),
+        leftConjunct: instantiateFormula(f.leftConjunct, fb, formulaSize, connectives, symbols),
+        rightConjunct: instantiateFormula(f.rightConjunct, fb, formulaSize, connectives, symbols),
       }
     case 'disjunction':
       return {
         kind: 'disjunction',
-        leftDisjunct: instantiateFormula(f.leftDisjunct, fb, formulaSize),
-        rightDisjunct: instantiateFormula(f.rightDisjunct, fb, formulaSize),
+        leftDisjunct: instantiateFormula(f.leftDisjunct, fb, formulaSize, connectives, symbols),
+        rightDisjunct: instantiateFormula(f.rightDisjunct, fb, formulaSize, connectives, symbols),
       }
   }
 }
@@ -616,18 +626,21 @@ const instantiateContext = (
   fb: FormulaBinding,
   sb: SequenceBinding,
   formulaSize: number,
+  sequenceSize: number,
+  connectives: string[],
+  symbols: string[],
 ): Prop[] => {
   const result: Prop[] = []
   for (const item of ctx) {
     if (item.kind === 'seq') {
       let val = sb.get(item.name)
       if (val === undefined) {
-        val = Array.from({ length: randomInt(0, 2) }, () => random(bellRandom(0, formulaSize))())
+        val = Array.from({ length: bellRandom(0, sequenceSize) }, () => makeRandomProp(formulaSize, connectives, symbols))
         sb.set(item.name, val)
       }
       result.push(...val)
     } else {
-      result.push(instantiateFormula(item, fb, formulaSize))
+      result.push(instantiateFormula(item, fb, formulaSize, connectives, symbols))
     }
   }
   return result
@@ -639,12 +652,12 @@ export type InstantiatedRule = {
   conclusion: InstantiatedSequent
 }
 
-export const instantiate = (schema: RuleSchema, formulaSize: number = 2): InstantiatedRule => {
+export const instantiate = (schema: RuleSchema, formulaSize: number = 2, sequenceSize: number = 2, connectives: string[] = [], symbols: string[] = ['p', 'q', 'r', 's', 'u', 'v']): InstantiatedRule => {
   const fb: FormulaBinding = new Map()
   const sb: SequenceBinding = new Map()
   const instantiateSeq = (s: SchemaSequent): InstantiatedSequent => ({
-    antecedent: instantiateContext(s.antecedent, fb, sb, formulaSize),
-    succedent: instantiateContext(s.succedent, fb, sb, formulaSize),
+    antecedent: instantiateContext(s.antecedent, fb, sb, formulaSize, sequenceSize, connectives, symbols),
+    succedent: instantiateContext(s.succedent, fb, sb, formulaSize, sequenceSize, connectives, symbols),
   })
   return {
     premises: schema.premises.map(instantiateSeq),

@@ -63,7 +63,7 @@ const newState = (config: QuizConfig): QuizState | null => {
   if (q === null) return null
   const answer = q.schemas[q.answerIndex]
   if (answer === undefined) return null
-  return { ...q, guessIndex: null, instance: instantiate(answer, config.formulaSize) }
+  return { ...q, guessIndex: null, instance: instantiate(answer, config.instanceFormulaSize, config.instanceSequenceSize, config.instanceConnectives, config.instanceSymbols) }
 }
 
 // ── Mount ──────────────────────────────────────────────────────────────────────

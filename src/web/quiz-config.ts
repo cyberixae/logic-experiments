@@ -10,6 +10,7 @@ import { sequent } from '../model/sequent'
 import {
   QuizConfig,
   ALL_SYMBOLS,
+  ALL_INSTANCE_SYMBOLS,
   ALL_CONNECTIVE_TYPES,
   ALL_VARIABLES,
   ALL_SEQUENCES,
@@ -38,8 +39,8 @@ const renderAtom = (name: string): string => html(fromAtom(atom(name))(basic))
 const sequentText = (ant: Prop[], suc: Prop[]): string =>
   plain(fromSequent(sequent(ant, suc))(basic))
 
-const fromInstanceRule = (schema: RuleSchema, formulaSize: number): string => {
-  const inst = instantiate(schema, formulaSize)
+const fromInstanceRule = (schema: RuleSchema, formulaSize: number, sequenceSize: number, connectives: string[], symbols: string[]): string => {
+  const inst = instantiate(schema, formulaSize, sequenceSize, connectives, symbols)
   return treeAuto(
     sequentText(inst.conclusion.antecedent, inst.conclusion.succedent),
     inst.premises.map((p) => sequentText(p.antecedent, p.succedent)),
@@ -164,13 +165,14 @@ export const mountQuizConfig = (
     const settings = document.createElement('div')
     settings.className = 'config-settings'
 
-    const shapeSection = document.createElement('div')
-    shapeSection.className = 'config-section'
+    // Rule settings section
+    const ruleSection = document.createElement('div')
+    ruleSection.className = 'config-section'
 
-    const settingsTitle = document.createElement('div')
-    settingsTitle.className = 'config-section-title'
-    settingsTitle.textContent = t('formulaShape')
-    shapeSection.appendChild(settingsTitle)
+    const ruleTitle = document.createElement('div')
+    ruleTitle.className = 'config-section-title'
+    ruleTitle.textContent = t('ruleSettings')
+    ruleSection.appendChild(ruleTitle)
 
     // Symbols
     const symbolSection = createSection(t('symbols'))
@@ -188,7 +190,7 @@ export const mountQuizConfig = (
       )
     }
     symbolSection.appendChild(symbolToggles)
-    shapeSection.appendChild(symbolSection)
+    ruleSection.appendChild(symbolSection)
 
     // Connectives
     const connLabel: Record<string, string> = {
@@ -214,7 +216,7 @@ export const mountQuizConfig = (
       )
     }
     connSection.appendChild(connToggles)
-    shapeSection.appendChild(connSection)
+    ruleSection.appendChild(connSection)
 
     // Formula variables
     const varSection = createSection(t('variables'))
@@ -232,7 +234,7 @@ export const mountQuizConfig = (
       )
     }
     varSection.appendChild(varToggles)
-    shapeSection.appendChild(varSection)
+    ruleSection.appendChild(varSection)
 
     // Sequence symbols
     const seqSection = createSection(t('sequences'))
@@ -250,7 +252,7 @@ export const mountQuizConfig = (
       )
     }
     seqSection.appendChild(seqToggles)
-    shapeSection.appendChild(seqSection)
+    ruleSection.appendChild(seqSection)
 
     // Premises
     const premisesSection = createSection(t('premises'))
@@ -272,16 +274,14 @@ export const mountQuizConfig = (
       premisesToggles.appendChild(btn)
     }
     premisesSection.appendChild(premisesToggles)
-    shapeSection.appendChild(premisesSection)
+    ruleSection.appendChild(premisesSection)
 
     // Formula size and context size
     const sizeSection = createSection(t('size'))
     sizeSection.appendChild(
       createRow(
         t('size'),
-        createNumberInput(config.formulaSize, (v) => {
-          config.formulaSize = v
-        }),
+        createNumberInput(config.formulaSize, (v) => { config.formulaSize = v }),
       ),
     )
     sizeSection.appendChild(
@@ -290,9 +290,77 @@ export const mountQuizConfig = (
         createNumberInput(config.contextSize, (v) => { config.contextSize = v }, 0, 6),
       ),
     )
-    shapeSection.appendChild(sizeSection)
+    ruleSection.appendChild(sizeSection)
 
-    settings.appendChild(shapeSection)
+    settings.appendChild(ruleSection)
+
+    // Instantiation settings section
+    const instSection = document.createElement('div')
+    instSection.className = 'config-section'
+
+    const instTitle = document.createElement('div')
+    instTitle.className = 'config-section-title'
+    instTitle.textContent = t('instantiationSettings')
+    instSection.appendChild(instTitle)
+
+    const instSymbolSection = createSection(t('symbols'))
+    const instSymbolToggles = document.createElement('div')
+    instSymbolToggles.className = 'config-toggles'
+    for (const s of ALL_INSTANCE_SYMBOLS) {
+      instSymbolToggles.appendChild(
+        createToggle(
+          renderAtom(s),
+          true,
+          s,
+          () => config.instanceSymbols.includes(s),
+          () => toggle(config.instanceSymbols, s),
+        ),
+      )
+    }
+    instSymbolSection.appendChild(instSymbolToggles)
+    instSection.appendChild(instSymbolSection)
+
+    const instConnLabel: Record<string, string> = {
+      negation: '¬',
+      implication: '→',
+      conjunction: '∧',
+      disjunction: '∨',
+      falsum: '⊥',
+      verum: '⊤',
+    }
+    const instConnSection = createSection(t('connectives'))
+    const instConnToggles = document.createElement('div')
+    instConnToggles.className = 'config-toggles'
+    for (const c of ALL_CONNECTIVE_TYPES) {
+      instConnToggles.appendChild(
+        createToggle(
+          instConnLabel[c] ?? c,
+          false,
+          c,
+          () => config.instanceConnectives.includes(c),
+          () => toggle(config.instanceConnectives, c),
+        ),
+      )
+    }
+    instConnSection.appendChild(instConnToggles)
+    instSection.appendChild(instConnSection)
+
+    const instSizeSection = createSection(t('size'))
+    instSizeSection.appendChild(
+      createRow(
+        t('size'),
+        createNumberInput(config.instanceFormulaSize, (v) => { config.instanceFormulaSize = v }),
+      ),
+    )
+    instSizeSection.appendChild(
+      createRow(
+        t('sequenceSize'),
+        createNumberInput(config.instanceSequenceSize, (v) => { config.instanceSequenceSize = v }, 0, 6),
+      ),
+    )
+    instSection.appendChild(instSizeSection)
+
+    settings.appendChild(instSection)
 
     // Buttons
     const buttons = document.createElement('div')
@@ -341,7 +409,7 @@ export const mountQuizConfig = (
         for (let i = 0; i < 1; i++) {
           const instCard = document.createElement('pre')
           instCard.className = 'quiz-card rule'
-          const text = fromInstanceRule(schema, config.formulaSize)
+          const text = fromInstanceRule(schema, config.instanceFormulaSize, config.instanceSequenceSize, config.instanceConnectives, config.instanceSymbols)
           instCard.textContent = text
           row.appendChild(instCard)
         }
