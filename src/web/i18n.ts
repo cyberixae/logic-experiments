@@ -57,6 +57,10 @@ const en = {
   presets: 'Presets',
   statsTemplate:
     'Generated {formulas} formulas ({rate}/s), {tautologies} tautologies, {solved} solved. Updated {sinceUpdate}s ago.',
+  custom: 'Custom',
+  matchDone: 'Match Complete',
+  matchScore: 'Score: {score} / {max}',
+  matchFinalPreset: 'Final preset: {preset}',
 } as const
 
 const fi: Record<MessageKey, string> = {
@@ -118,6 +122,10 @@ const fi: Record<MessageKey, string> = {
   presets: 'Esiasetukset',
   statsTemplate:
     'Tuotettu {formulas} kaavaa ({rate}/s), {tautologies} tautologiaa, {solved} ratkaisua. Päivitetty {sinceUpdate}s sitten.',
+  custom: 'Muokattu',
+  matchDone: 'Tunnistus valmis',
+  matchScore: 'Pisteet: {score} / {max}',
+  matchFinalPreset: 'Viimeinen esiasetus: {preset}',
 }
 
 const es: Record<MessageKey, string> = {
@@ -179,6 +187,10 @@ const es: Record<MessageKey, string> = {
   presets: 'Preajustes',
   statsTemplate:
     'Generadas {formulas} fórmulas ({rate}/s), {tautologies} tautologías, {solved} resueltas. Actualizado hace {sinceUpdate}s.',
+  custom: 'Personalizado',
+  matchDone: 'Prueba completa',
+  matchScore: 'Puntuación: {score} / {max}',
+  matchFinalPreset: 'Preajuste final: {preset}',
 }
 
 const cs: Record<MessageKey, string> = {
@@ -240,6 +252,10 @@ const cs: Record<MessageKey, string> = {
   presets: 'Předvolby',
   statsTemplate:
     'Vygenerováno {formulas} formulí ({rate}/s), {tautologies} tautologií, {solved} vyřešeno. Aktualizováno před {sinceUpdate}s.',
+  custom: 'Vlastní',
+  matchDone: 'Kvíz dokončen',
+  matchScore: 'Skóre: {score} / {max}',
+  matchFinalPreset: 'Poslední předvolba: {preset}',
 }
 
 const pl: Record<MessageKey, string> = {
@@ -301,6 +317,10 @@ const pl: Record<MessageKey, string> = {
   presets: 'Ustawienia wstępne',
   statsTemplate:
     'Wygenerowano {formulas} formuł ({rate}/s), {tautologies} tautologii, {solved} rozwiązanych. Zaktualizowano {sinceUpdate}s temu.',
+  custom: 'Niestandardowy',
+  matchDone: 'Quiz ukończony',
+  matchScore: 'Wynik: {score} / {max}',
+  matchFinalPreset: 'Ostatnie ustawienie wstępne: {preset}',
 }
 
 type MessageKey = keyof typeof en

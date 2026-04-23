@@ -9,6 +9,8 @@ import { mountCampaign } from './web/campaign'
 import { mountRandom } from './web/random'
 import { mountQuiz } from './web/quiz'
 import { mountQuizConfig } from './web/quiz-config'
+import { mountMatchIntro } from './web/match-intro'
+import { mountMatchCurated } from './web/match-curated'
 import { parseQuizConfigFromParams, setQuizConfigParams } from './quiz/config'
 import { mountSystem } from './web/system'
 import {
@@ -132,6 +134,12 @@ const mount = (screen: Screen) => {
         mount('match')
       })
       break
+    case 'match-intro':
+      current = mountMatchIntro(body, navigate)
+      break
+    case 'match-curated':
+      current = mountMatchCurated(body, navigate)
+      break
     case 'random-config':
       current = mountRandomConfig(body, navigate, (config) => {
         pool.configure(config)
@@ -203,6 +211,12 @@ const init = () => {
   } else if (mode === 'match-config') {
     currentScreen = 'match-config'
     mount('match-config')
+  } else if (mode === 'match-intro') {
+    currentScreen = 'match-intro'
+    mount('match-intro')
+  } else if (mode === 'match-curated') {
+    currentScreen = 'match-curated'
+    mount('match-curated')
   } else if (params.get('level') !== null) {
     // Legacy URL: ?level=ch0identity1 — jump straight into campaign
     enterMode('campaign')

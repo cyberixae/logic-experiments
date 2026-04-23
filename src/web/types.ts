@@ -6,5 +6,7 @@ export type Screen =
   | 'system'
   | 'random-config'
   | 'match-config'
+  | 'match-intro'
+  | 'match-curated'
 export type Navigate = (screen: Screen) => void
 export type MountResult = { cleanup: () => void; rerender: () => void }
