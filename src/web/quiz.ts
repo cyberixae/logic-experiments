@@ -69,12 +69,21 @@ const renderQuestionTree = (
 
 // ── Quiz state ─────────────────────────────────────────────────────────────────
 
-type QuizState = QuizQuestion & { guessIndex: number | null }
+type QuizState = QuizQuestion & {
+  wrongIndices: Set<number>
+  solved: boolean
+  flaggedIndices: Set<number>
+}
 
 const newState = (config: QuizConfig): QuizState | null => {
   const q = generateQuestion(config)
   if (q === null) return null
-  return { ...q, guessIndex: null }
+  return {
+    ...q,
+    wrongIndices: new Set(),
+    solved: false,
+    flaggedIndices: new Set(),
+  }
 }
 
 // ── Mount ──────────────────────────────────────────────────────────────────────
@@ -87,6 +96,7 @@ export const mountQuiz = (
   let state: QuizState | null = newState(config)
   let zoom = 1
   let pendingAutoZoom = true
+  let cardEls: Array<{ card: HTMLElement; flagBtn: HTMLElement }> = []
   let regenerateTimer: ReturnType<typeof setTimeout> | null = null
   let pausePopupOpen = false
 
@@ -106,9 +116,7 @@ export const mountQuiz = (
       questionArea.style.setProperty('--tree-zoom', String(zoom))
       const treeEl = renderQuestionTree(
         instance,
-        state !== null && state.guessIndex !== null
-          ? answer.name
-          : '\u00a0?\u00a0',
+        state !== null && state.solved ? answer.name : '\u00a0?\u00a0',
       )
       questionArea.appendChild(treeEl)
       container.appendChild(questionArea)
@@ -166,7 +174,8 @@ export const mountQuiz = (
         requestAnimationFrame(() => {
           const treeWidth = treeEl.getBoundingClientRect().width
           const areaWidth = questionArea.getBoundingClientRect().width
-          questionArea.scrollLeft = (treeWidth - areaWidth) / 2
+          const padLeft = parseFloat(getComputedStyle(questionArea).paddingLeft)
+          questionArea.scrollLeft = padLeft + (treeWidth - areaWidth) / 2
         })
       })
     }
@@ -229,18 +238,28 @@ export const mountQuiz = (
 
     panel.appendChild(zoomRow)
 
+    cardEls = []
     const cardsArea = document.createElement('div')
     cardsArea.setAttribute('class', 'quiz-cards')
+    const flagsRow = state.solved ? null : document.createElement('div')
+    if (flagsRow !== null) flagsRow.setAttribute('class', 'quiz-flags')
 
     for (let i = 0; i < state.schemas.length; i += 1) {
       const schema = state.schemas[i]
       if (schema === undefined) continue
+      const isWrong = state.wrongIndices.has(i)
+      const flagged = state.flaggedIndices.has(i)
+
       const card = document.createElement('pre')
       let cls = 'quiz-card rule button'
-      if (state.guessIndex !== null) {
+      if (state.solved) {
         if (i === state.answerIndex) cls += ' quiz-card-correct'
-        else if (i === state.guessIndex) cls += ' quiz-card-wrong'
+        else if (isWrong) cls += ' quiz-card-wrong'
         else cls += ' disabled'
+      } else if (isWrong) {
+        cls += ' quiz-card-wrong'
+      } else if (flagged) {
+        cls += ' disabled'
       }
       card.setAttribute('class', cls)
       card.innerHTML =
@@ -248,25 +267,93 @@ export const mountQuiz = (
         fromSchemaRule(schema, true) +
         '</span>' +
         '<span class="rule-label short">' +
-        fromSchemaRule(schema, false) +
+        fromSchemaRule(schema, true) +
         '</span>'
 
-      if (state.guessIndex === null) {
+      const flagBtn = document.createElement('div')
+      flagBtn.setAttribute('class', 'button toggle quiz-card-flag')
+      flagBtn.textContent = '🚩'
+      const led = document.createElement('span')
+      led.setAttribute('class', 'led' + (flagged ? ' on' : ''))
+      flagBtn.appendChild(led)
+
+      if (!state.solved && !isWrong && !flagged) {
         const idx = i
         card.onclick = () => {
-          if (state === null) return
-          state = { ...state, guessIndex: idx }
-          render()
-          regenerateTimer = setTimeout(() => {
-            state = newState(config)
-            pendingAutoZoom = true
+          if (state === null || state.solved) return
+          if (state.wrongIndices.has(idx)) return
+          if (idx === state.answerIndex) {
+            state = { ...state, solved: true }
             render()
-          }, 1500)
+            regenerateTimer = setTimeout(() => {
+              state = newState(config)
+              pendingAutoZoom = true
+              render()
+            }, 1500)
+          } else {
+            state = {
+              ...state,
+              wrongIndices: new Set([...state.wrongIndices, idx]),
+            }
+            card.classList.add('quiz-card-wrong')
+            card.onclick = null
+            flagBtn.classList.add('disabled')
+            flagBtn.onclick = null
+          }
         }
       }
-      cardsArea.appendChild(card)
+
+      if (isWrong) {
+        flagBtn.classList.add('disabled')
+      } else {
+        flagBtn.onclick = () => {
+          if (state === null || state.solved) return
+          if (state.flaggedIndices.has(i)) {
+            state.flaggedIndices.delete(i)
+            card.classList.remove('disabled')
+            const idx = i
+            card.onclick = () => {
+              if (state === null || state.solved) return
+              if (state.wrongIndices.has(idx)) return
+              if (idx === state.answerIndex) {
+                state = { ...state, solved: true }
+                render()
+                regenerateTimer = setTimeout(() => {
+                  state = newState(config)
+                  pendingAutoZoom = true
+                  render()
+                }, 1500)
+              } else {
+                state = {
+                  ...state,
+                  wrongIndices: new Set([...state.wrongIndices, idx]),
+                }
+                card.classList.add('quiz-card-wrong')
+                card.onclick = null
+                flagBtn.classList.add('disabled')
+                flagBtn.onclick = null
+              }
+            }
+            led.classList.remove('on')
+          } else {
+            state.flaggedIndices.add(i)
+            card.classList.add('disabled')
+            card.onclick = null
+            led.classList.add('on')
+          }
+        }
+      }
+
+      cardEls[i] = { card, flagBtn }
+
+      const slot = document.createElement('div')
+      slot.setAttribute('class', 'quiz-card-slot')
+      slot.appendChild(card)
+      cardsArea.appendChild(slot)
+      if (flagsRow !== null) flagsRow.appendChild(flagBtn)
     }
     panel.appendChild(cardsArea)
+    if (flagsRow !== null) panel.appendChild(flagsRow)
     container.appendChild(panel)
 
     if (pausePopupOpen) {
@@ -306,23 +393,36 @@ export const mountQuiz = (
   const handleKey = (ev: KeyboardEvent) => {
     if (ev.ctrlKey || ev.metaKey || ev.altKey) return
     const digitMatch = ev.code.match(/^Digit([1-4])$/)
-    if (
-      digitMatch &&
-      !pausePopupOpen &&
-      state !== null &&
-      state.guessIndex === null
-    ) {
+    if (digitMatch && !pausePopupOpen && state !== null && !state.solved) {
       const idxStr = digitMatch[1]
       if (idxStr === undefined) return
       const idx = parseInt(idxStr) - 1
-      if (idx < state.schemas.length) {
-        state = { ...state, guessIndex: idx }
-        render()
-        regenerateTimer = setTimeout(() => {
-          state = newState(config)
-          pendingAutoZoom = true
+      if (
+        idx < state.schemas.length &&
+        !state.wrongIndices.has(idx) &&
+        !state.flaggedIndices.has(idx)
+      ) {
+        if (idx === state.answerIndex) {
+          state = { ...state, solved: true }
           render()
-        }, 1500)
+          regenerateTimer = setTimeout(() => {
+            state = newState(config)
+            pendingAutoZoom = true
+            render()
+          }, 1500)
+        } else {
+          state = {
+            ...state,
+            wrongIndices: new Set([...state.wrongIndices, idx]),
+          }
+          const el = cardEls[idx]
+          if (el !== undefined) {
+            el.card.classList.add('quiz-card-wrong')
+            el.card.onclick = null
+            el.flagBtn.classList.add('disabled')
+            el.flagBtn.onclick = null
+          }
+        }
       }
       return
     }

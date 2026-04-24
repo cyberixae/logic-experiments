@@ -20,7 +20,8 @@ const TOTAL_ROUNDS = 100
 const BLOCK_SIZE = 10
 const ADVANCE_THRESHOLD = 8
 const STAY_THRESHOLD = 5
-const MAX_SCORE = 550
+const CHOICE_COUNT = 4
+const MAX_SCORE = 5500
 
 const AUTO_ZOOM_MIN = 0.8
 const AUTO_ZOOM_MAX = 1.2
@@ -28,7 +29,7 @@ const AUTO_ZOOM_PAD = 0.9
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
-type RoundResult = { preset: number; correct: boolean }
+type RoundResult = { preset: number; attempts: number }
 
 type CuratedSession = {
   roundsPlayed: number
@@ -38,7 +39,11 @@ type CuratedSession = {
   phase: 'playing' | 'done'
 }
 
-type QuizState = QuizQuestion & { guessIndex: number | null }
+type QuizState = QuizQuestion & {
+  wrongIndices: Set<number>
+  solved: boolean
+  flaggedIndices: Set<number>
+}
 
 // ── Session helpers ────────────────────────────────────────────────────────────
 
@@ -57,8 +62,13 @@ const advancePreset = (current: number, correct: number): number => {
   return Math.max(0, current - 1)
 }
 
+const scoreForRound = (preset: number, attempts: number): number => {
+  if (attempts >= CHOICE_COUNT) return 0
+  return Math.floor(((preset + 1) * 10) / Math.pow(2, attempts - 1))
+}
+
 const totalScore = (results: RoundResult[]): number =>
-  results.reduce((sum, r) => sum + (r.correct ? r.preset + 1 : 0), 0)
+  results.reduce((sum, r) => sum + scoreForRound(r.preset, r.attempts), 0)
 
 // ── Question tree ──────────────────────────────────────────────────────────────
 
@@ -113,7 +123,12 @@ const newQuestion = (presetIndex: number): QuizState | null => {
   if (config === undefined) return null
   const q = generateQuestion(config)
   if (q === null) return null
-  return { ...q, guessIndex: null }
+  return {
+    ...q,
+    wrongIndices: new Set(),
+    solved: false,
+    flaggedIndices: new Set(),
+  }
 }
 
 // ── Mount ──────────────────────────────────────────────────────────────────────
@@ -126,6 +141,7 @@ export const mountMatchCurated = (
   let question: QuizState | null = newQuestion(session.currentPreset)
   let zoom = 1
   let pendingAutoZoom = true
+  let cardEls: Array<{ card: HTMLElement; flagBtn: HTMLElement }> = []
   let regenerateTimer: ReturnType<typeof setTimeout> | null = null
   let pausePopupOpen = false
 
@@ -205,7 +221,7 @@ export const mountMatchCurated = (
         questionArea.style.setProperty('--tree-zoom', String(zoom))
         const treeEl = renderQuestionTree(
           q.instance,
-          q.guessIndex !== null ? answer.name : ' ? ',
+          q.solved ? answer.name : ' ? ',
         )
         questionArea.appendChild(treeEl)
         container.appendChild(questionArea)
@@ -263,7 +279,10 @@ export const mountMatchCurated = (
           requestAnimationFrame(() => {
             const treeWidth = treeEl.getBoundingClientRect().width
             const areaWidth = questionArea.getBoundingClientRect().width
-            questionArea.scrollLeft = (treeWidth - areaWidth) / 2
+            const padLeft = parseFloat(
+              getComputedStyle(questionArea).paddingLeft,
+            )
+            questionArea.scrollLeft = padLeft + (treeWidth - areaWidth) / 2
           })
         })
       }
@@ -281,11 +300,28 @@ export const mountMatchCurated = (
     }
     panel.appendChild(menuBtn)
 
-    const progress = document.createElement('div')
-    progress.setAttribute('class', 'curated-progress')
-    progress.textContent =
-      String(session.roundsPlayed + 1) + ' / ' + String(TOTAL_ROUNDS)
-    panel.appendChild(progress)
+    const stats = document.createElement('div')
+    stats.setAttribute('class', 'curated-stats')
+
+    const roundEl = document.createElement('div')
+    roundEl.textContent =
+      t('round') +
+      ' ' +
+      String(session.roundsPlayed + 1) +
+      '/' +
+      String(TOTAL_ROUNDS)
+    stats.appendChild(roundEl)
+
+    const levelEl = document.createElement('div')
+    levelEl.textContent = t('score') + ' x' + String(session.currentPreset + 1)
+    stats.appendChild(levelEl)
+
+    panel.appendChild(stats)
+
+    const scoreEl = document.createElement('div')
+    scoreEl.setAttribute('class', 'curated-score')
+    scoreEl.textContent = String(totalScore(session.roundResults))
+    panel.appendChild(scoreEl)
 
     if (q === null) {
       const msg = document.createElement('div')
@@ -295,18 +331,28 @@ export const mountMatchCurated = (
       return
     }
 
+    cardEls = []
     const cardsArea = document.createElement('div')
     cardsArea.setAttribute('class', 'quiz-cards')
+    const flagsRow = q.solved ? null : document.createElement('div')
+    if (flagsRow !== null) flagsRow.setAttribute('class', 'quiz-flags')
 
     for (let i = 0; i < q.schemas.length; i += 1) {
       const schema = q.schemas[i]
       if (schema === undefined) continue
+      const isWrong = q.wrongIndices.has(i)
+      const flagged = q.flaggedIndices.has(i)
+
       const card = document.createElement('pre')
       let cls = 'quiz-card rule button'
-      if (q.guessIndex !== null) {
+      if (q.solved) {
         if (i === q.answerIndex) cls += ' quiz-card-correct'
-        else if (i === q.guessIndex) cls += ' quiz-card-wrong'
+        else if (isWrong) cls += ' quiz-card-wrong'
         else cls += ' disabled'
+      } else if (isWrong) {
+        cls += ' quiz-card-wrong'
+      } else if (flagged) {
+        cls += ' disabled'
       }
       card.setAttribute('class', cls)
       card.innerHTML =
@@ -314,16 +360,49 @@ export const mountMatchCurated = (
         fromSchemaRule(schema, true) +
         '</span>' +
         '<span class="rule-label short">' +
-        fromSchemaRule(schema, false) +
+        fromSchemaRule(schema, true) +
         '</span>'
 
-      if (q.guessIndex === null) {
+      if (!q.solved && !isWrong && !flagged) {
         const idx = i
         card.onclick = () => guess(idx)
       }
-      cardsArea.appendChild(card)
+
+      const slot = document.createElement('div')
+      slot.setAttribute('class', 'quiz-card-slot')
+      slot.appendChild(card)
+      cardsArea.appendChild(slot)
+
+      const flagBtn = document.createElement('div')
+      flagBtn.setAttribute('class', 'button toggle quiz-card-flag')
+      flagBtn.textContent = '🚩'
+      const led = document.createElement('span')
+      led.setAttribute('class', 'led' + (flagged ? ' on' : ''))
+      flagBtn.appendChild(led)
+      if (isWrong) {
+        flagBtn.classList.add('disabled')
+      } else {
+        const idx = i
+        flagBtn.onclick = () => {
+          if (question === null || question.solved) return
+          if (question.flaggedIndices.has(idx)) {
+            question.flaggedIndices.delete(idx)
+            card.classList.remove('disabled')
+            card.onclick = () => guess(idx)
+            led.classList.remove('on')
+          } else {
+            question.flaggedIndices.add(idx)
+            card.classList.add('disabled')
+            card.onclick = null
+            led.classList.add('on')
+          }
+        }
+      }
+      cardEls[i] = { card, flagBtn }
+      if (flagsRow !== null) flagsRow.appendChild(flagBtn)
     }
     panel.appendChild(cardsArea)
+    if (flagsRow !== null) panel.appendChild(flagsRow)
     container.appendChild(panel)
 
     if (pausePopupOpen) {
@@ -362,34 +441,52 @@ export const mountMatchCurated = (
   }
 
   const guess = (idx: number) => {
-    if (question === null || question.guessIndex !== null) return
-    const correct = idx === question.answerIndex
-    question = { ...question, guessIndex: idx }
-    render()
-    regenerateTimer = setTimeout(() => {
-      session.roundResults.push({ preset: session.currentPreset, correct })
-      session.roundsPlayed += 1
-      session.correctInBlock += correct ? 1 : 0
+    if (question === null || question.solved) return
+    if (question.wrongIndices.has(idx)) return
 
-      if (session.roundsPlayed % BLOCK_SIZE === 0) {
-        session.currentPreset = advancePreset(
-          session.currentPreset,
-          session.correctInBlock,
-        )
-        session.correctInBlock = 0
-      }
-
-      if (session.roundsPlayed === TOTAL_ROUNDS) {
-        session.phase = 'done'
-        question = null
-        render()
-        return
-      }
-
-      question = newQuestion(session.currentPreset)
-      pendingAutoZoom = true
+    if (idx === question.answerIndex) {
+      const firstTry = question.wrongIndices.size === 0
+      const wrongCount = question.wrongIndices.size
+      question = { ...question, solved: true }
       render()
-    }, 1500)
+      regenerateTimer = setTimeout(() => {
+        const attempts = wrongCount + 1
+        session.roundResults.push({ preset: session.currentPreset, attempts })
+        session.roundsPlayed += 1
+        if (firstTry) session.correctInBlock += 1
+
+        if (session.roundsPlayed % BLOCK_SIZE === 0) {
+          session.currentPreset = advancePreset(
+            session.currentPreset,
+            session.correctInBlock,
+          )
+          session.correctInBlock = 0
+        }
+
+        if (session.roundsPlayed === TOTAL_ROUNDS) {
+          session.phase = 'done'
+          question = null
+          render()
+          return
+        }
+
+        question = newQuestion(session.currentPreset)
+        pendingAutoZoom = true
+        render()
+      }, 1500)
+    } else {
+      question = {
+        ...question,
+        wrongIndices: new Set([...question.wrongIndices, idx]),
+      }
+      const el = cardEls[idx]
+      if (el !== undefined) {
+        el.card.classList.add('quiz-card-wrong')
+        el.card.onclick = null
+        el.flagBtn.classList.add('disabled')
+        el.flagBtn.onclick = null
+      }
+    }
   }
 
   render()
@@ -421,11 +518,15 @@ export const mountMatchCurated = (
       return
     }
     const digitMatch = ev.code.match(/^Digit([1-4])$/)
-    if (digitMatch && question !== null && question.guessIndex === null) {
+    if (digitMatch && question !== null && !question.solved) {
       const idxStr = digitMatch[1]
       if (idxStr === undefined) return
       const idx = parseInt(idxStr) - 1
-      if (idx < question.schemas.length) {
+      if (
+        idx < question.schemas.length &&
+        !question.wrongIndices.has(idx) &&
+        !question.flaggedIndices.has(idx)
+      ) {
         guess(idx)
       }
     }
