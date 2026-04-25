@@ -112,7 +112,7 @@ export const mountQuiz = (
 
     if (instance !== null && answer !== undefined) {
       const questionArea = document.createElement('div')
-      questionArea.setAttribute('class', 'quiz-question')
+      questionArea.setAttribute('class', 'match-question')
       questionArea.style.setProperty('--tree-zoom', String(zoom))
       const treeEl = renderQuestionTree(
         instance,

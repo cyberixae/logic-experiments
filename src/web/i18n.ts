@@ -63,6 +63,7 @@ const en = {
   matchDone: 'Match Complete',
   matchScore: 'Score: {score} / {max}',
   matchFinalPreset: 'Final preset: {preset}',
+  multiplier: 'Multiplier',
 } as const
 
 const fi: Record<MessageKey, string> = {
@@ -130,6 +131,7 @@ const fi: Record<MessageKey, string> = {
   matchDone: 'Tunnistus valmis',
   matchScore: 'Pisteet: {score} / {max}',
   matchFinalPreset: 'Viimeinen esiasetus: {preset}',
+  multiplier: 'Kerroin',
 }
 
 const es: Record<MessageKey, string> = {
@@ -197,6 +199,7 @@ const es: Record<MessageKey, string> = {
   matchDone: 'Prueba completa',
   matchScore: 'Puntuación: {score} / {max}',
   matchFinalPreset: 'Preajuste final: {preset}',
+  multiplier: 'Multiplicador',
 }
 
 const cs: Record<MessageKey, string> = {
@@ -264,6 +267,7 @@ const cs: Record<MessageKey, string> = {
   matchDone: 'Kvíz dokončen',
   matchScore: 'Skóre: {score} / {max}',
   matchFinalPreset: 'Poslední předvolba: {preset}',
+  multiplier: 'Násobitel',
 }
 
 const pl: Record<MessageKey, string> = {
@@ -331,6 +335,7 @@ const pl: Record<MessageKey, string> = {
   matchDone: 'Quiz ukończony',
   matchScore: 'Wynik: {score} / {max}',
   matchFinalPreset: 'Ostatnie ustawienie wstępne: {preset}',
+  multiplier: 'Mnożnik',
 }
 
 type MessageKey = keyof typeof en

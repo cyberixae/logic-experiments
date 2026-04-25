@@ -861,6 +861,78 @@ html.loading body {
 .quiz-zoom .button {
   min-width: 2em;
 }
+/* === Match mode three-section layout === */
+.match-viewport {
+  height: 100dvh;
+  padding: 1em 0;
+  box-sizing: border-box;
+}
+.match-layout {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 1em;
+  height: 100%;
+}
+.match-hud {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  padding: 0 1em;
+  flex-shrink: 0;
+}
+.match-layout .match-question {
+  height: 10em;
+  padding: 0;
+  position: static;
+}
+.match-answers {
+  align-items: center;
+  justify-content: center;
+  padding: 1em;
+  overflow-y: auto;
+  max-width: 48em;
+  width: 100%;
+  margin: 0 auto;
+  box-sizing: border-box;
+  mask-image: linear-gradient(
+    to bottom,
+    transparent,
+    black 1em,
+    black calc(100% - 1em),
+    transparent
+  );
+}
+.match-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 1em;
+}
+.match-hud .quiz-menu-btn {
+  position: static;
+  justify-self: start;
+  width: 1.2em;
+  height: 1.2em;
+  line-height: 1.2em;
+  border-color: transparent;
+}
+.match-hud .curated-score {
+  position: static;
+  transform: none;
+  text-align: center;
+}
+.match-hud .curated-stats {
+  position: static;
+  justify-self: end;
+  text-align: right;
+}
+.match-controls .quiz-flags {
+  position: static;
+  transform: none;
+  width: 100%;
+}
+/* === end match layout === */
 .quiz-menu-btn {
   position: fixed;
   bottom: 1em;
@@ -899,7 +971,7 @@ html.loading body {
   max-width: 48em;
   margin: 2em auto;
 }
-.quiz-question {
+.match-question {
   --base-tree-zoom: 1;
   display: flex;
   justify-content: safe center;
@@ -910,13 +982,13 @@ html.loading body {
   overflow: auto;
   width: 100%;
 }
-.quiz-question {
+.match-question {
   scrollbar-width: none;
 }
-.quiz-question::-webkit-scrollbar {
+.match-question::-webkit-scrollbar {
   display: none;
 }
-.quiz-question > .tree-node {
+.match-question > .tree-node {
   font-size: calc(2em * var(--base-tree-zoom, 1) * var(--tree-zoom, 1));
 }
 .quiz-cards {
@@ -985,7 +1057,7 @@ html.loading body {
   .bench {
     overflow-x: hidden;
   }
-  .quiz-question {
+  .match-question {
     --base-tree-zoom: 0.6;
   }
   .quiz-menu-btn {
@@ -998,16 +1070,22 @@ html.loading body {
   }
   .quiz-cards {
     grid-template-columns: 1fr;
+    gap: 0.75em;
   }
-  body:has(.quiz-panel) {
+  .quiz-panel {
+    height: 100dvh;
+    min-height: unset;
     overflow-y: auto;
   }
-  .quiz-question {
+  .match-question {
     position: sticky;
     top: 0;
     background-color: #ffeedd;
     z-index: 5;
     height: 14em;
+  }
+  .match-layout .match-question {
+    position: static;
   }
   .curated-stats {
     top: 0.3em;
