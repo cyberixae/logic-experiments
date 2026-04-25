@@ -551,15 +551,8 @@ const countRuleUsage = (d: AnyDerivation): Record<RuleCategory, number> => {
 
 const formatHudCounts = (counts: Record<RuleCategory, number>): string => {
   const order: RuleCategory[] = ['axiom', 'structural', 'logical', 'meta']
-  let lastNonZero = -1
-  order.forEach((cat, i) => {
-    if (counts[cat] > 0) lastNonZero = i
-  })
   const total = order.reduce((sum, cat) => sum + counts[cat], 0)
-  if (lastNonZero === -1) return '<b>0</b>'
-  const segments = order.slice(0, lastNonZero + 1).map((cat) => counts[cat])
-  if (segments.length === 1) return `<b>${total}</b>`
-  return `<b>${total}</b> <span class="breakdown">${segments.join('+')}</span>`
+  return `<b>${total}</b>`
 }
 
 export const createBench = (
@@ -567,6 +560,7 @@ export const createBench = (
   makeCongrats: () => { hurray: HTMLElement; buttons: HTMLElement },
   controlsEl: HTMLElement,
   rerender: () => void,
+  onMenu?: () => void,
 ): HTMLElement => {
   const ls = workspace.applicableRules()
   const rules = workspace.availableRules()
@@ -669,10 +663,37 @@ export const createBench = (
     ),
   )
 
+  const rulesBtn = document.createElement('div')
+  rulesBtn.setAttribute('class', 'button toggle bench-rules-btn')
+  rulesBtn.setAttribute('aria-label', t('rules'))
+  rulesBtn.textContent = '?'
+  rulesBtn.onclick = () => {
+    rulesVisible = !rulesVisible
+    rerender()
+  }
+  const rulesLed = document.createElement('span')
+  rulesLed.setAttribute('class', 'led' + (rulesVisible ? ' on' : ''))
+  rulesBtn.appendChild(rulesLed)
+
+  const topbar = document.createElement('div')
+  topbar.setAttribute('class', 'bench-topbar')
+
+  const topbarLeft = document.createElement('div')
+  topbarLeft.setAttribute('class', 'bench-topbar-left')
+  if (onMenu !== undefined) {
+    const menuBtn = document.createElement('div')
+    menuBtn.setAttribute('class', 'button quiz-menu-btn')
+    menuBtn.setAttribute('aria-label', t('menu'))
+    menuBtn.textContent = '⋮'
+    menuBtn.onclick = onMenu
+    topbarLeft.appendChild(menuBtn)
+  }
+  topbar.appendChild(topbarLeft)
+
   const hud = document.createElement('div')
   hud.setAttribute('class', 'hud' + (solved ? ' solved' : ''))
   const hudCounts = formatHudCounts(countRuleUsage(focus.derivation))
-  hud.innerHTML = solved ? t('score') + ' ' + hudCounts : hudCounts
+  hud.innerHTML = solved ? t('moves') + ' ' + hudCounts : hudCounts
   if (solved) {
     const solution = workspace.currentSolution()
     const par = document.createElement('div')
@@ -682,7 +703,16 @@ export const createBench = (
       : t('par') + ' 💀'
     hud.appendChild(par)
   }
-  panel.appendChild(hud)
+  topbar.appendChild(hud)
+
+  const topbarRight = document.createElement('div')
+  topbarRight.setAttribute('class', 'bench-topbar-right')
+  if (!solved) {
+    topbarRight.appendChild(rulesBtn)
+  }
+  topbar.appendChild(topbarRight)
+
+  panel.appendChild(topbar)
 
   // Mobile bottom sheet for rules
   const rulesSheet = document.createElement('div')
@@ -852,19 +882,6 @@ export const createBench = (
     return g
   }
 
-  const rulesBtn = createButton(
-    t('rules'),
-    false,
-    () => {
-      rulesVisible = !rulesVisible
-      rerender()
-    },
-    getActionHint('toggleRules'),
-  )
-  rulesBtn.classList.add('toggle')
-  const rulesLed = document.createElement('span')
-  rulesLed.setAttribute('class', 'led' + (rulesVisible ? ' on' : ''))
-  rulesBtn.appendChild(rulesLed)
   const axiomBtn = createButton(
     t('axiom'),
     inactive || !keys(center).some((k) => ls.includes(k)),
@@ -881,10 +898,6 @@ export const createBench = (
   gazeGroup.appendChild(gazeConnectiveBtn)
   gazeGroup.appendChild(gazeRightBtn)
 
-  const rulesGroup = makeGroup()
-  rulesGroup.setAttribute('class', 'controls-group controls-rules')
-  rulesGroup.appendChild(rulesBtn)
-
   const axiomGroup = makeGroup()
   axiomGroup.setAttribute('class', 'controls-group controls-axiom')
   axiomGroup.appendChild(axiomBtn)
@@ -894,7 +907,7 @@ export const createBench = (
   zoomGroup.appendChild(zoomReset)
   zoomGroup.appendChild(zoomIn)
 
-  controlsEl.setAttribute('class', 'controls-group')
+  controlsEl.setAttribute('class', 'controls-group controls-undo')
 
   const centerCell = document.createElement('div')
   centerCell.setAttribute('class', 'controls-center')
@@ -925,7 +938,6 @@ export const createBench = (
 
   const rightCell = document.createElement('div')
   rightCell.setAttribute('class', 'controls-right')
-  rightCell.appendChild(branchGroup)
   rightCell.appendChild(zoomGroup)
 
   const controlsBar = document.createElement('div')
@@ -934,11 +946,14 @@ export const createBench = (
     congrats.buttons.setAttribute('class', 'congrabuttons controls-group')
     centerCell.appendChild(congrats.buttons)
   } else {
-    centerCell.appendChild(rulesGroup)
+    centerCell.appendChild(controlsEl)
     centerCell.appendChild(gazeGroup)
     centerCell.appendChild(axiomGroup)
   }
-  controlsBar.appendChild(controlsEl)
+  const leftCell = document.createElement('div')
+  leftCell.setAttribute('class', 'controls-left')
+  leftCell.appendChild(branchGroup)
+  controlsBar.appendChild(leftCell)
   controlsBar.appendChild(centerCell)
   controlsBar.appendChild(rightCell)
   panel.appendChild(controlsBar)

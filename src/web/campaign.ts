@@ -98,7 +98,6 @@ const createControls = (
   ws: AnyWorkspace,
   _listingEl: HTMLElement,
   rerender: () => void,
-  onMenu: () => void,
   showLevelButton: boolean,
   onLevel: () => void,
 ): HTMLElement => {
@@ -107,9 +106,6 @@ const createControls = (
   const panel = document.createElement('div')
   panel.setAttribute('class', 'controls')
 
-  panel.appendChild(
-    createButton(t('menu'), false, onMenu, getActionHint('menu')),
-  )
   if (showLevelButton) {
     panel.appendChild(
       createButton(t('level'), false, onLevel, getActionHint('level')),
@@ -243,12 +239,13 @@ export const mountCampaign = (
       ws,
       listingEl,
       rerender,
-      togglePausePopup,
       levelPresses >= 2,
       () => toggleLevel(listingEl),
     )
     const makeCongrats = () => createCongrats(ws, selectLevel, rerender)
-    container.appendChild(createBench(ws, makeCongrats, controlsEl, rerender))
+    container.appendChild(
+      createBench(ws, makeCongrats, controlsEl, rerender, togglePausePopup),
+    )
     if (pausePopupOpen) {
       const canReset = activePath(ws.currentConjecture()).length > 0
       const resetEnabled = canReset || isGazeModeActive()

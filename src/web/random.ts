@@ -27,7 +27,6 @@ import { t } from './i18n'
 const createControls = (
   getWorkspace: () => AnyWorkspace,
   rerender: () => void,
-  onMenu: () => void,
 ): HTMLElement => {
   const ws = getWorkspace()
   const canUndo = activePath(ws.currentConjecture()).length > 0
@@ -35,9 +34,6 @@ const createControls = (
   const panel = document.createElement('div')
   panel.setAttribute('class', 'controls')
 
-  panel.appendChild(
-    createButton(t('menu'), false, onMenu, getActionHint('menu')),
-  )
   panel.appendChild(
     createButton(
       t('undo'),
@@ -124,9 +120,11 @@ export const mountRandom = (
   const rerender = () => {
     const ws = getWorkspace()
     container.innerHTML = ''
-    const controlsEl = createControls(getWorkspace, rerender, togglePausePopup)
+    const controlsEl = createControls(getWorkspace, rerender)
     const makeCongrats = () => createCongrats(onNew, openSettings)
-    container.appendChild(createBench(ws, makeCongrats, controlsEl, rerender))
+    container.appendChild(
+      createBench(ws, makeCongrats, controlsEl, rerender, togglePausePopup),
+    )
     if (pausePopupOpen) {
       const canReset = activePath(ws.currentConjecture()).length > 0
       const resetEnabled = canReset || isGazeModeActive()
