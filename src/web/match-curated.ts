@@ -142,6 +142,7 @@ export const mountMatchCurated = (
   let zoom = 1
   let pendingAutoZoom = true
   let cardEls: Array<{ card: HTMLElement; flagBtn: HTMLElement }> = []
+  let treeLabelEl: HTMLElement | null = null
   let regenerateTimer: ReturnType<typeof setTimeout> | null = null
   let pausePopupOpen = false
 
@@ -265,10 +266,8 @@ export const mountMatchCurated = (
         const questionArea = document.createElement('div')
         questionArea.setAttribute('class', 'match-question')
         questionArea.style.setProperty('--tree-zoom', String(zoom))
-        const treeEl = renderQuestionTree(
-          q.instance,
-          q.solved ? answer.name : ' ? ',
-        )
+        const treeEl = renderQuestionTree(q.instance, ' ? ')
+        treeLabelEl = treeEl.querySelector<HTMLElement>('.tree-rule-label')
         questionArea.appendChild(treeEl)
         layout.appendChild(questionArea)
         requestAnimationFrame(() => {
@@ -473,7 +472,28 @@ export const mountMatchCurated = (
       const firstTry = question.wrongIndices.size === 0
       const wrongCount = question.wrongIndices.size
       question = { ...question, solved: true }
-      render()
+
+      // Local DOM update — avoid full re-render to preserve scroll position
+      const answer = question.schemas[question.answerIndex]
+      if (treeLabelEl !== null && answer !== undefined) {
+        treeLabelEl.innerHTML = html(
+          printString('(' + answer.name + ')')(basic),
+        )
+      }
+      for (let i = 0; i < question.schemas.length; i += 1) {
+        const el = cardEls[i]
+        if (el === undefined) continue
+        el.card.onclick = null
+        el.flagBtn.classList.add('disabled')
+        el.flagBtn.onclick = null
+        if (i === question.answerIndex) {
+          el.card.classList.remove('disabled')
+          el.card.classList.add('quiz-card-correct')
+        } else if (!question.wrongIndices.has(i)) {
+          el.card.classList.add('disabled')
+        }
+      }
+
       regenerateTimer = setTimeout(() => {
         const attempts = wrongCount + 1
         session.roundResults.push({ preset: session.currentPreset, attempts })
