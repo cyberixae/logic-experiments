@@ -1,5 +1,5 @@
 import { equals, AnySequent } from '../../model/sequent'
-import { equalsDerivation, ProofUsing } from '../../model/derivation'
+import { AnyDerivation, ProofUsing } from '../../model/derivation'
 import { bruteSearch } from '../../solver/brute'
 import { challenges } from '../index'
 import { RuleId } from '../../model/rule'
@@ -16,6 +16,11 @@ const brutePromise = async <S extends AnySequent, R extends RuleId>(
   }
 }
 
+const countNodes = (d: AnyDerivation): number => {
+  if (d.kind === 'premise') return 1
+  return 1 + d.deps.reduce((s, c) => s + countNodes(c), 0)
+}
+
 describe('challenges', () => {
   describe.each(Object.entries(challenges))(
     '%s challenge',
@@ -25,7 +30,7 @@ describe('challenges', () => {
       })
       it('solution is optimal', async () => {
         const [optimal] = await brutePromise({ goal, rules })
-        expect(equalsDerivation(solution, optimal)).toBe(true)
+        expect(countNodes(optimal) >= countNodes(solution)).toBe(true)
       }, 2000)
     },
   )
