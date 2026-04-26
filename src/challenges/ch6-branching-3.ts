@@ -1,27 +1,8 @@
-import { rk } from '../systems/rk'
+import { rk, rules } from '../systems/rk'
 import { sequent } from '../model/sequent'
-import { tutorial } from '../model/challenge'
+import { challenge } from '../model/challenge'
 
 const { a, o, z, i } = rk
-
-const rules = [
-  'i',
-  'swl',
-  'swr',
-  'sRotLF',
-  'sRotRF',
-  'sRotLB',
-  'sRotRB',
-  'nl',
-  'nr',
-  'cl',
-  'cr',
-  'dl',
-  'dr',
-  'ir',
-] as const
-
-const pinned = ['dl', 'cr'] as const
 
 const goal = sequent(
   [o.p2.disjunction(a('p'), a('p'))],
@@ -33,4 +14,4 @@ const solution = z.dl(
   z.cr(i.i(a('p')), i.i(a('p'))),
 )
 
-export const ch6branching3 = tutorial({ rules, goal, solution, pinned })
+export const ch6branching3 = challenge({ rules, goal, solution })

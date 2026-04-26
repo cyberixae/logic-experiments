@@ -1,10 +1,8 @@
 import { rk, rules } from '../systems/rk'
 import { sequent } from '../model/sequent'
-import { tutorial } from '../model/challenge'
+import { challenge } from '../model/challenge'
 
 const { a, o, z, i } = rk
-
-const pinned = ['f', 'v'] as const
 
 const goal = sequent(
   [o.p2.disjunction(o.p0.falsum, a('p'))],
@@ -16,4 +14,4 @@ const solution = z.dl(
   z.cr(z.swl(a('p'), i.v()), i.i(a('p'))),
 )
 
-export const ch8constants7 = tutorial({ rules, goal, solution, pinned })
+export const ch8constants7 = challenge({ rules, goal, solution })

@@ -8,7 +8,6 @@ import { ch1weakening3 } from './ch1-weakening-3'
 import { ch1weakening4 } from './ch1-weakening-4'
 import { ch1weakening5 } from './ch1-weakening-5'
 import { ch1weakening6 } from './ch1-weakening-6'
-import { ch1weakening7 } from './ch1-weakening-7'
 import { ch1weakening8 } from './ch1-weakening-8'
 import { ch1weakening9 } from './ch1-weakening-9'
 
@@ -28,7 +27,6 @@ import { ch3negation3 } from './ch3-negation-3'
 import { ch3negation4 } from './ch3-negation-4'
 import { ch3negation5 } from './ch3-negation-5'
 import { ch3negation6 } from './ch3-negation-6'
-import { ch3negation7 } from './ch3-negation-7'
 import { ch3negation8 } from './ch3-negation-8'
 import { ch3negation9 } from './ch3-negation-9'
 import { ch3negation10 } from './ch3-negation-10'
@@ -107,7 +105,6 @@ export const challenges = {
   ch1weakening4,
   ch1weakening5,
   ch1weakening6,
-  ch1weakening7,
   ch1weakening8,
   ch1weakening9,
 
@@ -127,7 +124,6 @@ export const challenges = {
   ch3negation4,
   ch3negation5,
   ch3negation6,
-  ch3negation7,
   ch3negation8,
   ch3negation9,
   ch3negation10,

@@ -1,28 +1,8 @@
-import { rk } from '../systems/rk'
+import { rk, rules } from '../systems/rk'
 import { sequent } from '../model/sequent'
-import { tutorial } from '../model/challenge'
+import { challenge } from '../model/challenge'
 
 const { a, o, i } = rk
-
-const rules = [
-  'i',
-  'swl',
-  'swr',
-  'sRotLF',
-  'sRotRF',
-  'sRotLB',
-  'sRotRB',
-  'nl',
-  'nr',
-  'cl',
-  'cr',
-  'dl',
-  'dr',
-  'il',
-  'ir',
-] as const
-
-const pinned = ['il'] as const
 
 const goal = sequent(
   [
@@ -46,4 +26,4 @@ const solution = i.i(
   ),
 )
 
-export const ch7completeness11 = tutorial({ rules, goal, solution, pinned })
+export const ch7completeness11 = challenge({ rules, goal, solution })

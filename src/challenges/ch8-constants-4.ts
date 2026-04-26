@@ -1,30 +1,8 @@
-import { rk } from '../systems/rk'
+import { rk, rules } from '../systems/rk'
 import { sequent } from '../model/sequent'
-import { tutorial } from '../model/challenge'
+import { challenge } from '../model/challenge'
 
 const { a, o, z, i } = rk
-
-const rules = [
-  'i',
-  'f',
-  'v',
-  'swl',
-  'swr',
-  'sRotLF',
-  'sRotRF',
-  'sRotLB',
-  'sRotRB',
-  'nl',
-  'nr',
-  'cl',
-  'cr',
-  'dl',
-  'dr',
-  'il',
-  'ir',
-] as const
-
-const pinned = ['f', 'v'] as const
 
 const goal = sequent([a('s'), o.p0.falsum, a('s')], [a('r'), a('p'), a('r')])
 
@@ -35,4 +13,4 @@ const solution = z.sRotLF(
   ),
 )
 
-export const ch8constants4 = tutorial({ rules, goal, solution, pinned })
+export const ch8constants4 = challenge({ rules, goal, solution })
