@@ -5,6 +5,11 @@ const { bruteLimit } = require('../lib/solver/brute')
 const { fromDerivation } = require('../lib/render/code')
 const { equalsDerivation } = require('../lib/model/derivation')
 
+function countNodes(d: any): number {
+  if (d.kind === 'premise') return 1
+  return 1 + d.deps.reduce((s: number, c: any) => s + countNodes(c), 0)
+}
+
 const challengesDir = path.join(__dirname, '../src/challenges')
 
 const fileMap = {}
@@ -31,6 +36,7 @@ for (const [name, challenge] of Object.entries(challenges)) {
 
   const [optimal] = found
   if (equalsDerivation(solution, optimal)) continue
+  if (countNodes(optimal) >= countNodes(solution)) continue
 
   const file = fileMap[name.toLowerCase()]
   if (!file) {
