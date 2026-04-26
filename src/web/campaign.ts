@@ -1,7 +1,10 @@
 import { reset } from '../interactive/event'
 import { activePath } from '../interactive/focus'
 import { Session } from '../interactive/session'
-import { isTutorial } from '../model/challenge'
+import { isChallenge, Configuration } from '../model/challenge'
+import { AnyDerivation } from '../model/derivation'
+import { RuleId } from '../model/rule'
+import { AnySequent } from '../model/sequent'
 import { basic, fromRuleId, fromSequent } from '../render/print'
 import { html } from '../render/segment'
 import { Action } from '../interactive/action'
@@ -26,6 +29,21 @@ import {
 } from './game'
 import { MountResult, Navigate } from './types'
 import { t } from './i18n'
+
+const rulesUsedIn = (d: AnyDerivation): Set<RuleId> => {
+  if (d.kind === 'premise') return new Set()
+  const result: Set<RuleId> = new Set([d.rule])
+  for (const dep of d.deps) {
+    for (const rule of rulesUsedIn(dep)) result.add(rule)
+  }
+  return result
+}
+
+const challengeRules = (c: Configuration<AnySequent>) => {
+  if (!isChallenge(c)) return []
+  const used = rulesUsedIn(c.solution)
+  return c.rules.filter((r) => used.has(r))
+}
 
 const createListing = (
   ws: AnyWorkspace,
@@ -68,19 +86,12 @@ const createListing = (
     title.setAttribute('class', 'title')
     title.innerHTML = id
     item.appendChild(title)
-    const pinned = isTutorial(challenge) ? challenge.pinned : []
     const rules = document.createElement('div')
     rules.setAttribute('class', 'rules')
-    rules.innerHTML = challenge.rules
-      .map((rule) => {
-        const text = html(
-          fromRuleId(rule, t('sideLeft'), t('sideRight'))(basic),
-        )
-        if (pinned.includes(rule)) {
-          return `<span class="pinned">${text}</span>`
-        }
-        return text
-      })
+    rules.innerHTML = challengeRules(challenge)
+      .map((rule) =>
+        html(fromRuleId(rule, t('sideLeft'), t('sideRight'))(basic)),
+      )
       .join(', ')
     item.appendChild(rules)
     const goal = document.createElement('div')
