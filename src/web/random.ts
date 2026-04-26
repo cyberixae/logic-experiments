@@ -4,6 +4,7 @@ import { Session } from '../interactive/session'
 import { Action } from '../interactive/action'
 import {
   AnyWorkspace,
+  ApplyReverse1,
   createBench,
   createButton,
   createDispatch,
@@ -21,6 +22,7 @@ import {
   zoomTreeOut,
   zoomTreeReset,
 } from './game'
+import { createFormulaEditor } from './formula-editor'
 import { MountResult, Navigate } from './types'
 import { t } from './i18n'
 
@@ -117,13 +119,45 @@ export const mountRandom = (
     onNew()
   }
 
+  let formulaEditorOpen = false
+  let closeFormulaEditor: (() => void) | null = null
+  const onApplyReverse1: ApplyReverse1 = (_key, onFormula) => {
+    if (formulaEditorOpen) return
+    formulaEditorOpen = true
+    const cancel = () => {
+      formulaEditorOpen = false
+      closeFormulaEditor = null
+      container.removeChild(modal)
+    }
+    const modal = createFormulaEditor(
+      t('cutTitle'),
+      t('cutConfirm'),
+      (formula) => {
+        formulaEditorOpen = false
+        closeFormulaEditor = null
+        container.removeChild(modal)
+        onFormula(formula)
+      },
+      cancel,
+    )
+    closeFormulaEditor = cancel
+    container.appendChild(modal)
+  }
+
   const rerender = () => {
     const ws = getWorkspace()
     container.innerHTML = ''
     const controlsEl = createControls(getWorkspace, rerender)
     const makeCongrats = () => createCongrats(onNew, openSettings)
     container.appendChild(
-      createBench(ws, makeCongrats, controlsEl, rerender, togglePausePopup),
+      createBench(
+        ws,
+        makeCongrats,
+        controlsEl,
+        rerender,
+        togglePausePopup,
+        onApplyReverse1,
+      ),
     )
     if (pausePopupOpen) {
       const canReset = activePath(ws.currentConjecture()).length > 0
@@ -163,8 +197,15 @@ export const mountRandom = (
     onSolved,
     undefined,
     togglePausePopup,
+    onApplyReverse1,
   )
   const dispatch = (action: Action) => {
+    if (formulaEditorOpen) {
+      if (action === 'menu' || action === 'exit' || action === 'undo') {
+        closeFormulaEditor?.()
+      }
+      return
+    }
     if (action === 'exit') {
       if (pausePopupOpen) exitToMenu()
       return

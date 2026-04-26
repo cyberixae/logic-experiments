@@ -350,7 +350,7 @@ export function fromRuleId(s: rule.RuleId, l = 'L', r = 'R'): Printer {
         a1: () => 'a1',
         a2: () => 'a2',
         a3: () => 'a3',
-        cut: () => 'cut',
+        cut: () => '✂️',
         fcut: () => 'fcut',
         fcr: () => t.conjunction.join(empty) + right(r, 'ᶠ'),
         fdl: () => t.disjunction.join(empty) + left(l, 'ᶠ'),

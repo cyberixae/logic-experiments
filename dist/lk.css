@@ -97,6 +97,14 @@ html.loading body {
   align-items: end;
   gap: 1em;
 }
+.controls-left {
+  display: flex;
+  align-items: end;
+  gap: 1em;
+}
+.controls-undo-inner {
+  display: contents;
+}
 .controls-right {
   display: flex;
   justify-content: flex-end;
@@ -494,6 +502,38 @@ html.loading body {
 .pause-buttons-spacer {
   height: 1em;
 }
+.formula-editor-popup {
+  background-color: #fff2;
+  border: 4px solid #f80;
+  border-radius: 20px;
+  padding: 2em 3em;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.2em;
+}
+.formula-editor-title {
+  font-size: 2em;
+  font-weight: bold;
+}
+.formula-editor-stack {
+  font-size: 1.4em;
+  min-height: 1.8em;
+  min-width: 10em;
+  text-align: center;
+  background: #fff2;
+  border-radius: 6px;
+  padding: 0.3em 0.8em;
+}
+.formula-editor-controls {
+  display: flex;
+  gap: 0.8em;
+}
+.formula-editor-controls .button {
+  padding: 0.5em 1.2em;
+  color: #000;
+}
 .pause-buttons .button .key-hint {
   position: absolute;
   width: 30px;
@@ -860,7 +900,10 @@ html.loading body {
 .ghost-node .parenthesis,
 .level-select .connective,
 .level-select .connective.active,
-.level-select .parenthesis {
+.level-select .parenthesis,
+.formula-editor-stack .connective,
+.formula-editor-stack .connective.active,
+.formula-editor-stack .parenthesis {
   color: inherit;
 }
 .gazed {
@@ -1291,8 +1334,11 @@ html.loading body {
   .controls-center {
     gap: 0.5em;
   }
-  .controls-left,
   .controls-right {
+    display: none;
+  }
+  .branch-btn,
+  .controls-lemma {
     display: none;
   }
 

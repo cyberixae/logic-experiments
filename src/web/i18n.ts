@@ -65,6 +65,9 @@ const en = {
   matchScore: 'Score: {score} / {max}',
   matchFinalPreset: 'Final preset: {preset}',
   multiplier: 'Multiplier',
+  cutTitle: 'Choose Cut Formula',
+  cutConfirm: 'Apply Cut',
+  lemma: 'Lemma',
 } as const
 
 const fi: Record<MessageKey, string> = {
@@ -134,6 +137,9 @@ const fi: Record<MessageKey, string> = {
   matchScore: 'Pisteet: {score} / {max}',
   matchFinalPreset: 'Viimeinen esiasetus: {preset}',
   multiplier: 'Kerroin',
+  cutTitle: 'Valitse leikkaava kaava',
+  cutConfirm: 'Käytä leikkausta',
+  lemma: 'Lemma',
 }
 
 const es: Record<MessageKey, string> = {
@@ -203,6 +209,9 @@ const es: Record<MessageKey, string> = {
   matchScore: 'Puntuación: {score} / {max}',
   matchFinalPreset: 'Preajuste final: {preset}',
   multiplier: 'Multiplicador',
+  cutTitle: 'Elige la fórmula de corte',
+  cutConfirm: 'Aplicar corte',
+  lemma: 'Lema',
 }
 
 const cs: Record<MessageKey, string> = {
@@ -272,6 +281,9 @@ const cs: Record<MessageKey, string> = {
   matchScore: 'Skóre: {score} / {max}',
   matchFinalPreset: 'Poslední předvolba: {preset}',
   multiplier: 'Násobitel',
+  cutTitle: 'Zvolte vzorec řezu',
+  cutConfirm: 'Použít řez',
+  lemma: 'Lemma',
 }
 
 const pl: Record<MessageKey, string> = {
@@ -341,6 +353,9 @@ const pl: Record<MessageKey, string> = {
   matchScore: 'Wynik: {score} / {max}',
   matchFinalPreset: 'Ostatnie ustawienie wstępne: {preset}',
   multiplier: 'Mnożnik',
+  cutTitle: 'Wybierz formułę cięcia',
+  cutConfirm: 'Zastosuj cięcie',
+  lemma: 'Lemat',
 }
 
 type MessageKey = keyof typeof en

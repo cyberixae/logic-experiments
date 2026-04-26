@@ -4,6 +4,7 @@ import { bruteSearch } from '../../solver/brute'
 import { challenges } from '../index'
 import { RuleId } from '../../model/rule'
 import { Configuration } from '../../model/challenge'
+import { isReverseId1 } from '../../rules'
 
 const brutePromise = async <S extends AnySequent, R extends RuleId>(
   c: Configuration<S, ReadonlyArray<R>>,
@@ -29,7 +30,8 @@ describe('challenges', () => {
         expect(equals(solution.result, goal)).toBe(true)
       })
       it('solution is optimal', async () => {
-        const [optimal] = await brutePromise({ goal, rules })
+        const solverRules = rules.filter((r) => !isReverseId1(r))
+        const [optimal] = await brutePromise({ goal, rules: solverRules })
         expect(countNodes(optimal) >= countNodes(solution)).toBe(true)
       }, 2000)
     },

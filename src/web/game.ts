@@ -1,5 +1,6 @@
 import {
   reverse0,
+  reverse1,
   undo,
   reset,
   prevBranch,
@@ -24,6 +25,7 @@ import { renderDerivation, layoutTree } from './tree'
 import {
   center,
   isReverseId0,
+  isReverseId1,
   left,
   leftLogical,
   leftStructural,
@@ -32,7 +34,10 @@ import {
   rightStructural,
   ruleCategory,
   RuleCategory,
+  ReverseId0,
+  ReverseId1,
 } from '../rules'
+import type { Prop } from '../model/prop'
 import { AnyWorkspace } from '../interactive/workspace'
 import { Action } from '../interactive/action'
 import { computeGhostChain, GhostStep } from '../interactive/ghost'
@@ -118,6 +123,7 @@ const ruleAction: Partial<Record<RuleId, Action>> = {
   a1: 'axiom',
   a2: 'axiom',
   a3: 'axiom',
+  cut: 'lemma',
 }
 
 const keyHintBadge = (
@@ -555,12 +561,18 @@ const formatHudCounts = (counts: Record<RuleCategory, number>): string => {
   return `<b>${total}</b>`
 }
 
+export type ApplyReverse1 = (
+  key: ReverseId1,
+  onFormula: (formula: Prop) => void,
+) => void
+
 export const createBench = (
   workspace: AnyWorkspace,
   makeCongrats: () => { hurray: HTMLElement; buttons: HTMLElement },
   controlsEl: HTMLElement,
   rerender: () => void,
   onMenu?: () => void,
+  onApplyReverse1?: ApplyReverse1,
 ): HTMLElement => {
   const ls = workspace.applicableRules()
   const rules = workspace.availableRules()
@@ -572,13 +584,27 @@ export const createBench = (
 
   const apply = (key: RuleId) => {
     setGazeModeActive(false)
-    if (isReverseId0(key)) workspace.applyEvent(reverse0(key))
-    rerender()
+    if (isReverseId0(key)) {
+      workspace.applyEvent(reverse0(key))
+      rerender()
+    } else if (isReverseId1(key) && onApplyReverse1 !== undefined) {
+      onApplyReverse1(key, (formula) => {
+        workspace.applyEvent(reverse1(key, formula))
+        rerender()
+      })
+    }
   }
   const applyCenter = (key: RuleId) => {
     setGazeModeActive(false)
-    if (isReverseId0(key)) workspace.applyEvent(reverse0(key))
-    rerender()
+    if (isReverseId0(key)) {
+      workspace.applyEvent(reverse0(key))
+      rerender()
+    } else if (isReverseId1(key) && onApplyReverse1 !== undefined) {
+      onApplyReverse1(key, (formula) => {
+        workspace.applyEvent(reverse1(key, formula))
+        rerender()
+      })
+    }
   }
 
   const seq = activeSequent(workspace.currentConjecture())
@@ -884,7 +910,7 @@ export const createBench = (
 
   const axiomBtn = createButton(
     t('axiom'),
-    inactive || !keys(center).some((k) => ls.includes(k)),
+    inactive || !keys(center).some((k) => ls.includes(k) && isReverseId0(k)),
     () => {
       autoRule(workspace, keys(center))
       rerender()
@@ -892,14 +918,31 @@ export const createBench = (
     getActionHint('axiom'),
   )
 
+  const lemmaDisabled =
+    inactive || onApplyReverse1 === undefined || !ls.includes('cut')
+  const lemmaBtn = createButton(
+    t('lemma'),
+    lemmaDisabled,
+    () => {
+      if (onApplyReverse1 === undefined) return
+      onApplyReverse1('cut', (formula) => {
+        workspace.applyEvent(reverse1('cut', formula))
+        rerender()
+      })
+    },
+    getActionHint('lemma'),
+  )
+
+  const lemmaGroup = makeGroup('controls-lemma')
+  lemmaGroup.appendChild(lemmaBtn)
+
   const gazeGroup = makeGroup(isGazeModeActive() ? 'gaze' : 'hot')
   gazeGroup.appendChild(gazeLeftBtn)
   gazeGroup.appendChild(gazeWeakeningBtn)
   gazeGroup.appendChild(gazeConnectiveBtn)
   gazeGroup.appendChild(gazeRightBtn)
 
-  const axiomGroup = makeGroup()
-  axiomGroup.setAttribute('class', 'controls-group controls-axiom')
+  const axiomGroup = makeGroup('controls-axiom')
   axiomGroup.appendChild(axiomBtn)
 
   const zoomGroup = makeGroup()
@@ -907,7 +950,7 @@ export const createBench = (
   zoomGroup.appendChild(zoomReset)
   zoomGroup.appendChild(zoomIn)
 
-  controlsEl.setAttribute('class', 'controls-group controls-undo')
+  controlsEl.setAttribute('class', 'controls-undo-inner')
 
   const centerCell = document.createElement('div')
   centerCell.setAttribute('class', 'controls-center')
@@ -923,6 +966,7 @@ export const createBench = (
     },
     getActionHint('prevBranch'),
   )
+  prevBranchBtn.classList.add('branch-btn')
   const nextBranchBtn = createButton(
     '↱',
     !canSwitch,
@@ -932,9 +976,12 @@ export const createBench = (
     },
     getActionHint('nextBranch'),
   )
-  const branchGroup = makeGroup()
-  branchGroup.appendChild(prevBranchBtn)
-  branchGroup.appendChild(nextBranchBtn)
+  nextBranchBtn.classList.add('branch-btn')
+
+  const navGroup = makeGroup('controls-undo')
+  navGroup.appendChild(prevBranchBtn)
+  navGroup.appendChild(controlsEl)
+  navGroup.appendChild(nextBranchBtn)
 
   const rightCell = document.createElement('div')
   rightCell.setAttribute('class', 'controls-right')
@@ -946,13 +993,13 @@ export const createBench = (
     congrats.buttons.setAttribute('class', 'congrabuttons controls-group')
     centerCell.appendChild(congrats.buttons)
   } else {
-    centerCell.appendChild(controlsEl)
+    centerCell.appendChild(lemmaGroup)
     centerCell.appendChild(gazeGroup)
     centerCell.appendChild(axiomGroup)
   }
   const leftCell = document.createElement('div')
   leftCell.setAttribute('class', 'controls-left')
-  leftCell.appendChild(branchGroup)
+  leftCell.appendChild(navGroup)
   controlsBar.appendChild(leftCell)
   controlsBar.appendChild(centerCell)
   controlsBar.appendChild(rightCell)
@@ -994,9 +1041,12 @@ export const createBench = (
 
 const autoRule = (workspace: AnyWorkspace, rules: RuleId[]) => {
   const available = workspace.applicableRules()
-  const [first] = rules.filter((rule) => available.includes(rule))
+  const [first] = rules.filter(
+    (rule): rule is ReverseId0 =>
+      available.includes(rule) && isReverseId0(rule),
+  )
   if (!first) return
-  if (isReverseId0(first)) workspace.applyEvent(reverse0(first))
+  workspace.applyEvent(reverse0(first))
 }
 
 export const createPausePopup = (
@@ -1080,6 +1130,7 @@ export const createDispatch =
     onSolved: (action: Action) => void,
     onLevel?: () => void,
     onMenu?: () => void,
+    onApplyReverse1?: ApplyReverse1,
   ) =>
   (action: Action): void => {
     if (action === 'gazeLeft' || action === 'gazeRight') {
@@ -1183,6 +1234,17 @@ export const createDispatch =
       case 'nextBranch':
         workspace.applyEvent(nextBranch())
         break
+      case 'lemma':
+        if (
+          onApplyReverse1 !== undefined &&
+          workspace.availableRules().includes('cut')
+        ) {
+          onApplyReverse1('cut', (formula) => {
+            workspace.applyEvent(reverse1('cut', formula))
+            rerender()
+          })
+        }
+        return
       case 'axiom':
         autoRule(workspace, keys(center))
         break

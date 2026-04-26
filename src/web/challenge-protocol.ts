@@ -4,7 +4,7 @@ import { RuleId } from '../model/rule'
 import { AnySequent } from '../model/sequent'
 
 export type ChallengeResult = {
-  challenge: Configuration<AnySequent, Array<RuleId>>
+  challenge: Configuration<AnySequent, ReadonlyArray<RuleId>>
   nonStructuralCount: number
   bypassed: boolean
   formulasTried: number

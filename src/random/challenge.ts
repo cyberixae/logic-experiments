@@ -6,9 +6,11 @@ import { RuleId } from '../model/rule'
 import { AnySequent, conclusion } from '../model/sequent'
 import { Challenge, Configuration } from '../model/challenge'
 import { ConnectiveWeights, RandomConfig, SymbolWeights } from './config'
+import { rules as rkRules } from '../systems/rk'
+import { isReverseId1 } from '../rules'
 
 export type GeneratedChallenge = {
-  challenge: Configuration<AnySequent, Array<RuleId>> & {
+  challenge: Configuration<AnySequent, ReadonlyArray<RuleId>> & {
     solution?: ProofUsing<AnySequent, RuleId>
   }
   nonStructuralCount: number
@@ -18,25 +20,10 @@ export type GeneratedChallenge = {
   solved: number
 }
 
-const RULES: Array<RuleId> = [
-  'i',
-  'f',
-  'v',
-  'swl',
-  'swr',
-  'sRotLF',
-  'sRotRF',
-  'sRotLB',
-  'sRotRB',
-  'nl',
-  'nr',
-  'cl',
-  'cr',
-  'dl',
-  'dr',
-  'il',
-  'ir',
-]
+const RULES: ReadonlyArray<RuleId> = rkRules
+const SOLVER_RULES: ReadonlyArray<RuleId> = RULES.filter(
+  (r) => !isReverseId1(r),
+)
 
 const STRUCTURAL_RULES: ReadonlySet<RuleId> = new Set([
   'swl',
@@ -61,8 +48,8 @@ export const random =
   (
     size: number = 10,
     minDifficulty: number = 8,
-  ): (() => Challenge<AnySequent, Array<RuleId>>) =>
-  (): Challenge<AnySequent, Array<RuleId>> => {
+  ): (() => Challenge<AnySequent, ReadonlyArray<RuleId>>) =>
+  (): Challenge<AnySequent, ReadonlyArray<RuleId>> => {
     const rules = RULES
     let solution: ProofUsing<AnySequent, RuleId> | undefined
     while (typeof solution === 'undefined') {
@@ -72,7 +59,7 @@ export const random =
           (tautology) => {
             const [proof, difficulty] = brute({
               goal: conclusion(tautology),
-              rules,
+              rules: SOLVER_RULES,
             })
             return difficulty < minDifficulty ? seq.empty() : seq.of(proof)
           },
@@ -207,7 +194,10 @@ export function* randomConfiguredStep(
     if (!prop.isTautology(formula)) continue
     tautologiesFound += 1
 
-    const solver = bruteSearch({ goal: conclusion(formula), rules })
+    const solver = bruteSearch({
+      goal: conclusion(formula),
+      rules: SOLVER_RULES,
+    })
     let proof: ProofUsing<AnySequent, RuleId> | undefined
     let depth = 0
     const solveStart = Date.now()

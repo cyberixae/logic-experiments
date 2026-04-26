@@ -15,6 +15,7 @@ export type Action =
   | 'menu'
   | 'exit'
   | 'axiom'
+  | 'lemma'
   | 'gazeLeft'
   | 'gazeRight'
   | 'gazeConnective'

@@ -80,6 +80,7 @@ export const rules = [
   'dr',
   'il',
   'ir',
+  'cut',
 ] as const
 
 export const name = 'RK'

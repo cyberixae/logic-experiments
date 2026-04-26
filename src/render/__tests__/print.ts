@@ -373,7 +373,7 @@ describe('print module', () => {
     })
 
     it('cut', () => {
-      expect(plain(fromRuleId('cut')(basic))).toBe('cut')
+      expect(plain(fromRuleId('cut')(basic))).toBe('✂️')
     })
 
     it('mp', () => {

@@ -2,6 +2,7 @@ const fs = require('fs')
 const path = require('path')
 const { challenges } = require('../lib/challenges/index')
 const { bruteLimit } = require('../lib/solver/brute')
+const { isReverseId1 } = require('../lib/rules')
 const { fromDerivation } = require('../lib/render/code')
 const { equalsDerivation } = require('../lib/model/derivation')
 
@@ -26,7 +27,8 @@ let missing = 0
 
 for (const [name, challenge] of Object.entries(challenges)) {
   const { goal, rules, solution } = challenge as any
-  const found = bruteLimit({ goal, rules }, maxLimit)
+  const solverRules = rules.filter((r: string) => !isReverseId1(r))
+  const found = bruteLimit({ goal, rules: solverRules }, maxLimit)
 
   if (found.length === 0) {
     console.log(`${name}: no proof found within limit ${maxLimit}`)

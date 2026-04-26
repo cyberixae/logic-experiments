@@ -18,6 +18,7 @@ export const qwertyKeyMap: Record<KeyboardEvent['code'], Action> = {
   KeyJ: 'rightConnective',
   KeyL: 'rightWeakening',
   Semicolon: 'rightRotateRight',
+  KeyC: 'lemma',
   Space: 'axiom',
   Enter: 'axiom',
   Backspace: 'undo',
