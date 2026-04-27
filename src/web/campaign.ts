@@ -289,6 +289,7 @@ export const mountCampaign = (
         rerender,
         togglePausePopup,
         onApplyReverse1,
+        true,
       ),
     )
     if (pausePopupOpen) {

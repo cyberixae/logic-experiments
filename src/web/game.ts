@@ -573,6 +573,7 @@ export const createBench = (
   rerender: () => void,
   onMenu?: () => void,
   onApplyReverse1?: ApplyReverse1,
+  hideLemma?: boolean,
 ): HTMLElement => {
   const ls = workspace.applicableRules()
   const rules = workspace.availableRules()
@@ -993,7 +994,7 @@ export const createBench = (
     congrats.buttons.setAttribute('class', 'congrabuttons controls-group')
     centerCell.appendChild(congrats.buttons)
   } else {
-    centerCell.appendChild(lemmaGroup)
+    if (hideLemma !== true) centerCell.appendChild(lemmaGroup)
     centerCell.appendChild(gazeGroup)
     centerCell.appendChild(axiomGroup)
   }
