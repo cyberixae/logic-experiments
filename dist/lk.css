@@ -493,7 +493,7 @@ html.loading body {
 }
 .pause-buttons .button {
   position: relative;
-  padding: 0.6em 1.2em;
+  padding: 1em 1.2em;
   color: #000;
   opacity: 1;
 }
@@ -540,7 +540,8 @@ html.loading body {
   width: 30px;
   height: 30px;
   line-height: 30px;
-  top: 8px;
+  top: 50%;
+  transform: translateY(-50%);
   left: -15px;
 }
 .level-select {
