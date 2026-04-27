@@ -13,6 +13,7 @@ import { mountMatchIntro } from './web/match-intro'
 import { mountMatchCurated } from './web/match-curated'
 import { parseQuizConfigFromParams, setQuizConfigParams } from './quiz/config'
 import { mountSystem } from './web/system'
+import { mountSecret } from './web/secret'
 import {
   mountRandomConfig,
   parseConfigFromParams,
@@ -111,6 +112,9 @@ const mount = (screen: Screen) => {
         session.replaceWorkspace(ws)
       })
       break
+    case 'secret':
+      current = mountSecret(body, navigate)
+      break
     case 'system':
       current = mountSystem(body, navigate)
       break
@@ -202,6 +206,9 @@ const init = () => {
   } else if (mode === 'random-config') {
     currentScreen = 'random-config'
     mount('random-config')
+  } else if (mode === 'secret') {
+    currentScreen = 'secret'
+    mount('secret')
   } else if (mode === 'system') {
     currentScreen = 'system'
     mount('system')

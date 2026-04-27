@@ -787,6 +787,7 @@ html.loading body {
   font-size: 5em;
   font-weight: bold;
   letter-spacing: 0.1em;
+  user-select: none;
 }
 .menu-modes {
   display: flex;

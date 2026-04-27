@@ -13,6 +13,8 @@ export const mountMenu = (
   container: HTMLElement,
   navigate: Navigate,
 ): MountResult => {
+  let clicks = 0
+
   const render = () => {
     container.innerHTML = ''
 
@@ -24,23 +26,21 @@ export const mountMenu = (
     const title = document.createElement('div')
     title.setAttribute('class', 'menu-title')
     title.innerHTML = t('title')
+    title.onclick = () => {
+      clicks += 1
+      if (clicks > 5) navigate('secret')
+    }
     panel.appendChild(title)
 
     const modes = document.createElement('div')
     modes.setAttribute('class', 'menu-modes')
 
     for (const mode of gameModes) {
+      if (mode === 'match') continue
       const btn = document.createElement('div')
       btn.setAttribute('class', 'button menu-mode')
       btn.innerHTML = modeLabel[mode]()
-      btn.onclick = () =>
-        navigate(
-          mode === 'random'
-            ? 'random-config'
-            : mode === 'match'
-              ? 'match-curated'
-              : mode,
-        )
+      btn.onclick = () => navigate(mode === 'random' ? 'random-config' : mode)
       modes.appendChild(btn)
     }
 

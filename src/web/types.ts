@@ -3,6 +3,7 @@ import { GameMode } from '../model/mode'
 export type Screen =
   | GameMode
   | 'menu'
+  | 'secret'
   | 'system'
   | 'random-config'
   | 'match-config'
