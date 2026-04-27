@@ -56,17 +56,44 @@ html.loading body {
   align-items: center;
 }
 .bench-topbar .quiz-menu-btn {
-  position: static;
+  position: relative;
+  left: auto;
+  bottom: auto;
   width: 1.2em;
   height: 1.2em;
   line-height: 1.2em;
   border-color: transparent;
 }
 .bench-topbar .bench-rules-btn {
+  position: relative;
   width: 1.2em;
   height: 1.2em;
   line-height: 1.2em;
   border-color: transparent;
+}
+.bench-topbar .quiz-menu-btn .key-hint {
+  position: absolute;
+  width: 30px;
+  height: 30px;
+  line-height: 28px;
+  top: 50%;
+  right: -15px;
+  transform: translateY(-50%);
+  background: #fff6;
+  color: #000a;
+  border: 2px solid #fed;
+}
+.bench-topbar .bench-rules-btn .key-hint {
+  position: absolute;
+  width: 30px;
+  height: 30px;
+  line-height: 28px;
+  top: 50%;
+  left: -15px;
+  transform: translateY(-50%);
+  background: #fff6;
+  color: #000a;
+  border: 2px solid #fed;
 }
 
 .controls {

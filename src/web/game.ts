@@ -701,6 +701,8 @@ export const createBench = (
   const rulesLed = document.createElement('span')
   rulesLed.setAttribute('class', 'led' + (rulesVisible ? ' on' : ''))
   rulesBtn.appendChild(rulesLed)
+  const rulesHint = getActionHint('toggleRules')
+  if (rulesHint !== undefined) rulesBtn.appendChild(keyHintBadge(rulesHint))
 
   const topbar = document.createElement('div')
   topbar.setAttribute('class', 'bench-topbar')
@@ -713,6 +715,8 @@ export const createBench = (
     menuBtn.setAttribute('aria-label', t('menu'))
     menuBtn.textContent = '⋮'
     menuBtn.onclick = onMenu
+    const menuHint = getActionHint('menu')
+    if (menuHint !== undefined) menuBtn.appendChild(keyHintBadge(menuHint))
     topbarLeft.appendChild(menuBtn)
   }
   topbar.appendChild(topbarLeft)
