@@ -356,6 +356,7 @@ html.loading body {
   text-align: center;
   z-index: 1;
   white-space: nowrap;
+  filter: sepia(1) saturate(3) brightness(1.05);
 }
 .par {
   position: absolute;
