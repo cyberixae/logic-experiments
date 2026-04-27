@@ -428,6 +428,10 @@ export const mountQuiz = (
     }
     const action = qwertyKeyMap[ev.code]
     if (!action) return
+    if (ev.code === 'KeyB' && pausePopupOpen) {
+      navigate('match-config')
+      return
+    }
     if (action === 'menu') {
       pausePopupOpen = !pausePopupOpen
       render()

@@ -545,6 +545,10 @@ export const mountMatchCurated = (
       render()
       return
     }
+    if (ev.code === 'KeyB') {
+      navigate('match-config')
+      return
+    }
     if (pausePopupOpen) {
       if (action === 'undo') {
         pausePopupOpen = false

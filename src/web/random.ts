@@ -10,6 +10,7 @@ import {
   createDispatch,
   createPausePopup,
   dualHint,
+  kbdHint,
   getActionHint,
   isGazeModeActive,
   markKeyboardInput,
@@ -64,7 +65,9 @@ const createCongrats = (
 
   const buttons = document.createElement('div')
   buttons.setAttribute('class', 'congrabuttons')
-  buttons.appendChild(createButton(t('changeSettings'), false, onSettings))
+  buttons.appendChild(
+    createButton(t('customChallenge'), false, onSettings, kbdHint('b')),
+  )
   buttons.appendChild(
     createButton(t('newChallenge'), false, onNew, dualHint('n', 'axiom')),
   )
@@ -229,6 +232,10 @@ export const mountRandom = (
     markKeyboardInput()
     if (ev.code === 'KeyN') {
       onNew()
+      return
+    }
+    if (ev.code === 'KeyB') {
+      openSettings()
       return
     }
     if (ev.code === 'Slash' || ev.code === 'Equal') {

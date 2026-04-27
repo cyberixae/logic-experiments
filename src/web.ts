@@ -19,6 +19,7 @@ import {
   parseConfigFromParams,
   setConfigParams,
 } from './web/random-config'
+import { defaultRandomConfig } from './random/config'
 import { setGazeModeActive } from './web/game'
 import { onLocaleChange, setLocale } from './web/i18n'
 import { ChallengePool } from './web/challenge-pool'
@@ -53,6 +54,9 @@ const navigate = (screen: Screen) => {
     setGazeModeActive(false)
     session.returnToMenu()
   }
+  if (screen === 'random') {
+    pool.configure(defaultRandomConfig())
+  }
   if (includes(gameModes, screen) && screen !== 'match') {
     enterMode(screen)
   }
@@ -67,7 +71,7 @@ const navigate = (screen: Screen) => {
     url = qs ? `?${qs}` : window.location.pathname
   } else {
     nextParams.set('mode', screen)
-    if (screen === 'random' || screen === 'random-config') {
+    if (screen === 'random-config') {
       for (const key of [
         'symbols',
         'connectives',

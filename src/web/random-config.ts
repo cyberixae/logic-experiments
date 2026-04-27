@@ -279,7 +279,7 @@ const createSection = (title: string): HTMLElement => {
 
 export const mountRandomConfig = (
   container: HTMLElement,
-  navigate: Navigate,
+  _navigate: Navigate,
   onStart: (config: RandomConfig) => void,
 ): MountResult => {
   const config = parseConfigFromParams(
@@ -582,7 +582,7 @@ export const mountRandomConfig = (
     const backBtn = document.createElement('div')
     backBtn.className = 'button'
     backBtn.textContent = t('back')
-    backBtn.onclick = () => navigate('menu')
+    backBtn.onclick = () => history.back()
     buttons.appendChild(backBtn)
 
     const startBtn = document.createElement('div')

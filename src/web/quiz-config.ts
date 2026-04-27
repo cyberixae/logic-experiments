@@ -138,7 +138,7 @@ let renderPresetButtons = () => {}
 
 export const mountQuizConfig = (
   container: HTMLElement,
-  navigate: Navigate,
+  _navigate: Navigate,
   onStart: (config: QuizConfig) => void,
 ): MountResult => {
   const config = parseQuizConfigFromParams(
@@ -349,7 +349,7 @@ export const mountQuizConfig = (
     const backBtn = document.createElement('div')
     backBtn.className = 'button'
     backBtn.textContent = t('back')
-    backBtn.onclick = () => navigate('menu')
+    backBtn.onclick = () => history.back()
     buttons.appendChild(backBtn)
     const startBtn = document.createElement('div')
     startBtn.className = 'button'

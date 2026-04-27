@@ -1093,7 +1093,9 @@ export const createPausePopup = (
     ),
   )
   if (onCustom) {
-    buttons.appendChild(createButton(t('customChallenge'), false, onCustom))
+    buttons.appendChild(
+      createButton(t('customChallenge'), false, onCustom, kbdHint('b')),
+    )
   }
   if (onFresh) {
     buttons.appendChild(
@@ -1101,7 +1103,9 @@ export const createPausePopup = (
     )
   }
   if (onSettings) {
-    buttons.appendChild(createButton(t('changeSettings'), false, onSettings))
+    buttons.appendChild(
+      createButton(t('customChallenge'), false, onSettings, kbdHint('b')),
+    )
   }
   buttons.appendChild(
     createButton(t('exitToMainMenu'), false, onExit, getActionHint('exit')),
