@@ -170,12 +170,10 @@ export const center = {
   a1: ruleA1,
   a2: ruleA2,
   a3: ruleA3,
-  f: ruleF,
   cut: ruleCut,
   fcut: ruleFCut,
   i: ruleI,
   mp: ruleMP,
-  v: ruleV,
 } satisfies Partial<{ [K in RuleId]: Rule<AnySequent, K> }>
 
 export const leftStructural = {
@@ -198,6 +196,7 @@ export const leftLogical = {
 } satisfies Partial<{ [K in RuleId]: Rule<AnySequent, K> }>
 
 export const left = {
+  f: ruleF,
   ...leftStructural,
   ...leftLogical,
 } satisfies Partial<{ [K in RuleId]: Rule<AnySequent, K> }>
@@ -221,6 +220,7 @@ export const rightLogical = {
 } satisfies Partial<{ [K in RuleId]: Rule<AnySequent, K> }>
 
 export const right = {
+  v: ruleV,
   ...rightStructural,
   ...rightLogical,
 } satisfies Partial<{ [K in RuleId]: Rule<AnySequent, K> }>

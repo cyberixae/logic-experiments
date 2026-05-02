@@ -33,7 +33,7 @@ html.loading body {
   position: relative;
   display: grid;
   grid-template-rows: min-content min-content 1fr min-content;
-  grid-template-columns: min-content 1fr min-content;
+  grid-template-columns: min-content minmax(0, 1fr) min-content;
   grid-template-areas:
     'topbar   topbar topbar'
     'left     main   right'
@@ -228,6 +228,7 @@ html.loading body {
   align-items: center;
   display: flex;
   flex-direction: row;
+  flex-wrap: wrap;
   gap: 1em;
   z-index: 1;
 }
@@ -239,6 +240,13 @@ html.loading body {
   gap: 1em;
   z-index: 1;
   padding-left: 1em;
+  padding-right: 25px;
+  overflow-y: auto;
+  min-height: 0;
+  direction: rtl;
+}
+.left > * {
+  direction: ltr;
 }
 .right {
   grid-area: right;
@@ -248,6 +256,9 @@ html.loading body {
   gap: 1em;
   z-index: 1;
   padding-right: 1em;
+  padding-left: 25px;
+  overflow-y: auto;
+  min-height: 0;
 }
 .playarea {
   --base-tree-zoom: 1;
@@ -1429,7 +1440,48 @@ html.loading body {
     padding: 1.5em 2em;
   }
 
-  /* Subtask 5: Rule panels as bottom sheet on mobile */
+  /* Subtask 5: Rule panels as bottom sheet on mobile — moved to container query */
+
+  /* === Random config on mobile === */
+  .random-config {
+    height: 100dvh;
+    padding: 1em;
+    gap: 1em;
+  }
+  .config-title {
+    font-size: 1.5em;
+  }
+  .config-columns {
+    flex-direction: column;
+    gap: 1.5em;
+  }
+  .config-settings {
+    width: 100%;
+  }
+  .config-section {
+    max-width: none;
+  }
+  .config-preview {
+    width: 100%;
+  }
+  .config-preview-list {
+    max-height: none;
+  }
+  .config-buttons {
+    flex-direction: row;
+    justify-content: space-between;
+    width: 100%;
+  }
+  .config-buttons .button {
+    flex: 1;
+    min-width: 0;
+    padding: 0.6em 1em;
+    text-align: center;
+  }
+}
+
+/* === Rules overlay — applies below 900px bench width === */
+@container bench (max-width: 900px) {
   .bench .left,
   .bench .main,
   .bench .right {
@@ -1481,14 +1533,6 @@ html.loading body {
     gap: 0.5em;
     margin-bottom: 0.5em;
   }
-  .rules-sheet-center .rule[data-rule='f'] {
-    order: 99;
-    grid-column: 1;
-  }
-  .rules-sheet-center .rule[data-rule='v'] {
-    order: 100;
-    grid-column: 2;
-  }
   .rules-sheet-sides {
     display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
@@ -1530,20 +1574,16 @@ html.loading body {
   .rules-sheet .rule .gaze-hint-stack .key-hint {
     position: static;
   }
-
   .has-pinned .bench {
     padding-bottom: 6em;
   }
   .has-pinned-many .bench {
     padding-bottom: 11.3em;
   }
-
   .has-pinned-many .playarea {
     padding-bottom: 15.5em;
     scroll-padding-bottom: 15.5em;
   }
-
-  /* Pinned rules strip below gaze buttons */
   .pinned-strip {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -1585,8 +1625,6 @@ html.loading body {
   .pinned-strip .rule .gaze-hint-stack .key-hint {
     position: static;
   }
-
-  /* Fade tree behind gaze buttons when the rules sheet is closed */
   .bench.rules-hidden::after {
     content: '';
     position: fixed;
@@ -1605,42 +1643,5 @@ html.loading body {
   .bench.rules-hidden.has-pinned-many::after {
     height: 19em;
     background: linear-gradient(to top, #ffeedd, #ffeedd 14.5em, transparent);
-  }
-
-  /* === Random config on mobile === */
-  .random-config {
-    height: 100dvh;
-    padding: 1em;
-    gap: 1em;
-  }
-  .config-title {
-    font-size: 1.5em;
-  }
-  .config-columns {
-    flex-direction: column;
-    gap: 1.5em;
-  }
-  .config-settings {
-    width: 100%;
-  }
-  .config-section {
-    max-width: none;
-  }
-  .config-preview {
-    width: 100%;
-  }
-  .config-preview-list {
-    max-height: none;
-  }
-  .config-buttons {
-    flex-direction: row;
-    justify-content: space-between;
-    width: 100%;
-  }
-  .config-buttons .button {
-    flex: 1;
-    min-width: 0;
-    padding: 0.6em 1em;
-    text-align: center;
   }
 }
