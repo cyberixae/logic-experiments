@@ -68,6 +68,8 @@ const en = {
   cutConfirm: 'Apply Cut',
   lemma: 'Lemma',
   secret: 'Secret',
+  prevBranch: 'Prev',
+  nextBranch: 'Next',
 } as const
 
 const fi: Record<MessageKey, string> = {
@@ -140,6 +142,8 @@ const fi: Record<MessageKey, string> = {
   cutConfirm: 'Käytä leikkausta',
   lemma: 'Lemma',
   secret: 'Salainen',
+  prevBranch: 'Edell.',
+  nextBranch: 'Seur.',
 }
 
 const es: Record<MessageKey, string> = {
@@ -212,6 +216,8 @@ const es: Record<MessageKey, string> = {
   cutConfirm: 'Aplicar corte',
   lemma: 'Lema',
   secret: 'Secreto',
+  prevBranch: 'Ant.',
+  nextBranch: 'Sig.',
 }
 
 const cs: Record<MessageKey, string> = {
@@ -284,6 +290,8 @@ const cs: Record<MessageKey, string> = {
   cutConfirm: 'Použít řez',
   lemma: 'Lemma',
   secret: 'Tajné',
+  prevBranch: 'Předch.',
+  nextBranch: 'Další',
 }
 
 const pl: Record<MessageKey, string> = {
@@ -356,6 +364,8 @@ const pl: Record<MessageKey, string> = {
   cutConfirm: 'Zastosuj cięcie',
   lemma: 'Lemat',
   secret: 'Tajne',
+  prevBranch: 'Poprz.',
+  nextBranch: 'Nast.',
 }
 
 type MessageKey = keyof typeof en

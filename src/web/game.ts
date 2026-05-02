@@ -162,7 +162,7 @@ export const createButton = (
     if (hint !== undefined) {
       const labelSpan = document.createElement('span')
       labelSpan.setAttribute('class', 'button-label')
-      labelSpan.textContent = ' ' + label
+      labelSpan.textContent = label
       el.appendChild(labelSpan)
     } else {
       el.innerHTML = label
@@ -170,11 +170,11 @@ export const createButton = (
   } else {
     const longSpan = document.createElement('span')
     longSpan.setAttribute('class', 'button-label long')
-    longSpan.textContent = (hint !== undefined ? ' ' : '') + label.long
+    longSpan.textContent = label.long
     el.appendChild(longSpan)
     const shortSpan = document.createElement('span')
     shortSpan.setAttribute('class', 'button-label short')
-    shortSpan.textContent = (hint !== undefined ? ' ' : '') + label.short
+    shortSpan.textContent = label.short
     el.appendChild(shortSpan)
   }
   return el
@@ -826,7 +826,7 @@ export const createBench = (
     kbdHint('-'),
   )
   const zoomReset = createButton(
-    '⊙',
+    '×1',
     false,
     () => {
       zoomTreeReset()
@@ -950,20 +950,17 @@ export const createBench = (
   const axiomGroup = makeGroup('controls-axiom')
   axiomGroup.appendChild(axiomBtn)
 
-  const zoomGroup = makeGroup()
+  const zoomGroup = makeGroup('controls-zoom')
   zoomGroup.appendChild(zoomOut)
   zoomGroup.appendChild(zoomReset)
   zoomGroup.appendChild(zoomIn)
 
   controlsEl.setAttribute('class', 'controls-undo-inner')
 
-  const centerCell = document.createElement('div')
-  centerCell.setAttribute('class', 'controls-center')
-
   const branchCount = branches(workspace.currentConjecture().derivation).length
   const canSwitch = !solved && branchCount > 1
   const prevBranchBtn = createButton(
-    '↰',
+    t('prevBranch'),
     !canSwitch,
     () => {
       workspace.applyEvent(prevBranch())
@@ -971,9 +968,8 @@ export const createBench = (
     },
     getActionHint('prevBranch'),
   )
-  prevBranchBtn.classList.add('branch-btn')
   const nextBranchBtn = createButton(
-    '↱',
+    t('nextBranch'),
     !canSwitch,
     () => {
       workspace.applyEvent(nextBranch())
@@ -981,33 +977,30 @@ export const createBench = (
     },
     getActionHint('nextBranch'),
   )
-  nextBranchBtn.classList.add('branch-btn')
 
-  const navGroup = makeGroup('controls-undo')
+  const navGroup = makeGroup('controls-nav')
   navGroup.appendChild(prevBranchBtn)
   navGroup.appendChild(controlsEl)
   navGroup.appendChild(nextBranchBtn)
-
-  const rightCell = document.createElement('div')
-  rightCell.setAttribute('class', 'controls-right')
-  rightCell.appendChild(zoomGroup)
 
   const controlsBar = document.createElement('div')
   controlsBar.setAttribute('class', 'controls')
   if (congrats) {
     congrats.buttons.setAttribute('class', 'congrabuttons controls-group')
-    centerCell.appendChild(congrats.buttons)
+    controlsBar.appendChild(congrats.buttons)
   } else {
-    if (hideLemma !== true) centerCell.appendChild(lemmaGroup)
-    centerCell.appendChild(gazeGroup)
-    centerCell.appendChild(axiomGroup)
+    const leftWing = document.createElement('div')
+    leftWing.setAttribute('class', 'controls-wing controls-wing-left')
+    leftWing.appendChild(navGroup)
+    if (hideLemma !== true) leftWing.appendChild(lemmaGroup)
+    controlsBar.appendChild(leftWing)
+    controlsBar.appendChild(gazeGroup)
+    const rightWing = document.createElement('div')
+    rightWing.setAttribute('class', 'controls-wing controls-wing-right')
+    rightWing.appendChild(axiomGroup)
+    rightWing.appendChild(zoomGroup)
+    controlsBar.appendChild(rightWing)
   }
-  const leftCell = document.createElement('div')
-  leftCell.setAttribute('class', 'controls-left')
-  leftCell.appendChild(navGroup)
-  controlsBar.appendChild(leftCell)
-  controlsBar.appendChild(centerCell)
-  controlsBar.appendChild(rightCell)
   panel.appendChild(controlsBar)
 
   // Mobile pinned rules strip below gaze buttons

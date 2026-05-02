@@ -2,8 +2,13 @@
 
 :root {
   --gaze-color: #48f;
+  --branch-color: #fcaa;
 }
 
+html {
+  height: 100%;
+  overflow: hidden;
+}
 body {
   background-color: #ffeedd;
   font-family: 'Noto Sans', 'Noto Sans Math', sans-serif;
@@ -14,6 +19,7 @@ body {
   font-size: 1.2em;
   height: 100%;
   overflow: hidden;
+  overscroll-behavior: none;
   margin: 0;
 }
 html.loading body {
@@ -23,7 +29,7 @@ html.loading body {
   width: 100vw;
   height: 100dvh;
   box-sizing: border-box;
-  padding: 1em 0;
+  padding: 0.5em 0;
   position: relative;
   display: grid;
   grid-template-rows: min-content min-content 1fr min-content;
@@ -33,6 +39,8 @@ html.loading body {
     'left     main   right'
     'left     status right'
     'controls controls controls';
+  container-type: inline-size;
+  container-name: bench;
 }
 .bench.rules-hidden .left .rule:not(.pinned),
 .bench.rules-hidden .main .rule:not(.pinned),
@@ -44,7 +52,7 @@ html.loading body {
   display: grid;
   grid-template-columns: 1fr auto 1fr;
   align-items: start;
-  padding: 0 1em 1em;
+  padding: 0 0.5em 1em;
 }
 .bench-topbar-left {
   display: flex;
@@ -57,8 +65,6 @@ html.loading body {
 }
 .bench-topbar .quiz-menu-btn {
   position: relative;
-  left: auto;
-  bottom: auto;
   width: 1.2em;
   height: 1.2em;
   line-height: 1.2em;
@@ -96,21 +102,113 @@ html.loading body {
   border: 2px solid #fed;
 }
 
+/* Mobile (default): gaze / lemma-zoom-axiom / nav */
 .controls {
   grid-area: controls;
+  position: relative;
+  z-index: 4;
   display: grid;
   grid-template-columns: 1fr auto 1fr;
-  align-items: end;
-  gap: 1em;
-  padding: 0 1em;
+  grid-template-areas:
+    'gaze  gaze  gaze'
+    'lemma zoom  axiom'
+    'nav   nav   nav';
+  gap: 0.5em;
+  padding: 20px 0.5em 0.5em;
+}
+.controls .controls-nav {
+  grid-area: nav;
+}
+.controls .controls-lemma {
+  grid-area: lemma;
+}
+.controls > .gaze,
+.controls > .hot {
+  grid-area: gaze;
+}
+.controls .controls-axiom {
+  grid-area: axiom;
+}
+.controls .controls-zoom {
+  grid-area: zoom;
+}
+.controls > .congrabuttons {
+  grid-column: 1 / -1;
+  justify-self: center;
+}
+.controls .controls-group {
+  justify-self: center;
+}
+.controls .controls-lemma {
+  justify-self: end;
+}
+.controls .controls-axiom {
+  justify-self: start;
+}
+.controls-wing {
+  display: contents;
+}
+/* Tablet: lemma-gaze-axiom / nav-zoom */
+@container bench (min-width: 640px) {
+  .bench {
+    padding: 1em 0;
+  }
+  .bench-topbar {
+    padding-left: 1em;
+    padding-right: 1em;
+  }
+  .controls .button {
+    min-width: 1.5em;
+  }
+  .controls {
+    grid-template-columns: 1fr auto auto 1fr;
+    grid-template-areas:
+      'lemma gaze  gaze  axiom'
+      'nav   nav   zoom  zoom';
+    padding-left: 1em;
+    padding-right: 1em;
+  }
+  .controls .controls-lemma {
+    justify-self: start;
+  }
+  .controls .controls-axiom {
+    justify-self: end;
+  }
+  .controls .controls-nav {
+    justify-self: start;
+  }
+  .controls .controls-zoom {
+    justify-self: end;
+  }
+}
+/* Desktop: wings left/right of centered gaze */
+@container bench (min-width: 1080px) {
+  .controls {
+    grid-template-columns: 1fr auto 1fr;
+    grid-template-areas: 'left gaze right';
+    padding-left: 1em;
+    padding-right: 1em;
+  }
+  .controls-wing {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.5em;
+    justify-content: space-between;
+  }
+  .controls-wing-left {
+    grid-area: left;
+  }
+  .controls-wing-right {
+    grid-area: right;
+  }
 }
 .controls-group {
   display: flex;
   flex-direction: row;
-  gap: 1em;
-  border-bottom: 0.5em solid rgba(0, 0, 0, 0.3);
+  gap: 0.5em;
+  border-bottom: 0.5em solid rgba(0, 0, 0, 0.1);
   padding-bottom: 0.5em;
-  width: fit-content;
 }
 .controls-group.gaze {
   border-bottom-color: var(--gaze-color);
@@ -118,25 +216,11 @@ html.loading body {
 .controls-group.hot {
   border-bottom-color: #c33;
 }
-.controls-center {
-  display: flex;
-  flex-direction: row;
-  align-items: end;
-  gap: 1em;
-}
-.controls-left {
-  display: flex;
-  align-items: end;
-  gap: 1em;
+.controls-nav {
+  border-bottom-color: var(--branch-color);
 }
 .controls-undo-inner {
   display: contents;
-}
-.controls-right {
-  display: flex;
-  justify-content: flex-end;
-  align-items: end;
-  gap: 1em;
 }
 .main {
   grid-area: main;
@@ -276,11 +360,6 @@ html.loading body {
   padding: 0 8px;
   border-radius: 999px;
 }
-.controls .button .key-hint.wide {
-  width: auto;
-  min-width: 30px;
-  padding: 0 7px;
-}
 .main .rule .key-hint {
   position: absolute;
   bottom: -20px;
@@ -294,8 +373,15 @@ html.loading body {
   width: 30px;
   height: 30px;
   line-height: 30px;
-  top: 8px;
-  left: -15px;
+  top: -20px;
+  right: 10px;
+}
+.controls .button .key-hint.wide {
+  width: auto;
+  min-width: 30px;
+  padding: 0 7px;
+  top: -20px;
+  right: 10px;
 }
 .button.disabled > .key-hint,
 .button.disabled > .gaze-hint-stack {
@@ -1039,12 +1125,6 @@ html.loading body {
   width: 100%;
 }
 /* === end match layout === */
-.quiz-menu-btn {
-  position: fixed;
-  bottom: 1em;
-  left: 1em;
-  z-index: 10;
-}
 .curated-stats {
   position: fixed;
   top: 1em;
@@ -1162,14 +1242,10 @@ html.loading body {
   }
   .bench {
     overflow-x: hidden;
+    padding-bottom: 0;
   }
   .match-question {
     --base-tree-zoom: 0.6;
-  }
-  .quiz-menu-btn {
-    bottom: auto;
-    top: 0.3em;
-    left: 0.3em;
   }
   .quiz-zoom {
     display: none;
@@ -1274,31 +1350,6 @@ html.loading body {
     display: inline;
   }
 
-  /* Remove hint space from gaze button labels */
-  .controls-center .controls-group.gaze .button .button-label,
-  .controls-center .controls-group.hot .button .button-label {
-    margin-left: -0.5em;
-  }
-  /* Flip hint space for left-side buttons */
-  .bench > .controls > .controls-group:first-child .button .button-label {
-    margin-left: -0.5em;
-    margin-right: 0.5em;
-  }
-
-  /* Move gaze button hints to top edge */
-  .controls-center .controls-group.gaze .button .key-hint,
-  .controls-center .controls-group.hot .button .key-hint {
-    top: -15px;
-    left: auto;
-    right: 20%;
-    transform: translateX(50%);
-  }
-  /* Left side buttons: hint on right */
-  .bench > .controls > .controls-group:first-child .button .key-hint {
-    left: auto;
-    right: -15px;
-  }
-
   /* Keep keyboard hints inside rule cards */
   .left .rule > .key-hint {
     right: 0;
@@ -1331,59 +1382,6 @@ html.loading body {
   /* glyph matches the on-screen gaze direction buttons. */
   .gaze-hint-stack .key-hint {
     display: inline-block;
-  }
-
-  /* Subtask 3: Responsive controls bar */
-  .controls {
-    position: fixed;
-    bottom: 0.3em;
-    left: 0.3em;
-    right: 0.3em;
-    display: flex;
-    justify-content: center;
-    gap: 0.5em;
-    padding: 0;
-    z-index: 5;
-  }
-  .controls-group {
-    gap: 0.5em;
-    border-bottom: none;
-    padding-bottom: 0;
-  }
-  .controls-center .controls-group.gaze,
-  .controls-center .controls-group.hot {
-    border-bottom: 0.5em solid rgba(0, 0, 0, 0.3);
-    padding-bottom: 0.5em;
-  }
-  .controls-center .controls-group.gaze {
-    border-bottom-color: var(--gaze-color);
-  }
-  .controls-center .controls-group.hot {
-    border-bottom-color: #c33;
-  }
-  .controls-center {
-    gap: 0.5em;
-  }
-  .controls-right {
-    display: none;
-  }
-  .branch-btn,
-  .controls-lemma {
-    display: none;
-  }
-
-  .controls-undo,
-  .controls-axiom {
-    position: fixed;
-    z-index: 5;
-    top: 5em;
-  }
-  .controls-undo {
-    left: 0.3em;
-    flex-direction: column;
-  }
-  .controls-axiom {
-    right: 0.3em;
   }
 
   /* Subtask 4: Responsive menu & popups */
@@ -1437,6 +1435,9 @@ html.loading body {
   .bench .right {
     display: none;
   }
+  .bench:not(.rules-hidden) .controls {
+    display: none;
+  }
   .bench:not(.rules-hidden) .rules-sheet {
     display: flex;
     flex-direction: column;
@@ -1471,9 +1472,8 @@ html.loading body {
     border-top-color: #c33;
   }
   .bench:not(.rules-hidden) .playarea {
-    max-height: 40dvh;
-    padding: 5em 1em 1em 1em;
-    scroll-padding: 5em 1em 1em 1em;
+    padding: 5em 1em 50dvh 1em;
+    scroll-padding: 5em 1em 50dvh 1em;
   }
   .rules-sheet-center {
     display: grid;
@@ -1531,12 +1531,13 @@ html.loading body {
     position: static;
   }
 
-  .has-pinned .controls {
-    bottom: 6em;
+  .has-pinned .bench {
+    padding-bottom: 6em;
   }
-  .has-pinned-many .controls {
-    bottom: 11.3em;
+  .has-pinned-many .bench {
+    padding-bottom: 11.3em;
   }
+
   .has-pinned-many .playarea {
     padding-bottom: 15.5em;
     scroll-padding-bottom: 15.5em;
