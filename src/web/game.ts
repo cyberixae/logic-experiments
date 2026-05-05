@@ -29,6 +29,7 @@ import {
   left,
   leftLogical,
   leftStructural,
+  reverseAxiom0,
   right,
   rightLogical,
   rightStructural,
@@ -915,9 +916,10 @@ export const createBench = (
 
   const axiomBtn = createButton(
     t('axiom'),
-    inactive || !keys(center).some((k) => ls.includes(k) && isReverseId0(k)),
+    inactive ||
+      !keys(reverseAxiom0).some((k) => ls.includes(k) && isReverseId0(k)),
     () => {
-      autoRule(workspace, keys(center))
+      autoRule(workspace, keys(reverseAxiom0))
       rerender()
     },
     getActionHint('axiom'),
@@ -1248,7 +1250,7 @@ export const createDispatch =
         }
         return
       case 'axiom':
-        autoRule(workspace, keys(center))
+        autoRule(workspace, keys(reverseAxiom0))
         break
       case 'undo':
         workspace.applyEvent(undo())
