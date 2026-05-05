@@ -819,7 +819,7 @@ export const createBench = (
     kbdHint('-'),
   )
   const zoomReset = createButton(
-    '×1',
+    ':',
     false,
     () => {
       zoomTreeReset()
