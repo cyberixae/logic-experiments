@@ -28,11 +28,9 @@ import {
   isReverseId1,
   left,
   leftLogical,
-  leftStructural,
   reverseAxiom0,
   right,
   rightLogical,
-  rightStructural,
   ruleCategory,
   RuleCategory,
   ReverseId0,
@@ -461,13 +459,7 @@ const createRuleCard = (
       (isPinned ? ' pinned' : ''),
   )
   pre.dataset['rule'] = key
-  const group =
-    key in leftStructural || key in rightStructural
-      ? 'structural'
-      : key in leftLogical || key in rightLogical
-        ? 'logical'
-        : 'center'
-  pre.dataset['group'] = group
+  pre.dataset['group'] = ruleCategory[key]
   if (interactive && !disabled) pre.onclick = () => onApply(key)
   const withLabel = fromDerivation(
     rule.example,

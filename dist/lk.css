@@ -1501,7 +1501,7 @@ html.loading body {
     z-index: 10;
     background-color: #ffeeddf0;
     border-top: 0.5em solid rgba(0, 0, 0, 0.3);
-    padding: 0.5em;
+    padding: 1em 0.5em;
     gap: 0.5em;
     overflow-y: auto;
     overflow-x: hidden;
@@ -1548,6 +1548,9 @@ html.loading body {
     overflow: hidden;
     display: flex;
     justify-content: center;
+  }
+  .rules-sheet-col .rule[data-group='axiom'] + .rule[data-group='structural'] {
+    margin-top: 0.5em;
   }
   .rules-sheet .rule[data-group='structural'] + .rule[data-group='logical'] {
     margin-top: 0.5em;
