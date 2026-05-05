@@ -565,14 +565,6 @@ html.loading body {
 .congrabuttons .button {
   position: relative;
 }
-.congrabuttons .button .key-hint {
-  position: absolute;
-  width: 30px;
-  height: 30px;
-  line-height: 30px;
-  top: 8px;
-  left: -15px;
-}
 .button-label.short {
   display: none;
 }
@@ -1329,16 +1321,6 @@ html.loading body {
     padding-bottom: 5em;
   }
 
-  /* Congrats buttons: same hint style as gaze buttons */
-  .congrabuttons .button .key-hint {
-    top: -15px;
-    left: auto;
-    right: 20%;
-    transform: translateX(50%);
-  }
-  .congrabuttons .button .button-label {
-    margin-left: -0.5em;
-  }
   .button-label.long {
     display: none;
   }
