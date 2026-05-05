@@ -255,8 +255,8 @@ export const mountCampaign = (
       container.removeChild(modal)
     }
     const modal = createFormulaEditor(
-      t('cutTitle'),
-      t('cutConfirm'),
+      t('lemmaTitle'),
+      t('lemmaConfirm'),
       (formula) => {
         formulaEditorOpen = false
         closeFormulaEditor = null
