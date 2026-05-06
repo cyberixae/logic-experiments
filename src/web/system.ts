@@ -4,7 +4,7 @@ import { t } from './i18n'
 
 export const mountSystem = (
   container: HTMLElement,
-  _navigate: Navigate,
+  navigate: Navigate,
 ): MountResult => {
   const render = () => {
     const params = new URLSearchParams(window.location.search)
@@ -54,6 +54,12 @@ export const mountSystem = (
         }
         list.appendChild(link)
       }
+      const menuBtn = document.createElement('div')
+      menuBtn.setAttribute('class', 'button system-item')
+      menuBtn.innerHTML = t('exitToMainMenu')
+      menuBtn.onclick = () => navigate('menu')
+      list.appendChild(menuBtn)
+
       panel.appendChild(list)
     }
 
