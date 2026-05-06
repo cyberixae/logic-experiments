@@ -81,6 +81,6 @@ The utilities in `src/utils/` exist to give standard TypeScript/JavaScript opera
 
 - Strict TypeScript; all types use discriminated unions with type guards/refinements
 - No semicolons, single quotes (Prettier config)
-- Output goes to `lib/` (tsc) and `dist/` (esbuild)
+- Output goes to `lib/` (tsc) and `dist/lk.js` + `dist/lk.w.js` (esbuild). **`dist/lk.html` and `dist/lk.css` are source files committed to git, not build outputs** — edit them directly when changing the web app's HTML structure or styles.
 - ESLint enforces several non-obvious rules: no `++`/`--` (`no-plusplus`), no non-null assertions (`!`), no type assertions (`as`/`<T>`) outside tests and utils, strict boolean expressions (no implicit truthiness on non-booleans)
 - Every user-facing string lives in `src/web/i18n.ts` and is retrieved via `t(key)`. For templated strings (embedded numbers, names), use `{placeholder}` tokens in the translation and substitute at the call site — do not define per-locale formatter functions that bypass the `Record<MessageKey, string>` contract.
