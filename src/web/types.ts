@@ -9,5 +9,6 @@ export type Screen =
   | 'match-config'
   | 'match-intro'
   | 'match-curated'
+  | 'versus'
 export type Navigate = (screen: Screen) => void
 export type MountResult = { cleanup: () => void; rerender: () => void }

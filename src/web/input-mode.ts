@@ -27,6 +27,7 @@ export const qwertyKeyMap: Record<KeyboardEvent['code'], Action> = {
   ArrowUp: 'gazeConnective',
   ArrowDown: 'gazeWeakening',
   KeyR: 'toggleRules',
+  KeyN: 'skip',
 }
 
 const codeToLabel = (code: string): string => {
@@ -72,6 +73,8 @@ export const ps5GazeKeyMap: Record<number, Action> = {
   ...ps5SharedKeyMap,
   0: 'axiom', // Cross — alias for muscle memory
   1: 'undo', // Circle — alias
+  2: 'lemma', // Square
+  3: 'skip', // Triangle
   12: 'gazeConnective', // D-pad up
   13: 'gazeWeakening', // D-pad down
   14: 'gazeLeft', // D-pad left
@@ -219,6 +222,14 @@ export const kbdHint = (s: string): string | undefined =>
 // mode, the pad hint for the given action in pad mode.
 export const dualHint = (kbd: string, padAction: Action): string | undefined =>
   gamepadActive ? activeActionPadHint()[padAction] : kbd
+
+// Pure variants that take an explicit isGamepad flag instead of reading the
+// global gamepadActive — used by per-bench contexts (e.g. versus mode).
+export const getActionHintPure = (
+  action: Action,
+  isGamepad: boolean,
+): string | undefined =>
+  isGamepad ? activeActionPadHint()[action] : actionKeyHint[action]
 
 // === Test seam ===
 

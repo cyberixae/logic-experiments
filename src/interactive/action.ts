@@ -21,3 +21,4 @@ export type Action =
   | 'gazeConnective'
   | 'gazeWeakening'
   | 'toggleRules'
+  | 'skip'

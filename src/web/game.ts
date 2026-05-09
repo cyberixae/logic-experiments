@@ -49,6 +49,7 @@ import {
   activePadKeyMap,
   dualHint,
   getActionHint,
+  getActionHintPure,
   isGazeModeActive,
   kbdHint,
   markGamepadInput,
@@ -184,7 +185,7 @@ let rulesVisible = false
 export const setDefaultRulesVisible = (visible: boolean): void => {
   rulesVisible = visible
   treeZoom = 1
-  autoZoomedDerivation = null
+  autoZoomedDerivations = new WeakSet()
 }
 
 let treeZoom = 1
@@ -192,7 +193,7 @@ const ZOOM_MIN = 0.4
 const ZOOM_MAX = 2
 const ZOOM_STEP = 0.2
 
-let autoZoomedDerivation: unknown = null
+let autoZoomedDerivations = new WeakSet<AnyDerivation>()
 export const zoomTreeOut = (): void => {
   treeZoom = Math.max(ZOOM_MIN, treeZoom - ZOOM_STEP)
 }
@@ -204,6 +205,96 @@ export const zoomTreeIn = (): void => {
 }
 const AUTO_ZOOM_MAX = 1.2
 const AUTO_ZOOM_PAD = 0.9
+
+// Per-bench context: isolates the state that must be independent when two
+// benches are rendered side by side (gaze mode, zoom, scroll, hint mode).
+export type BenchCtx = {
+  isGazeModeActive: () => boolean
+  setGazeModeActive: (v: boolean) => void
+  getActionHint: (action: Action) => string | undefined
+  kbdHint: (s: string) => string | undefined
+  getTreeZoom: () => number
+  setTreeZoom: (v: number) => void
+  tryAutoZoom: (d: AnyDerivation) => boolean
+  getLastScroll: () => { top: number; left: number }
+  setLastScroll: (top: number, left: number) => void
+  isRulesVisible: () => boolean
+  toggleRulesVisible: () => void
+  showPar: boolean
+  showHud: boolean
+}
+
+export const createBenchCtx = (
+  isGamepadMode = false,
+  autoZoom = true,
+  showPar = true,
+  showHud = true,
+): BenchCtx => {
+  let gazeModeActive = false
+  let zoom = 1
+  const autoZoomed = new WeakSet<AnyDerivation>()
+  let lastScrollTop = 0
+  let lastScrollLeft = 0
+  let rulesVis = false
+  return {
+    isGazeModeActive: () => gazeModeActive,
+    setGazeModeActive: (v) => {
+      gazeModeActive = v
+    },
+    getActionHint: (action) => getActionHintPure(action, isGamepadMode),
+    kbdHint: (s) => (isGamepadMode ? undefined : s),
+    getTreeZoom: () => zoom,
+    setTreeZoom: (v) => {
+      zoom = v
+    },
+    tryAutoZoom: (d) => {
+      if (!autoZoom) return false
+      if (autoZoomed.has(d)) return false
+      autoZoomed.add(d)
+      return true
+    },
+    getLastScroll: () => ({ top: lastScrollTop, left: lastScrollLeft }),
+    setLastScroll: (top, left) => {
+      lastScrollTop = top
+      lastScrollLeft = left
+    },
+    isRulesVisible: () => rulesVis,
+    toggleRulesVisible: () => {
+      rulesVis = !rulesVis
+    },
+    showPar,
+    showHud,
+  }
+}
+
+// Default context backed by the module-level globals; used by all single-player
+// modes so their calling sites need no changes.
+const defaultCtx: BenchCtx = {
+  isGazeModeActive,
+  setGazeModeActive,
+  getActionHint,
+  kbdHint,
+  getTreeZoom: () => treeZoom,
+  setTreeZoom: (v) => {
+    treeZoom = v
+  },
+  tryAutoZoom: (d) => {
+    if (autoZoomedDerivations.has(d)) return false
+    autoZoomedDerivations.add(d)
+    return true
+  },
+  getLastScroll: () => ({ top: lastScrollTop, left: lastScrollLeft }),
+  setLastScroll: (top, left) => {
+    lastScrollTop = top
+    lastScrollLeft = left
+  },
+  isRulesVisible: () => rulesVisible,
+  toggleRulesVisible: () => {
+    rulesVisible = !rulesVisible
+  },
+  showPar: true,
+  showHud: true,
+}
 
 const CHECK_TOTAL_MS = 3000
 const CHECK_STEP_MIN_MS = 80
@@ -266,21 +357,22 @@ const runProofCheckSweep = (tree: HTMLElement): void => {
 let lastScrollTop = 0
 let lastScrollLeft = 0
 
-const createPlayArea = (workspace: AnyWorkspace): HTMLElement => {
+const createPlayArea = (
+  workspace: AnyWorkspace,
+  ctx: BenchCtx,
+): HTMLElement => {
   const panel = document.createElement('div')
   const solvedClass = workspace.isSolved() ? ' solved' : ''
   panel.setAttribute('class', 'playarea' + solvedClass)
-  panel.style.setProperty('--tree-zoom', String(treeZoom))
+  panel.style.setProperty('--tree-zoom', String(ctx.getTreeZoom()))
+  const { top: startTop, left: startLeft } = ctx.getLastScroll()
   panel.addEventListener('scroll', () => {
-    lastScrollTop = panel.scrollTop
-    lastScrollLeft = panel.scrollLeft
+    ctx.setLastScroll(panel.scrollTop, panel.scrollLeft)
   })
-  const startTop = lastScrollTop
-  const startLeft = lastScrollLeft
   const focus = workspace.currentConjecture()
   const solved = workspace.isSolved()
-  const gaze = isGazeModeActive() ? workspace.gaze() : null
-  const ghostChain = isGazeModeActive()
+  const gaze = ctx.isGazeModeActive() ? workspace.gaze() : null
+  const ghostChain = ctx.isGazeModeActive()
     ? computeGhostChain(
         activeSequent(focus),
         workspace.gaze(),
@@ -320,8 +412,7 @@ const createPlayArea = (workspace: AnyWorkspace): HTMLElement => {
         }
       })
     }
-    if (isFresh && !solved && autoZoomedDerivation !== focus.derivation) {
-      autoZoomedDerivation = focus.derivation
+    if (isFresh && !solved && ctx.tryAutoZoom(focus.derivation)) {
       const rootSequent = tree.querySelector<HTMLElement>(
         ':scope > .tree-sequent',
       )
@@ -337,12 +428,12 @@ const createPlayArea = (workspace: AnyWorkspace): HTMLElement => {
             ZOOM_MIN,
             Math.min(
               AUTO_ZOOM_MAX,
-              (treeZoom * availW * AUTO_ZOOM_PAD) / sequentRect.width,
+              (ctx.getTreeZoom() * availW * AUTO_ZOOM_PAD) / sequentRect.width,
             ),
           )
-          if (Math.abs(target - treeZoom) > 0.01) {
-            treeZoom = target
-            panel.style.setProperty('--tree-zoom', String(treeZoom))
+          if (Math.abs(target - ctx.getTreeZoom()) > 0.01) {
+            ctx.setTreeZoom(target)
+            panel.style.setProperty('--tree-zoom', String(ctx.getTreeZoom()))
             layoutTree(tree, { skipActiveScroll: true })
           }
         }
@@ -448,6 +539,7 @@ const createRuleCard = (
   gazeHints: GazeHintInfo,
   panelClass: string,
   interactive: boolean,
+  getHint: (action: Action) => string | undefined,
 ): HTMLElement => {
   const isPinned = pinned.includes(key)
   const pre = document.createElement('pre')
@@ -481,7 +573,7 @@ const createRuleCard = (
     withoutLabel +
     '</span>'
   const action = ruleAction[key]
-  const hint = action !== undefined ? getActionHint(action) : undefined
+  const hint = action !== undefined ? getHint(action) : undefined
   const ruleHintVariant = panelClass === 'main' ? 'base' : 'hot'
   if (hint !== undefined && !hideRules)
     pre.appendChild(keyHintBadge(hint, ruleHintVariant))
@@ -508,6 +600,7 @@ const createPanel = <K extends RuleId>(
   solved: boolean,
   onApply: (key: RuleId) => void,
   gazeHints: GazeHintInfo,
+  getHint: (action: Action) => string | undefined,
 ): HTMLElement => {
   const panel = document.createElement('div')
   panel.setAttribute('class', className)
@@ -526,13 +619,16 @@ const createPanel = <K extends RuleId>(
         gazeHints,
         className,
         interactive,
+        getHint,
       ),
     )
   })
   return panel
 }
 
-const countRuleUsage = (d: AnyDerivation): Record<RuleCategory, number> => {
+export const countRuleUsage = (
+  d: AnyDerivation,
+): Record<RuleCategory, number> => {
   const counts: Record<RuleCategory, number> = {
     axiom: 0,
     structural: 0,
@@ -567,6 +663,8 @@ export const createBench = (
   onMenu?: () => void,
   onApplyReverse1?: ApplyReverse1,
   hideLemma?: boolean,
+  ctx: BenchCtx = defaultCtx,
+  onSkip?: () => void,
 ): HTMLElement => {
   const ls = workspace.applicableRules()
   const rules = workspace.availableRules()
@@ -577,7 +675,7 @@ export const createBench = (
   const inactive = solved || branchClosed
 
   const apply = (key: RuleId) => {
-    setGazeModeActive(false)
+    ctx.setGazeModeActive(false)
     if (isReverseId0(key)) {
       workspace.applyEvent(reverse0(key))
       rerender()
@@ -589,7 +687,7 @@ export const createBench = (
     }
   }
   const applyCenter = (key: RuleId) => {
-    setGazeModeActive(false)
+    ctx.setGazeModeActive(false)
     if (isReverseId0(key)) {
       workspace.applyEvent(reverse0(key))
       rerender()
@@ -616,17 +714,20 @@ export const createBench = (
       hintChar,
     }
   }
-  const gazeHints: GazeHintInfo = isGazeModeActive()
+  const gazeHints: GazeHintInfo = ctx.isGazeModeActive()
     ? {
         connective: buildKindHints(
           'connective',
-          getActionHint('gazeConnective'),
+          ctx.getActionHint('gazeConnective'),
         ),
-        weakening: buildKindHints('weakening', getActionHint('gazeWeakening')),
+        weakening: buildKindHints(
+          'weakening',
+          ctx.getActionHint('gazeWeakening'),
+        ),
       }
     : { connective: null, weakening: null }
 
-  const hideRules = !rulesVisible || solved
+  const hideRules = !ctx.isRulesVisible() || solved
   const pinned = workspace.pinnedRules()
   const panel = document.createElement('div')
   const hasPinned = !solved && pinned.length > 0
@@ -649,6 +750,7 @@ export const createBench = (
       inactive,
       apply,
       gazeHints,
+      ctx.getActionHint,
     ),
   )
   const congrats = solved ? makeCongrats() : null
@@ -666,6 +768,7 @@ export const createBench = (
         inactive,
         applyCenter,
         gazeHints,
+        ctx.getActionHint,
       ),
     )
   }
@@ -680,6 +783,7 @@ export const createBench = (
       inactive,
       apply,
       gazeHints,
+      ctx.getActionHint,
     ),
   )
 
@@ -688,13 +792,13 @@ export const createBench = (
   rulesBtn.setAttribute('aria-label', t('rules'))
   rulesBtn.textContent = '?'
   rulesBtn.onclick = () => {
-    rulesVisible = !rulesVisible
+    ctx.toggleRulesVisible()
     rerender()
   }
   const rulesLed = document.createElement('span')
-  rulesLed.setAttribute('class', 'led' + (rulesVisible ? ' on' : ''))
+  rulesLed.setAttribute('class', 'led' + (ctx.isRulesVisible() ? ' on' : ''))
   rulesBtn.appendChild(rulesLed)
-  const rulesHint = getActionHint('toggleRules')
+  const rulesHint = ctx.getActionHint('toggleRules')
   if (rulesHint !== undefined) rulesBtn.appendChild(keyHintBadge(rulesHint))
 
   const topbar = document.createElement('div')
@@ -708,24 +812,36 @@ export const createBench = (
     menuBtn.setAttribute('aria-label', t('menu'))
     menuBtn.textContent = '⋮'
     menuBtn.onclick = onMenu
-    const menuHint = getActionHint('menu')
+    const menuHint = ctx.getActionHint('menu')
     if (menuHint !== undefined) menuBtn.appendChild(keyHintBadge(menuHint))
     topbarLeft.appendChild(menuBtn)
+  }
+  if (!solved && onSkip !== undefined) {
+    const skipBtn = document.createElement('div')
+    skipBtn.setAttribute('class', 'button bench-skip-btn')
+    skipBtn.setAttribute('aria-label', t('skip'))
+    skipBtn.textContent = '»'
+    skipBtn.onclick = onSkip
+    const skipHint = ctx.getActionHint('skip')
+    if (skipHint !== undefined) skipBtn.appendChild(keyHintBadge(skipHint))
+    topbarLeft.appendChild(skipBtn)
   }
   topbar.appendChild(topbarLeft)
 
   const hud = document.createElement('div')
   hud.setAttribute('class', 'hud' + (solved ? ' solved' : ''))
-  const hudCounts = formatHudCounts(countRuleUsage(focus.derivation))
-  hud.innerHTML = solved ? t('moves') + ' ' + hudCounts : hudCounts
-  if (solved) {
-    const solution = workspace.currentSolution()
-    const par = document.createElement('div')
-    par.setAttribute('class', 'par')
-    par.innerHTML = solution
-      ? t('par') + ' ' + formatHudCounts(countRuleUsage(solution))
-      : t('par') + ' 💀'
-    hud.appendChild(par)
+  if (ctx.showHud) {
+    const hudCounts = formatHudCounts(countRuleUsage(focus.derivation))
+    hud.innerHTML = solved ? t('moves') + ' ' + hudCounts : hudCounts
+    if (solved && ctx.showPar) {
+      const solution = workspace.currentSolution()
+      const par = document.createElement('div')
+      par.setAttribute('class', 'par')
+      par.innerHTML = solution
+        ? t('par') + ' ' + formatHudCounts(countRuleUsage(solution))
+        : t('par') + ' 💀'
+      hud.appendChild(par)
+    }
   }
   topbar.appendChild(hud)
 
@@ -740,7 +856,7 @@ export const createBench = (
 
   // Mobile bottom sheet for rules
   const rulesSheet = document.createElement('div')
-  const sheetMode = isGazeModeActive() ? 'gaze' : 'hot'
+  const sheetMode = ctx.isGazeModeActive() ? 'gaze' : 'hot'
   rulesSheet.setAttribute('class', 'rules-sheet ' + sheetMode)
   if (!congrats) {
     const sheetCenter = document.createElement('div')
@@ -759,6 +875,7 @@ export const createBench = (
         gazeHints,
         'main',
         interactive,
+        ctx.getActionHint,
       )
       sheetCenter.appendChild(card)
     })
@@ -782,6 +899,7 @@ export const createBench = (
       gazeHints,
       'left',
       interactive,
+      ctx.getActionHint,
     )
     leftCol.appendChild(card)
   })
@@ -801,6 +919,7 @@ export const createBench = (
       gazeHints,
       'right',
       interactive,
+      ctx.getActionHint,
     )
     rightCol.appendChild(card)
   })
@@ -808,48 +927,48 @@ export const createBench = (
   sheetSides.appendChild(rightCol)
   rulesSheet.appendChild(sheetSides)
   panel.appendChild(rulesSheet)
-  panel.appendChild(createPlayArea(workspace))
+  panel.appendChild(createPlayArea(workspace, ctx))
   const zoomOut = createButton(
     '−',
     false,
     () => {
-      zoomTreeOut()
+      ctx.setTreeZoom(Math.max(ZOOM_MIN, ctx.getTreeZoom() - ZOOM_STEP))
       rerender()
     },
-    kbdHint('-'),
+    ctx.kbdHint('-'),
   )
   const zoomReset = createButton(
     ':',
     false,
     () => {
-      zoomTreeReset()
+      ctx.setTreeZoom(1)
       rerender()
     },
-    kbdHint('0'),
+    ctx.kbdHint('0'),
   )
   const zoomIn = createButton(
     '+',
     false,
     () => {
-      zoomTreeIn()
+      ctx.setTreeZoom(Math.min(ZOOM_MAX, ctx.getTreeZoom() + ZOOM_STEP))
       rerender()
     },
-    kbdHint('+'),
+    ctx.kbdHint('+'),
   )
   const gazeMovable =
     !inactive && seq.antecedent.length + seq.succedent.length > 1
-  const leftDisabled = isGazeModeActive()
+  const leftDisabled = ctx.isGazeModeActive()
     ? !gazeMovable
     : inactive || seq.antecedent.length === 0
-  const rightDisabled = isGazeModeActive()
+  const rightDisabled = ctx.isGazeModeActive()
     ? !gazeMovable
     : inactive || seq.succedent.length === 0
   const gazeLeftBtn = createButton(
     t('left'),
     leftDisabled,
     () => {
-      if (!isGazeModeActive()) {
-        setGazeModeActive(true)
+      if (!ctx.isGazeModeActive()) {
+        ctx.setGazeModeActive(true)
         workspace.setGaze({
           side: 'left',
           index: seq.antecedent.length - 1,
@@ -859,37 +978,37 @@ export const createBench = (
       }
       rerender()
     },
-    getActionHint('gazeLeft'),
+    ctx.getActionHint('gazeLeft'),
   )
   const gazeRightBtn = createButton(
     t('right'),
     rightDisabled,
     () => {
-      if (!isGazeModeActive()) {
-        setGazeModeActive(true)
+      if (!ctx.isGazeModeActive()) {
+        ctx.setGazeModeActive(true)
         workspace.setGaze({ side: 'right', index: 0 })
       } else {
         workspace.moveGaze(1)
       }
       rerender()
     },
-    getActionHint('gazeRight'),
+    ctx.getActionHint('gazeRight'),
   )
   const gazeWeakeningBtn = createButton(
     t('drop'),
-    !isGazeModeActive() || inactive,
+    !ctx.isGazeModeActive() || inactive,
     () => {
       workspace.setGazeKind('weakening')
       applyGazeRule(workspace, 'weakening')
       rerender()
     },
-    getActionHint('gazeWeakening'),
+    ctx.getActionHint('gazeWeakening'),
   )
   const connectiveRule = gazeHints.connective?.eventualRule ?? null
   const connectiveLabel =
     connectiveRule !== null ? (ruleConnectiveLabel[connectiveRule] ?? '') : ''
   const connectiveDisabled =
-    !isGazeModeActive() || inactive || connectiveLabel === ''
+    !ctx.isGazeModeActive() || inactive || connectiveLabel === ''
   const gazeConnectiveBtn = createButton(
     t('destruct'),
     connectiveDisabled,
@@ -898,7 +1017,7 @@ export const createBench = (
       applyGazeRule(workspace, 'connective')
       rerender()
     },
-    getActionHint('gazeConnective'),
+    ctx.getActionHint('gazeConnective'),
   )
   const makeGroup = (...cls: string[]): HTMLElement => {
     const g = document.createElement('div')
@@ -914,7 +1033,7 @@ export const createBench = (
       autoRule(workspace, keys(reverseAxiom0))
       rerender()
     },
-    getActionHint('axiom'),
+    ctx.getActionHint('axiom'),
   )
 
   const lemmaDisabled =
@@ -929,13 +1048,13 @@ export const createBench = (
         rerender()
       })
     },
-    getActionHint('lemma'),
+    ctx.getActionHint('lemma'),
   )
 
   const lemmaGroup = makeGroup('controls-lemma')
   lemmaGroup.appendChild(lemmaBtn)
 
-  const gazeGroup = makeGroup(isGazeModeActive() ? 'gaze' : 'hot')
+  const gazeGroup = makeGroup(ctx.isGazeModeActive() ? 'gaze' : 'hot')
   gazeGroup.appendChild(gazeLeftBtn)
   gazeGroup.appendChild(gazeWeakeningBtn)
   gazeGroup.appendChild(gazeConnectiveBtn)
@@ -960,7 +1079,7 @@ export const createBench = (
       workspace.applyEvent(prevBranch())
       rerender()
     },
-    getActionHint('prevBranch'),
+    ctx.getActionHint('prevBranch'),
   )
   const nextBranchBtn = createButton(
     t('nextBranch'),
@@ -969,7 +1088,7 @@ export const createBench = (
       workspace.applyEvent(nextBranch())
       rerender()
     },
-    getActionHint('nextBranch'),
+    ctx.getActionHint('nextBranch'),
   )
 
   const navGroup = makeGroup('controls-nav')
@@ -1022,6 +1141,7 @@ export const createBench = (
         gazeHints,
         panelClass,
         !hideRules,
+        ctx.getActionHint,
       )
       pinnedStrip.appendChild(card)
     }
@@ -1127,37 +1247,38 @@ export const createDispatch =
     onLevel?: () => void,
     onMenu?: () => void,
     onApplyReverse1?: ApplyReverse1,
+    ctx: BenchCtx = defaultCtx,
   ) =>
   (action: Action): void => {
     if (action === 'gazeLeft' || action === 'gazeRight') {
-      if (!isGazeModeActive()) {
+      if (!ctx.isGazeModeActive()) {
         const workspace = getWorkspace()
         const seq = activeSequent(workspace.currentConjecture())
         if (action === 'gazeLeft') {
           if (seq.antecedent.length === 0) return
-          setGazeModeActive(true)
+          ctx.setGazeModeActive(true)
           workspace.setGaze({
             side: 'left',
             index: seq.antecedent.length - 1,
           })
         } else {
           if (seq.succedent.length === 0) return
-          setGazeModeActive(true)
+          ctx.setGazeModeActive(true)
           workspace.setGaze({ side: 'right', index: 0 })
         }
         rerender()
         return
       }
     } else if (action === 'gazeConnective' || action === 'gazeWeakening') {
-      if (!isGazeModeActive()) return
+      if (!ctx.isGazeModeActive()) return
     } else if (
-      isGazeModeActive() &&
+      ctx.isGazeModeActive() &&
       (RULE_APPLY_ACTIONS.has(action) || action === 'reset')
     ) {
-      setGazeModeActive(false)
-    } else if (action === 'undo' && isGazeModeActive()) {
+      ctx.setGazeModeActive(false)
+    } else if (action === 'undo' && ctx.isGazeModeActive()) {
       if (activePath(getWorkspace().currentConjecture()).length === 0) {
-        setGazeModeActive(false)
+        ctx.setGazeModeActive(false)
       }
     }
     if (action === 'menu') {
@@ -1170,7 +1291,7 @@ export const createDispatch =
       return
     }
     if (action === 'toggleRules') {
-      rulesVisible = !rulesVisible
+      ctx.toggleRulesVisible()
       rerender()
       return
     }

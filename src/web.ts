@@ -14,6 +14,7 @@ import { mountMatchCurated } from './web/match-curated'
 import { parseQuizConfigFromParams, setQuizConfigParams } from './quiz/config'
 import { mountSystem } from './web/system'
 import { mountSecret } from './web/secret'
+import { mountVersus } from './web/versus'
 import {
   mountRandomConfig,
   parseConfigFromParams,
@@ -54,7 +55,7 @@ const navigate = (screen: Screen) => {
     setGazeModeActive(false)
     session.returnToMenu()
   }
-  if (screen === 'random') {
+  if (screen === 'random' || screen === 'versus') {
     pool.configure(defaultRandomConfig())
   }
   if (includes(gameModes, screen) && screen !== 'match') {
@@ -148,6 +149,9 @@ const mount = (screen: Screen) => {
     case 'match-curated':
       current = mountMatchCurated(body, navigate)
       break
+    case 'versus':
+      current = mountVersus(body, navigate, pool)
+      break
     case 'random-config':
       current = mountRandomConfig(body, navigate, (config) => {
         pool.configure(config)
@@ -228,6 +232,9 @@ const init = () => {
   } else if (mode === 'match-curated') {
     currentScreen = 'match-curated'
     mount('match-curated')
+  } else if (mode === 'versus') {
+    currentScreen = 'versus'
+    mount('versus')
   } else if (params.get('level') !== null) {
     // Legacy URL: ?level=ch0identity1 — jump straight into campaign
     enterMode('campaign')

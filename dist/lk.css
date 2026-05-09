@@ -78,7 +78,15 @@ html.loading body {
   line-height: 1.2em;
   border-color: transparent;
 }
-.bench-topbar .quiz-menu-btn .key-hint {
+.bench-topbar .bench-skip-btn {
+  position: relative;
+  width: 1.2em;
+  height: 1.2em;
+  line-height: 1.2em;
+  border-color: transparent;
+}
+.bench-topbar .quiz-menu-btn .key-hint,
+.bench-topbar .bench-skip-btn .key-hint {
   position: absolute;
   width: 30px;
   height: 30px;
@@ -1649,4 +1657,112 @@ html.loading body {
     height: 19em;
     background: linear-gradient(to top, #ffeedd, #ffeedd 14.5em, transparent);
   }
+}
+
+/* --- Versus mode --- */
+.versus-screen {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  background: #ffeedd;
+}
+.versus-arena {
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+  overflow: hidden;
+}
+.versus-half {
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+}
+.versus-half + .versus-half {
+  border-left: 2px solid #ccc;
+}
+.versus-half .bench {
+  width: 100%;
+  height: 100%;
+}
+.versus-half .playarea {
+  padding-left: 3em;
+  padding-right: 3em;
+  scroll-padding-left: 3em;
+  scroll-padding-right: 3em;
+}
+.versus-half + .versus-half {
+  border-left: none;
+}
+.versus-thermo {
+  width: 5em;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  border-left: 1px solid #ccc;
+  border-right: 1px solid #ccc;
+}
+.versus-thermo-clock {
+  flex-shrink: 0;
+  text-align: center;
+  font-size: 1.3em;
+  font-variant-numeric: tabular-nums;
+  padding: 0.3em 0;
+  border-bottom: 1px solid #ccc;
+}
+.versus-thermo-rows {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0.3em 0;
+}
+.versus-thermo-row {
+  display: flex;
+  flex-direction: row;
+  flex-shrink: 0;
+}
+.versus-thermo-cell {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-variant-numeric: tabular-nums;
+  padding: 0.15em 0;
+  opacity: 0.5;
+}
+.versus-thermo-cell.current {
+  opacity: 1;
+}
+.versus-thermo-cell.p1,
+.versus-thermo-cell.p2 {
+  color: #000;
+}
+.versus-thermo-moves {
+  font-size: 1.4em;
+}
+.versus-thermo-points {
+  font-size: 0.85em;
+}
+.versus-half:first-child .rules-sheet {
+  right: calc(50% + 2.5em);
+}
+.versus-half:last-child .rules-sheet {
+  left: calc(50% + 2.5em);
+}
+.versus-result {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  gap: 1em;
+  z-index: 100;
+}
+.versus-result-message {
+  font-size: 2em;
+  font-weight: bold;
+}
+.versus-result-scores {
+  font-size: 1.3em;
 }

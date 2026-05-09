@@ -70,6 +70,13 @@ const en = {
   secret: 'Secret',
   prevBranch: 'Prev',
   nextBranch: 'Next',
+  versus: 'Versus',
+  player1: 'Player 1',
+  player2: 'Player 2',
+  timeUp: "Time's Up!",
+  tie: 'Tie!',
+  winsTemplate: '{player} wins!',
+  skip: 'Skip',
 } as const
 
 const fi: Record<MessageKey, string> = {
@@ -144,6 +151,13 @@ const fi: Record<MessageKey, string> = {
   secret: 'Salainen',
   prevBranch: 'Edell.',
   nextBranch: 'Seur.',
+  versus: 'Vastakkain',
+  player1: 'Pelaaja 1',
+  player2: 'Pelaaja 2',
+  timeUp: 'Aika loppui!',
+  tie: 'Tasapeli!',
+  winsTemplate: '{player} voittaa!',
+  skip: 'Ohita',
 }
 
 const es: Record<MessageKey, string> = {
@@ -218,6 +232,13 @@ const es: Record<MessageKey, string> = {
   secret: 'Secreto',
   prevBranch: 'Ant.',
   nextBranch: 'Sig.',
+  versus: 'Versus',
+  player1: 'Jugador 1',
+  player2: 'Jugador 2',
+  timeUp: '¡Se acabó el tiempo!',
+  tie: '¡Empate!',
+  winsTemplate: '¡{player} gana!',
+  skip: 'Saltar',
 }
 
 const cs: Record<MessageKey, string> = {
@@ -292,6 +313,13 @@ const cs: Record<MessageKey, string> = {
   secret: 'Tajné',
   prevBranch: 'Předch.',
   nextBranch: 'Další',
+  versus: 'Versus',
+  player1: 'Hráč 1',
+  player2: 'Hráč 2',
+  timeUp: 'Čas vypršel!',
+  tie: 'Remíza!',
+  winsTemplate: '{player} vyhrává!',
+  skip: 'Přeskočit',
 }
 
 const pl: Record<MessageKey, string> = {
@@ -366,6 +394,13 @@ const pl: Record<MessageKey, string> = {
   secret: 'Tajne',
   prevBranch: 'Poprz.',
   nextBranch: 'Nast.',
+  versus: 'Versus',
+  player1: 'Gracz 1',
+  player2: 'Gracz 2',
+  timeUp: 'Czas minął!',
+  tie: 'Remis!',
+  winsTemplate: '{player} wygrywa!',
+  skip: 'Pomiń',
 }
 
 type MessageKey = keyof typeof en
