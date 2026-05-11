@@ -150,11 +150,6 @@ export const mountVersus = (
   let closeEditor1: (() => void) | null = null
   let closeEditor2: (() => void) | null = null
 
-  const noCongrats = () => ({
-    hurray: document.createElement('div'),
-    buttons: document.createElement('div'),
-  })
-
   const makeUndoControls = (ws: AnyWorkspace, ctx: BenchCtx): HTMLElement => {
     const el = document.createElement('div')
     el.setAttribute('class', 'controls')
@@ -195,7 +190,7 @@ export const mountVersus = (
     half1.appendChild(
       createBench(
         ws1,
-        noCongrats,
+        makeCongratsP1,
         makeUndoControls(ws1, ctx1),
         rerender,
         undefined,
@@ -211,7 +206,7 @@ export const mountVersus = (
     half2.appendChild(
       createBench(
         ws2,
-        noCongrats,
+        makeCongratsP2,
         makeUndoControls(ws2, ctx2),
         rerender,
         undefined,
@@ -585,6 +580,33 @@ export const mountVersus = (
     onApplyReverse2,
     ctx2,
   )
+
+  const makeCongratsP1 = () => {
+    const hurray = document.createElement('div')
+    const buttons = document.createElement('div')
+    buttons.appendChild(
+      createButton(
+        t('continue'),
+        false,
+        () => dispatch1('axiom'),
+        ctx1.getActionHint('axiom'),
+      ),
+    )
+    return { hurray, buttons }
+  }
+  const makeCongratsP2 = () => {
+    const hurray = document.createElement('div')
+    const buttons = document.createElement('div')
+    buttons.appendChild(
+      createButton(
+        t('continue'),
+        false,
+        () => dispatch2('axiom'),
+        ctx2.getActionHint('axiom'),
+      ),
+    )
+    return { hurray, buttons }
+  }
 
   // Only patch the timer text each tick — a full rerender would destroy the DOM
   // mid-animation and prevent the solved zoom + proof-check sweep from completing.
