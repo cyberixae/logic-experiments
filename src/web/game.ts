@@ -504,7 +504,7 @@ const ruleConnectiveLabel: Partial<Record<RuleId, string>> = {
 type GazeHintsForKind = {
   immediateRule: RuleId | null
   eventualRule: RuleId | null
-  hintChar: string
+  hintChar: string | undefined
 }
 
 type GazeHintInfo = {
@@ -516,7 +516,7 @@ const gazeHintBadgeForKind = (
   key: RuleId,
   hints: GazeHintsForKind | null,
 ): HTMLElement | null => {
-  if (!hints) return null
+  if (!hints || hints.hintChar === undefined) return null
   if (key === hints.immediateRule) {
     return keyHintBadge(hints.hintChar, 'cold')
   }
@@ -705,7 +705,6 @@ export const createBench = (
     kind: 'connective' | 'weakening',
     hintChar: string | undefined,
   ): GazeHintsForKind | null => {
-    if (hintChar === undefined) return null
     const chain = computeGhostChain(seq, workspace.gaze(), kind, available)
     if (!chain || chain.length === 0) return null
     return {
@@ -1436,6 +1435,7 @@ const applyGazeRule = (
 
 export const setupGamepad = (
   dispatch: (action: Action) => void,
+  gamepadIndex = 0,
 ): (() => void) => {
   const oldPresses: Array<boolean> = []
   let active = false
@@ -1443,7 +1443,7 @@ export const setupGamepad = (
 
   const loop = () => {
     if (!active) return
-    const gp = navigator.getGamepads()[0]
+    const gp = navigator.getGamepads()[gamepadIndex]
     if (gp) {
       for (const [button, action] of Object.entries(activePadKeyMap())) {
         const index = Number(button)
@@ -1484,22 +1484,16 @@ export const setupGamepad = (
   }
 
   const onDisconnected = () => {
-    const stillConnected = Array.from(navigator.getGamepads()).some(
-      (p) => p !== null,
-    )
-    if (!stillConnected) {
-      active = false
-      onGamepadDisconnected()
-    }
+    if (navigator.getGamepads()[gamepadIndex] !== null) return
+    active = false
+    onGamepadDisconnected()
   }
 
   window.addEventListener('gamepadconnected', onConnected)
   window.addEventListener('gamepaddisconnected', onDisconnected)
 
   // Detect a pad that was already connected before mount.
-  const preExisting = Array.from(navigator.getGamepads()).some(
-    (p) => p !== null,
-  )
+  const preExisting = navigator.getGamepads()[gamepadIndex] !== null
   if (preExisting) onConnected()
 
   return () => {

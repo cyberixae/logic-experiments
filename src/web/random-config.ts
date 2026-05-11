@@ -283,6 +283,7 @@ export const createSection = (title: string): HTMLElement => {
 export const buildFormulaSettingsSection = (
   config: RandomConfig,
   onChange: () => void,
+  prependFilterRows: HTMLElement[] = [],
 ): HTMLElement => {
   const createToggle = (
     content: string,
@@ -312,10 +313,58 @@ export const buildFormulaSettingsSection = (
 
   const shapeSection = createSection(t('formulaShape'))
 
-  const connectiveHeading = document.createElement('div')
-  connectiveHeading.className = 'config-subsection-title'
-  connectiveHeading.textContent = t('connectives')
-  shapeSection.appendChild(connectiveHeading)
+  const filterHeading = document.createElement('div')
+  filterHeading.className = 'config-subsection-title'
+  filterHeading.textContent = t('filter')
+  shapeSection.appendChild(filterHeading)
+
+  for (const row of prependFilterRows) {
+    shapeSection.appendChild(row)
+  }
+
+  shapeSection.appendChild(
+    createRow(
+      t('bypassPercent'),
+      createNumberInput(
+        config.bypassPercent,
+        (v) => {
+          config.bypassPercent = v
+          onChange()
+        },
+        0,
+        100,
+      ),
+    ),
+  )
+
+  shapeSection.appendChild(
+    createRow(
+      t('targetNonStructural'),
+      createNumberInput(
+        config.targetNonStructural,
+        (v) => {
+          config.targetNonStructural = v
+          onChange()
+        },
+        1,
+      ),
+    ),
+  )
+
+  shapeSection.appendChild(
+    createRow(
+      t('size'),
+      createNumberInput(
+        config.size,
+        (v) => {
+          config.size = v
+          onChange()
+        },
+        1,
+        30,
+      ),
+    ),
+  )
 
   const defaultConnectives = defaultRandomConfig().connectives
   const connectiveKeys: Array<{
@@ -328,6 +377,11 @@ export const buildFormulaSettingsSection = (
     { key: 'disjunction', label: t('disjunctionWeight'), symbol: '∨' },
     { key: 'negation', label: t('negationWeight'), symbol: '¬' },
   ]
+
+  const connectiveHeading = document.createElement('div')
+  connectiveHeading.className = 'config-subsection-title'
+  connectiveHeading.textContent = t('connectives')
+  shapeSection.appendChild(connectiveHeading)
 
   const connectiveToggles = document.createElement('div')
   connectiveToggles.className = 'config-toggles'
@@ -391,55 +445,6 @@ export const buildFormulaSettingsSection = (
     )
   }
   shapeSection.appendChild(symbolToggles)
-
-  const filterHeading = document.createElement('div')
-  filterHeading.className = 'config-subsection-title'
-  filterHeading.textContent = t('filter')
-  shapeSection.appendChild(filterHeading)
-
-  shapeSection.appendChild(
-    createRow(
-      t('size'),
-      createNumberInput(
-        config.size,
-        (v) => {
-          config.size = v
-          onChange()
-        },
-        1,
-        30,
-      ),
-    ),
-  )
-
-  shapeSection.appendChild(
-    createRow(
-      t('targetNonStructural'),
-      createNumberInput(
-        config.targetNonStructural,
-        (v) => {
-          config.targetNonStructural = v
-          onChange()
-        },
-        1,
-      ),
-    ),
-  )
-
-  shapeSection.appendChild(
-    createRow(
-      t('bypassPercent'),
-      createNumberInput(
-        config.bypassPercent,
-        (v) => {
-          config.bypassPercent = v
-          onChange()
-        },
-        0,
-        100,
-      ),
-    ),
-  )
 
   return shapeSection
 }

@@ -35,6 +35,12 @@ export const mountMenu = (
     const modes = document.createElement('div')
     modes.setAttribute('class', 'menu-modes')
 
+    const versusBtn = document.createElement('div')
+    versusBtn.setAttribute('class', 'button menu-mode')
+    versusBtn.textContent = t('versus')
+    versusBtn.onclick = () => navigate('versus-config')
+    modes.appendChild(versusBtn)
+
     for (const mode of gameModes) {
       if (mode === 'match') continue
       const btn = document.createElement('div')

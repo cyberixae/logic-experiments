@@ -16,6 +16,11 @@ import { mountSystem } from './web/system'
 import { mountSecret } from './web/secret'
 import { mountVersus } from './web/versus'
 import {
+  mountVersusConfig,
+  parseVersusConfigFromParams,
+  setVersusConfigParams,
+} from './web/versus-config'
+import {
   mountRandomConfig,
   parseConfigFromParams,
   setConfigParams,
@@ -55,7 +60,7 @@ const navigate = (screen: Screen) => {
     setGazeModeActive(false)
     session.returnToMenu()
   }
-  if (screen === 'random' || screen === 'versus') {
+  if (screen === 'random') {
     pool.configure(defaultRandomConfig())
   }
   if (includes(gameModes, screen) && screen !== 'match') {
@@ -79,6 +84,21 @@ const navigate = (screen: Screen) => {
         'formula_size',
         'proof_size',
         'chaoticity',
+      ]) {
+        const val = currentParams.get(key)
+        if (val !== null) nextParams.set(key, val)
+      }
+    }
+    if (screen === 'versus-config' || screen === 'versus') {
+      for (const key of [
+        'symbols',
+        'connectives',
+        'formula_size',
+        'proof_size',
+        'chaoticity',
+        'versus_time',
+        'versus_p1',
+        'versus_p2',
       ]) {
         const val = currentParams.get(key)
         if (val !== null) nextParams.set(key, val)
@@ -149,8 +169,27 @@ const mount = (screen: Screen) => {
     case 'match-curated':
       current = mountMatchCurated(body, navigate)
       break
-    case 'versus':
-      current = mountVersus(body, navigate, pool)
+    case 'versus': {
+      const vConfig = parseVersusConfigFromParams(
+        new URLSearchParams(window.location.search),
+      )
+      pool.configure(vConfig.randomConfig)
+      current = mountVersus(body, navigate, pool, vConfig)
+      break
+    }
+    case 'versus-config':
+      current = mountVersusConfig(body, navigate, (versusConfig) => {
+        current.cleanup()
+        currentScreen = 'versus'
+        pool.configure(versusConfig.randomConfig)
+        const params = new URLSearchParams()
+        const lang = new URLSearchParams(window.location.search).get('lang')
+        if (lang !== null) params.set('lang', lang)
+        params.set('mode', 'versus')
+        setVersusConfigParams(versusConfig, params)
+        history.pushState({ screen: 'versus' }, '', `?${params.toString()}`)
+        mount('versus')
+      })
       break
     case 'random-config':
       current = mountRandomConfig(body, navigate, (config) => {
@@ -235,6 +274,9 @@ const init = () => {
   } else if (mode === 'versus') {
     currentScreen = 'versus'
     mount('versus')
+  } else if (mode === 'versus-config') {
+    currentScreen = 'versus-config'
+    mount('versus-config')
   } else if (params.get('level') !== null) {
     // Legacy URL: ?level=ch0identity1 — jump straight into campaign
     enterMode('campaign')

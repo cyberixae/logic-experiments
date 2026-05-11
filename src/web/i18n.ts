@@ -77,6 +77,13 @@ const en = {
   tie: 'Tie!',
   winsTemplate: '{player} wins!',
   skip: 'Skip',
+  inputMethod: 'Input',
+  players: 'Players',
+  matchLength: 'Match Length (min)',
+  mouse: 'Mouse',
+  keyboard: 'Keyboard',
+  gamepad1: 'Gamepad 1',
+  gamepad2: 'Gamepad 2',
 } as const
 
 const fi: Record<MessageKey, string> = {
@@ -158,6 +165,13 @@ const fi: Record<MessageKey, string> = {
   tie: 'Tasapeli!',
   winsTemplate: '{player} voittaa!',
   skip: 'Ohita',
+  inputMethod: 'Ohjain',
+  players: 'Pelaajat',
+  matchLength: 'Ottelun kesto (min)',
+  mouse: 'Hiiri',
+  keyboard: 'Näppäimistö',
+  gamepad1: 'Ohjain 1',
+  gamepad2: 'Ohjain 2',
 }
 
 const es: Record<MessageKey, string> = {
@@ -239,6 +253,13 @@ const es: Record<MessageKey, string> = {
   tie: '¡Empate!',
   winsTemplate: '¡{player} gana!',
   skip: 'Saltar',
+  inputMethod: 'Control',
+  players: 'Jugadores',
+  matchLength: 'Duración (min)',
+  mouse: 'Ratón',
+  keyboard: 'Teclado',
+  gamepad1: 'Mando 1',
+  gamepad2: 'Mando 2',
 }
 
 const cs: Record<MessageKey, string> = {
@@ -320,6 +341,13 @@ const cs: Record<MessageKey, string> = {
   tie: 'Remíza!',
   winsTemplate: '{player} vyhrává!',
   skip: 'Přeskočit',
+  inputMethod: 'Ovládání',
+  players: 'Hráči',
+  matchLength: 'Délka zápasu (min)',
+  mouse: 'Myš',
+  keyboard: 'Klávesnice',
+  gamepad1: 'Ovladač 1',
+  gamepad2: 'Ovladač 2',
 }
 
 const pl: Record<MessageKey, string> = {
@@ -401,6 +429,13 @@ const pl: Record<MessageKey, string> = {
   tie: 'Remis!',
   winsTemplate: '{player} wygrywa!',
   skip: 'Pomiń',
+  inputMethod: 'Sterowanie',
+  players: 'Gracze',
+  matchLength: 'Czas meczu (min)',
+  mouse: 'Mysz',
+  keyboard: 'Klawiatura',
+  gamepad1: 'Pad 1',
+  gamepad2: 'Pad 2',
 }
 
 type MessageKey = keyof typeof en

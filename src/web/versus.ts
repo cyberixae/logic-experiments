@@ -22,8 +22,7 @@ import {
 import { createFormulaEditor } from './formula-editor'
 import { MountResult, Navigate } from './types'
 import { t } from './i18n'
-
-const DURATION = 300 // 5 minutes in seconds
+import { VersusConfig } from './versus-config'
 
 const formatTime = (s: number): string => {
   const m = Math.floor(s / 60)
@@ -70,6 +69,7 @@ export const mountVersus = (
   container: HTMLElement,
   navigate: Navigate,
   pool: ChallengePool,
+  versusConfig: VersusConfig,
 ): MountResult => {
   // Shared challenge list — same challenges in same order for both players
   const sharedChallenges: ChallengeResult[] = []
@@ -129,14 +129,19 @@ export const mountVersus = (
   let ws1 = makeWorkspace(0)
   let ws2 = makeWorkspace(0)
 
-  // Per-bench isolated contexts: P1 = keyboard, P2 = gamepad.
+  // Per-bench isolated contexts — input mode determines action hint style.
   // Auto-zoom disabled: at half-viewport width it overshoots downward; zoom=1 is the right default.
   // showPar disabled: revealing par while the other player is still solving gives an unfair hint.
-  const ctx1 = createBenchCtx(false, false, false, false)
-  const ctx2 = createBenchCtx(true, false, false, false)
+  const makeCtx = (input: typeof versusConfig.p1Input): BenchCtx => {
+    const base = createBenchCtx(input !== 'keyboard', false, false, false)
+    if (input !== 'mouse') return base
+    return { ...base, getActionHint: () => undefined, kbdHint: () => undefined }
+  }
+  const ctx1 = makeCtx(versusConfig.p1Input)
+  const ctx2 = makeCtx(versusConfig.p2Input)
 
   // Timer
-  let timeLeft = DURATION
+  let timeLeft = versusConfig.gameDurationSeconds
   let gameOver = false
   // Reference kept so the ticker can patch text without rebuilding the DOM.
   let timerEl: HTMLElement | null = null
@@ -600,8 +605,10 @@ export const mountVersus = (
     }
   }, 1000)
 
-  // Player 1: keyboard. Block dispatch while the formula editor is open;
-  // 'menu'/'undo' still dismiss it.
+  const gpIndex = (input: typeof versusConfig.p1Input): number =>
+    input === 'gamepad2' ? 1 : 0
+
+  // Block dispatch while the formula editor is open; 'menu'/'undo' still dismiss it.
   const handleKey = (ev: KeyboardEvent) => {
     if (ev.ctrlKey || ev.metaKey || ev.altKey || gameOver) return
     markKeyboardInput()
@@ -617,11 +624,12 @@ export const mountVersus = (
     }
     dispatch1(action)
   }
-  document.addEventListener('keydown', handleKey)
 
-  // Player 2: gamepad. Same guard for the formula editor.
-  const cleanupGamepad = setupGamepad((action) => {
-    if (gameOver) return
+  const handleKey2 = (ev: KeyboardEvent) => {
+    if (ev.ctrlKey || ev.metaKey || ev.altKey || gameOver) return
+    markKeyboardInput()
+    const action = qwertyKeyMap[ev.code]
+    if (action === undefined) return
     if (closeEditor2 !== null) {
       if (action === 'menu' || action === 'undo') closeEditor2()
       return
@@ -631,7 +639,50 @@ export const mountVersus = (
       return
     }
     dispatch2(action)
-  })
+  }
+
+  let cleanupP1: () => void
+  if (versusConfig.p1Input === 'keyboard') {
+    document.addEventListener('keydown', handleKey)
+    cleanupP1 = () => document.removeEventListener('keydown', handleKey)
+  } else if (versusConfig.p1Input === 'mouse') {
+    cleanupP1 = () => {}
+  } else {
+    cleanupP1 = setupGamepad((action) => {
+      if (gameOver) return
+      if (closeEditor1 !== null) {
+        if (action === 'menu' || action === 'undo') closeEditor1()
+        return
+      }
+      if (action === 'skip') {
+        skipPlayer1()
+        return
+      }
+      dispatch1(action)
+    }, gpIndex(versusConfig.p1Input))
+  }
+
+  let cleanupP2: () => void
+  if (versusConfig.p2Input === 'keyboard') {
+    document.addEventListener('keydown', handleKey2)
+    cleanupP2 = () => document.removeEventListener('keydown', handleKey2)
+  } else if (versusConfig.p2Input === 'mouse') {
+    cleanupP2 = () => {}
+  } else {
+    cleanupP2 = setupGamepad((action) => {
+      if (gameOver) return
+      if (closeEditor2 !== null) {
+        if (action === 'menu' || action === 'undo') closeEditor2()
+        return
+      }
+      if (action === 'skip') {
+        skipPlayer2()
+        return
+      }
+      dispatch2(action)
+    }, gpIndex(versusConfig.p2Input))
+  }
+
   const unsubGamepad = subscribeGamepad(rerender)
 
   rerender()
@@ -639,8 +690,8 @@ export const mountVersus = (
   return {
     cleanup: () => {
       clearInterval(ticker)
-      document.removeEventListener('keydown', handleKey)
-      cleanupGamepad()
+      cleanupP1()
+      cleanupP2()
       unsubGamepad()
       closeEditor1?.()
       closeEditor2?.()
