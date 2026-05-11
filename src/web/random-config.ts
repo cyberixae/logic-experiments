@@ -109,20 +109,23 @@ import {
 
 const TARGET_COUNT = 10
 
-type PreviewEntry = {
+export type PreviewEntry = {
   formula: prop.Prop
   nonStructural: number
   distance: number
 }
 
-const entryDistance = (nonStructural: number, config: RandomConfig): number => {
+export const entryDistance = (
+  nonStructural: number,
+  config: RandomConfig,
+): number => {
   const diff = nonStructural - config.targetNonStructural
   if (diff === 0) return 0
   // Prefer above target over below: 8, 9, 7, 10, 6, ...
   return diff > 0 ? diff * 2 - 1 : -diff * 2
 }
 
-const insertSorted = (
+export const insertSorted = (
   entries: Array<PreviewEntry>,
   entry: PreviewEntry,
 ): Array<PreviewEntry> => {
@@ -136,7 +139,7 @@ const insertSorted = (
   return result.slice(0, TARGET_COUNT)
 }
 
-const isDone = (entries: Array<PreviewEntry>): boolean =>
+export const isDone = (entries: Array<PreviewEntry>): boolean =>
   entries.length >= TARGET_COUNT && entries.every((e) => e.distance === 0)
 
 const renderAtom = (name: string): string =>
@@ -147,7 +150,7 @@ const renderFormula = (p: prop.Prop): string => {
   return html(segments)
 }
 
-type PreviewWorker = {
+export type PreviewWorker = {
   configure: (config: RandomConfig) => void
   updateTimeout: (bufferSize: number) => void
   terminate: () => void
@@ -159,7 +162,7 @@ const timeoutForBuffer = (bufferSize: number): number => {
   return 2000
 }
 
-const createPreviewWorker = (
+export const createPreviewWorker = (
   config: RandomConfig,
   onResult: (msg: ChallengeMessage) => void,
 ): PreviewWorker => {
@@ -202,7 +205,7 @@ const createPreviewWorker = (
   }
 }
 
-const renderPreviewList = (entries: Array<PreviewEntry>): void => {
+export const renderPreviewList = (entries: Array<PreviewEntry>): void => {
   const list = document.querySelector('.config-preview-list')
   if (!list) return
   list.innerHTML = ''
@@ -221,7 +224,7 @@ const renderPreviewList = (entries: Array<PreviewEntry>): void => {
   }
 }
 
-const createNumberInput = (
+export const createNumberInput = (
   value: number,
   onChange: (v: number) => void,
   min: number = 0,
@@ -252,7 +255,7 @@ const createNumberInput = (
   return input
 }
 
-const createRow = (label: string, input: HTMLElement): HTMLElement => {
+export const createRow = (label: string, input: HTMLElement): HTMLElement => {
   const row = document.createElement('div')
   row.className = 'config-row'
 
@@ -265,7 +268,7 @@ const createRow = (label: string, input: HTMLElement): HTMLElement => {
   return row
 }
 
-const createSection = (title: string): HTMLElement => {
+export const createSection = (title: string): HTMLElement => {
   const section = document.createElement('div')
   section.className = 'config-section'
 
@@ -275,6 +278,170 @@ const createSection = (title: string): HTMLElement => {
   section.appendChild(heading)
 
   return section
+}
+
+export const buildFormulaSettingsSection = (
+  config: RandomConfig,
+  onChange: () => void,
+): HTMLElement => {
+  const createToggle = (
+    content: string,
+    useHtml: boolean,
+    title: string,
+    isActive: () => boolean,
+    onToggle: () => void,
+  ): HTMLElement => {
+    const btn = document.createElement('pre')
+    btn.className = 'button toggle'
+    if (useHtml) {
+      btn.innerHTML = content
+    } else {
+      btn.textContent = content
+    }
+    btn.title = title
+    const led = document.createElement('span')
+    led.className = 'led' + (isActive() ? ' on' : '')
+    btn.appendChild(led)
+    btn.onclick = () => {
+      onToggle()
+      led.className = 'led' + (isActive() ? ' on' : '')
+      onChange()
+    }
+    return btn
+  }
+
+  const shapeSection = createSection(t('formulaShape'))
+
+  const connectiveHeading = document.createElement('div')
+  connectiveHeading.className = 'config-subsection-title'
+  connectiveHeading.textContent = t('connectives')
+  shapeSection.appendChild(connectiveHeading)
+
+  const defaultConnectives = defaultRandomConfig().connectives
+  const connectiveKeys: Array<{
+    key: keyof ConnectiveWeights
+    label: string
+    symbol: string
+  }> = [
+    { key: 'implication', label: t('implicationWeight'), symbol: '→' },
+    { key: 'conjunction', label: t('conjunctionWeight'), symbol: '∧' },
+    { key: 'disjunction', label: t('disjunctionWeight'), symbol: '∨' },
+    { key: 'negation', label: t('negationWeight'), symbol: '¬' },
+  ]
+
+  const connectiveToggles = document.createElement('div')
+  connectiveToggles.className = 'config-toggles'
+  for (const { key, label, symbol } of connectiveKeys) {
+    connectiveToggles.appendChild(
+      createToggle(
+        symbol,
+        false,
+        label,
+        () => config.connectives[key] > 0,
+        () => {
+          config.connectives[key] =
+            config.connectives[key] > 0 ? 0 : defaultConnectives[key]
+        },
+      ),
+    )
+  }
+
+  const defaultSymbols = defaultRandomConfig().symbols
+  const constantKeys: Array<{ key: keyof SymbolWeights; symbol: string }> = [
+    { key: 'falsum', symbol: '⊥' },
+    { key: 'verum', symbol: '⊤' },
+  ]
+  for (const { key, symbol } of constantKeys) {
+    connectiveToggles.appendChild(
+      createToggle(
+        symbol,
+        false,
+        symbol,
+        () => config.symbols[key] > 0,
+        () => {
+          config.symbols[key] =
+            config.symbols[key] > 0 ? 0 : defaultSymbols[key]
+        },
+      ),
+    )
+  }
+  shapeSection.appendChild(connectiveToggles)
+
+  const symbolHeading = document.createElement('div')
+  symbolHeading.className = 'config-subsection-title'
+  symbolHeading.textContent = t('symbols')
+  shapeSection.appendChild(symbolHeading)
+
+  const symbolKeys: Array<keyof SymbolWeights> = ['p', 'q', 'r', 's', 'u', 'v']
+
+  const symbolToggles = document.createElement('div')
+  symbolToggles.className = 'config-toggles'
+  for (const key of symbolKeys) {
+    symbolToggles.appendChild(
+      createToggle(
+        renderAtom(key),
+        true,
+        key,
+        () => config.symbols[key] > 0,
+        () => {
+          config.symbols[key] =
+            config.symbols[key] > 0 ? 0 : defaultSymbols[key]
+        },
+      ),
+    )
+  }
+  shapeSection.appendChild(symbolToggles)
+
+  const filterHeading = document.createElement('div')
+  filterHeading.className = 'config-subsection-title'
+  filterHeading.textContent = t('filter')
+  shapeSection.appendChild(filterHeading)
+
+  shapeSection.appendChild(
+    createRow(
+      t('size'),
+      createNumberInput(
+        config.size,
+        (v) => {
+          config.size = v
+          onChange()
+        },
+        1,
+        30,
+      ),
+    ),
+  )
+
+  shapeSection.appendChild(
+    createRow(
+      t('targetNonStructural'),
+      createNumberInput(
+        config.targetNonStructural,
+        (v) => {
+          config.targetNonStructural = v
+          onChange()
+        },
+        1,
+      ),
+    ),
+  )
+
+  shapeSection.appendChild(
+    createRow(
+      t('bypassPercent'),
+      createNumberInput(
+        config.bypassPercent,
+        (v) => {
+          config.bypassPercent = v
+          onChange()
+        },
+        0,
+        100,
+      ),
+    ),
+  )
+
+  return shapeSection
 }
 
 export const mountRandomConfig = (
@@ -383,11 +550,6 @@ export const mountRandomConfig = (
     startClock()
   }
 
-  const onInputChange = (setter: (v: number) => void) => (v: number) => {
-    setter(v)
-    restartSearch()
-  }
-
   const rerender = () => {
     container.innerHTML = ''
 
@@ -408,172 +570,7 @@ export const mountRandomConfig = (
     const settings = document.createElement('div')
     settings.className = 'config-settings'
 
-    // Formula shape section
-    const shapeSection = createSection(t('formulaShape'))
-
-    // Connective toggles
-    const connectiveHeading = document.createElement('div')
-    connectiveHeading.className = 'config-subsection-title'
-    connectiveHeading.textContent = t('connectives')
-    shapeSection.appendChild(connectiveHeading)
-
-    const defaultConnectives = defaultRandomConfig().connectives
-    const connectiveKeys: Array<{
-      key: keyof ConnectiveWeights
-      label: string
-      symbol: string
-    }> = [
-      { key: 'implication', label: t('implicationWeight'), symbol: '\u2192' },
-      { key: 'conjunction', label: t('conjunctionWeight'), symbol: '\u2227' },
-      { key: 'disjunction', label: t('disjunctionWeight'), symbol: '\u2228' },
-      { key: 'negation', label: t('negationWeight'), symbol: '\u00AC' },
-    ]
-
-    const createToggle = (
-      content: string,
-      useHtml: boolean,
-      title: string,
-      isActive: () => boolean,
-      onToggle: () => void,
-    ): HTMLElement => {
-      const btn = document.createElement('pre')
-      btn.className = 'button toggle'
-      if (useHtml) {
-        btn.innerHTML = content
-      } else {
-        btn.textContent = content
-      }
-      btn.title = title
-      const led = document.createElement('span')
-      led.className = 'led' + (isActive() ? ' on' : '')
-      btn.appendChild(led)
-      btn.onclick = () => {
-        onToggle()
-        led.className = 'led' + (isActive() ? ' on' : '')
-        restartSearch()
-      }
-      return btn
-    }
-
-    const connectiveToggles = document.createElement('div')
-    connectiveToggles.className = 'config-toggles'
-    for (const { key, label, symbol } of connectiveKeys) {
-      connectiveToggles.appendChild(
-        createToggle(
-          symbol,
-          false,
-          label,
-          () => config.connectives[key] > 0,
-          () => {
-            config.connectives[key] =
-              config.connectives[key] > 0 ? 0 : defaultConnectives[key]
-          },
-        ),
-      )
-    }
-
-    const defaultSymbols = defaultRandomConfig().symbols
-    const constantKeys: Array<{ key: keyof SymbolWeights; symbol: string }> = [
-      { key: 'falsum', symbol: '\u22A5' },
-      { key: 'verum', symbol: '\u22A4' },
-    ]
-    for (const { key, symbol } of constantKeys) {
-      connectiveToggles.appendChild(
-        createToggle(
-          symbol,
-          false,
-          symbol,
-          () => config.symbols[key] > 0,
-          () => {
-            config.symbols[key] =
-              config.symbols[key] > 0 ? 0 : defaultSymbols[key]
-          },
-        ),
-      )
-    }
-    shapeSection.appendChild(connectiveToggles)
-
-    // Symbol toggles
-    const symbolHeading = document.createElement('div')
-    symbolHeading.className = 'config-subsection-title'
-    symbolHeading.textContent = t('symbols')
-    shapeSection.appendChild(symbolHeading)
-
-    const symbolKeys: Array<keyof SymbolWeights> = [
-      'p',
-      'q',
-      'r',
-      's',
-      'u',
-      'v',
-    ]
-
-    const symbolToggles = document.createElement('div')
-    symbolToggles.className = 'config-toggles'
-    for (const key of symbolKeys) {
-      symbolToggles.appendChild(
-        createToggle(
-          renderAtom(key),
-          true,
-          key,
-          () => config.symbols[key] > 0,
-          () => {
-            config.symbols[key] =
-              config.symbols[key] > 0 ? 0 : defaultSymbols[key]
-          },
-        ),
-      )
-    }
-    shapeSection.appendChild(symbolToggles)
-
-    settings.appendChild(shapeSection)
-
-    // Parameters subsection
-    const filterHeading = document.createElement('div')
-    filterHeading.className = 'config-subsection-title'
-    filterHeading.textContent = t('filter')
-    shapeSection.appendChild(filterHeading)
-
-    shapeSection.appendChild(
-      createRow(
-        t('size'),
-        createNumberInput(
-          config.size,
-          onInputChange((v) => {
-            config.size = v
-          }),
-          1,
-          30,
-        ),
-      ),
-    )
-
-    shapeSection.appendChild(
-      createRow(
-        t('targetNonStructural'),
-        createNumberInput(
-          config.targetNonStructural,
-          onInputChange((v) => {
-            config.targetNonStructural = v
-          }),
-          1,
-        ),
-      ),
-    )
-
-    shapeSection.appendChild(
-      createRow(
-        t('bypassPercent'),
-        createNumberInput(
-          config.bypassPercent,
-          onInputChange((v) => {
-            config.bypassPercent = v
-          }),
-          0,
-          100,
-        ),
-      ),
-    )
+    settings.appendChild(buildFormulaSettingsSection(config, restartSearch))
 
     // Buttons
     const buttons = document.createElement('div')
