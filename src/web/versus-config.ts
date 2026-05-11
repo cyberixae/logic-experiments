@@ -108,10 +108,13 @@ const inputEmoji = (input: PlayerInput): string => {
   return '🎮₂'
 }
 
+const connectedGamepadCount = (): number =>
+  Array.from(navigator.getGamepads()).filter((gp) => gp !== null).length
+
 const isInputAvailable = (input: PlayerInput): boolean => {
   if (input === 'mouse' || input === 'keyboard') return true
-  const index = input === 'gamepad1' ? 0 : 1
-  return navigator.getGamepads()[index] !== null
+  const needed = input === 'gamepad1' ? 1 : 2
+  return connectedGamepadCount() >= needed
 }
 
 export const mountVersusConfig = (

@@ -627,8 +627,15 @@ export const mountVersus = (
     }
   }, 1000)
 
-  const gpIndex = (input: typeof versusConfig.p1Input): number =>
-    input === 'gamepad2' ? 1 : 0
+  const connectedGamepadIndices = (): number[] =>
+    Array.from(navigator.getGamepads()).flatMap((gp, i) =>
+      gp !== null ? [i] : [],
+    )
+
+  const gpIndex = (input: typeof versusConfig.p1Input): number => {
+    const indices = connectedGamepadIndices()
+    return input === 'gamepad2' ? (indices[1] ?? 1) : (indices[0] ?? 0)
+  }
 
   // Block dispatch while the formula editor is open; 'menu'/'undo' still dismiss it.
   const handleKey = (ev: KeyboardEvent) => {
