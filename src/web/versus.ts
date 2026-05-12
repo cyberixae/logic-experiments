@@ -399,7 +399,7 @@ export const mountVersus = (
       if (typeof p2Moves === 'number') {
         skipSynthetic1.delete(challengeIdx)
         const diff = moves1 - p2Moves
-        const bonus = diff * diff
+        const bonus = Math.abs(diff)
         if (moves1 < p2Moves) {
           score1 += bonus
           levelPoints1.set(challengeIdx, 1 + bonus)
@@ -415,7 +415,7 @@ export const mountVersus = (
       const p2Entry = resolved2.get(challengeIdx)
       if (typeof p2Entry === 'number') {
         const diff = moves1 - p2Entry
-        const bonus = diff * diff
+        const bonus = Math.abs(diff)
         if (moves1 < p2Entry) {
           score1 += bonus
           levelPoints1.set(challengeIdx, 1 + bonus)
@@ -455,7 +455,7 @@ export const mountVersus = (
       if (typeof p1Moves === 'number') {
         skipSynthetic2.delete(challengeIdx)
         const diff = moves2 - p1Moves
-        const bonus = diff * diff
+        const bonus = Math.abs(diff)
         if (moves2 < p1Moves) {
           score2 += bonus
           levelPoints2.set(challengeIdx, 1 + bonus)
@@ -471,7 +471,7 @@ export const mountVersus = (
       const p1Entry = resolved1.get(challengeIdx)
       if (typeof p1Entry === 'number') {
         const diff = moves2 - p1Entry
-        const bonus = diff * diff
+        const bonus = Math.abs(diff)
         if (moves2 < p1Entry) {
           score2 += bonus
           levelPoints2.set(challengeIdx, 1 + bonus)
@@ -506,7 +506,7 @@ export const mountVersus = (
       // Covers both first-time skip (opponent solved first) and re-skip after re-queue.
       const synthetic = 2 * p2Entry
       skipSynthetic1.set(challengeIdx, synthetic)
-      const bonus = p2Entry * p2Entry
+      const bonus = p2Entry
       score2 += bonus
       levelPoints2.set(
         challengeIdx,
@@ -528,7 +528,7 @@ export const mountVersus = (
       // Opponent already solved this level; skip is now permanent — apply penalty.
       const synthetic = 2 * p1Entry
       skipSynthetic2.set(challengeIdx, synthetic)
-      const bonus = p1Entry * p1Entry
+      const bonus = p1Entry
       score1 += bonus
       levelPoints1.set(
         challengeIdx,
