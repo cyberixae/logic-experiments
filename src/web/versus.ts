@@ -427,9 +427,9 @@ export const mountVersus = (
           )
         }
       } else if (p2Entry === 'skip') {
-        // Player 2 skipped; re-queue the challenge for them.
+        // Player 2 skipped; re-queue the challenge for them (oldest pending first).
         // Penalty is deferred — only applied if P2 skips again (making it permanent).
-        pending2 = [challengeIdx, ...pending2]
+        pending2 = [...pending2, challengeIdx]
       }
     }
   }
@@ -483,9 +483,9 @@ export const mountVersus = (
           )
         }
       } else if (p1Entry === 'skip') {
-        // Player 1 skipped; re-queue the challenge for them.
+        // Player 1 skipped; re-queue the challenge for them (oldest pending first).
         // Penalty is deferred — only applied if P1 skips again (making it permanent).
-        pending1 = [challengeIdx, ...pending1]
+        pending1 = [...pending1, challengeIdx]
       }
     }
   }
