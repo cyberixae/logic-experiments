@@ -28,12 +28,6 @@ export const mountSecret = (
     matchBtn.onclick = () => navigate('match-curated')
     modes.appendChild(matchBtn)
 
-    const versusBtn = document.createElement('div')
-    versusBtn.setAttribute('class', 'button menu-mode')
-    versusBtn.innerHTML = t('versus')
-    versusBtn.onclick = () => navigate('versus')
-    modes.appendChild(versusBtn)
-
     const systemsBtn = document.createElement('div')
     systemsBtn.setAttribute('class', 'button menu-mode')
     systemsBtn.innerHTML = t('systems')
