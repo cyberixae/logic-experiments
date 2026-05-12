@@ -216,7 +216,7 @@ export const mountQuiz = (
     zoomRow.appendChild(zoomOut)
 
     const zoomReset = document.createElement('div')
-    zoomReset.setAttribute('class', 'button')
+    zoomReset.setAttribute('class', 'button zoom-reset')
     zoomReset.textContent = '⊙'
     zoomReset.onclick = () => {
       zoom = 1

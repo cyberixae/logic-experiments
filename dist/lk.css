@@ -157,6 +157,12 @@ html.loading body {
 .controls-wing {
   display: contents;
 }
+/* Mobile only */
+@container bench (max-width: 639px) {
+  .button.zoom-reset {
+    min-width: 1.4em;
+  }
+}
 /* Tablet: lemma-gaze-axiom / nav-zoom */
 @container bench (min-width: 640px) {
   .bench {

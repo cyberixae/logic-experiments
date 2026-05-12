@@ -945,6 +945,7 @@ export const createBench = (
     },
     ctx.kbdHint('0'),
   )
+  zoomReset.classList.add('zoom-reset')
   const zoomIn = createButton(
     '+',
     false,
