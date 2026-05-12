@@ -84,15 +84,17 @@ export const mountVersus = (
   type DisplayEntry = ResolvedEntry | 'current'
 
   // Per-player state
-  let index1 = 0 // next sequential challenge index for player 1
+  let wsIdx1 = 0 // challenge index that ws1 is currently built for
+  let index1 = 1 // next sequential challenge index (used when pending1 is empty)
   let score1 = 0
   const resolved1 = new Map<number, ResolvedEntry>() // challenge idx → outcome
   const levelPoints1 = new Map<number, number>()
   const skipSynthetic1 = new Map<number, number>()
-  let pending1: number[] = [] // challenge indices to re-face, front = next
+  let pending1: number[] = [] // re-queued challenge indices, front = next
   let scoreCommitted1 = false
 
-  let index2 = 0
+  let wsIdx2 = 0
+  let index2 = 1
   let score2 = 0
   const resolved2 = new Map<number, ResolvedEntry>()
   const levelPoints2 = new Map<number, number>()
@@ -100,8 +102,8 @@ export const mountVersus = (
   let pending2: number[] = []
   let scoreCommitted2 = false
 
-  const currentChallengeIdx1 = (): number => pending1[0] ?? index1
-  const currentChallengeIdx2 = (): number => pending2[0] ?? index2
+  const currentChallengeIdx1 = (): number => wsIdx1
+  const currentChallengeIdx2 = (): number => wsIdx2
 
   const makeWorkspace = (i: number): AnyWorkspace => {
     ensureChallenge(i)
@@ -113,21 +115,27 @@ export const mountVersus = (
 
   const advancePlayer1 = (): void => {
     scoreCommitted1 = false
-    if (pending1.length > 0) {
-      pending1 = pending1.slice(1)
+    const [next1, ...rest1] = pending1
+    if (next1 !== undefined) {
+      wsIdx1 = next1
+      pending1 = rest1
     } else {
+      wsIdx1 = index1
       index1 += 1
     }
-    ws1 = makeWorkspace(currentChallengeIdx1())
+    ws1 = makeWorkspace(wsIdx1)
   }
   const advancePlayer2 = (): void => {
     scoreCommitted2 = false
-    if (pending2.length > 0) {
-      pending2 = pending2.slice(1)
+    const [next2, ...rest2] = pending2
+    if (next2 !== undefined) {
+      wsIdx2 = next2
+      pending2 = rest2
     } else {
+      wsIdx2 = index2
       index2 += 1
     }
-    ws2 = makeWorkspace(currentChallengeIdx2())
+    ws2 = makeWorkspace(wsIdx2)
   }
 
   let ws1 = makeWorkspace(0)
@@ -252,8 +260,11 @@ export const mountVersus = (
       resolved: Map<number, ResolvedEntry>,
       ci: number,
       i: number,
-    ): DisplayEntry | undefined =>
-      i === ci ? (resolved.get(i) ?? 'current') : resolved.get(i)
+    ): DisplayEntry | undefined => {
+      if (i !== ci) return resolved.get(i)
+      const entry = resolved.get(ci)
+      return typeof entry === 'number' ? entry : 'current'
+    }
 
     const entryMoves = (
       e: DisplayEntry | undefined,
@@ -382,12 +393,10 @@ export const mountVersus = (
     levelPoints1.set(challengeIdx, 1)
 
     if (isRetry) {
-      // Player 1 re-solves a previously skipped challenge after player 2 solved it.
-      // Undo the synthetic bonus that was awarded to player 2 at re-queue time.
+      // Player 1 re-solves a previously skipped challenge; compare move counts normally.
+      // No bonus was awarded upfront — penalty only triggers if P1 had re-skipped.
       const p2Moves = resolved2.get(challengeIdx)
       if (typeof p2Moves === 'number') {
-        score2 -= p2Moves * p2Moves
-        levelPoints2.set(challengeIdx, 1)
         skipSynthetic1.delete(challengeIdx)
         const diff = moves1 - p2Moves
         const bonus = diff * diff
@@ -396,7 +405,10 @@ export const mountVersus = (
           levelPoints1.set(challengeIdx, 1 + bonus)
         } else if (p2Moves < moves1) {
           score2 += bonus
-          levelPoints2.set(challengeIdx, 1 + bonus)
+          levelPoints2.set(
+            challengeIdx,
+            (levelPoints2.get(challengeIdx) ?? 1) + bonus,
+          )
         }
       }
     } else {
@@ -415,13 +427,8 @@ export const mountVersus = (
           )
         }
       } else if (p2Entry === 'skip') {
-        // Player 2 skipped this challenge; player 1 just solved it.
-        // Award synthetic penalty to player 2 and re-queue the challenge for them.
-        const synthetic = 2 * moves1
-        skipSynthetic2.set(challengeIdx, synthetic)
-        const bonus = moves1 * moves1
-        score1 += bonus
-        levelPoints1.set(challengeIdx, 1 + bonus)
+        // Player 2 skipped; re-queue the challenge for them.
+        // Penalty is deferred — only applied if P2 skips again (making it permanent).
         pending2 = [challengeIdx, ...pending2]
       }
     }
@@ -443,10 +450,9 @@ export const mountVersus = (
     levelPoints2.set(challengeIdx, 1)
 
     if (isRetry) {
+      // Player 2 re-solves a previously skipped challenge; compare move counts normally.
       const p1Moves = resolved1.get(challengeIdx)
       if (typeof p1Moves === 'number') {
-        score1 -= p1Moves * p1Moves
-        levelPoints1.set(challengeIdx, 1)
         skipSynthetic2.delete(challengeIdx)
         const diff = moves2 - p1Moves
         const bonus = diff * diff
@@ -455,7 +461,10 @@ export const mountVersus = (
           levelPoints2.set(challengeIdx, 1 + bonus)
         } else if (p1Moves < moves2) {
           score1 += bonus
-          levelPoints1.set(challengeIdx, 1 + bonus)
+          levelPoints1.set(
+            challengeIdx,
+            (levelPoints1.get(challengeIdx) ?? 1) + bonus,
+          )
         }
       }
     } else {
@@ -474,11 +483,8 @@ export const mountVersus = (
           )
         }
       } else if (p1Entry === 'skip') {
-        const synthetic = 2 * moves2
-        skipSynthetic1.set(challengeIdx, synthetic)
-        const bonus = moves2 * moves2
-        score2 += bonus
-        levelPoints2.set(challengeIdx, 1 + bonus)
+        // Player 1 skipped; re-queue the challenge for them.
+        // Penalty is deferred — only applied if P1 skips again (making it permanent).
         pending1 = [challengeIdx, ...pending1]
       }
     }
@@ -491,48 +497,43 @@ export const mountVersus = (
 
   const skipPlayer1 = () => {
     if (gameOver) return
-    const challengeIdx = currentChallengeIdx1()
-    const isRetry = resolved1.get(challengeIdx) === 'skip'
+    const challengeIdx = wsIdx1
     resolved1.set(challengeIdx, 'skip')
 
-    if (!isRetry) {
-      // First-time skip: if opponent already solved, apply synthetic (no re-queue —
-      // re-queue only triggers when opponent solves AFTER the skip).
-      const p2Entry = resolved2.get(challengeIdx)
-      if (typeof p2Entry === 'number') {
-        const synthetic = 2 * p2Entry
-        skipSynthetic1.set(challengeIdx, synthetic)
-        const bonus = p2Entry * p2Entry
-        score2 += bonus
-        levelPoints2.set(
-          challengeIdx,
-          (levelPoints2.get(challengeIdx) ?? 1) + bonus,
-        )
-      }
+    const p2Entry = resolved2.get(challengeIdx)
+    if (typeof p2Entry === 'number') {
+      // Opponent already solved this level; skip is now permanent — apply penalty.
+      // Covers both first-time skip (opponent solved first) and re-skip after re-queue.
+      const synthetic = 2 * p2Entry
+      skipSynthetic1.set(challengeIdx, synthetic)
+      const bonus = p2Entry * p2Entry
+      score2 += bonus
+      levelPoints2.set(
+        challengeIdx,
+        (levelPoints2.get(challengeIdx) ?? 1) + bonus,
+      )
     }
-    // Re-skip of a pending challenge: synthetic was already applied at re-queue time; no change.
+    // If opponent hasn't solved yet, penalty is deferred until they solve and P1 re-skips.
 
     advancePlayer1()
     rerender()
   }
   const skipPlayer2 = () => {
     if (gameOver) return
-    const challengeIdx = currentChallengeIdx2()
-    const isRetry = resolved2.get(challengeIdx) === 'skip'
+    const challengeIdx = wsIdx2
     resolved2.set(challengeIdx, 'skip')
 
-    if (!isRetry) {
-      const p1Entry = resolved1.get(challengeIdx)
-      if (typeof p1Entry === 'number') {
-        const synthetic = 2 * p1Entry
-        skipSynthetic2.set(challengeIdx, synthetic)
-        const bonus = p1Entry * p1Entry
-        score1 += bonus
-        levelPoints1.set(
-          challengeIdx,
-          (levelPoints1.get(challengeIdx) ?? 1) + bonus,
-        )
-      }
+    const p1Entry = resolved1.get(challengeIdx)
+    if (typeof p1Entry === 'number') {
+      // Opponent already solved this level; skip is now permanent — apply penalty.
+      const synthetic = 2 * p1Entry
+      skipSynthetic2.set(challengeIdx, synthetic)
+      const bonus = p1Entry * p1Entry
+      score1 += bonus
+      levelPoints1.set(
+        challengeIdx,
+        (levelPoints1.get(challengeIdx) ?? 1) + bonus,
+      )
     }
 
     advancePlayer2()
