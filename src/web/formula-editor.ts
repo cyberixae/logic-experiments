@@ -31,11 +31,19 @@ const setDisabled = (
   btn.onclick = disabled ? null : handler
 }
 
+const makeHintBadge = (text: string): HTMLElement => {
+  const badge = document.createElement('span')
+  badge.setAttribute('class', text.length > 1 ? 'key-hint wide' : 'key-hint')
+  badge.textContent = text
+  return badge
+}
+
 export const createFormulaEditor = (
   title: string,
   confirmLabel: string,
   onConfirm: (formula: Prop) => void,
   onCancel: () => void,
+  undoHint?: string,
 ): { el: HTMLElement; tryUndo: () => boolean } => {
   let stack: Stack = []
   let history: ReadonlyArray<Stack> = []
@@ -170,6 +178,8 @@ export const createFormulaEditor = (
   popup.appendChild(controls)
   shroud.appendChild(popup)
 
+  const hintBadge = undoHint !== undefined ? makeHintBadge(undoHint) : null
+
   const renderState = (): void => {
     stackDisplay.innerHTML =
       stack.length === 0
@@ -191,6 +201,15 @@ export const createFormulaEditor = (
     setDisabled(undoBtn, history.length === 0, () => {
       doUndo()
     })
+
+    if (hintBadge !== null) {
+      hintBadge.remove()
+      if (history.length > 0) {
+        undoBtn.appendChild(hintBadge)
+      } else {
+        cancelBtn.appendChild(hintBadge)
+      }
+    }
 
     const formula = stack.length === 1 ? stack[0] : undefined
     confirmBtn.setAttribute(

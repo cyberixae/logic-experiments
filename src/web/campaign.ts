@@ -267,6 +267,7 @@ export const mountCampaign = (
         onFormula(formula)
       },
       cancel,
+      '⌫',
     )
     closeFormulaEditor = cancel
     tryUndoInEditor = tryUndo

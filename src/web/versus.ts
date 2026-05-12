@@ -43,6 +43,7 @@ const makeVersusFormulaEditor = (
   side: 'left' | 'right',
   onFormula: (formula: Prop) => void,
   onCancel: () => void,
+  undoHint?: string,
 ): { close: () => void; tryUndo: () => boolean } => {
   let modalEl: HTMLElement | null = null
   const close = () => {
@@ -55,6 +56,7 @@ const makeVersusFormulaEditor = (
     t('lemmaConfirm'),
     onFormula,
     close,
+    undoHint,
   )
   modalEl = el
   if (side === 'left') {
@@ -577,6 +579,11 @@ export const mountVersus = (
         closeEditor1 = null
         tryUndoEditor1 = null
       },
+      versusConfig.p1Input === 'keyboard'
+        ? '⌫'
+        : versusConfig.p1Input === 'mouse'
+          ? undefined
+          : '○',
     )
     closeEditor1 = ed1.close
     tryUndoEditor1 = ed1.tryUndo
@@ -594,6 +601,11 @@ export const mountVersus = (
         closeEditor2 = null
         tryUndoEditor2 = null
       },
+      versusConfig.p2Input === 'keyboard'
+        ? '⌫'
+        : versusConfig.p2Input === 'mouse'
+          ? undefined
+          : '○',
     )
     closeEditor2 = ed2.close
     tryUndoEditor2 = ed2.tryUndo

@@ -672,8 +672,24 @@ html.loading body {
   gap: 0.8em;
 }
 .formula-editor-controls .button {
+  position: relative;
   padding: 0.5em 1.2em;
   color: #000;
+}
+.formula-editor-controls .button .key-hint {
+  position: absolute;
+  width: 30px;
+  height: 30px;
+  line-height: 30px;
+  top: -20px;
+  right: 10px;
+}
+.formula-editor-controls .button .key-hint.wide {
+  width: auto;
+  min-width: 30px;
+  padding: 0 7px;
+  top: -20px;
+  right: 10px;
 }
 .pause-buttons .button .key-hint {
   position: absolute;

@@ -145,6 +145,7 @@ export const mountRandom = (
         onFormula(formula)
       },
       cancel,
+      '⌫',
     )
     closeFormulaEditor = cancel
     tryUndoInEditor = tryUndo
