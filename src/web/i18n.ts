@@ -165,7 +165,7 @@ const fi: Record<MessageKey, string> = {
   player2: 'Pelaaja 2',
   timeUp: 'Aika loppui!',
   tie: 'Tasapeli!',
-  winsTemplate: '{player} voittaa!',
+  winsTemplate: '{player} voitti!',
   skip: 'Ohita',
   inputMethod: 'Ohjain',
   players: 'Pelaajat',
