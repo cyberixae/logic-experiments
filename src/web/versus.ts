@@ -90,6 +90,7 @@ export const mountVersus = (
   const levelPoints1 = new Map<number, number>()
   const skipSynthetic1 = new Map<number, number>()
   let pending1: number[] = [] // challenge indices to re-face, front = next
+  let scoreCommitted1 = false
 
   let index2 = 0
   let score2 = 0
@@ -97,6 +98,7 @@ export const mountVersus = (
   const levelPoints2 = new Map<number, number>()
   const skipSynthetic2 = new Map<number, number>()
   let pending2: number[] = []
+  let scoreCommitted2 = false
 
   const currentChallengeIdx1 = (): number => pending1[0] ?? index1
   const currentChallengeIdx2 = (): number => pending2[0] ?? index2
@@ -110,6 +112,7 @@ export const mountVersus = (
   }
 
   const advancePlayer1 = (): void => {
+    scoreCommitted1 = false
     if (pending1.length > 0) {
       pending1 = pending1.slice(1)
     } else {
@@ -118,6 +121,7 @@ export const mountVersus = (
     ws1 = makeWorkspace(currentChallengeIdx1())
   }
   const advancePlayer2 = (): void => {
+    scoreCommitted2 = false
     if (pending2.length > 0) {
       pending2 = pending2.slice(1)
     } else {
@@ -175,6 +179,8 @@ export const mountVersus = (
 
   // rerender is defined before solvePlayer* so they can reference it
   const rerender = () => {
+    if (ws1.isSolved()) commitScore1()
+    if (ws2.isSolved()) commitScore2()
     container.innerHTML = ''
     timerEl = null
 
@@ -246,7 +252,8 @@ export const mountVersus = (
       resolved: Map<number, ResolvedEntry>,
       ci: number,
       i: number,
-    ): DisplayEntry | undefined => (i === ci ? 'current' : resolved.get(i))
+    ): DisplayEntry | undefined =>
+      i === ci ? (resolved.get(i) ?? 'current') : resolved.get(i)
 
     const entryMoves = (
       e: DisplayEntry | undefined,
@@ -314,6 +321,18 @@ export const mountVersus = (
       )
       thermoRows.appendChild(row)
     }
+    const thermoTotal = document.createElement('div')
+    thermoTotal.setAttribute('class', 'versus-thermo-total')
+    const totalCell1 = document.createElement('div')
+    totalCell1.setAttribute('class', 'versus-thermo-cell p1 total')
+    totalCell1.textContent = String(score1)
+    const totalCell2 = document.createElement('div')
+    totalCell2.setAttribute('class', 'versus-thermo-cell p2 total')
+    totalCell2.textContent = String(score2)
+    thermoTotal.appendChild(totalCell1)
+    thermoTotal.appendChild(totalCell2)
+    thermo.appendChild(thermoTotal)
+
     thermo.appendChild(thermoRows)
 
     arena.appendChild(half1)
@@ -352,7 +371,9 @@ export const mountVersus = (
   }
 
   // Auto-advance on solve — replaces workspace before rerender so bench never shows congrats
-  const solvePlayer1 = () => {
+  const commitScore1 = () => {
+    if (scoreCommitted1) return
+    scoreCommitted1 = true
     const challengeIdx = currentChallengeIdx1()
     const moves1 = totalMoves(ws1)
     const isRetry = resolved1.get(challengeIdx) === 'skip'
@@ -404,11 +425,16 @@ export const mountVersus = (
         pending2 = [challengeIdx, ...pending2]
       }
     }
-
+  }
+  const solvePlayer1 = () => {
+    commitScore1()
     advancePlayer1()
     rerender()
   }
-  const solvePlayer2 = () => {
+
+  const commitScore2 = () => {
+    if (scoreCommitted2) return
+    scoreCommitted2 = true
     const challengeIdx = currentChallengeIdx2()
     const moves2 = totalMoves(ws2)
     const isRetry = resolved2.get(challengeIdx) === 'skip'
@@ -456,7 +482,9 @@ export const mountVersus = (
         pending1 = [challengeIdx, ...pending1]
       }
     }
-
+  }
+  const solvePlayer2 = () => {
+    commitScore2()
     advancePlayer2()
     rerender()
   }

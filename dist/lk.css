@@ -1747,6 +1747,18 @@ html.loading body {
 .versus-thermo-points {
   font-size: 0.85em;
 }
+.versus-thermo-total {
+  display: flex;
+  flex-direction: row;
+  flex-shrink: 0;
+  border-bottom: 1px solid #ccc;
+}
+.versus-thermo-cell.total {
+  opacity: 1;
+  font-size: 1.4em;
+  font-weight: bold;
+  padding: 0.3em 0;
+}
 .versus-half:first-child .rules-sheet {
   right: calc(50% + 2.5em);
 }

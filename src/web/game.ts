@@ -1248,6 +1248,7 @@ export const createDispatch =
     onMenu?: () => void,
     onApplyReverse1?: ApplyReverse1,
     ctx: BenchCtx = defaultCtx,
+    onJustSolved?: () => void,
   ) =>
   (action: Action): void => {
     if (action === 'gazeLeft' || action === 'gazeRight') {
@@ -1382,6 +1383,9 @@ export const createDispatch =
         workspace.setGazeKind('weakening')
         applyGazeRule(workspace, 'weakening')
         break
+    }
+    if (workspace.isSolved()) {
+      onJustSolved?.()
     }
     rerender()
   }
