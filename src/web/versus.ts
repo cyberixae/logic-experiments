@@ -43,26 +43,27 @@ const makeVersusFormulaEditor = (
   side: 'left' | 'right',
   onFormula: (formula: Prop) => void,
   onCancel: () => void,
-): (() => void) => {
-  let modal: HTMLElement | null = null
+): { close: () => void; tryUndo: () => boolean } => {
+  let modalEl: HTMLElement | null = null
   const close = () => {
-    modal?.remove()
-    modal = null
+    modalEl?.remove()
+    modalEl = null
     onCancel()
   }
-  modal = createFormulaEditor(
+  const { el, tryUndo } = createFormulaEditor(
     t('lemmaTitle'),
     t('lemmaConfirm'),
     onFormula,
     close,
   )
+  modalEl = el
   if (side === 'left') {
-    modal.style.right = 'calc(50% + 2.5em)'
+    el.style.right = 'calc(50% + 2.5em)'
   } else {
-    modal.style.left = 'calc(50% + 2.5em)'
+    el.style.left = 'calc(50% + 2.5em)'
   }
-  document.body.appendChild(modal)
-  return close
+  document.body.appendChild(el)
+  return { close, tryUndo }
 }
 
 export const mountVersus = (
@@ -160,7 +161,9 @@ export const mountVersus = (
 
   // Formula editor state — tracked separately per player so each half is independent.
   let closeEditor1: (() => void) | null = null
+  let tryUndoEditor1: (() => boolean) | null = null
   let closeEditor2: (() => void) | null = null
+  let tryUndoEditor2: (() => boolean) | null = null
 
   const makeUndoControls = (ws: AnyWorkspace, ctx: BenchCtx): HTMLElement => {
     const el = document.createElement('div')
@@ -563,29 +566,37 @@ export const mountVersus = (
   // an inline left/right override on the fixed-position element.
   const onApplyReverse1: ApplyReverse1 = (_key, onFormula) => {
     if (closeEditor1 !== null) return
-    closeEditor1 = makeVersusFormulaEditor(
+    const ed1 = makeVersusFormulaEditor(
       'left',
       (formula) => {
         closeEditor1 = null
+        tryUndoEditor1 = null
         onFormula(formula)
       },
       () => {
         closeEditor1 = null
+        tryUndoEditor1 = null
       },
     )
+    closeEditor1 = ed1.close
+    tryUndoEditor1 = ed1.tryUndo
   }
   const onApplyReverse2: ApplyReverse1 = (_key, onFormula) => {
     if (closeEditor2 !== null) return
-    closeEditor2 = makeVersusFormulaEditor(
+    const ed2 = makeVersusFormulaEditor(
       'right',
       (formula) => {
         closeEditor2 = null
+        tryUndoEditor2 = null
         onFormula(formula)
       },
       () => {
         closeEditor2 = null
+        tryUndoEditor2 = null
       },
     )
+    closeEditor2 = ed2.close
+    tryUndoEditor2 = ed2.tryUndo
   }
 
   // Independent dispatch per player
@@ -666,16 +677,31 @@ export const mountVersus = (
     return input === 'gamepad2' ? (indices[1] ?? 1) : (indices[0] ?? 0)
   }
 
-  // Block dispatch while the formula editor is open; 'menu'/'undo' still dismiss it.
+  const handleEditorInput1 = (action: string): boolean => {
+    if (closeEditor1 === null) return false
+    if (action === 'undo') {
+      if (!(tryUndoEditor1?.() ?? false)) closeEditor1()
+    } else if (action === 'menu') {
+      closeEditor1()
+    }
+    return true
+  }
+  const handleEditorInput2 = (action: string): boolean => {
+    if (closeEditor2 === null) return false
+    if (action === 'undo') {
+      if (!(tryUndoEditor2?.() ?? false)) closeEditor2()
+    } else if (action === 'menu') {
+      closeEditor2()
+    }
+    return true
+  }
+
   const handleKey = (ev: KeyboardEvent) => {
     if (ev.ctrlKey || ev.metaKey || ev.altKey || gameOver) return
     markKeyboardInput()
     const action = qwertyKeyMap[ev.code]
     if (action === undefined) return
-    if (closeEditor1 !== null) {
-      if (action === 'menu' || action === 'undo') closeEditor1()
-      return
-    }
+    if (handleEditorInput1(action)) return
     if (action === 'skip') {
       skipPlayer1()
       return
@@ -688,10 +714,7 @@ export const mountVersus = (
     markKeyboardInput()
     const action = qwertyKeyMap[ev.code]
     if (action === undefined) return
-    if (closeEditor2 !== null) {
-      if (action === 'menu' || action === 'undo') closeEditor2()
-      return
-    }
+    if (handleEditorInput2(action)) return
     if (action === 'skip') {
       skipPlayer2()
       return
@@ -708,10 +731,7 @@ export const mountVersus = (
   } else {
     cleanupP1 = setupGamepad((action) => {
       if (gameOver) return
-      if (closeEditor1 !== null) {
-        if (action === 'menu' || action === 'undo') closeEditor1()
-        return
-      }
+      if (handleEditorInput1(action)) return
       if (action === 'skip') {
         skipPlayer1()
         return
@@ -729,10 +749,7 @@ export const mountVersus = (
   } else {
     cleanupP2 = setupGamepad((action) => {
       if (gameOver) return
-      if (closeEditor2 !== null) {
-        if (action === 'menu' || action === 'undo') closeEditor2()
-        return
-      }
+      if (handleEditorInput2(action)) return
       if (action === 'skip') {
         skipPlayer2()
         return

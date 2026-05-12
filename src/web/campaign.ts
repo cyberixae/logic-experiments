@@ -246,26 +246,30 @@ export const mountCampaign = (
 
   let formulaEditorOpen = false
   let closeFormulaEditor: (() => void) | null = null
+  let tryUndoInEditor: (() => boolean) | null = null
   const onApplyReverse1: ApplyReverse1 = (_key, onFormula) => {
     if (formulaEditorOpen) return
     formulaEditorOpen = true
     const cancel = () => {
       formulaEditorOpen = false
       closeFormulaEditor = null
+      tryUndoInEditor = null
       container.removeChild(modal)
     }
-    const modal = createFormulaEditor(
+    const { el: modal, tryUndo } = createFormulaEditor(
       t('lemmaTitle'),
       t('lemmaConfirm'),
       (formula) => {
         formulaEditorOpen = false
         closeFormulaEditor = null
+        tryUndoInEditor = null
         container.removeChild(modal)
         onFormula(formula)
       },
       cancel,
     )
     closeFormulaEditor = cancel
+    tryUndoInEditor = tryUndo
     container.appendChild(modal)
   }
 
@@ -334,7 +338,9 @@ export const mountCampaign = (
   )
   const dispatch = (action: Action) => {
     if (formulaEditorOpen) {
-      if (action === 'menu' || action === 'exit' || action === 'undo') {
+      if (action === 'undo') {
+        if (!(tryUndoInEditor?.() ?? false)) closeFormulaEditor?.()
+      } else if (action === 'menu' || action === 'exit') {
         closeFormulaEditor?.()
       }
       return

@@ -36,7 +36,7 @@ export const createFormulaEditor = (
   confirmLabel: string,
   onConfirm: (formula: Prop) => void,
   onCancel: () => void,
-): HTMLElement => {
+): { el: HTMLElement; tryUndo: () => boolean } => {
   let stack: Stack = []
   let history: ReadonlyArray<Stack> = []
 
@@ -208,5 +208,12 @@ export const createFormulaEditor = (
   }
 
   renderState()
-  return shroud
+  return {
+    el: shroud,
+    tryUndo: () => {
+      if (history.length === 0) return false
+      doUndo()
+      return true
+    },
+  }
 }
