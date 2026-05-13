@@ -55,7 +55,11 @@ const makeVersusFormulaEditor = (
   const { el, tryUndo } = createFormulaEditor(
     t('lemmaTitle'),
     t('lemmaConfirm'),
-    onFormula,
+    (formula) => {
+      modalEl?.remove()
+      modalEl = null
+      onFormula(formula)
+    },
     close,
     undoHint,
   )
@@ -75,6 +79,14 @@ export const mountVersus = (
   pool: ChallengePool,
   versusConfig: VersusConfig,
 ): MountResult => {
+  // container is document.body — clearing it on each rerender would remove the
+  // formula-editor shroud (also appended to body). Use a dedicated child as
+  // the rerender root so the editor survives opponent moves; the one-shot
+  // container clear at mount drops any DOM left by the previous screen.
+  container.innerHTML = ''
+  const root = document.createElement('div')
+  container.appendChild(root)
+
   // Shared challenge list — same challenges in same order for both players
   const sharedChallenges: ChallengeResult[] = []
   const ensureChallenge = (i: number) => {
@@ -195,7 +207,7 @@ export const mountVersus = (
   const rerender = () => {
     if (ws1.isSolved()) commitScore1()
     if (ws2.isSolved()) commitScore2()
-    container.innerHTML = ''
+    root.innerHTML = ''
     timerEl = null
 
     const screen = document.createElement('div')
@@ -366,7 +378,7 @@ export const mountVersus = (
     arena.appendChild(half2)
 
     screen.appendChild(arena)
-    container.appendChild(screen)
+    root.appendChild(screen)
 
     // Result overlay when time expires
     if (gameOver) {
@@ -392,7 +404,7 @@ export const mountVersus = (
       overlay.appendChild(msg)
       overlay.appendChild(scores)
       overlay.appendChild(backBtn)
-      container.appendChild(overlay)
+      root.appendChild(overlay)
     }
   }
 
