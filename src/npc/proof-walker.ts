@@ -1,4 +1,4 @@
-import { Event, reverse0, reverse1 } from '../interactive/event'
+import { Event, nextBranch, reverse0, reverse1 } from '../interactive/event'
 import { ProofUsing } from '../model/derivation'
 import { Prop } from '../model/prop'
 import { RuleId } from '../model/rule'
@@ -22,7 +22,11 @@ const extractAuxFormula = (
   return isNonEmptyArray(succ) ? succ[0] : null
 }
 
-const walk = (node: ProofUsing<AnySequent, RuleId>, out: Event[]): void => {
+const walk = (
+  node: ProofUsing<AnySequent, RuleId>,
+  out: Event[],
+  shuffle: boolean,
+): void => {
   const rule = node.rule
   if (isReverseId1(rule)) {
     const aux = extractAuxFormula(rule, node.deps)
@@ -30,11 +34,28 @@ const walk = (node: ProofUsing<AnySequent, RuleId>, out: Event[]): void => {
   } else if (isReverseId0(rule)) {
     out.push(reverse0(rule))
   }
-  for (const dep of node.deps) walk(dep, out)
+
+  // For 2-dep branching rules, randomly visit deps in reverse order.
+  // After emitting nextBranch the workspace focuses dep[1]; once that subtree
+  // closes, forwardThenBackOpen navigates back to the still-open dep[0].
+  if (shuffle && node.deps.length === 2 && Math.random() < 0.5) {
+    const dep0 = node.deps[0]
+    const dep1 = node.deps[1]
+    if (dep0 !== undefined && dep1 !== undefined) {
+      out.push(nextBranch())
+      walk(dep1, out, shuffle)
+      walk(dep0, out, shuffle)
+      return
+    }
+  }
+  for (const dep of node.deps) walk(dep, out, shuffle)
 }
 
-export const linearize = (proof: ProofUsing<AnySequent, RuleId>): Event[] => {
+export const linearize = (
+  proof: ProofUsing<AnySequent, RuleId>,
+  shuffle: boolean = true,
+): Event[] => {
   const events: Event[] = []
-  walk(proof, events)
+  walk(proof, events, shuffle)
   return events
 }
