@@ -85,6 +85,7 @@ const en = {
   keyboard: 'Keyboard',
   gamepad1: 'Gamepad 1',
   gamepad2: 'Gamepad 2',
+  npc: 'NPC',
 } as const
 
 const fi: Record<MessageKey, string> = {
@@ -174,6 +175,7 @@ const fi: Record<MessageKey, string> = {
   keyboard: 'Näppäimistö',
   gamepad1: 'Ohjain 1',
   gamepad2: 'Ohjain 2',
+  npc: 'NPC',
 }
 
 const es: Record<MessageKey, string> = {
@@ -263,6 +265,7 @@ const es: Record<MessageKey, string> = {
   keyboard: 'Teclado',
   gamepad1: 'Mando 1',
   gamepad2: 'Mando 2',
+  npc: 'NPC',
 }
 
 const cs: Record<MessageKey, string> = {
@@ -352,6 +355,7 @@ const cs: Record<MessageKey, string> = {
   keyboard: 'Klávesnice',
   gamepad1: 'Ovladač 1',
   gamepad2: 'Ovladač 2',
+  npc: 'NPC',
 }
 
 const pl: Record<MessageKey, string> = {
@@ -441,6 +445,7 @@ const pl: Record<MessageKey, string> = {
   keyboard: 'Klawiatura',
   gamepad1: 'Pad 1',
   gamepad2: 'Pad 2',
+  npc: 'NPC',
 }
 
 type MessageKey = keyof typeof en

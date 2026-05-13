@@ -17,14 +17,22 @@ import { MountResult, Navigate } from './types'
 import { t, formatStats } from './i18n'
 import { createLangSwitcher } from './lang-switcher'
 import { ChallengeMessage } from './challenge-protocol'
+import {
+  NpcKnobs,
+  defaultNpcKnobs,
+  parseNpcKnobsFromParams,
+  setNpcKnobsParams,
+} from '../npc/knobs'
 
-export type PlayerInput = 'mouse' | 'keyboard' | 'gamepad1' | 'gamepad2'
+export type PlayerInput = 'mouse' | 'keyboard' | 'gamepad1' | 'gamepad2' | 'npc'
 
 export type VersusConfig = {
   randomConfig: RandomConfig
   gameDurationSeconds: number
   p1Input: PlayerInput
   p2Input: PlayerInput
+  npc1Knobs: NpcKnobs
+  npc2Knobs: NpcKnobs
 }
 
 export const defaultVersusConfig = (): VersusConfig => ({
@@ -32,6 +40,8 @@ export const defaultVersusConfig = (): VersusConfig => ({
   gameDurationSeconds: 300,
   p1Input: 'keyboard',
   p2Input: 'mouse',
+  npc1Knobs: defaultNpcKnobs(),
+  npc2Knobs: defaultNpcKnobs(),
 })
 
 const INPUT_OPTIONS: PlayerInput[] = [
@@ -39,6 +49,7 @@ const INPUT_OPTIONS: PlayerInput[] = [
   'keyboard',
   'gamepad1',
   'gamepad2',
+  'npc',
 ]
 
 const pickNumber = (
@@ -62,7 +73,8 @@ const pickInput = (
     raw === 'mouse' ||
     raw === 'keyboard' ||
     raw === 'gamepad1' ||
-    raw === 'gamepad2'
+    raw === 'gamepad2' ||
+    raw === 'npc'
   )
     return raw
   return fallback
@@ -81,6 +93,8 @@ export const parseVersusConfigFromParams = (
     ),
     p1Input: pickInput(params, 'versus_p1', defaults.p1Input),
     p2Input: pickInput(params, 'versus_p2', defaults.p2Input),
+    npc1Knobs: parseNpcKnobsFromParams(params, 'npc1_'),
+    npc2Knobs: parseNpcKnobsFromParams(params, 'npc2_'),
   }
 }
 
@@ -92,27 +106,31 @@ export const setVersusConfigParams = (
   params.set('versus_time', String(config.gameDurationSeconds))
   params.set('versus_p1', config.p1Input)
   params.set('versus_p2', config.p2Input)
+  setNpcKnobsParams(config.npc1Knobs, params, 'npc1_')
+  setNpcKnobsParams(config.npc2Knobs, params, 'npc2_')
 }
 
 const inputLabel = (input: PlayerInput): string => {
   if (input === 'mouse') return t('mouse')
   if (input === 'keyboard') return t('keyboard')
   if (input === 'gamepad1') return t('gamepad1')
-  return t('gamepad2')
+  if (input === 'gamepad2') return t('gamepad2')
+  return t('npc')
 }
 
 const inputEmoji = (input: PlayerInput): string => {
   if (input === 'mouse') return '🖱️'
   if (input === 'keyboard') return '⌨️'
   if (input === 'gamepad1') return '🎮₁'
-  return '🎮₂'
+  if (input === 'gamepad2') return '🎮₂'
+  return '🤖'
 }
 
 const connectedGamepadCount = (): number =>
   Array.from(navigator.getGamepads()).filter((gp) => gp !== null).length
 
 const isInputAvailable = (input: PlayerInput): boolean => {
-  if (input === 'mouse' || input === 'keyboard') return true
+  if (input === 'mouse' || input === 'keyboard' || input === 'npc') return true
   const needed = input === 'gamepad1' ? 1 : 2
   return connectedGamepadCount() >= needed
 }

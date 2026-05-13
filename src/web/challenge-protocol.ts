@@ -1,10 +1,13 @@
 import { Configuration } from '../model/challenge'
+import { ProofUsing } from '../model/derivation'
 import { RandomConfig } from '../random/config'
 import { RuleId } from '../model/rule'
 import { AnySequent } from '../model/sequent'
 
 export type ChallengeResult = {
-  challenge: Configuration<AnySequent, ReadonlyArray<RuleId>>
+  challenge: Configuration<AnySequent, ReadonlyArray<RuleId>> & {
+    solution?: ProofUsing<AnySequent, RuleId>
+  }
   nonStructuralCount: number
   bypassed: boolean
   formulasTried: number

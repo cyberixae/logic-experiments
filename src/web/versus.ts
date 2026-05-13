@@ -5,6 +5,7 @@ import { Action } from '../interactive/action'
 import type { Prop } from '../model/prop'
 import { ChallengeResult } from './challenge-protocol'
 import { ChallengePool } from './challenge-pool'
+import { createNpcDriver } from '../npc/driver'
 import {
   AnyWorkspace,
   ApplyReverse1,
@@ -740,6 +741,25 @@ export const mountVersus = (
     cleanupP1 = () => document.removeEventListener('keydown', handleKey)
   } else if (versusConfig.p1Input === 'mouse') {
     cleanupP1 = () => {}
+  } else if (versusConfig.p1Input === 'npc') {
+    const driver = createNpcDriver({
+      getWorkspace: () => ws1,
+      getChallengeIdx: () => wsIdx1,
+      getChallengeSolution: () => sharedChallenges[wsIdx1]?.challenge.solution,
+      getTotalMoves: () => totalMoves(ws1),
+      applyEvent: (ev) => {
+        ws1.applyEvent(ev)
+        if (ws1.isSolved()) {
+          solvePlayer1()
+        } else {
+          rerender()
+        }
+      },
+      skip: skipPlayer1,
+      knobs: versusConfig.npc1Knobs,
+      isGameOver: () => gameOver,
+    })
+    cleanupP1 = driver.cleanup
   } else {
     cleanupP1 = setupGamepad((action) => {
       if (gameOver) return
@@ -758,6 +778,25 @@ export const mountVersus = (
     cleanupP2 = () => document.removeEventListener('keydown', handleKey2)
   } else if (versusConfig.p2Input === 'mouse') {
     cleanupP2 = () => {}
+  } else if (versusConfig.p2Input === 'npc') {
+    const driver = createNpcDriver({
+      getWorkspace: () => ws2,
+      getChallengeIdx: () => wsIdx2,
+      getChallengeSolution: () => sharedChallenges[wsIdx2]?.challenge.solution,
+      getTotalMoves: () => totalMoves(ws2),
+      applyEvent: (ev) => {
+        ws2.applyEvent(ev)
+        if (ws2.isSolved()) {
+          solvePlayer2()
+        } else {
+          rerender()
+        }
+      },
+      skip: skipPlayer2,
+      knobs: versusConfig.npc2Knobs,
+      isGameOver: () => gameOver,
+    })
+    cleanupP2 = driver.cleanup
   } else {
     cleanupP2 = setupGamepad((action) => {
       if (gameOver) return
