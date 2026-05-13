@@ -39,7 +39,7 @@ export const defaultVersusConfig = (): VersusConfig => ({
   randomConfig: defaultRandomConfig(),
   gameDurationSeconds: 300,
   p1Input: 'keyboard',
-  p2Input: 'mouse',
+  p2Input: 'npc',
   npc1Knobs: defaultNpcKnobs(),
   npc2Knobs: defaultNpcKnobs(),
 })
