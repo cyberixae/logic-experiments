@@ -120,10 +120,16 @@ export const createNpcDriver = (
       return
     }
 
+    const linearizeOpts = {
+      shuffle: true,
+      inflateProb: opts.knobs.inflateProb,
+      allowedRules: opts.getWorkspace().availableRules(),
+    }
+
     if (state.kind === 'idle' || state.kind === 'observing') {
       const solution = opts.getChallengeSolution()
       if (solution !== undefined) {
-        startExecuting(idx, linearize(solution), Date.now())
+        startExecuting(idx, linearize(solution, linearizeOpts), Date.now())
       } else {
         startPlanning(idx)
       }
@@ -134,7 +140,7 @@ export const createNpcDriver = (
       const proof = state.proofRef.value
       if (proof !== null) {
         state.handle.cancel()
-        startExecuting(idx, linearize(proof), state.startedAt)
+        startExecuting(idx, linearize(proof, linearizeOpts), state.startedAt)
         return
       }
       if (Date.now() - state.startedAt > opts.knobs.skipAfterMs) {
