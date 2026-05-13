@@ -205,35 +205,44 @@ export const mountVersus = (
     const arena = document.createElement('div')
     arena.setAttribute('class', 'versus-arena')
 
+    const isNpc1 = versusConfig.p1Input === 'npc'
+    const isNpc2 = versusConfig.p2Input === 'npc'
+
     const half1 = document.createElement('div')
-    half1.setAttribute('class', 'versus-half')
+    half1.setAttribute(
+      'class',
+      'versus-half' + (isNpc1 ? ' versus-half-npc' : ''),
+    )
     half1.appendChild(
       createBench(
         ws1,
         makeCongratsP1,
-        makeUndoControls(ws1, ctx1),
+        isNpc1 ? document.createElement('div') : makeUndoControls(ws1, ctx1),
         rerender,
         undefined,
         onApplyReverse1,
         undefined,
         ctx1,
-        skipPlayer1,
+        isNpc1 ? undefined : skipPlayer1,
       ),
     )
 
     const half2 = document.createElement('div')
-    half2.setAttribute('class', 'versus-half')
+    half2.setAttribute(
+      'class',
+      'versus-half' + (isNpc2 ? ' versus-half-npc' : ''),
+    )
     half2.appendChild(
       createBench(
         ws2,
         makeCongratsP2,
-        makeUndoControls(ws2, ctx2),
+        isNpc2 ? document.createElement('div') : makeUndoControls(ws2, ctx2),
         rerender,
         undefined,
         onApplyReverse2,
         undefined,
         ctx2,
-        skipPlayer2,
+        isNpc2 ? undefined : skipPlayer2,
       ),
     )
 

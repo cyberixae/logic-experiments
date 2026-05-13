@@ -1706,6 +1706,17 @@ html.loading body {
   width: 100%;
   height: 100%;
 }
+.versus-half-npc .bench {
+  pointer-events: none;
+}
+.versus-half-npc .bench > .left,
+.versus-half-npc .bench > .main,
+.versus-half-npc .bench > .right,
+.versus-half-npc .bench-topbar,
+.versus-half-npc .rules-sheet,
+.versus-half-npc .controls {
+  visibility: hidden;
+}
 .versus-half .playarea {
   padding-left: 3em;
   padding-right: 3em;
