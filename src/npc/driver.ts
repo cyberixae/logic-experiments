@@ -2,7 +2,7 @@ import { Event } from '../interactive/event'
 import { AnyWorkspace } from '../interactive/workspace'
 import { ProofUsing } from '../model/derivation'
 import { RuleId } from '../model/rule'
-import { AnySequent } from '../model/sequent'
+import { AnySequent, isTautology } from '../model/sequent'
 import { NpcKnobs } from './knobs'
 import { linearize } from './proof-walker'
 import { solveChunked, SolveHandle } from './solver-runner'
@@ -75,6 +75,15 @@ export const createNpcDriver = (
     const ws = opts.getWorkspace()
     const goal = ws.currentConjecture().derivation.result
     const rules = ws.availableRules()
+    // Bypassed (chaos) challenges arrive without a precomputed solution and
+    // the goal may not even be a tautology — running brute on it would never
+    // return and would block the main thread past skipAfterMs. Skip early
+    // when the truth-table check rules out a proof.
+    if (!isTautology(goal)) {
+      startObserving()
+      opts.skip()
+      return
+    }
     const proofRef: ProofRef = { value: null }
     const handle = solveChunked({ goal, rules }, (p) => {
       proofRef.value = p
