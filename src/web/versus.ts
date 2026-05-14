@@ -308,9 +308,9 @@ export const mountVersus = (
       e: DisplayEntry | undefined,
       pts: number | undefined,
     ): string => {
-      if (e === undefined || e === 'current') return ''
-      if (e === 'skip') return '0'
-      return `+${String(pts ?? 1)}`
+      if (e === undefined || e === 'current' || e === 'skip') return ''
+      const bonus = (pts ?? 1) - 1
+      return bonus > 0 ? `+${String(bonus)}` : ''
     }
     const makeCell = (
       entry: DisplayEntry | undefined,
