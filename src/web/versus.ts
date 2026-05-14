@@ -180,7 +180,21 @@ export const mountVersus = (
   let closeEditor2: (() => void) | null = null
   let tryUndoEditor2: (() => boolean) | null = null
 
-  const makeUndoControls = (ws: AnyWorkspace, ctx: BenchCtx): HTMLElement => {
+  const isNpc1 = versusConfig.p1Input === 'npc'
+  const isNpc2 = versusConfig.p2Input === 'npc'
+
+  // Refs to the current arena regions, refreshed every full rerender. Surgical
+  // updates swap just one of these so the opposite player's in-flight animation
+  // is never disturbed by their opponent's moves.
+  let half1El: HTMLElement | null = null
+  let half2El: HTMLElement | null = null
+  let thermoEl: HTMLElement | null = null
+
+  const makeUndoControls = (
+    ws: AnyWorkspace,
+    ctx: BenchCtx,
+    refresh: () => void,
+  ): HTMLElement => {
     const el = document.createElement('div')
     el.setAttribute('class', 'controls')
     const canUndo = activePath(ws.currentConjecture()).length > 0
@@ -195,7 +209,7 @@ export const mountVersus = (
           } else {
             ctx.setGazeModeActive(false)
           }
-          rerender()
+          refresh()
         },
         ctx.getActionHint('undo'),
       ),
@@ -203,34 +217,20 @@ export const mountVersus = (
     return el
   }
 
-  // rerender is defined before solvePlayer* so they can reference it
-  const rerender = () => {
-    if (ws1.isSolved()) commitScore1()
-    if (ws2.isSolved()) commitScore2()
-    root.innerHTML = ''
-    timerEl = null
-
-    const screen = document.createElement('div')
-    screen.setAttribute('class', 'versus-screen')
-
-    // Side-by-side benches
-    const arena = document.createElement('div')
-    arena.setAttribute('class', 'versus-arena')
-
-    const isNpc1 = versusConfig.p1Input === 'npc'
-    const isNpc2 = versusConfig.p2Input === 'npc'
-
-    const half1 = document.createElement('div')
-    half1.setAttribute(
+  const buildHalf1 = (): HTMLElement => {
+    const half = document.createElement('div')
+    half.setAttribute(
       'class',
       'versus-half' + (isNpc1 ? ' versus-half-npc' : ''),
     )
-    half1.appendChild(
+    half.appendChild(
       createBench(
         ws1,
         makeCongratsP1,
-        isNpc1 ? document.createElement('div') : makeUndoControls(ws1, ctx1),
-        rerender,
+        isNpc1
+          ? document.createElement('div')
+          : makeUndoControls(ws1, ctx1, refreshP1),
+        refreshP1,
         undefined,
         onApplyReverse1,
         undefined,
@@ -238,18 +238,23 @@ export const mountVersus = (
         isNpc1 ? undefined : skipPlayer1,
       ),
     )
+    return half
+  }
 
-    const half2 = document.createElement('div')
-    half2.setAttribute(
+  const buildHalf2 = (): HTMLElement => {
+    const half = document.createElement('div')
+    half.setAttribute(
       'class',
       'versus-half' + (isNpc2 ? ' versus-half-npc' : ''),
     )
-    half2.appendChild(
+    half.appendChild(
       createBench(
         ws2,
         makeCongratsP2,
-        isNpc2 ? document.createElement('div') : makeUndoControls(ws2, ctx2),
-        rerender,
+        isNpc2
+          ? document.createElement('div')
+          : makeUndoControls(ws2, ctx2, refreshP2),
+        refreshP2,
         undefined,
         onApplyReverse2,
         undefined,
@@ -257,7 +262,10 @@ export const mountVersus = (
         isNpc2 ? undefined : skipPlayer2,
       ),
     )
+    return half
+  }
 
+  const buildThermo = (): HTMLElement => {
     const thermo = document.createElement('div')
     thermo.setAttribute('class', 'versus-thermo')
 
@@ -373,9 +381,30 @@ export const mountVersus = (
 
     thermo.appendChild(thermoRows)
 
-    arena.appendChild(half1)
-    arena.appendChild(thermo)
-    arena.appendChild(half2)
+    return thermo
+  }
+
+  // rerender is defined before solvePlayer* so they can reference it
+  const rerender = () => {
+    if (ws1.isSolved()) commitScore1()
+    if (ws2.isSolved()) commitScore2()
+    root.innerHTML = ''
+    timerEl = null
+
+    const screen = document.createElement('div')
+    screen.setAttribute('class', 'versus-screen')
+
+    // Side-by-side benches
+    const arena = document.createElement('div')
+    arena.setAttribute('class', 'versus-arena')
+
+    half1El = buildHalf1()
+    half2El = buildHalf2()
+    thermoEl = buildThermo()
+
+    arena.appendChild(half1El)
+    arena.appendChild(thermoEl)
+    arena.appendChild(half2El)
 
     screen.appendChild(arena)
     root.appendChild(screen)
@@ -408,7 +437,6 @@ export const mountVersus = (
     }
   }
 
-  // Auto-advance on solve — replaces workspace before rerender so bench never shows congrats
   const commitScore1 = () => {
     if (scoreCommitted1) return
     scoreCommitted1 = true
@@ -463,7 +491,8 @@ export const mountVersus = (
   const solvePlayer1 = () => {
     commitScore1()
     advancePlayer1()
-    rerender()
+    rerenderHalf1()
+    rebuildThermo()
   }
 
   const commitScore2 = () => {
@@ -519,7 +548,8 @@ export const mountVersus = (
   const solvePlayer2 = () => {
     commitScore2()
     advancePlayer2()
-    rerender()
+    rerenderHalf2()
+    rebuildThermo()
   }
 
   const skipPlayer1 = () => {
@@ -543,7 +573,8 @@ export const mountVersus = (
     // If opponent hasn't solved yet, penalty is deferred until they solve and P1 re-skips.
 
     advancePlayer1()
-    rerender()
+    rerenderHalf1()
+    rebuildThermo()
   }
   const skipPlayer2 = () => {
     if (gameOver) return
@@ -564,17 +595,61 @@ export const mountVersus = (
     }
 
     advancePlayer2()
-    rerender()
+    rerenderHalf2()
+    rebuildThermo()
   }
 
-  // Advance on any action except menu (menu should still navigate away).
+  // Surgical updates: each player's actions only touch their own half (and
+  // the shared thermometer). This guarantees an opponent's moves can never
+  // restart a player's in-flight zoom + proof-check sweep — the only path
+  // that rebuilds the entire arena is `rerender`, used for initial mount,
+  // gameOver overlay, and gamepad-connection events.
+  const rerenderHalf1 = () => {
+    if (half1El === null) return
+    const fresh = buildHalf1()
+    half1El.replaceWith(fresh)
+    half1El = fresh
+  }
+  const rerenderHalf2 = () => {
+    if (half2El === null) return
+    const fresh = buildHalf2()
+    half2El.replaceWith(fresh)
+    half2El = fresh
+  }
+  const rebuildThermo = () => {
+    if (thermoEl === null) return
+    const fresh = buildThermo()
+    thermoEl.replaceWith(fresh)
+    thermoEl = fresh
+  }
+  // refreshP{1,2}: the dispatch callback for that player's regular moves.
+  // Commits score on the move that solves the level (so the scoreboard reflects
+  // the win), refreshes that player's bench, and rebuilds the thermometer.
+  // Never touches the opponent's half.
+  const refreshP1 = () => {
+    if (ws1.isSolved()) commitScore1()
+    rerenderHalf1()
+    rebuildThermo()
+  }
+  const refreshP2 = () => {
+    if (ws2.isSolved()) commitScore2()
+    rerenderHalf2()
+    rebuildThermo()
+  }
+
+  // Post-solve: only the Continue action (axiom) advances; menu navigates away;
+  // every other mapped key replays this player's animation on their own half.
   const onSolved1 = (action: Action) => {
     if (gameOver) return
     if (action === 'menu') {
       navigate('menu')
       return
     }
-    solvePlayer1()
+    if (action === 'axiom') {
+      solvePlayer1()
+      return
+    }
+    rerenderHalf1()
   }
   const onSolved2 = (action: Action) => {
     if (gameOver) return
@@ -582,7 +657,11 @@ export const mountVersus = (
       navigate('menu')
       return
     }
-    solvePlayer2()
+    if (action === 'axiom') {
+      solvePlayer2()
+      return
+    }
+    rerenderHalf2()
   }
 
   // Formula editors — appended to document.body so a rerender from the other
@@ -633,10 +712,12 @@ export const mountVersus = (
     tryUndoEditor2 = ed2.tryUndo
   }
 
-  // Independent dispatch per player
+  // Independent dispatch per player. Each player's regular-move rerender
+  // callback is scoped to their own half + the thermometer, so an opponent's
+  // moves can never disturb this player's in-flight animation.
   const dispatch1 = createDispatch(
     () => ws1,
-    rerender,
+    refreshP1,
     navigate,
     onSolved1,
     undefined,
@@ -646,7 +727,7 @@ export const mountVersus = (
   )
   const dispatch2 = createDispatch(
     () => ws2,
-    rerender,
+    refreshP2,
     navigate,
     onSolved2,
     undefined,
@@ -773,7 +854,7 @@ export const mountVersus = (
         if (ws1.isSolved()) {
           solvePlayer1()
         } else {
-          rerender()
+          refreshP1()
         }
       },
       skip: skipPlayer1,
@@ -810,7 +891,7 @@ export const mountVersus = (
         if (ws2.isSolved()) {
           solvePlayer2()
         } else {
-          rerender()
+          refreshP2()
         }
       },
       skip: skipPlayer2,
