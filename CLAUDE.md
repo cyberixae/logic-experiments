@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ```bash
 yarn build          # Compile TypeScript → lib/
-yarn build:web      # Bundle web interface → dist/lk.js + dist/lk.w.js (via esbuild)
+yarn build:web      # Bundle web interface → dist/lk.js + dist/lk.w.js + dist/lk.npc.w.js (via esbuild)
 yarn dev            # Watch + serve web interface locally
 yarn main           # Build + run interactive REPL
 yarn lint           # Lint all files with ESLint
@@ -54,6 +54,39 @@ This project implements propositional logic proof systems with an interactive RE
 
 ~88 challenges in 10 categories (ch0–ch9: identity → completeness), each specifying allowed rules and a goal sequent. Registered in `challenges/index.ts`.
 
+### Game modes
+
+The web app has three top-level user-facing modes declared in `src/model/mode.ts` (`'random' | 'campaign' | 'match'`), plus auxiliary screens:
+
+- **Campaign** (`src/web/campaign.ts`) — sequential progression through curated challenges; embeds the tutorial via the `Tutorial` type with `pinned` rules.
+- **Random** (`src/web/random.ts`, `src/random/`) — endless randomly-generated challenges. `src/random/challenge.ts` builds challenges; `src/random/config.ts` exposes config (rule selection, difficulty).
+- **Match / Versus** (`src/web/match-intro.ts`, `match-curated.ts`, `versus.ts`, `versus-config.ts`) — 5-minute head-to-head where two slots solve the same challenge pool side-by-side. P2 defaults to NPC; either slot can be `'human'` or `'npc'` via the input picker / URL params.
+- **Quiz** (`src/web/quiz.ts`, `quiz-config.ts`, `src/quiz/`) — secret-menu rule-recognition mode that uses the `RuleSchema` type to generate rule cards with random formula/sequence variable bindings. `src/quiz/schema.ts` is the shared schema infrastructure also relevant to future Nightmare / player-defined-systems work.
+- **Sandbox / System docs** (`src/web/system.ts`) — per-system reference shown via `?mode=system`.
+
+### Random configuration (`src/random/`)
+
+- `challenge.ts` — generates a random challenge given a config (selected rules, difficulty).
+- `config.ts` — config type + URL-param plumbing for Random mode.
+
+### Quiz subsystem (`src/quiz/`)
+
+- `schema.ts` — `RuleSchema`: rules-as-data with formula and sequence variables. Shared with future Nightmare / player-defined-systems epics; keep generic.
+- `generate.ts` — instantiates a `RuleSchema` into a concrete rule card by binding variables.
+- `render.ts` — renders a quiz card.
+- `config.ts` — Quiz config type.
+
+### NPC subsystem (`src/npc/`)
+
+Computer-controlled players for Versus mode. Each NPC slot dispatches through `workspace.applyEvent` like a human — no AI-only fast path.
+
+- `driver.ts` — tick-loop state machine (`idle → observing → planning → executing`); consumes knobs; dispatches events. `createNpcDriver` is instantiated once per NPC slot in `src/web/versus.ts`.
+- `knobs.ts` — knob defaults (`baseThinkMs`, `jitterMs`, `skipAfterMs`, `skipStuckMs`, `inflateProb`) + URL-param parsing (`npc1_*` / `npc2_*` per slot).
+- `proof-walker.ts` — `linearize(proof, opts)` walks a `ProofUsing` tree depth-first-left, emitting `Event`s for paced playback. Branch-order shuffle and B4 inflation (self-cancelling rotation pairs) live here.
+- `solver-runner.ts` — `createSolver()` lazily spawns one Web Worker per NPC slot for off-thread brute search. Cancel via request IDs.
+- `npc-worker.ts` — worker entry point; runs `bruteSearch` and posts proofs back.
+- `npc-protocol.ts` — message types for the worker channel.
+
 ### Rendering (`src/render/`)
 
 Template-based pretty-printer (`print.ts`) with customizable themes; block-based layout (`block.ts`).
@@ -81,6 +114,6 @@ The utilities in `src/utils/` exist to give standard TypeScript/JavaScript opera
 
 - Strict TypeScript; all types use discriminated unions with type guards/refinements
 - No semicolons, single quotes (Prettier config)
-- Output goes to `lib/` (tsc) and `dist/lk.js` + `dist/lk.w.js` (esbuild). **`dist/lk.html` and `dist/lk.css` are source files committed to git, not build outputs** — edit them directly when changing the web app's HTML structure or styles.
+- Output goes to `lib/` (tsc) and `dist/lk.js` + `dist/lk.w.js` (challenge worker) + `dist/lk.npc.w.js` (NPC planner worker) (esbuild). **`dist/lk.html` and `dist/lk.css` are source files committed to git, not build outputs** — edit them directly when changing the web app's HTML structure or styles.
 - ESLint enforces several non-obvious rules: no `++`/`--` (`no-plusplus`), no non-null assertions (`!`), no type assertions (`as`/`<T>`) outside tests and utils, strict boolean expressions (no implicit truthiness on non-booleans)
 - Every user-facing string lives in `src/web/i18n.ts` and is retrieved via `t(key)`. For templated strings (embedded numbers, names), use `{placeholder}` tokens in the translation and substitute at the call site — do not define per-locale formatter functions that bypass the `Record<MessageKey, string>` contract.
