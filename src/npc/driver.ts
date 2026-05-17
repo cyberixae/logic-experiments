@@ -5,7 +5,7 @@ import { RuleId } from '../model/rule'
 import { AnySequent, isTautology } from '../model/sequent'
 import { NpcKnobs } from './knobs'
 import { linearize } from './proof-walker'
-import { solveChunked, SolveHandle } from './solver-runner'
+import { createSolver, SolveHandle } from './solver-runner'
 
 export type NpcDriverOpts = {
   getWorkspace: () => AnyWorkspace
@@ -47,6 +47,7 @@ export const createNpcDriver = (
   let state: State = { kind: 'idle' }
   let pendingTimeout: ReturnType<typeof setTimeout> | null = null
   let cleanedUp = false
+  const solver = createSolver()
 
   const nextThinkDelay = (): number => {
     const base = opts.knobs.baseThinkMs
@@ -85,7 +86,7 @@ export const createNpcDriver = (
       return
     }
     const proofRef: ProofRef = { value: null }
-    const handle = solveChunked({ goal, rules }, (p) => {
+    const handle = solver.solveChunked({ goal, rules }, (p) => {
       proofRef.value = p
     })
     state = {
@@ -215,6 +216,7 @@ export const createNpcDriver = (
         pendingTimeout = null
       }
       cancelSolverIfPlanning()
+      solver.cleanup()
     },
   }
 }

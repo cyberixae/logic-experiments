@@ -3,4 +3,5 @@ coverage
 lib
 dist/lk.js
 dist/lk.w.js
+dist/lk.npc.w.js
 .yarn
