@@ -45,14 +45,18 @@ const makeVersusFormulaEditor = (
   onFormula: (formula: Prop) => void,
   onCancel: () => void,
   undoHint?: string,
-): { close: () => void; tryUndo: () => boolean } => {
+): {
+  close: () => void
+  tryUndo: () => boolean
+  onAction: (action: Action) => void
+} => {
   let modalEl: HTMLElement | null = null
   const close = () => {
     modalEl?.remove()
     modalEl = null
     onCancel()
   }
-  const { el, tryUndo } = createFormulaEditor(
+  const { el, tryUndo, onAction } = createFormulaEditor(
     t('lemmaTitle'),
     t('lemmaConfirm'),
     (formula) => {
@@ -70,7 +74,7 @@ const makeVersusFormulaEditor = (
     el.style.left = 'calc(50% + 2.5em)'
   }
   document.body.appendChild(el)
-  return { close, tryUndo }
+  return { close, tryUndo, onAction }
 }
 
 export const mountVersus = (
@@ -177,8 +181,10 @@ export const mountVersus = (
   // Formula editor state — tracked separately per player so each half is independent.
   let closeEditor1: (() => void) | null = null
   let tryUndoEditor1: (() => boolean) | null = null
+  let onActionEditor1: ((action: Action) => void) | null = null
   let closeEditor2: (() => void) | null = null
   let tryUndoEditor2: (() => boolean) | null = null
+  let onActionEditor2: ((action: Action) => void) | null = null
 
   const isNpc1 = versusConfig.p1Input === 'npc'
   const isNpc2 = versusConfig.p2Input === 'npc'
@@ -674,11 +680,13 @@ export const mountVersus = (
       (formula) => {
         closeEditor1 = null
         tryUndoEditor1 = null
+        onActionEditor1 = null
         onFormula(formula)
       },
       () => {
         closeEditor1 = null
         tryUndoEditor1 = null
+        onActionEditor1 = null
       },
       versusConfig.p1Input === 'keyboard'
         ? '⌫'
@@ -688,6 +696,7 @@ export const mountVersus = (
     )
     closeEditor1 = ed1.close
     tryUndoEditor1 = ed1.tryUndo
+    onActionEditor1 = ed1.onAction
   }
   const onApplyReverse2: ApplyReverse1 = (_key, onFormula) => {
     if (closeEditor2 !== null) return
@@ -696,11 +705,13 @@ export const mountVersus = (
       (formula) => {
         closeEditor2 = null
         tryUndoEditor2 = null
+        onActionEditor2 = null
         onFormula(formula)
       },
       () => {
         closeEditor2 = null
         tryUndoEditor2 = null
+        onActionEditor2 = null
       },
       versusConfig.p2Input === 'keyboard'
         ? '⌫'
@@ -710,6 +721,7 @@ export const mountVersus = (
     )
     closeEditor2 = ed2.close
     tryUndoEditor2 = ed2.tryUndo
+    onActionEditor2 = ed2.onAction
   }
 
   // Independent dispatch per player. Each player's regular-move rerender
@@ -792,21 +804,25 @@ export const mountVersus = (
     return input === 'gamepad2' ? (indices[1] ?? 1) : (indices[0] ?? 0)
   }
 
-  const handleEditorInput1 = (action: string): boolean => {
+  const handleEditorInput1 = (action: Action): boolean => {
     if (closeEditor1 === null) return false
     if (action === 'undo') {
       if (!(tryUndoEditor1?.() ?? false)) closeEditor1()
     } else if (action === 'menu') {
       closeEditor1()
+    } else {
+      onActionEditor1?.(action)
     }
     return true
   }
-  const handleEditorInput2 = (action: string): boolean => {
+  const handleEditorInput2 = (action: Action): boolean => {
     if (closeEditor2 === null) return false
     if (action === 'undo') {
       if (!(tryUndoEditor2?.() ?? false)) closeEditor2()
     } else if (action === 'menu') {
       closeEditor2()
+    } else {
+      onActionEditor2?.(action)
     }
     return true
   }

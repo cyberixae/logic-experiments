@@ -125,6 +125,7 @@ export const mountRandom = (
   let formulaEditorOpen = false
   let closeFormulaEditor: (() => void) | null = null
   let tryUndoInEditor: (() => boolean) | null = null
+  let editorOnAction: ((action: Action) => void) | null = null
   const onApplyReverse1: ApplyReverse1 = (_key, onFormula) => {
     if (formulaEditorOpen) return
     formulaEditorOpen = true
@@ -132,15 +133,21 @@ export const mountRandom = (
       formulaEditorOpen = false
       closeFormulaEditor = null
       tryUndoInEditor = null
+      editorOnAction = null
       container.removeChild(modal)
     }
-    const { el: modal, tryUndo } = createFormulaEditor(
+    const {
+      el: modal,
+      tryUndo,
+      onAction,
+    } = createFormulaEditor(
       t('lemmaTitle'),
       t('lemmaConfirm'),
       (formula) => {
         formulaEditorOpen = false
         closeFormulaEditor = null
         tryUndoInEditor = null
+        editorOnAction = null
         container.removeChild(modal)
         onFormula(formula)
       },
@@ -149,6 +156,7 @@ export const mountRandom = (
     )
     closeFormulaEditor = cancel
     tryUndoInEditor = tryUndo
+    editorOnAction = onAction
     container.appendChild(modal)
   }
 
@@ -213,6 +221,8 @@ export const mountRandom = (
         if (!(tryUndoInEditor?.() ?? false)) closeFormulaEditor?.()
       } else if (action === 'menu' || action === 'exit') {
         closeFormulaEditor?.()
+      } else {
+        editorOnAction?.(action)
       }
       return
     }

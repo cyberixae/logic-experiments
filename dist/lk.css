@@ -1079,6 +1079,10 @@ html.loading body {
 .gazed {
   border-bottom: 0.15em solid var(--gaze-color);
 }
+.formula-editor-popup .button.cursor {
+  outline: 3px solid #f80;
+  outline-offset: 2px;
+}
 .tree-sequent.ghost,
 .tree-inference.ghost {
   opacity: 0.55;
