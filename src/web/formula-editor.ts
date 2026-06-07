@@ -256,7 +256,7 @@ export const createFormulaEditor = (
   const renderState = (): void => {
     stackDisplay.innerHTML =
       stack.length === 0
-        ? '—'
+        ? ''
         : stack.map((p) => segment.html(fromProp(p)(basic))).join(' ')
 
     setDisabled(negBtn, stack.length === 0, () => {
