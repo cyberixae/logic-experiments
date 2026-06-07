@@ -1625,10 +1625,18 @@ html.loading body {
     left: auto;
     transform: none;
     width: 24px;
-    justify-content: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
   }
   .rules-sheet .rule .gaze-hint-stack .key-hint {
     position: static;
+    width: 24px;
+    height: 24px;
+    line-height: 24px;
+    font-size: 0.7em;
+    border-radius: 12px;
   }
   .has-pinned .bench {
     padding-bottom: 6em;
