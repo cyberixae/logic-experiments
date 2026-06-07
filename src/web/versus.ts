@@ -45,6 +45,7 @@ const makeVersusFormulaEditor = (
   onFormula: (formula: Prop) => void,
   onCancel: () => void,
   undoHint?: string,
+  activateHint?: string,
 ): {
   close: () => void
   tryUndo: () => boolean
@@ -66,6 +67,7 @@ const makeVersusFormulaEditor = (
     },
     close,
     undoHint,
+    activateHint,
   )
   modalEl = el
   if (side === 'left') {
@@ -693,6 +695,7 @@ export const mountVersus = (
         : versusConfig.p1Input === 'mouse'
           ? undefined
           : '○',
+      ctx1.getActionHint('axiom'),
     )
     closeEditor1 = ed1.close
     tryUndoEditor1 = ed1.tryUndo
@@ -718,6 +721,7 @@ export const mountVersus = (
         : versusConfig.p2Input === 'mouse'
           ? undefined
           : '○',
+      ctx2.getActionHint('axiom'),
     )
     closeEditor2 = ed2.close
     tryUndoEditor2 = ed2.tryUndo

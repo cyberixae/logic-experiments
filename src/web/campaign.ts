@@ -275,6 +275,7 @@ export const mountCampaign = (
       },
       cancel,
       '⌫',
+      getActionHint('axiom'),
     )
     closeFormulaEditor = cancel
     tryUndoInEditor = tryUndo

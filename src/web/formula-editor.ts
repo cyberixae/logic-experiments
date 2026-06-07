@@ -57,6 +57,7 @@ export const createFormulaEditor = (
   onConfirm: (formula: Prop) => void,
   onCancel: () => void,
   undoHint?: string,
+  activateHint?: string,
 ): {
   el: HTMLElement
   tryUndo: () => boolean
@@ -246,6 +247,12 @@ export const createFormulaEditor = (
 
   const hintBadge = undoHint !== undefined ? makeHintBadge(undoHint) : null
 
+  // Badge showing the activation key, parked on whichever button the cursor is
+  // on, so keyboard / gamepad players see how to press the focused button.
+  const cursorBadge =
+    activateHint !== undefined ? makeHintBadge(activateHint) : null
+  if (cursorBadge !== null) cursorBadge.classList.add('cursor-hint')
+
   const renderState = (): void => {
     stackDisplay.innerHTML =
       stack.length === 0
@@ -288,9 +295,16 @@ export const createFormulaEditor = (
     for (const row of rows) {
       for (const cell of row) cell.btn.classList.remove('cursor')
     }
-    if (cursorVisible) {
-      const focused = rows[cursorRow]?.[cursorCol]
-      if (focused !== undefined) focused.btn.classList.add('cursor')
+    const focused = cursorVisible ? rows[cursorRow]?.[cursorCol] : undefined
+    if (focused !== undefined) focused.btn.classList.add('cursor')
+
+    // The activation badge follows the cursor, but only onto buttons that can
+    // actually be activated.
+    if (cursorBadge !== null) {
+      cursorBadge.remove()
+      if (focused !== undefined && focused.isEnabled()) {
+        focused.btn.appendChild(cursorBadge)
+      }
     }
   }
 

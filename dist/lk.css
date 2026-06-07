@@ -1083,6 +1083,23 @@ html.loading body {
   outline: 3px solid #f80;
   outline-offset: 2px;
 }
+.formula-editor-popup .button {
+  position: relative;
+}
+.formula-editor-popup .button .cursor-hint {
+  position: absolute;
+  width: 30px;
+  height: 30px;
+  line-height: 30px;
+  top: -20px;
+  left: 10px;
+  right: auto;
+}
+.formula-editor-popup .button .cursor-hint.wide {
+  width: auto;
+  min-width: 30px;
+  padding: 0 7px;
+}
 .tree-sequent.ghost,
 .tree-inference.ghost {
   opacity: 0.55;
