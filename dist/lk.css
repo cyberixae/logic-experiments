@@ -1835,12 +1835,144 @@ html.loading body {
   background: rgba(0, 0, 0, 0.6);
   color: #fff;
   gap: 1em;
+  padding: 1.5em;
+  box-sizing: border-box;
   z-index: 100;
 }
-.versus-result-message {
+.versus-breakdown-title {
   font-size: 2em;
   font-weight: bold;
 }
-.versus-result-scores {
-  font-size: 1.3em;
+/* End-of-match breakdown. Per-level wrapper rows (.vb-level) on a shared grid via
+   subgrid, so columns align across rows while each row stays a discrete element.
+   Each cell carries a latent .vb-cell-label shown only in the collapsed card mode,
+   so narrow-screen reflow is a stylesheet-only change. */
+.versus-breakdown-grid {
+  display: grid;
+  grid-template-columns: repeat(4, auto) auto minmax(8em, auto) repeat(4, auto);
+  gap: 0.15em 0.7em;
+  align-items: center;
+  background: #fff;
+  color: #000;
+  padding: 1em 1.4em 1.2em;
+  border-radius: 0.4em;
+  /* Leave room for the title, the actions row and the overlay padding so the
+     whole stack stays within the viewport; the grid scrolls internally. */
+  max-height: calc(100dvh - 9em);
+  max-width: 95vw;
+  overflow: auto;
+  font-variant-numeric: tabular-nums;
+}
+.vb-level {
+  display: grid;
+  grid-template-columns: subgrid;
+  grid-column: 1 / -1;
+  align-items: center;
+}
+.vb-header {
+  align-items: baseline;
+  padding-bottom: 0.3em;
+}
+.vb-title-name {
+  font-weight: bold;
+}
+.vb-title-name.p1 {
+  grid-column: 1 / 4;
+  text-align: left;
+}
+.vb-title-name.p2 {
+  grid-column: 8 / 11;
+  text-align: right;
+}
+.vb-title-spacer {
+  grid-column: 5 / 7;
+}
+/* Score totals sit in the Points column (col 4 / col 7), centred like the Points
+   cells so each total reads as that column's sum. */
+.vb-title-score-cell {
+  text-align: center;
+}
+.vb-title-score-cell.p1 {
+  grid-column: 4;
+}
+.vb-title-score-cell.p2 {
+  grid-column: 7;
+}
+.vb-title-score {
+  font-size: 1.7em;
+  font-weight: bold;
+  line-height: 1;
+}
+.vb-subhead {
+  font-size: 0.8em;
+  opacity: 0.55;
+  border-bottom: 1px solid #ccc;
+  padding-bottom: 0.25em;
+  margin-bottom: 0.15em;
+}
+.vb-subcell {
+  text-align: center;
+}
+.vb-cell {
+  padding: 0.12em 0;
+  text-align: center;
+}
+.vb-cell-label {
+  display: none;
+}
+.vb-cell.pts .vb-cell-value {
+  font-weight: bold;
+}
+.vb-goal {
+  text-align: left;
+}
+.vb-sec-start {
+  border-left: 1px solid #e3e3e3;
+  padding-left: 0.6em;
+}
+.versus-breakdown-actions {
+  margin-top: 1em;
+}
+
+/* Minimal safe fallback when too narrow for the table: rows stack into cards and
+   the latent per-cell labels appear. A polished card design is a later pass. */
+@media (max-width: 720px) {
+  .versus-breakdown-grid {
+    display: block;
+  }
+  .vb-subhead {
+    display: none;
+  }
+  .vb-level {
+    display: block;
+    border: 1px solid #ccc;
+    border-radius: 0.3em;
+    padding: 0.5em 0.7em;
+    margin-bottom: 0.5em;
+  }
+  .vb-level.vb-header {
+    border: none;
+    padding: 0 0 0.4em;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.3em 0.6em;
+  }
+  .vb-title-spacer {
+    display: none;
+  }
+  .vb-cell {
+    display: flex;
+    justify-content: space-between;
+    gap: 1em;
+    text-align: left;
+  }
+  .vb-cell-label {
+    display: block;
+    opacity: 0.5;
+  }
+  .vb-sec-start {
+    border-left: none;
+    padding-left: 0;
+  }
 }

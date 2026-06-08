@@ -21,6 +21,8 @@ import {
   subscribeGamepad,
 } from './game'
 import { createFormulaEditor } from './formula-editor'
+import { basic, fromSequent } from '../render/print'
+import { html } from '../render/segment'
 import { MountResult, Navigate } from './types'
 import { t } from './i18n'
 import { VersusConfig } from './versus-config'
@@ -417,32 +419,221 @@ export const mountVersus = (
     screen.appendChild(arena)
     root.appendChild(screen)
 
-    // Result overlay when time expires
-    if (gameOver) {
-      const resultMsg =
-        score1 > score2
-          ? t('winsTemplate').replace('{player}', t('player1'))
-          : score2 > score1
-            ? t('winsTemplate').replace('{player}', t('player2'))
-            : t('tie')
+    // End-of-match breakdown screen when time expires.
+    if (gameOver) root.appendChild(buildResultScreen())
+  }
 
-      const overlay = document.createElement('div')
-      overlay.setAttribute('class', 'versus-result')
+  // ── End-of-match breakdown ────────────────────────────────────────────────
+  // A dedicated screen mirroring the arena: P1 | Level | P2, one row per level.
+  // Pure read over the existing per-player maps — no new state. Markup uses
+  // per-level wrapper rows + CSS subgrid so the table can later collapse into
+  // cards via a stylesheet-only media query (each cell carries a latent label).
 
-      const msg = document.createElement('div')
-      msg.setAttribute('class', 'versus-result-message')
-      msg.textContent = resultMsg
+  // The settled display state of one level for one player, mirroring the
+  // thermometer's displayEntry: a move count, a skip, the in-progress level, or
+  // unreached (undefined).
+  const breakdownEntry = (
+    resolved: Map<number, ResolvedEntry>,
+    ci: number,
+    i: number,
+  ): DisplayEntry | undefined => {
+    if (i !== ci) return resolved.get(i)
+    const entry = resolved.get(ci)
+    return typeof entry === 'number' ? entry : 'current'
+  }
 
-      const scores = document.createElement('div')
-      scores.setAttribute('class', 'versus-result-scores')
-      scores.textContent = `${t('player1')}: ${String(score1)}  •  ${t('player2')}: ${String(score2)}`
+  type SideCells = {
+    moves: string
+    done: string
+    bonus: string
+    points: string
+  }
 
-      const backBtn = createButton(t('back'), false, () => navigate('menu'))
-      overlay.appendChild(msg)
-      overlay.appendChild(scores)
-      overlay.appendChild(backBtn)
-      root.appendChild(overlay)
+  const sideCells = (
+    entry: DisplayEntry | undefined,
+    currentMoves: number,
+    levelPoints: number | undefined,
+    synthetic: number | undefined,
+  ): SideCells => {
+    if (entry === undefined)
+      return { moves: '', done: '', bonus: '', points: '' }
+    if (entry === 'current')
+      return { moves: String(currentMoves), done: '…', bonus: '', points: '' }
+    if (entry === 'skip')
+      return {
+        moves: synthetic !== undefined ? String(synthetic) : '',
+        done: '⊘',
+        bonus: '—',
+        points: '0',
+      }
+    const pts = levelPoints ?? 1
+    const bonus = pts - 1
+    return {
+      moves: String(entry),
+      done: '✓',
+      bonus: bonus > 0 ? `+${String(bonus)}` : '—',
+      points: String(pts),
     }
+  }
+
+  // One cell: value text plus a latent label (shown only in collapsed card mode).
+  const cell = (cls: string, label: string, value: string): HTMLElement => {
+    const el = document.createElement('div')
+    el.setAttribute('class', `vb-cell ${cls}`)
+    const lab = document.createElement('div')
+    lab.setAttribute('class', 'vb-cell-label')
+    lab.textContent = label
+    const val = document.createElement('div')
+    val.setAttribute('class', 'vb-cell-value')
+    val.textContent = value
+    el.appendChild(lab)
+    el.appendChild(val)
+    return el
+  }
+
+  const par = (i: number): string => {
+    const solution = sharedChallenges[i]?.challenge.solution
+    if (solution === undefined) return '💀'
+    const counts = countRuleUsage(solution)
+    return String(Object.values(counts).reduce((a, b) => a + b, 0))
+  }
+
+  const buildResultScreen = (): HTMLElement => {
+    const ci1 = currentChallengeIdx1()
+    const ci2 = currentChallengeIdx2()
+    const maxIdx = Math.max(
+      ci1,
+      ci2,
+      ...Array.from(resolved1.keys()),
+      ...Array.from(resolved2.keys()),
+    )
+    const moves1 = totalMoves(ws1)
+    const moves2 = totalMoves(ws2)
+
+    const overlay = document.createElement('div')
+    overlay.setAttribute('class', 'versus-result')
+
+    const title = document.createElement('div')
+    title.setAttribute('class', 'versus-breakdown-title')
+    title.textContent =
+      score1 > score2
+        ? t('winsTemplate').replace('{player}', t('player1'))
+        : score2 > score1
+          ? t('winsTemplate').replace('{player}', t('player2'))
+          : t('tie')
+    overlay.appendChild(title)
+
+    const grid = document.createElement('div')
+    grid.setAttribute('class', 'versus-breakdown-grid')
+
+    // Header row: player names + per-player totals, empty centre spacer.
+    const header = document.createElement('div')
+    header.setAttribute('class', 'vb-level vb-header')
+    // Each total sits in its player's Points grid column (centred like the Points
+    // cells) so it reads as that column's sum.
+    const p1Name = document.createElement('div')
+    p1Name.setAttribute('class', 'vb-title-name p1')
+    p1Name.textContent = t('player1')
+    const p1Score = document.createElement('div')
+    p1Score.setAttribute('class', 'vb-title-score-cell p1')
+    p1Score.innerHTML = `<span class="vb-title-score">${String(score1)}</span>`
+    // Empty center spacer (Par + Goal columns) — no upper 'Level' title.
+    const spacer = document.createElement('div')
+    spacer.setAttribute('class', 'vb-title-spacer')
+    const p2Score = document.createElement('div')
+    p2Score.setAttribute('class', 'vb-title-score-cell p2')
+    p2Score.innerHTML = `<span class="vb-title-score">${String(score2)}</span>`
+    const p2Name = document.createElement('div')
+    p2Name.setAttribute('class', 'vb-title-name p2')
+    p2Name.textContent = t('player2')
+    header.appendChild(p1Name)
+    header.appendChild(p1Score)
+    header.appendChild(spacer)
+    header.appendChild(p2Score)
+    header.appendChild(p2Name)
+    grid.appendChild(header)
+
+    // Column subheader row (hidden in collapsed card mode; labels take over).
+    const sub = document.createElement('div')
+    sub.setAttribute('class', 'vb-level vb-subhead')
+    const subCols = [
+      t('moves'),
+      t('done'),
+      t('bonus'),
+      t('points'),
+      t('par'),
+      t('goal'),
+      t('points'),
+      t('bonus'),
+      t('done'),
+      t('moves'),
+    ]
+    subCols.forEach((label, idx) => {
+      const c = document.createElement('div')
+      c.setAttribute(
+        'class',
+        'vb-cell vb-subcell' + (idx === 4 || idx === 6 ? ' vb-sec-start' : ''),
+      )
+      c.textContent = label
+      sub.appendChild(c)
+    })
+    grid.appendChild(sub)
+
+    for (let i = 0; i <= maxIdx; i += 1) {
+      const e1 = breakdownEntry(resolved1, ci1, i)
+      const e2 = breakdownEntry(resolved2, ci2, i)
+      const s1 = sideCells(
+        e1,
+        moves1,
+        levelPoints1.get(i),
+        skipSynthetic1.get(i),
+      )
+      const s2 = sideCells(
+        e2,
+        moves2,
+        levelPoints2.get(i),
+        skipSynthetic2.get(i),
+      )
+
+      const row = document.createElement('div')
+      row.setAttribute('class', 'vb-level')
+
+      row.appendChild(cell('p1 num', t('moves'), s1.moves))
+      row.appendChild(cell('p1 num', t('done'), s1.done))
+      row.appendChild(cell('p1 num', t('bonus'), s1.bonus))
+      row.appendChild(cell('p1 num pts', t('points'), s1.points))
+
+      const parCell = cell('vb-sec-start num', t('par'), par(i))
+      row.appendChild(parCell)
+      const goalCell = document.createElement('div')
+      goalCell.setAttribute('class', 'vb-cell vb-goal')
+      const goalLab = document.createElement('div')
+      goalLab.setAttribute('class', 'vb-cell-label')
+      goalLab.textContent = t('goal')
+      const goalVal = document.createElement('div')
+      goalVal.setAttribute('class', 'vb-cell-value')
+      const seq = sharedChallenges[i]?.challenge.goal
+      if (seq !== undefined) goalVal.innerHTML = html(fromSequent(seq)(basic))
+      goalCell.appendChild(goalLab)
+      goalCell.appendChild(goalVal)
+      row.appendChild(goalCell)
+
+      row.appendChild(cell('p2 num pts vb-sec-start', t('points'), s2.points))
+      row.appendChild(cell('p2 num', t('bonus'), s2.bonus))
+      row.appendChild(cell('p2 num', t('done'), s2.done))
+      row.appendChild(cell('p2 num', t('moves'), s2.moves))
+
+      grid.appendChild(row)
+    }
+
+    overlay.appendChild(grid)
+
+    const actions = document.createElement('div')
+    actions.setAttribute('class', 'versus-breakdown-actions')
+    actions.appendChild(createButton(t('back'), false, () => navigate('menu')))
+    overlay.appendChild(actions)
+
+    return overlay
   }
 
   const commitScore1 = () => {
