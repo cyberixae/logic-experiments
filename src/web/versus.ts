@@ -15,6 +15,7 @@ import {
   createBenchCtx,
   createButton,
   createDispatch,
+  getActionHintPure,
   markKeyboardInput,
   qwertyKeyMap,
   setupGamepad,
@@ -631,7 +632,22 @@ export const mountVersus = (
 
     const actions = document.createElement('div')
     actions.setAttribute('class', 'versus-breakdown-actions')
-    actions.appendChild(createButton(t('back'), false, () => navigate('menu')))
+    actions.appendChild(
+      createButton(
+        t('settings'),
+        false,
+        () => navigate('versus-config'),
+        getActionHintPure('lemma', false),
+      ),
+    )
+    actions.appendChild(
+      createButton(
+        t('playAgain'),
+        false,
+        () => navigate('versus'),
+        getActionHintPure('skip', false),
+      ),
+    )
     overlay.appendChild(actions)
 
     return overlay
@@ -1023,6 +1039,14 @@ export const mountVersus = (
     return true
   }
 
+  // On the end-of-match breakdown screen, the Lemma bind opens settings and the
+  // Skip bind starts a rematch. Reusing these binds (not confirm/undo) avoids
+  // accidental exits and keeps confirm/undo free for future cursor navigation.
+  const handleResultAction = (action: Action) => {
+    if (action === 'lemma') navigate('versus-config')
+    else if (action === 'skip') navigate('versus')
+  }
+
   const handleKey = (ev: KeyboardEvent) => {
     if (ev.ctrlKey || ev.metaKey || ev.altKey || gameOver) return
     markKeyboardInput()
@@ -1123,6 +1147,21 @@ export const mountVersus = (
     }, gpIndex(versusConfig.p2Input))
   }
 
+  // Result-screen navigation must work no matter how the slots are configured —
+  // including all-NPC matches, where no per-player keyboard or gamepad listener
+  // is installed. These always-on listeners cover keyboard and the first gamepad
+  // independently of slot input; the per-player handlers above ignore input once
+  // the match is over, so there is no double dispatch.
+  const handleResultKey = (ev: KeyboardEvent) => {
+    if (!gameOver || ev.ctrlKey || ev.metaKey || ev.altKey) return
+    const action = qwertyKeyMap[ev.code]
+    if (action !== undefined) handleResultAction(action)
+  }
+  document.addEventListener('keydown', handleResultKey)
+  const cleanupResultPad = setupGamepad((action) => {
+    if (gameOver) handleResultAction(action)
+  }, connectedGamepadIndices()[0] ?? 0)
+
   const unsubGamepad = subscribeGamepad(rerender)
 
   rerender()
@@ -1132,6 +1171,8 @@ export const mountVersus = (
       clearInterval(ticker)
       cleanupP1()
       cleanupP2()
+      document.removeEventListener('keydown', handleResultKey)
+      cleanupResultPad()
       unsubGamepad()
       closeEditor1?.()
       closeEditor2?.()

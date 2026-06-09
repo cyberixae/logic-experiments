@@ -64,6 +64,7 @@ export { AnyWorkspace }
 export {
   dualHint,
   getActionHint,
+  getActionHintPure,
   isGamepadActive,
   isGazeModeActive,
   isHotMode,
