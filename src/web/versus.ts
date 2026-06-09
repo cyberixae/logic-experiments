@@ -21,6 +21,7 @@ import {
   setupGamepad,
   subscribeGamepad,
 } from './game'
+import { createLangSwitcher } from './lang-switcher'
 import { createFormulaEditor } from './formula-editor'
 import { basic, fromSequent } from '../render/print'
 import { html } from '../render/segment'
@@ -181,6 +182,7 @@ export const mountVersus = (
   // Timer
   let timeLeft = versusConfig.gameDurationSeconds
   let gameOver = false
+  let paused = false
   // Reference kept so the ticker can patch text without rebuilding the DOM.
   let timerEl: HTMLElement | null = null
 
@@ -393,7 +395,81 @@ export const mountVersus = (
 
     thermo.appendChild(thermoRows)
 
+    // Global pause-menu button, shared by both players and below the scoreboard
+    // since it's not the main attraction. Keyboard/gamepad open the menu via the
+    // always-on control listeners; this is the pointer affordance.
+    const menuBtn = createButton(
+      '⋮',
+      false,
+      () => setPaused(true),
+      getActionHintPure('menu', false),
+    )
+    menuBtn.classList.add('versus-menu-btn')
+    menuBtn.setAttribute('aria-label', t('menu'))
+    thermo.appendChild(menuBtn)
+
     return thermo
+  }
+
+  const setPaused = (v: boolean) => {
+    paused = v
+    rerender()
+  }
+
+  // Standard in-game pause menu, mirroring createPausePopup's structure but with
+  // versus-appropriate actions (no per-player Reset; a Play Again that restarts
+  // the match with the same settings).
+  const buildPauseMenu = (): HTMLElement => {
+    const shroud = document.createElement('div')
+    shroud.setAttribute('class', 'shroud pause-shroud')
+    shroud.onclick = (ev) => {
+      if (ev.target === shroud) {
+        ev.preventDefault()
+        setPaused(false)
+      }
+    }
+    const panel = document.createElement('div')
+    panel.setAttribute('class', 'pause-popup')
+    panel.onclick = (ev) => {
+      ev.stopPropagation()
+    }
+    const title = document.createElement('div')
+    title.setAttribute('class', 'pause-title')
+    title.textContent = t('paused')
+    panel.appendChild(title)
+    const buttons = document.createElement('div')
+    buttons.setAttribute('class', 'pause-buttons')
+    buttons.appendChild(
+      createButton(
+        t('resumeGame'),
+        false,
+        () => setPaused(false),
+        getActionHintPure('menu', false),
+      ),
+    )
+    buttons.appendChild(
+      createButton(
+        t('playAgain'),
+        false,
+        () => navigate('versus'),
+        getActionHintPure('skip', false),
+      ),
+    )
+    buttons.appendChild(
+      createButton(t('settings'), false, () => navigate('versus-config')),
+    )
+    buttons.appendChild(
+      createButton(
+        t('exitToMainMenu'),
+        false,
+        () => navigate('menu'),
+        getActionHintPure('exit', false),
+      ),
+    )
+    panel.appendChild(buttons)
+    shroud.appendChild(panel)
+    shroud.appendChild(createLangSwitcher())
+    return shroud
   }
 
   // rerender is defined before solvePlayer* so they can reference it
@@ -423,6 +499,7 @@ export const mountVersus = (
 
     // End-of-match breakdown screen when time expires.
     if (gameOver) root.appendChild(buildResultScreen())
+    else if (paused) root.appendChild(buildPauseMenu())
   }
 
   // ── End-of-match breakdown ────────────────────────────────────────────────
@@ -990,7 +1067,7 @@ export const mountVersus = (
   // Only patch the timer text each tick — a full rerender would destroy the DOM
   // mid-animation and prevent the solved zoom + proof-check sweep from completing.
   const ticker = setInterval(() => {
-    if (gameOver) return
+    if (gameOver || paused) return
     timeLeft -= 1
     if (timeLeft <= 0) {
       timeLeft = 0
@@ -1047,11 +1124,37 @@ export const mountVersus = (
     else if (action === 'skip') navigate('versus')
   }
 
+  // Match-control actions are handled globally (see the always-on listeners
+  // below), independent of which input device each slot uses, so the menu is
+  // reachable in any configuration including all-NPC matches. The menu/pause
+  // toggle lives here rather than in the per-player handlers, which only drive
+  // gameplay and ignore input once paused or the match is over.
+  const handleControlAction = (action: Action) => {
+    if (gameOver) {
+      handleResultAction(action)
+      return
+    }
+    if (paused) {
+      if (action === 'menu' || action === 'undo') setPaused(false)
+      else if (action === 'skip') navigate('versus')
+      else if (action === 'exit') navigate('menu')
+      return
+    }
+    if (action !== 'menu') return
+    // First menu press cancels an open formula editor; otherwise it pauses.
+    if (closeEditor1 !== null || closeEditor2 !== null) {
+      closeEditor1?.()
+      closeEditor2?.()
+    } else {
+      setPaused(true)
+    }
+  }
+
   const handleKey = (ev: KeyboardEvent) => {
-    if (ev.ctrlKey || ev.metaKey || ev.altKey || gameOver) return
-    markKeyboardInput()
+    if (ev.ctrlKey || ev.metaKey || ev.altKey || gameOver || paused) return
     const action = qwertyKeyMap[ev.code]
-    if (action === undefined) return
+    if (action === undefined || action === 'menu') return
+    markKeyboardInput()
     if (handleEditorInput1(action)) return
     if (action === 'skip') {
       skipPlayer1()
@@ -1061,10 +1164,10 @@ export const mountVersus = (
   }
 
   const handleKey2 = (ev: KeyboardEvent) => {
-    if (ev.ctrlKey || ev.metaKey || ev.altKey || gameOver) return
-    markKeyboardInput()
+    if (ev.ctrlKey || ev.metaKey || ev.altKey || gameOver || paused) return
     const action = qwertyKeyMap[ev.code]
-    if (action === undefined) return
+    if (action === undefined || action === 'menu') return
+    markKeyboardInput()
     if (handleEditorInput2(action)) return
     if (action === 'skip') {
       skipPlayer2()
@@ -1096,11 +1199,12 @@ export const mountVersus = (
       skip: skipPlayer1,
       knobs: versusConfig.npc1Knobs,
       isGameOver: () => gameOver,
+      isPaused: () => paused,
     })
     cleanupP1 = driver.cleanup
   } else {
     cleanupP1 = setupGamepad((action) => {
-      if (gameOver) return
+      if (gameOver || paused || action === 'menu') return
       if (handleEditorInput1(action)) return
       if (action === 'skip') {
         skipPlayer1()
@@ -1133,11 +1237,12 @@ export const mountVersus = (
       skip: skipPlayer2,
       knobs: versusConfig.npc2Knobs,
       isGameOver: () => gameOver,
+      isPaused: () => paused,
     })
     cleanupP2 = driver.cleanup
   } else {
     cleanupP2 = setupGamepad((action) => {
-      if (gameOver) return
+      if (gameOver || paused || action === 'menu') return
       if (handleEditorInput2(action)) return
       if (action === 'skip') {
         skipPlayer2()
@@ -1147,20 +1252,21 @@ export const mountVersus = (
     }, gpIndex(versusConfig.p2Input))
   }
 
-  // Result-screen navigation must work no matter how the slots are configured —
-  // including all-NPC matches, where no per-player keyboard or gamepad listener
-  // is installed. These always-on listeners cover keyboard and the first gamepad
-  // independently of slot input; the per-player handlers above ignore input once
-  // the match is over, so there is no double dispatch.
-  const handleResultKey = (ev: KeyboardEvent) => {
-    if (!gameOver || ev.ctrlKey || ev.metaKey || ev.altKey) return
+  // Match control (open/close the pause menu, plus end-of-match navigation) is
+  // handled by always-on listeners that don't depend on how the slots are
+  // configured, so the menu is reachable from any input device — keyboard, any
+  // connected gamepad, or the on-screen button — even in all-NPC matches. The
+  // per-player handlers above only drive gameplay, so there is no double dispatch.
+  const handleControlKey = (ev: KeyboardEvent) => {
+    if (ev.ctrlKey || ev.metaKey || ev.altKey) return
     const action = qwertyKeyMap[ev.code]
-    if (action !== undefined) handleResultAction(action)
+    if (action !== undefined) handleControlAction(action)
   }
-  document.addEventListener('keydown', handleResultKey)
-  const cleanupResultPad = setupGamepad((action) => {
-    if (gameOver) handleResultAction(action)
-  }, connectedGamepadIndices()[0] ?? 0)
+  document.addEventListener('keydown', handleControlKey)
+  const controlPadIndices = [...new Set([0, ...connectedGamepadIndices()])]
+  const cleanupControlPads = controlPadIndices.map((idx) =>
+    setupGamepad((action) => handleControlAction(action), idx),
+  )
 
   const unsubGamepad = subscribeGamepad(rerender)
 
@@ -1171,8 +1277,8 @@ export const mountVersus = (
       clearInterval(ticker)
       cleanupP1()
       cleanupP2()
-      document.removeEventListener('keydown', handleResultKey)
-      cleanupResultPad()
+      document.removeEventListener('keydown', handleControlKey)
+      cleanupControlPads.forEach((c) => c())
       unsubGamepad()
       closeEditor1?.()
       closeEditor2?.()

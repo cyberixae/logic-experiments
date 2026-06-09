@@ -16,6 +16,7 @@ export type NpcDriverOpts = {
   skip: () => void
   knobs: NpcKnobs
   isGameOver: () => boolean
+  isPaused?: () => boolean
 }
 
 type ProofRef = { value: ProofUsing<AnySequent, RuleId> | null }
@@ -40,6 +41,7 @@ type State =
     }
 
 const PLANNING_POLL_MS = 300
+const PAUSE_POLL_MS = 200
 
 export const createNpcDriver = (
   opts: NpcDriverOpts,
@@ -47,6 +49,7 @@ export const createNpcDriver = (
   let state: State = { kind: 'idle' }
   let pendingTimeout: ReturnType<typeof setTimeout> | null = null
   let cleanedUp = false
+  let pausedAt: number | null = null
   const solver = createSolver()
 
   const nextThinkDelay = (): number => {
@@ -118,6 +121,26 @@ export const createNpcDriver = (
   const tick = (): void => {
     pendingTimeout = null
     if (cleanedUp || opts.isGameOver()) return
+
+    if (opts.isPaused?.() ?? false) {
+      if (pausedAt === null) pausedAt = Date.now()
+      schedule(PAUSE_POLL_MS) // keep the loop alive; do nothing while paused
+      return
+    }
+    if (pausedAt !== null) {
+      // Shift time-sensitive timestamps forward by the paused duration so the
+      // skip/stuck timers don't falsely fire on resume.
+      const delta = Date.now() - pausedAt
+      pausedAt = null
+      if (state.kind === 'planning') {
+        state = { ...state, startedAt: state.startedAt + delta }
+      } else if (state.kind === 'executing') {
+        state = {
+          ...state,
+          challengeStartedAt: state.challengeStartedAt + delta,
+        }
+      }
+    }
 
     const idx = opts.getChallengeIdx()
 

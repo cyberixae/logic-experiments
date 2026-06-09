@@ -1762,6 +1762,35 @@ html.loading body {
   flex-direction: column;
   border-left: 1px solid #ccc;
   border-right: 1px solid #ccc;
+  /* Sit above the benches' controls bar (z-index 4), which shares the
+     screen-level stacking context, so the menu button isn't painted under it. */
+  position: relative;
+  z-index: 5;
+}
+/* Match the bench-topbar icon buttons, but straddle the key hint over the top
+   edge (the thermo column is too narrow for a side badge). */
+.versus-menu-btn {
+  flex-shrink: 0;
+  align-self: center;
+  position: relative;
+  width: 1.2em;
+  height: 1.2em;
+  line-height: 1.2em;
+  font-size: 1.5em;
+  border-color: transparent;
+  margin: 1.2em 0 0.6em;
+}
+.versus-menu-btn .key-hint {
+  position: absolute;
+  width: 30px;
+  height: 30px;
+  line-height: 28px;
+  top: 0;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: #fff6;
+  color: #000a;
+  border: 2px solid #fed;
 }
 .versus-thermo-clock {
   flex-shrink: 0;
@@ -1772,10 +1801,19 @@ html.loading body {
   border-bottom: 1px solid #ccc;
 }
 .versus-thermo-rows {
+  /* Fill the column so the fade is a fixed band at the bottom of the visible
+     area: scores only fade as they reach the bottom (and on scroll overflow). */
   flex: 1;
+  min-height: 0;
   overflow-y: auto;
   padding: 0.3em 0;
   scrollbar-width: none;
+  mask-image: linear-gradient(to bottom, black calc(100% - 4em), transparent);
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    black calc(100% - 4em),
+    transparent
+  );
 }
 .versus-thermo-rows::-webkit-scrollbar {
   display: none;
