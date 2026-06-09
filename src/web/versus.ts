@@ -166,10 +166,11 @@ export const mountVersus = (
   let ws2 = makeWorkspace(0)
 
   // Per-bench isolated contexts — input mode determines action hint style.
-  // Auto-zoom disabled: at half-viewport width it overshoots downward; zoom=1 is the right default.
+  // Auto-zoom capped at 1.0: in the half-viewport split it only ever shrinks long
+  // sequents to fit; zooming in past 1.0 overshoots downward, so 1.0 is the ceiling.
   // showPar disabled: revealing par while the other player is still solving gives an unfair hint.
   const makeCtx = (input: typeof versusConfig.p1Input): BenchCtx => {
-    const base = createBenchCtx(input !== 'keyboard', false, false, false)
+    const base = createBenchCtx(input !== 'keyboard', true, false, false, 1)
     if (input !== 'mouse') return base
     return { ...base, getActionHint: () => undefined, kbdHint: () => undefined }
   }

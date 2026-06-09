@@ -216,6 +216,7 @@ export type BenchCtx = {
   getTreeZoom: () => number
   setTreeZoom: (v: number) => void
   tryAutoZoom: (d: AnyDerivation) => boolean
+  autoZoomMax: number
   getLastScroll: () => { top: number; left: number }
   setLastScroll: (top: number, left: number) => void
   isRulesVisible: () => boolean
@@ -229,6 +230,7 @@ export const createBenchCtx = (
   autoZoom = true,
   showPar = true,
   showHud = true,
+  autoZoomMax = AUTO_ZOOM_MAX,
 ): BenchCtx => {
   let gazeModeActive = false
   let zoom = 1
@@ -264,6 +266,7 @@ export const createBenchCtx = (
     },
     showPar,
     showHud,
+    autoZoomMax,
   }
 }
 
@@ -294,6 +297,7 @@ const defaultCtx: BenchCtx = {
   },
   showPar: true,
   showHud: true,
+  autoZoomMax: AUTO_ZOOM_MAX,
 }
 
 const CHECK_TOTAL_MS = 3000
@@ -427,7 +431,7 @@ const createPlayArea = (
           const target = Math.max(
             ZOOM_MIN,
             Math.min(
-              AUTO_ZOOM_MAX,
+              ctx.autoZoomMax,
               (ctx.getTreeZoom() * availW * AUTO_ZOOM_PAD) / sequentRect.width,
             ),
           )
