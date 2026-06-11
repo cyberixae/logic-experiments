@@ -155,8 +155,6 @@ export const createNpcDriver = (
 
     const linearizeOpts = {
       shuffle: true,
-      inflateProb: opts.knobs.inflateProb,
-      allowedRules: opts.getWorkspace().availableRules(),
     }
 
     if (state.kind === 'idle' || state.kind === 'observing') {

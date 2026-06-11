@@ -9,10 +9,10 @@ const goal = sequent(
   [a('q'), o.p0.falsum, a('p')],
 )
 
-const solution = z.sRotLF(
-  z.swl(
-    a('s'),
-    z.swl(a('r'), z.swr(a('q'), z.swr(o.p0.falsum, z.swr(a('p'), i.f())))),
+const solution = z.swl(
+  a('r'),
+  z.sRotLB(
+    z.swl(a('s'), z.swr(a('q'), z.swr(o.p0.falsum, z.swr(a('p'), i.f())))),
   ),
 )
 

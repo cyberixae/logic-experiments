@@ -19,20 +19,18 @@ describe('parseNpcKnobsFromParams', () => {
     expect(parseNpcKnobsFromParams(params, 'npc1_')).toEqual(defaultNpcKnobs())
   })
 
-  it('reads all five knobs from the given prefix', () => {
+  it('reads all knobs from the given prefix', () => {
     const params = new URLSearchParams({
       npc1_think: '100',
       npc1_jitter: '50',
       npc1_skip_time: '5000',
       npc1_skip_stuck: '1500',
-      npc1_inflate: '0.25',
     })
     expect(parseNpcKnobsFromParams(params, 'npc1_')).toEqual({
       baseThinkMs: 100,
       jitterMs: 50,
       skipAfterMs: 5000,
       skipStuckMs: 1500,
-      inflateProb: 0.25,
     })
   })
 
@@ -56,30 +54,26 @@ describe('parseNpcKnobsFromParams', () => {
     const params = new URLSearchParams({
       npc1_think: 'banana',
       npc1_jitter: 'NaN',
-      npc1_inflate: 'Infinity',
     })
     const knobs = parseNpcKnobsFromParams(params, 'npc1_')
     const defaults = defaultNpcKnobs()
     expect(knobs.baseThinkMs).toBe(defaults.baseThinkMs)
     expect(knobs.jitterMs).toBe(defaults.jitterMs)
-    expect(knobs.inflateProb).toBe(defaults.inflateProb)
   })
 
   it('accepts zero as a valid value (not a falsy fallback)', () => {
     const params = new URLSearchParams({
       npc1_think: '0',
       npc1_jitter: '0',
-      npc1_inflate: '0',
     })
     const knobs = parseNpcKnobsFromParams(params, 'npc1_')
     expect(knobs.baseThinkMs).toBe(0)
     expect(knobs.jitterMs).toBe(0)
-    expect(knobs.inflateProb).toBe(0)
   })
 })
 
 describe('setNpcKnobsParams', () => {
-  it('writes all five knobs under the given prefix', () => {
+  it('writes all knobs under the given prefix', () => {
     const params = new URLSearchParams()
     setNpcKnobsParams(
       {
@@ -87,7 +81,6 @@ describe('setNpcKnobsParams', () => {
         jitterMs: 50,
         skipAfterMs: 5000,
         skipStuckMs: 1500,
-        inflateProb: 0.25,
       },
       params,
       'npc1_',
@@ -96,7 +89,6 @@ describe('setNpcKnobsParams', () => {
     expect(params.get('npc1_jitter')).toBe('50')
     expect(params.get('npc1_skip_time')).toBe('5000')
     expect(params.get('npc1_skip_stuck')).toBe('1500')
-    expect(params.get('npc1_inflate')).toBe('0.25')
   })
 
   it('round-trips through parseNpcKnobsFromParams', () => {
@@ -105,7 +97,6 @@ describe('setNpcKnobsParams', () => {
       jitterMs: 567,
       skipAfterMs: 89000,
       skipStuckMs: 4321,
-      inflateProb: 0.5,
     }
     const params = new URLSearchParams()
     setNpcKnobsParams(original, params, 'npc2_')

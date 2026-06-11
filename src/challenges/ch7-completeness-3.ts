@@ -17,19 +17,14 @@ const goal = conclusion(
 const solution = z.ir(
   z.ir(
     z.ir(
-      z.sRotLF(
+      z.sRotLB(
         z.il(
-          z.sRotLF(
-            z.il(
-              z.sRotRF(z.swr(a('r'), z.swr(a('q'), i.i(a('p'))))),
-              z.sRotLF(z.swl(a('p'), z.swr(a('p'), i.i(a('r'))))),
-            ),
+          z.il(
+            z.sRotRB(z.swr(a('q'), z.swr(a('r'), i.i(a('p'))))),
+            z.sRotLB(z.sRotRB(z.swl(a('p'), z.swr(a('r'), i.i(a('q')))))),
           ),
-          z.sRotLF(
-            z.il(
-              z.sRotLF(z.sRotRF(z.swl(a('p'), z.swr(a('r'), i.i(a('q')))))),
-              z.sRotLB(z.swl(a('q'), z.swl(a('p'), i.i(a('r'))))),
-            ),
+          z.sRotLB(
+            z.swl(o.p2.implication(a('p'), a('q')), z.swl(a('p'), i.i(a('r')))),
           ),
         ),
       ),

@@ -6,10 +6,10 @@ const { a, o, z, i } = rk
 
 const goal = sequent([a('p'), o.p0.verum, a('q')], [a('r'), o.p0.verum, a('s')])
 
-const solution = z.sRotRF(
-  z.swl(
-    a('q'),
-    z.swl(o.p0.verum, z.swl(a('p'), z.swr(a('s'), z.swr(a('r'), i.v())))),
+const solution = z.swr(
+  a('r'),
+  z.sRotRB(
+    z.swl(a('q'), z.swl(o.p0.verum, z.swl(a('p'), z.swr(a('s'), i.v())))),
   ),
 )
 

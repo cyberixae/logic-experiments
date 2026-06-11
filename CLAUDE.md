@@ -81,8 +81,8 @@ The web app has three top-level user-facing modes declared in `src/model/mode.ts
 Computer-controlled players for Versus mode. Each NPC slot dispatches through `workspace.applyEvent` like a human — no AI-only fast path.
 
 - `driver.ts` — tick-loop state machine (`idle → observing → planning → executing`); consumes knobs; dispatches events. `createNpcDriver` is instantiated once per NPC slot in `src/web/versus.ts`.
-- `knobs.ts` — knob defaults (`baseThinkMs`, `jitterMs`, `skipAfterMs`, `skipStuckMs`, `inflateProb`) + URL-param parsing (`npc1_*` / `npc2_*` per slot).
-- `proof-walker.ts` — `linearize(proof, opts)` walks a `ProofUsing` tree depth-first-left, emitting `Event`s for paced playback. Branch-order shuffle and B4 inflation (self-cancelling rotation pairs) live here.
+- `knobs.ts` — knob defaults (`baseThinkMs`, `jitterMs`, `skipAfterMs`, `skipStuckMs`) + URL-param parsing (`npc1_*` / `npc2_*` per slot).
+- `proof-walker.ts` — `linearize(proof, opts)` walks a `ProofUsing` tree depth-first-left, emitting `Event`s for paced playback. Branch-order shuffle lives here.
 - `solver-runner.ts` — `createSolver()` lazily spawns one Web Worker per NPC slot for off-thread brute search. Cancel via request IDs.
 - `npc-worker.ts` — worker entry point; runs `bruteSearch` and posts proofs back.
 - `npc-protocol.ts` — message types for the worker channel.

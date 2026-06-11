@@ -12,7 +12,7 @@ const goal = conclusion(
 )
 
 const solution = z.ir(
-  z.cl(z.nl(z.sRotRF(z.swr(o.p2.disjunction(a('r'), a('s')), i.i(a('q')))))),
+  z.cl(z.nl(z.sRotRB(z.swr(o.p2.disjunction(a('r'), a('s')), i.i(a('q')))))),
 )
 
 export const ch5composition8 = challenge({ rules, goal, solution })

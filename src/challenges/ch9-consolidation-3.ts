@@ -17,12 +17,12 @@ const goal = conclusion(
 
 const solution = z.ir(
   z.cl(
-    z.sRotLF(
+    z.sRotLB(
       z.il(
-        z.sRotRF(
+        z.sRotRB(
           z.dr(
             z.nr(
-              z.sRotLF(
+              z.sRotLB(
                 z.swl(
                   o.p2.disjunction(o.p1.negation(a('q')), a('r')),
                   z.swr(a('r'), i.i(a('p'))),
@@ -31,10 +31,10 @@ const solution = z.ir(
             ),
           ),
         ),
-        z.sRotLF(
+        z.sRotLB(
           z.dl(
             z.nl(
-              z.sRotRF(
+              z.sRotRB(
                 z.swr(
                   o.p2.disjunction(o.p1.negation(a('p')), a('r')),
                   i.i(a('q')),
@@ -42,7 +42,7 @@ const solution = z.ir(
               ),
             ),
             z.dr(
-              z.sRotLF(
+              z.sRotLB(
                 z.swl(a('q'), z.swr(o.p1.negation(a('p')), i.i(a('r')))),
               ),
             ),

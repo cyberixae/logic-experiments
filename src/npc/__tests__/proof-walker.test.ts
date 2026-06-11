@@ -6,7 +6,6 @@ import { linearize } from '../proof-walker'
 
 const p = atom('p')
 const q = atom('q')
-const r = atom('r')
 const aux = atom('A')
 
 // A minimal single-leaf proof using the introduction rule `i`.
@@ -116,92 +115,11 @@ describe('linearize — shuffle', () => {
   })
 })
 
-describe('linearize — inflate', () => {
-  afterEach(() => {
-    jest.restoreAllMocks()
-  })
-
-  it('prepends a left-rotation pair when antecedent has >1 formulas and rules allow it', () => {
-    jest.spyOn(Math, 'random').mockReturnValue(0) // always trigger inflate
-    const node = proofUsing(sequent([p, q], [r]), [], 'i' as const)
-    const events = linearize(node, {
-      inflateProb: 1,
-      shuffle: false,
-      allowedRules: ['sRotLF', 'sRotLB', 'i'],
-    })
-    expect(events).toEqual([
-      reverse0('sRotLF'),
-      reverse0('sRotLB'),
-      reverse0('i'),
-    ])
-  })
-
-  it('prepends a right-rotation pair when succedent has >1 formulas and antecedent does not', () => {
-    jest.spyOn(Math, 'random').mockReturnValue(0)
-    const node = proofUsing(sequent([p], [q, r]), [], 'i' as const)
-    const events = linearize(node, {
-      inflateProb: 1,
-      shuffle: false,
-      allowedRules: ['sRotRF', 'sRotRB', 'i'],
-    })
-    expect(events).toEqual([
-      reverse0('sRotRF'),
-      reverse0('sRotRB'),
-      reverse0('i'),
-    ])
-  })
-
-  it('does not inflate when rotation rules are not in allowedRules', () => {
-    jest.spyOn(Math, 'random').mockReturnValue(0)
-    const node = proofUsing(sequent([p, q], [r]), [], 'i' as const)
-    const events = linearize(node, {
-      inflateProb: 1,
-      shuffle: false,
-      allowedRules: ['i'],
-    })
-    expect(events).toEqual([reverse0('i')])
-  })
-
-  it('prefers left-rotation when both sides qualify', () => {
-    jest.spyOn(Math, 'random').mockReturnValue(0)
-    const node = proofUsing(sequent([p, q], [p, q]), [], 'i' as const)
-    const events = linearize(node, {
-      inflateProb: 1,
-      shuffle: false,
-      allowedRules: ['sRotLF', 'sRotLB', 'sRotRF', 'sRotRB', 'i'],
-    })
-    expect(events).toEqual([
-      reverse0('sRotLF'),
-      reverse0('sRotLB'),
-      reverse0('i'),
-    ])
-  })
-
-  it('does not inflate when the eligible side has only one formula', () => {
-    jest.spyOn(Math, 'random').mockReturnValue(0)
-    const node = proofUsing(sequent([p], [q]), [], 'i' as const)
-    const events = linearize(node, {
-      inflateProb: 1,
-      shuffle: false,
-      allowedRules: ['sRotLF', 'sRotLB', 'sRotRF', 'sRotRB', 'i'],
-    })
-    expect(events).toEqual([reverse0('i')])
-  })
-
-  it('does not consult Math.random when inflateProb is 0', () => {
-    const spy = jest.spyOn(Math, 'random')
-    linearize(leafI(p), { inflateProb: 0, shuffle: false })
-    expect(spy).not.toHaveBeenCalled()
-  })
-})
-
 describe('linearize — defaults', () => {
-  it('defaults shuffle to true and inflateProb to 0', () => {
-    // With no opts and a single-dep tree, no shuffle branch is reachable
-    // and no inflate calls happen — output is identical to explicit defaults.
+  it('defaults shuffle to true', () => {
+    // With no opts and a single-dep tree, no shuffle branch is reachable —
+    // output is identical to explicitly passing shuffle: true.
     const node = leafI(p)
-    expect(linearize(node)).toEqual(
-      linearize(node, { shuffle: true, inflateProb: 0 }),
-    )
+    expect(linearize(node)).toEqual(linearize(node, { shuffle: true }))
   })
 })

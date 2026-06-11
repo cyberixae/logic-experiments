@@ -17,16 +17,16 @@ const goal = sequent(
   ],
 )
 
-const solution = z.sRotLF(
-  z.sRotRF(
-    z.swl(
-      o.p2.implication(a('q'), a('p')),
-      z.swl(
-        o.p2.implication(a('s'), a('r')),
-        z.swr(
-          o.p2.implication(a('s'), a('q')),
+const solution = z.swl(
+  o.p2.implication(a('s'), a('r')),
+  z.swr(
+    o.p2.implication(a('r'), a('p')),
+    z.sRotLB(
+      z.sRotRB(
+        z.swl(
+          o.p2.implication(a('q'), a('p')),
           z.swr(
-            o.p2.implication(a('r'), a('p')),
+            o.p2.implication(a('s'), a('q')),
             i.i(o.p2.implication(a('p'), a('s'))),
           ),
         ),

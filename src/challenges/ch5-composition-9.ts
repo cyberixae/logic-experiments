@@ -22,7 +22,7 @@ const solution = z.ir(
     z.dr(
       z.sRotRB(
         z.nr(
-          z.sRotLF(
+          z.sRotLB(
             z.swl(
               o.p2.conjunction(
                 o.p2.conjunction(o.p1.negation(a('p')), o.p1.negation(a('s'))),

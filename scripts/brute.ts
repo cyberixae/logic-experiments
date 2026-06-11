@@ -11,6 +11,15 @@ function countNodes(d: any): number {
   return 1 + d.deps.reduce((s: number, c: any) => s + countNodes(c), 0)
 }
 
+// True when the derivation applies a rule that is no longer in the allowed set
+// (e.g. a rule that was removed from the system). Such a solution is invalid and
+// must be regenerated even if the replacement is not shorter.
+function usesDisallowedRule(d: any, allowed: string[]): boolean {
+  if (d.kind === 'premise') return false
+  if (!allowed.includes(d.rule)) return true
+  return d.deps.some((c: any) => usesDisallowedRule(c, allowed))
+}
+
 const challengesDir = path.join(__dirname, '../src/challenges')
 
 const fileMap = {}
@@ -37,8 +46,15 @@ for (const [name, challenge] of Object.entries(challenges)) {
   }
 
   const [optimal] = found
-  if (equalsDerivation(solution, optimal)) continue
-  if (countNodes(optimal) >= countNodes(solution)) continue
+  // A solution using a now-removed rule must be regenerated even if an
+  // equal-or-shorter check would otherwise skip it. equalsDerivation compares
+  // result sequents (not rule ids), so e.g. an sRotRF node looks "equal" to an
+  // sRotRB node — guard on validity first.
+  const invalid = usesDisallowedRule(solution, rules)
+  if (!invalid) {
+    if (equalsDerivation(solution, optimal)) continue
+    if (countNodes(optimal) >= countNodes(solution)) continue
+  }
 
   const file = fileMap[name.toLowerCase()]
   if (!file) {

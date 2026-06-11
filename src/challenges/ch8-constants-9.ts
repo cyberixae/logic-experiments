@@ -24,7 +24,7 @@ const solution = z.cl(
     z.il(
       z.sRotRB(
         z.ir(
-          z.sRotLF(
+          z.sRotLB(
             z.swl(
               o.p2.conjunction(a('r'), a('q')),
               z.swr(

@@ -11,8 +11,8 @@ const goal = sequent(
 
 const solution = z.cl(
   z.dr(
-    z.sRotLF(
-      z.sRotRF(
+    z.sRotLB(
+      z.sRotRB(
         z.swl(
           o.p2.conjunction(a('r'), a('p')),
           z.swr(o.p2.disjunction(a('p'), a('r')), i.i(a('s'))),

@@ -10,7 +10,7 @@ const goal = sequent(
 )
 
 const solution = z.dr(
-  z.dl(z.swr(a('q'), i.i(a('p'))), z.sRotRF(z.swr(a('p'), i.i(a('q'))))),
+  z.dl(z.swr(a('q'), i.i(a('p'))), z.sRotRB(z.swr(a('p'), i.i(a('q'))))),
 )
 
 export const ch6branching4 = challenge({ rules, goal, solution })

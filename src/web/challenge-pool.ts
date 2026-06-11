@@ -18,8 +18,6 @@ const RULES = [
   'v',
   'swl',
   'swr',
-  'sRotLF',
-  'sRotRF',
   'sRotLB',
   'sRotRB',
   'nl',

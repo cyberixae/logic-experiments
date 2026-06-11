@@ -16,11 +16,11 @@ const goal = conclusion(
 
 const solution = z.ir(
   z.ir(
-    z.sRotLF(
+    z.sRotLB(
       z.il(
-        z.sRotRF(
+        z.sRotRB(
           z.ir(
-            z.sRotLF(
+            z.sRotLB(
               z.swl(
                 o.p2.implication(a('q'), o.p0.falsum),
                 z.swr(a('r'), i.i(a('p'))),
@@ -28,10 +28,10 @@ const solution = z.ir(
             ),
           ),
         ),
-        z.sRotLF(
+        z.sRotLB(
           z.il(
-            z.sRotRF(z.swr(o.p2.implication(a('p'), a('r')), i.i(a('q')))),
-            z.sRotLF(
+            z.sRotRB(z.swr(o.p2.implication(a('p'), a('r')), i.i(a('q')))),
+            z.sRotLB(
               z.swl(a('q'), z.swr(o.p2.implication(a('p'), a('r')), i.f())),
             ),
           ),

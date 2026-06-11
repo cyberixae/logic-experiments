@@ -14,12 +14,14 @@ const goal = conclusion(
 const solution = z.ir(
   z.ir(
     z.cl(
-      z.sRotLF(
-        z.il(
-          z.sRotRF(z.swl(a('q'), z.swr(a('r'), i.i(a('p'))))),
+      z.sRotLB(
+        z.sRotLB(
           z.il(
-            z.sRotLF(z.sRotRF(z.swl(a('p'), z.swr(a('r'), i.i(a('q')))))),
-            z.sRotLB(z.swl(a('q'), z.swl(a('p'), i.i(a('r'))))),
+            z.sRotRB(z.swl(a('q'), z.swr(a('r'), i.i(a('p'))))),
+            z.il(
+              z.sRotLB(z.sRotRB(z.swl(a('p'), z.swr(a('r'), i.i(a('q')))))),
+              z.sRotLB(z.swl(a('q'), z.swl(a('p'), i.i(a('r'))))),
+            ),
           ),
         ),
       ),

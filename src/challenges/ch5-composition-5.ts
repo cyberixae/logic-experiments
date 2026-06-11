@@ -22,12 +22,26 @@ const goal = sequent(
 
 const solution = z.cl(
   z.dr(
-    z.swl(
-      o.p2.disjunction(a('p'), a('r')),
-      z.cl(
-        z.swr(
-          o.p2.conjunction(a('p'), a('r')),
-          z.dr(z.sRotLF(z.swl(a('r'), z.swr(a('r'), i.i(a('p')))))),
+    z.dl(
+      z.swr(
+        o.p2.conjunction(a('p'), a('r')),
+        z.dr(
+          z.sRotLB(
+            z.swl(o.p2.conjunction(a('r'), a('p')), z.swr(a('r'), i.i(a('p')))),
+          ),
+        ),
+      ),
+      z.swr(
+        o.p2.conjunction(a('p'), a('r')),
+        z.dr(
+          z.sRotLB(
+            z.sRotRB(
+              z.swl(
+                o.p2.conjunction(a('r'), a('p')),
+                z.swr(a('p'), i.i(a('r'))),
+              ),
+            ),
+          ),
         ),
       ),
     ),

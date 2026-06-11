@@ -6,11 +6,9 @@ const { a, o, z, i } = rk
 
 const goal = sequent([a('s'), a('p'), a('s')], [a('r'), o.p0.verum, a('r')])
 
-const solution = z.sRotRF(
-  z.swl(
-    a('s'),
-    z.swl(a('p'), z.swl(a('s'), z.swr(a('r'), z.swr(a('r'), i.v())))),
-  ),
+const solution = z.swr(
+  a('r'),
+  z.sRotRB(z.swl(a('s'), z.swl(a('p'), z.swl(a('s'), z.swr(a('r'), i.v()))))),
 )
 
 export const ch8constants3 = challenge({ rules, goal, solution })

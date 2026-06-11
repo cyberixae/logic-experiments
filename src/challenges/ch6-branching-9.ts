@@ -19,13 +19,13 @@ const solution = z.ir(
     z.cl(
       z.cr(
         z.swl(a('q'), i.i(a('p'))),
-        z.dr(z.sRotLF(z.sRotRF(z.swl(a('p'), z.swr(a('r'), i.i(a('q'))))))),
+        z.dr(z.sRotLB(z.sRotRB(z.swl(a('p'), z.swr(a('r'), i.i(a('q'))))))),
       ),
     ),
     z.cl(
       z.cr(
         z.swl(a('r'), i.i(a('p'))),
-        z.dr(z.sRotLF(z.swl(a('p'), z.swr(a('q'), i.i(a('r')))))),
+        z.dr(z.sRotLB(z.swl(a('p'), z.swr(a('q'), i.i(a('r')))))),
       ),
     ),
   ),

@@ -13,7 +13,7 @@ const goal = conclusion(
 
 const solution = z.ir(
   z.il(
-    z.sRotRF(z.ir(z.swr(a('q'), i.i(a('p'))))),
+    z.sRotRB(z.ir(z.swr(a('q'), i.i(a('p'))))),
     i.i(o.p2.implication(a('p'), a('q'))),
   ),
 )

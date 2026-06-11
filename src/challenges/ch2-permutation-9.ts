@@ -9,16 +9,16 @@ const goal = sequent(
   [o.p1.negation(a('q')), o.p1.negation(a('p')), a('s'), o.p1.negation(a('r'))],
 )
 
-const solution = z.swr(
-  o.p1.negation(a('q')),
-  z.sRotLF(
-    z.sRotRB(
-      z.swl(
-        a('p'),
-        z.swl(
-          a('r'),
+const solution = z.swl(
+  a('r'),
+  z.swl(
+    a('q'),
+    z.swr(
+      o.p1.negation(a('q')),
+      z.sRotLB(
+        z.sRotRB(
           z.swl(
-            a('q'),
+            a('p'),
             z.swr(
               a('s'),
               z.swr(o.p1.negation(a('r')), i.i(o.p1.negation(a('p')))),

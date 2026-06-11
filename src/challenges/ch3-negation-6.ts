@@ -15,7 +15,7 @@ const goal = sequent(
   ],
 )
 
-const solution = z.sRotLF(
+const solution = z.sRotLB(
   z.swl(
     o.p1.negation(o.p1.negation(a('p'))),
     z.swr(

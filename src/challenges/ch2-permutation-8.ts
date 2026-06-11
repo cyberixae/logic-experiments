@@ -19,20 +19,20 @@ const goal = sequent(
   ],
 )
 
-const solution = z.sRotLB(
-  z.sRotRF(
-    z.swl(
-      o.p2.implication(a('q'), a('p')),
-      z.swl(
-        a('r'),
+const solution = z.swr(
+  o.p1.negation(a('p')),
+  z.swr(
+    o.p2.implication(a('s'), a('q')),
+    z.sRotLB(
+      z.sRotRB(
         z.swl(
-          o.p2.conjunction(a('s'), a('q')),
-          z.swr(
-            o.p2.disjunction(a('q'), a('p')),
-            z.swr(
-              o.p1.negation(a('p')),
+          o.p2.implication(a('q'), a('p')),
+          z.swl(
+            a('r'),
+            z.swl(
+              o.p2.conjunction(a('s'), a('q')),
               z.swr(
-                o.p2.implication(a('s'), a('q')),
+                o.p2.disjunction(a('q'), a('p')),
                 i.i(o.p1.negation(a('r'))),
               ),
             ),

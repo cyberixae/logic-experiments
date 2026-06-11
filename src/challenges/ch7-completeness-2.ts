@@ -13,10 +13,10 @@ const goal = conclusion(
 
 const solution = z.ir(
   z.ir(
-    z.sRotLF(
+    z.sRotLB(
       z.il(
-        z.sRotRF(z.nr(z.sRotLF(z.swl(o.p1.negation(a('q')), i.i(a('p')))))),
-        z.sRotLF(z.nl(z.sRotRF(z.swr(o.p1.negation(a('p')), i.i(a('q')))))),
+        z.sRotRB(z.nr(z.sRotLB(z.swl(o.p1.negation(a('q')), i.i(a('p')))))),
+        z.sRotLB(z.nl(z.sRotRB(z.swr(o.p1.negation(a('p')), i.i(a('q')))))),
       ),
     ),
   ),

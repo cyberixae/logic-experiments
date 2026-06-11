@@ -17,7 +17,6 @@ export const qwertyKeyMap: Record<KeyboardEvent['code'], Action> = {
   KeyH: 'rightRotateLeft',
   KeyJ: 'rightConnective',
   KeyL: 'rightWeakening',
-  Semicolon: 'rightRotateRight',
   KeyC: 'lemma',
   Space: 'axiom',
   Enter: 'axiom',
@@ -87,7 +86,6 @@ export const ps5GazeKeyMap: Record<number, Action> = {
 export const ps5HotKeyMap: Record<number, Action> = {
   ...ps5SharedKeyMap,
   0: 'rightWeakening', // Cross   ↔ L
-  1: 'rightRotateRight', // Circle  ↔ ;/ö
   2: 'rightRotateLeft', // Square  ↔ H
   3: 'rightConnective', // Triangle ↔ J
   12: 'leftConnective', // D-pad up    ↔ F

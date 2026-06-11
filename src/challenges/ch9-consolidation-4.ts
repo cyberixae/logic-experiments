@@ -6,6 +6,6 @@ const { a, o, z, i } = rk
 
 const goal = conclusion(o.p2.disjunction(a('p'), o.p1.negation(a('p'))))
 
-const solution = z.dr(z.sRotRF(z.nr(i.i(a('p')))))
+const solution = z.dr(z.sRotRB(z.nr(i.i(a('p')))))
 
 export const ch9consolidation4 = challenge({ rules, goal, solution })

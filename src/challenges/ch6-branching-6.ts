@@ -14,8 +14,8 @@ const goal = conclusion(
 const solution = z.ir(
   z.nl(
     z.cr(
-      z.sRotRF(z.dr(z.nr(z.swr(o.p1.negation(a('q')), i.i(a('p')))))),
-      z.sRotRF(z.dr(z.swr(o.p1.negation(a('p')), z.nr(i.i(a('q')))))),
+      z.sRotRB(z.dr(z.nr(z.swr(o.p1.negation(a('q')), i.i(a('p')))))),
+      z.sRotRB(z.dr(z.swr(o.p1.negation(a('p')), z.nr(i.i(a('q')))))),
     ),
   ),
 )

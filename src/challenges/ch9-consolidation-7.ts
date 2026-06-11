@@ -35,12 +35,12 @@ const solution = z.dr(
             z.dr(
               z.swr(
                 o.p2.conjunction(a('r'), o.p2.implication(a('s'), a('p'))),
-                z.dr(z.sRotRF(z.swr(a('p'), i.i(a('r'))))),
+                z.dr(z.sRotRB(z.swr(a('p'), i.i(a('r'))))),
               ),
             ),
           ),
         ),
-        z.ir(z.sRotLF(z.swl(a('r'), z.swr(a('q'), i.f())))),
+        z.ir(z.sRotLB(z.swl(a('r'), z.swr(a('q'), i.f())))),
       ),
     ),
   ),

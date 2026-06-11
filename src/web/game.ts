@@ -98,7 +98,6 @@ const ghostToDerivation = <J extends AnySequent>(
 
 const ruleAction: Partial<Record<RuleId, Action>> = {
   swl: 'leftWeakening',
-  sRotLF: 'leftRotateLeft',
   sRotLB: 'leftRotateRight',
   nl: 'leftConnective',
   cl: 'leftConnective',
@@ -110,7 +109,6 @@ const ruleAction: Partial<Record<RuleId, Action>> = {
   fil: 'leftConnective',
   swr: 'rightWeakening',
   sRotRB: 'rightRotateLeft',
-  sRotRF: 'rightRotateRight',
   nr: 'rightConnective',
   dr: 'rightConnective',
   dr1: 'rightConnective',
@@ -1235,12 +1233,10 @@ export const createPausePopup = (
 const RULE_APPLY_ACTIONS: ReadonlySet<Action> = new Set<Action>([
   'leftWeakening',
   'leftConnective',
-  'leftRotateLeft',
   'leftRotateRight',
   'rightWeakening',
   'rightConnective',
   'rightRotateLeft',
-  'rightRotateRight',
 ])
 
 export const createDispatch =
@@ -1330,9 +1326,6 @@ export const createDispatch =
       case 'leftWeakening':
         workspace.applyEvent(reverse0('swl'))
         break
-      case 'leftRotateLeft':
-        workspace.applyEvent(reverse0('sRotLF'))
-        break
       case 'leftRotateRight':
         workspace.applyEvent(reverse0('sRotLB'))
         break
@@ -1344,9 +1337,6 @@ export const createDispatch =
         break
       case 'rightRotateLeft':
         workspace.applyEvent(reverse0('sRotRB'))
-        break
-      case 'rightRotateRight':
-        workspace.applyEvent(reverse0('sRotRF'))
         break
       case 'rightConnective':
         autoRule(workspace, keys(rightLogical))

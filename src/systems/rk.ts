@@ -22,9 +22,7 @@ import { ruleNL } from '../rules/nl'
 import { ruleNR } from '../rules/nr'
 import { ruleSWL } from '../rules/swl'
 import { ruleSWR } from '../rules/swr'
-import { ruleSRotLF } from '../rules/srotlf'
 import { ruleSRotLB } from '../rules/srotlb'
-import { ruleSRotRF } from '../rules/srotrf'
 import { ruleSRotRB } from '../rules/srotrb'
 
 // Language
@@ -56,9 +54,7 @@ const zeta = {
   nr: ruleNR.apply,
   swl: ruleSWL.apply,
   swr: ruleSWR.apply,
-  sRotLF: ruleSRotLF.apply,
   sRotLB: ruleSRotLB.apply,
-  sRotRF: ruleSRotRF.apply,
   sRotRB: ruleSRotRB.apply,
 }
 
@@ -68,8 +64,6 @@ export const rules = [
   'v',
   'swl',
   'swr',
-  'sRotLF',
-  'sRotRF',
   'sRotLB',
   'sRotRB',
   'nl',

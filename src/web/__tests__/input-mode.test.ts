@@ -251,7 +251,7 @@ describe('getActionHint', () => {
       expect(getActionHint('axiom')).toBe('R2')
     })
 
-    it('returns L2 for undo (Circle is now rightRotateRight)', () => {
+    it('returns L2 for undo (Circle is unmapped in hot mode)', () => {
       expect(getActionHint('undo')).toBe('L2')
     })
 
@@ -266,7 +266,6 @@ describe('getActionHint', () => {
       expect(getActionHint('rightRotateLeft')).toBe('□')
       expect(getActionHint('rightConnective')).toBe('△')
       expect(getActionHint('rightWeakening')).toBe('✕')
-      expect(getActionHint('rightRotateRight')).toBe('◯')
     })
 
     it('returns nothing for gaze actions (no pad mapping in hot mode)', () => {
@@ -348,9 +347,9 @@ describe('key map invariants', () => {
     expect(ps5HotKeyMap[15]).toBe('leftRotateRight')
   })
 
-  it('hot map has all 4 face buttons bound to right rule actions', () => {
+  it('hot map binds face buttons to right rule actions (Circle now free)', () => {
     expect(ps5HotKeyMap[0]).toBe('rightWeakening')
-    expect(ps5HotKeyMap[1]).toBe('rightRotateRight')
+    expect(ps5HotKeyMap[1]).toBeUndefined()
     expect(ps5HotKeyMap[2]).toBe('rightRotateLeft')
     expect(ps5HotKeyMap[3]).toBe('rightConnective')
   })
@@ -396,11 +395,11 @@ describe('qwertyKeyMap basic shape', () => {
     expect(qwertyKeyMap['KeyG']).toBe('leftRotateRight')
   })
 
-  it('binds the HJL; row to right rules', () => {
+  it('binds the HJL row to right rules (Semicolon now free)', () => {
     expect(qwertyKeyMap['KeyH']).toBe('rightRotateLeft')
     expect(qwertyKeyMap['KeyJ']).toBe('rightConnective')
     expect(qwertyKeyMap['KeyL']).toBe('rightWeakening')
-    expect(qwertyKeyMap['Semicolon']).toBe('rightRotateRight')
+    expect(qwertyKeyMap['Semicolon']).toBeUndefined()
   })
 
   it('binds arrow keys to gaze actions', () => {

@@ -18,16 +18,16 @@ const goal = sequent(
   ],
 )
 
-const solution = z.sRotLF(
-  z.sRotRF(
-    z.swl(
-      o.p1.negation(o.p1.negation(a('p'))),
-      z.swl(
-        o.p1.negation(o.p1.negation(o.p1.negation(a('q')))),
-        z.swr(
-          o.p1.negation(o.p1.negation(a('q'))),
+const solution = z.swl(
+  o.p1.negation(o.p1.negation(o.p1.negation(a('q')))),
+  z.swr(
+    o.p1.negation(o.p1.negation(o.p1.negation(a('p')))),
+    z.sRotLB(
+      z.sRotRB(
+        z.swl(
+          o.p1.negation(o.p1.negation(a('p'))),
           z.swr(
-            o.p1.negation(o.p1.negation(o.p1.negation(a('p')))),
+            o.p1.negation(o.p1.negation(a('q'))),
             i.i(o.p2.conjunction(o.p1.negation(a('p')), o.p1.negation(a('q')))),
           ),
         ),

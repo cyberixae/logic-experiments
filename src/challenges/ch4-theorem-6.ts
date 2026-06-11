@@ -8,6 +8,6 @@ const goal = conclusion(
   o.p2.implication(a('r'), o.p2.implication(a('q'), a('q'))),
 )
 
-const solution = z.ir(z.ir(z.sRotLF(z.swl(a('r'), i.i(a('q'))))))
+const solution = z.ir(z.ir(z.sRotLB(z.swl(a('r'), i.i(a('q'))))))
 
 export const ch4theorem6 = challenge({ rules, goal, solution })

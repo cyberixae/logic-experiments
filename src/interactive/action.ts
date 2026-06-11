@@ -5,7 +5,6 @@ export type Action =
   | 'leftConnective'
   | 'rightWeakening'
   | 'rightRotateLeft'
-  | 'rightRotateRight'
   | 'rightConnective'
   | 'prevBranch'
   | 'nextBranch'

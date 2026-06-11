@@ -13,7 +13,7 @@ const goal = conclusion(
 
 const solution = z.ir(
   z.ir(
-    z.sRotLF(
+    z.sRotLB(
       z.swl(
         o.p2.implication(
           a('p'),

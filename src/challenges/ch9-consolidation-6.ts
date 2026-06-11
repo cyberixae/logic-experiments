@@ -18,27 +18,18 @@ const solution = z.ir(
   z.ir(
     z.ir(
       z.dl(
-        z.sRotLF(
-          z.il(
-            z.sRotLF(
-              z.sRotRF(
-                z.swl(
-                  o.p2.implication(a('q'), a('r')),
-                  z.swr(a('r'), i.i(a('p'))),
-                ),
-              ),
-            ),
-            z.sRotLB(
-              z.swl(
-                a('p'),
-                z.swl(o.p2.implication(a('q'), a('r')), i.i(a('r'))),
-              ),
+        z.sRotLB(
+          z.swl(
+            o.p2.implication(a('q'), a('r')),
+            z.il(
+              z.sRotRB(z.swr(a('r'), i.i(a('p')))),
+              z.sRotLB(z.swl(a('p'), i.i(a('r')))),
             ),
           ),
         ),
         z.sRotLB(
           z.il(
-            z.sRotRF(
+            z.sRotRB(
               z.swl(
                 o.p2.implication(a('p'), a('r')),
                 z.swr(a('r'), i.i(a('q'))),

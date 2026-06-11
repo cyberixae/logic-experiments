@@ -3,7 +3,6 @@ export type NpcKnobs = {
   jitterMs: number
   skipAfterMs: number
   skipStuckMs: number
-  inflateProb: number
 }
 
 export const defaultNpcKnobs = (): NpcKnobs => ({
@@ -11,7 +10,6 @@ export const defaultNpcKnobs = (): NpcKnobs => ({
   jitterMs: 400,
   skipAfterMs: 30000,
   skipStuckMs: 8000,
-  inflateProb: 0,
 })
 
 const pickNumber = (
@@ -39,7 +37,6 @@ export const parseNpcKnobsFromParams = (
       prefix + 'skip_stuck',
       defaults.skipStuckMs,
     ),
-    inflateProb: pickNumber(params, prefix + 'inflate', defaults.inflateProb),
   }
 }
 
@@ -52,5 +49,4 @@ export const setNpcKnobsParams = (
   params.set(prefix + 'jitter', String(knobs.jitterMs))
   params.set(prefix + 'skip_time', String(knobs.skipAfterMs))
   params.set(prefix + 'skip_stuck', String(knobs.skipStuckMs))
-  params.set(prefix + 'inflate', String(knobs.inflateProb))
 }

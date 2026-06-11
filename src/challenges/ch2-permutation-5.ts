@@ -9,7 +9,7 @@ const goal = sequent(
   [o.p2.conjunction(a('p'), a('q')), o.p2.disjunction(a('p'), a('q'))],
 )
 
-const solution = z.sRotRF(
+const solution = z.sRotRB(
   z.swl(
     o.p2.conjunction(a('p'), a('q')),
     z.swr(
