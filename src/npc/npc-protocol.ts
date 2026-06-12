@@ -7,6 +7,9 @@ export type SolveRequest = {
   requestId: number
   goal: AnySequent
   rules: ReadonlyArray<RuleId>
+  // Search gives up past this depth and answers with an 'exhausted' message
+  // instead of deepening forever.
+  maxDepth: number
 }
 
 export type CancelRequest = {
@@ -22,4 +25,9 @@ export type ProofMessage = {
   proof: ProofUsing<AnySequent, RuleId>
 }
 
-export type WorkerMessage = ProofMessage
+export type ExhaustedMessage = {
+  type: 'exhausted'
+  requestId: number
+}
+
+export type WorkerMessage = ProofMessage | ExhaustedMessage

@@ -298,6 +298,21 @@ export function* bruteSearch<S extends AnySequent, R extends RuleId>(
   }
 }
 
+// Bounded sibling of bruteSearch: gives up cleanly (returns null) instead of
+// deepening forever, so a caller can tell "no proof within budget" apart from
+// "still searching".
+export function* bruteSearchLimit<S extends AnySequent, R extends RuleId>(
+  c: Configuration<S, ReadonlyArray<R>>,
+  maxLimit: number,
+): Generator<void, [ProofUsing<S, R>, number] | null> {
+  for (let limit = 0; limit <= maxLimit; limit += 1) {
+    const proof = tryAtDepth(c, limit)
+    if (proof) return [proof, limit]
+    yield
+  }
+  return null
+}
+
 export const brute = <S extends AnySequent, R extends RuleId>(
   c: Configuration<S, ReadonlyArray<R>>,
 ): [ProofUsing<S, R>, number] => {

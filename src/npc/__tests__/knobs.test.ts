@@ -25,12 +25,14 @@ describe('parseNpcKnobsFromParams', () => {
       npc1_jitter: '50',
       npc1_skip_time: '5000',
       npc1_skip_stuck: '1500',
+      npc1_depth: '3',
     })
     expect(parseNpcKnobsFromParams(params, 'npc1_')).toEqual({
       baseThinkMs: 100,
       jitterMs: 50,
       skipAfterMs: 5000,
       skipStuckMs: 1500,
+      searchDepth: 3,
     })
   })
 
@@ -81,6 +83,7 @@ describe('setNpcKnobsParams', () => {
         jitterMs: 50,
         skipAfterMs: 5000,
         skipStuckMs: 1500,
+        searchDepth: 4,
       },
       params,
       'npc1_',
@@ -89,6 +92,7 @@ describe('setNpcKnobsParams', () => {
     expect(params.get('npc1_jitter')).toBe('50')
     expect(params.get('npc1_skip_time')).toBe('5000')
     expect(params.get('npc1_skip_stuck')).toBe('1500')
+    expect(params.get('npc1_depth')).toBe('4')
   })
 
   it('round-trips through parseNpcKnobsFromParams', () => {
@@ -97,6 +101,7 @@ describe('setNpcKnobsParams', () => {
       jitterMs: 567,
       skipAfterMs: 89000,
       skipStuckMs: 4321,
+      searchDepth: 7,
     }
     const params = new URLSearchParams()
     setNpcKnobsParams(original, params, 'npc2_')

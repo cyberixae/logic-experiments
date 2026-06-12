@@ -3,6 +3,7 @@ import { AnyWorkspace } from '../interactive/workspace'
 import { ProofUsing } from '../model/derivation'
 import { RuleId } from '../model/rule'
 import { AnySequent, isTautology } from '../model/sequent'
+import { isReverseId1 } from '../rules'
 import { NpcKnobs } from './knobs'
 import { linearize } from './proof-walker'
 import { createSolver, SolveHandle } from './solver-runner'
@@ -10,7 +11,6 @@ import { createSolver, SolveHandle } from './solver-runner'
 export type NpcDriverOpts = {
   getWorkspace: () => AnyWorkspace
   getChallengeIdx: () => number
-  getChallengeSolution: () => ProofUsing<AnySequent, RuleId> | undefined
   getTotalMoves: () => number
   applyEvent: (ev: Event) => void
   skip: () => void
@@ -19,7 +19,10 @@ export type NpcDriverOpts = {
   isPaused?: () => boolean
 }
 
-type ProofRef = { value: ProofUsing<AnySequent, RuleId> | null }
+type SearchRef = {
+  proof: ProofUsing<AnySequent, RuleId> | null
+  exhausted: boolean
+}
 
 type State =
   | { kind: 'idle' }
@@ -29,7 +32,14 @@ type State =
       observedIdx: number
       startedAt: number
       handle: SolveHandle
-      proofRef: ProofRef
+      searchRef: SearchRef
+    }
+  // Bounded search came back empty. Sit visibly stuck for a while (the skip
+  // "tell" — a stub until idle behaviour lands), then skip.
+  | {
+      kind: 'givingUp'
+      observedIdx: number
+      since: number
     }
   | {
       kind: 'executing'
@@ -78,7 +88,10 @@ export const createNpcDriver = (
   const startPlanning = (idx: number): void => {
     const ws = opts.getWorkspace()
     const goal = ws.currentConjecture().derivation.result
-    const rules = ws.availableRules()
+    // Brute search can't pick useful auxiliary formulas for reverse1 rules
+    // (cut family) — it enumerates candidates blindly, which explodes the
+    // search space. Filter them out, like the challenge generator does.
+    const rules = ws.availableRules().filter((r) => !isReverseId1(r))
     // Bypassed (chaos) challenges arrive without a precomputed solution and
     // the goal may not even be a tautology — running brute on it would never
     // return and would block the main thread past skipAfterMs. Skip early
@@ -88,16 +101,25 @@ export const createNpcDriver = (
       opts.skip()
       return
     }
-    const proofRef: ProofRef = { value: null }
-    const handle = solver.solveChunked({ goal, rules }, (p) => {
-      proofRef.value = p
-    })
+    const searchRef: SearchRef = { proof: null, exhausted: false }
+    const handle = solver.solveChunked(
+      { goal, rules },
+      (p) => {
+        searchRef.proof = p
+      },
+      {
+        maxDepth: opts.knobs.searchDepth,
+        onExhausted: () => {
+          searchRef.exhausted = true
+        },
+      },
+    )
     state = {
       kind: 'planning',
       observedIdx: idx,
       startedAt: Date.now(),
       handle,
-      proofRef,
+      searchRef,
     }
     schedule(PLANNING_POLL_MS)
   }
@@ -134,6 +156,8 @@ export const createNpcDriver = (
       pausedAt = null
       if (state.kind === 'planning') {
         state = { ...state, startedAt: state.startedAt + delta }
+      } else if (state.kind === 'givingUp') {
+        state = { ...state, since: state.since + delta }
       } else if (state.kind === 'executing') {
         state = {
           ...state,
@@ -145,7 +169,9 @@ export const createNpcDriver = (
     const idx = opts.getChallengeIdx()
 
     if (
-      (state.kind === 'planning' || state.kind === 'executing') &&
+      (state.kind === 'planning' ||
+        state.kind === 'givingUp' ||
+        state.kind === 'executing') &&
       state.observedIdx !== idx
     ) {
       cancelSolverIfPlanning()
@@ -158,24 +184,37 @@ export const createNpcDriver = (
     }
 
     if (state.kind === 'idle' || state.kind === 'observing') {
-      const solution = opts.getChallengeSolution()
-      if (solution !== undefined) {
-        startExecuting(idx, linearize(solution, linearizeOpts), Date.now())
-      } else {
-        startPlanning(idx)
-      }
+      // No foreknowledge: the NPC never reads the precomputed solution and
+      // always searches for itself.
+      startPlanning(idx)
       return
     }
 
     if (state.kind === 'planning') {
-      const proof = state.proofRef.value
+      const proof = state.searchRef.proof
       if (proof !== null) {
         state.handle.cancel()
         startExecuting(idx, linearize(proof, linearizeOpts), state.startedAt)
         return
       }
+      if (state.searchRef.exhausted) {
+        state.handle.cancel()
+        state = { kind: 'givingUp', observedIdx: idx, since: Date.now() }
+        schedule(PLANNING_POLL_MS)
+        return
+      }
       if (Date.now() - state.startedAt > opts.knobs.skipAfterMs) {
         state.handle.cancel()
+        startObserving()
+        opts.skip()
+        return
+      }
+      schedule(PLANNING_POLL_MS)
+      return
+    }
+
+    if (state.kind === 'givingUp') {
+      if (Date.now() - state.since > opts.knobs.skipStuckMs) {
         startObserving()
         opts.skip()
         return

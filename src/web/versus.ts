@@ -1186,7 +1186,6 @@ export const mountVersus = (
     const driver = createNpcDriver({
       getWorkspace: () => ws1,
       getChallengeIdx: () => wsIdx1,
-      getChallengeSolution: () => sharedChallenges[wsIdx1]?.challenge.solution,
       getTotalMoves: () => totalMoves(ws1),
       applyEvent: (ev) => {
         ws1.applyEvent(ev)
@@ -1224,7 +1223,6 @@ export const mountVersus = (
     const driver = createNpcDriver({
       getWorkspace: () => ws2,
       getChallengeIdx: () => wsIdx2,
-      getChallengeSolution: () => sharedChallenges[wsIdx2]?.challenge.solution,
       getTotalMoves: () => totalMoves(ws2),
       applyEvent: (ev) => {
         ws2.applyEvent(ev)

@@ -6,10 +6,18 @@ import { ControlMessage, WorkerMessage } from './npc-protocol'
 
 export type SolveHandle = { cancel: () => void }
 
+export type SolveOpts = {
+  // Bounded search: give up past this depth and call onExhausted instead of
+  // deepening forever.
+  maxDepth: number
+  onExhausted: () => void
+}
+
 export type Solver = {
   solveChunked: (
     config: Configuration<AnySequent, ReadonlyArray<RuleId>>,
     onProof: (proof: ProofUsing<AnySequent, RuleId>) => void,
+    opts: SolveOpts,
   ) => SolveHandle
   cleanup: () => void
 }
@@ -17,6 +25,7 @@ export type Solver = {
 type PendingRequest = {
   requestId: number
   onProof: (proof: ProofUsing<AnySequent, RuleId>) => void
+  onExhausted: () => void
 }
 
 export const createSolver = (): Solver => {
@@ -28,11 +37,16 @@ export const createSolver = (): Solver => {
     if (worker !== null) return worker
     const w = new Worker('lk.npc.w.js')
     w.onmessage = (e: MessageEvent<WorkerMessage>) => {
-      if (e.data.type !== 'proof') return
       if (current === null || e.data.requestId !== current.requestId) return
-      const onProof = current.onProof
-      current = null
-      onProof(e.data.proof)
+      if (e.data.type === 'proof') {
+        const onProof = current.onProof
+        current = null
+        onProof(e.data.proof)
+      } else if (e.data.type === 'exhausted') {
+        const onExhausted = current.onExhausted
+        current = null
+        onExhausted()
+      }
     }
     w.onerror = (e) => {
       console.error('NPC worker error:', e.message)
@@ -46,15 +60,16 @@ export const createSolver = (): Solver => {
   }
 
   return {
-    solveChunked: (config, onProof) => {
+    solveChunked: (config, onProof, opts) => {
       const requestId = nextRequestId
       nextRequestId += 1
-      current = { requestId, onProof }
+      current = { requestId, onProof, onExhausted: opts.onExhausted }
       post({
         type: 'solve',
         requestId,
         goal: config.goal,
         rules: config.rules,
+        maxDepth: opts.maxDepth,
       })
       return {
         cancel: () => {

@@ -1,6 +1,6 @@
 /// <reference lib="webworker" />
 
-import { bruteSearch } from '../solver/brute'
+import { bruteSearchLimit } from '../solver/brute'
 import { RuleId } from '../model/rule'
 import { AnySequent } from '../model/sequent'
 import { ControlMessage, WorkerMessage } from './npc-protocol'
@@ -11,15 +11,23 @@ const startSolve = (
   requestId: number,
   goal: AnySequent,
   rules: ReadonlyArray<RuleId>,
+  maxDepth: number,
 ) => {
   currentRequestId = requestId
-  const gen = bruteSearch({ goal, rules })
+  const gen = bruteSearchLimit({ goal, rules }, maxDepth)
   const tick = () => {
     if (currentRequestId !== requestId) return
     const result = gen.next()
     if (result.done === true) {
-      const [proof] = result.value
       currentRequestId = null
+      if (result.value === null) {
+        self.postMessage({
+          type: 'exhausted',
+          requestId,
+        } satisfies WorkerMessage)
+        return
+      }
+      const [proof] = result.value
       self.postMessage({
         type: 'proof',
         requestId,
@@ -34,7 +42,7 @@ const startSolve = (
 
 self.onmessage = (e: MessageEvent<ControlMessage>) => {
   if (e.data.type === 'solve') {
-    startSolve(e.data.requestId, e.data.goal, e.data.rules)
+    startSolve(e.data.requestId, e.data.goal, e.data.rules, e.data.maxDepth)
   } else if (e.data.type === 'cancel') {
     if (currentRequestId === e.data.requestId) {
       currentRequestId = null
