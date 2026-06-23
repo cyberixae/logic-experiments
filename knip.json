@@ -1,0 +1,12 @@
+{
+  "$schema": "https://unpkg.com/knip@6/schema.json",
+  "entry": [
+    "src/web.ts",
+    "src/web/challenge-worker.ts",
+    "src/npc/npc-worker.ts",
+    "scripts/brute.ts"
+  ],
+  "project": ["src/**/*.ts", "scripts/**/*.ts"],
+  "ignoreExportsUsedInFile": true,
+  "ignoreBinaries": ["open", "wait"]
+}
