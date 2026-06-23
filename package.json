@@ -25,7 +25,6 @@
     "lint": "yarn eslint --max-warnings 0",
     "build": "yarn tsc",
     "brute": "yarn build && node scripts/brute.ts",
-    "namegen": "node scripts/namegen.ts",
     "prettify": "prettier . --write",
     "format:check": "prettier . --check",
     "ci": "yarn format:check && yarn lint && yarn typecheck && yarn test && yarn build:web"
