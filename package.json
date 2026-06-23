@@ -2,7 +2,6 @@
   "name": "prop",
   "version": "0.0.1",
   "description": "Propositional logic stuff",
-  "main": "index.js",
   "license": "UNLICENSED",
   "author": "Toni Ruottu <toni.ruottu@iki.fi>",
   "packageManager": "yarn@4.13.0",

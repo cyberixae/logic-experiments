@@ -1,12 +1,10 @@
 {
   "$schema": "https://unpkg.com/knip@6/schema.json",
-  "entry": [
-    "src/web.ts",
-    "src/web/challenge-worker.ts",
-    "src/npc/npc-worker.ts",
-    "scripts/brute.ts"
-  ],
+  "entry": ["src/web/challenge-worker.ts", "src/npc/npc-worker.ts"],
   "project": ["src/**/*.ts", "scripts/**/*.ts"],
+  "ignore": ["src/utils/string.ts"],
   "ignoreExportsUsedInFile": true,
-  "ignoreBinaries": ["open", "wait"]
+  "ignoreBinaries": ["open", "wait"],
+  "ignoreIssues": { "**": ["types"] },
+  "treatConfigHintsAsErrors": true
 }
