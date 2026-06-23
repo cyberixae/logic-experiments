@@ -1,5 +1,5 @@
 import { GameMode, gameModes } from './model/mode'
-import { repl, WorkspaceFactory } from './interactive/repl'
+import { WorkspaceFactory } from './interactive/repl'
 import { Session } from './interactive/session'
 import { Workspace } from './interactive/workspace'
 import { challenges } from './challenges'
@@ -24,7 +24,6 @@ import { defaultRandomConfig } from './random/config'
 import { setGazeModeActive } from './web/game'
 import { onLocaleChange, setLocale } from './web/i18n'
 import { ChallengePool } from './web/challenge-pool'
-import { plain } from './render/segment'
 import { includes } from './utils/array'
 
 const pool = new ChallengePool()
@@ -36,17 +35,11 @@ const factory: WorkspaceFactory = {
   random: () => new Workspace({ challenge: pool.take().challenge }),
 }
 
-const gen = repl(session, factory)
-gen.next('')
-
 let current: MountResult = { cleanup: () => {}, rerender: () => {} }
-let currentScreen: Screen = 'menu'
 
 const enterMode = (mode: GameMode) => {
   session.enter(mode, factory[mode]())
 }
-
-const screenForSession = (): Screen => session.mode ?? 'menu'
 
 const navigate = (screen: Screen) => {
   current.cleanup()
@@ -60,7 +53,6 @@ const navigate = (screen: Screen) => {
   if (includes(gameModes, screen)) {
     enterMode(screen)
   }
-  currentScreen = screen
   const currentParams = new URLSearchParams(window.location.search)
   const lang = currentParams.get('lang')
   const nextParams = new URLSearchParams()
@@ -137,7 +129,6 @@ const mount = (screen: Screen) => {
     case 'versus-config':
       current = mountVersusConfig(body, navigate, (versusConfig) => {
         current.cleanup()
-        currentScreen = 'versus'
         pool.configure(versusConfig.randomConfig)
         const params = new URLSearchParams()
         const lang = new URLSearchParams(window.location.search).get('lang')
@@ -152,7 +143,6 @@ const mount = (screen: Screen) => {
       current = mountRandomConfig(body, navigate, (config) => {
         pool.configure(config)
         current.cleanup()
-        currentScreen = 'random'
         enterMode('random')
         const params = new URLSearchParams()
         const lang = new URLSearchParams(window.location.search).get('lang')
@@ -166,34 +156,6 @@ const mount = (screen: Screen) => {
   }
 }
 
-const syncScreen = () => {
-  const expected = screenForSession()
-  if (expected === currentScreen) return
-  current.cleanup()
-  if (expected === 'menu') setGazeModeActive(false)
-  currentScreen = expected
-  const lang = new URLSearchParams(window.location.search).get('lang')
-  const langSuffix = lang !== null ? `&lang=${encodeURIComponent(lang)}` : ''
-  const menuUrl =
-    lang !== null
-      ? `${window.location.pathname}?lang=${encodeURIComponent(lang)}`
-      : window.location.pathname
-  history.pushState(
-    { screen: expected },
-    '',
-    expected === 'menu' ? menuUrl : `?mode=${expected}${langSuffix}`,
-  )
-  mount(expected)
-}
-
-const cmd = (input: string) => {
-  const result = gen.next(input)
-  console.log(plain(result.value))
-  syncScreen()
-  current.rerender()
-}
-Object.assign(window, { cmd })
-
 const init = () => {
   const params = new URLSearchParams(window.location.search)
   setLocale(params.get('lang'))
@@ -205,30 +167,22 @@ const init = () => {
       pool.configure(parseConfigFromParams(params))
     }
     enterMode(mode)
-    currentScreen = mode
     mount(mode)
   } else if (mode === 'random-config') {
-    currentScreen = 'random-config'
     mount('random-config')
   } else if (mode === 'secret') {
-    currentScreen = 'secret'
     mount('secret')
   } else if (mode === 'system') {
-    currentScreen = 'system'
     mount('system')
   } else if (mode === 'versus') {
-    currentScreen = 'versus'
     mount('versus')
   } else if (mode === 'versus-config') {
-    currentScreen = 'versus-config'
     mount('versus-config')
   } else if (params.get('level') !== null) {
     // Legacy URL: ?level=ch0identity1 — jump straight into campaign
     enterMode('campaign')
-    currentScreen = 'campaign'
     mount('campaign')
   } else {
-    currentScreen = 'menu'
     mount('menu')
   }
   document.documentElement.classList.remove('loading')
@@ -246,6 +200,5 @@ window.addEventListener('popstate', (event) => {
   if (includes(gameModes, screen)) {
     enterMode(screen)
   }
-  currentScreen = screen
   mount(screen)
 })
