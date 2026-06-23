@@ -17,7 +17,7 @@ const extractAuxFormula = (
   const dep0 = deps[0]
   const dep1 = deps[1]
   if (dep0 === undefined || dep1 === undefined) return null
-  if (rule === 'cut' || rule === 'fcut') {
+  if (rule === 'cut') {
     const succ = dep0.result.succedent
     return isNonEmptyArray(succ) ? last(succ) : null
   }

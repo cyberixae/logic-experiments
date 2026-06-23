@@ -92,13 +92,4 @@ describe('bruteRotate0 gap', () => {
     )
     expect(proof).toBeUndefined()
   })
-
-  it('finds proof when sRotLF is available to reconnect', () => {
-    // With sRotLF, bruteRotate0 can reconnect after rotation
-    const [proof] = bruteLimit(
-      { goal: sequent([q, p], [p]), rules: ['i', 'swl', 'sRotLF'] },
-      10,
-    )
-    expect(proof).toBeDefined()
-  })
 })

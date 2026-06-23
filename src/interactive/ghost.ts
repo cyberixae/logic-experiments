@@ -23,8 +23,8 @@ const findConnectiveRule = (
 ): keyof typeof reverseLogic0 | null => {
   const candidates: ReadonlyArray<keyof typeof reverseLogic0> =
     side === 'left'
-      ? (['nl', 'cl', 'cl1', 'cl2', 'dl', 'il'] as const)
-      : (['nr', 'dr', 'dr1', 'dr2', 'cr', 'ir'] as const)
+      ? (['nl', 'cl', 'dl', 'il'] as const)
+      : (['nr', 'dr', 'cr', 'ir'] as const)
   for (const id of candidates) {
     if (!available.has(id)) continue
     if (reverseLogic0[id].isResult(seq)) return id

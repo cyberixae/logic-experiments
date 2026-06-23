@@ -5,8 +5,6 @@ import * as prop from './prop'
 
 export type Formulas = Array<Prop>
 
-export type Split = (arr: Formulas) => [Formulas, Formulas]
-
 export const equals = (fa: Formulas, fb: Formulas): boolean => {
   return (
     fa.length === fb.length && zip(fa, fb).every(([a, b]) => prop.equals(a, b))

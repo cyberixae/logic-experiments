@@ -28,9 +28,4 @@ describe('isResult type guards', () => {
     expect(rules.cut.isResult(empty)).toBe(true)
     expect(rules.cut.isResult(sequent([atom('p')], [atom('q')]))).toBe(true)
   })
-
-  it('fcut: accepts any sequent', () => {
-    expect(rules.fcut.isResult(empty)).toBe(true)
-    expect(rules.fcut.isResult(sequent([atom('p')], [atom('q')]))).toBe(true)
-  })
 })

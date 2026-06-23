@@ -28,14 +28,8 @@ const SOLVER_RULES: ReadonlyArray<RuleId> = RULES.filter(
 const STRUCTURAL_RULES: ReadonlySet<RuleId> = new Set([
   'swl',
   'swr',
-  'scl',
-  'scr',
-  'sRotLF',
   'sRotLB',
-  'sRotRF',
   'sRotRB',
-  'sxl',
-  'sxr',
 ])
 
 export const countNonStructural = (d: AnyDerivation): number => {

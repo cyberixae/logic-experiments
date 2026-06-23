@@ -312,46 +312,6 @@ describe('print module', () => {
       expect(plain(fromRuleId('swr')(basic))).toBe('WR')
     })
 
-    it('cl1', () => {
-      expect(plain(fromRuleId('cl1')(basic))).toBe('∧L\u2081')
-    })
-
-    it('cl2', () => {
-      expect(plain(fromRuleId('cl2')(basic))).toBe('∧L\u2082')
-    })
-
-    it('dr1', () => {
-      expect(plain(fromRuleId('dr1')(basic))).toBe('∨R\u2081')
-    })
-
-    it('dr2', () => {
-      expect(plain(fromRuleId('dr2')(basic))).toBe('∨R\u2082')
-    })
-
-    it('scl', () => {
-      expect(plain(fromRuleId('scl')(basic))).toBe('CL')
-    })
-
-    it('scr', () => {
-      expect(plain(fromRuleId('scr')(basic))).toBe('CR')
-    })
-
-    it('sxl', () => {
-      expect(plain(fromRuleId('sxl')(basic))).toBe('XL')
-    })
-
-    it('sxr', () => {
-      expect(plain(fromRuleId('sxr')(basic))).toBe('XR')
-    })
-
-    it('sRotLF', () => {
-      expect(plain(fromRuleId('sRotLF')(basic))).toBe('\u21B6L')
-    })
-
-    it('sRotRF', () => {
-      expect(plain(fromRuleId('sRotRF')(basic))).toBe('\u21b7R')
-    })
-
     it('sRotLB', () => {
       expect(plain(fromRuleId('sRotLB')(basic))).toBe('\u21b7L')
     })
@@ -360,24 +320,8 @@ describe('print module', () => {
       expect(plain(fromRuleId('sRotRB')(basic))).toBe('\u21B6R')
     })
 
-    it('a1', () => {
-      expect(plain(fromRuleId('a1')(basic))).toBe('a1')
-    })
-
-    it('a2', () => {
-      expect(plain(fromRuleId('a2')(basic))).toBe('a2')
-    })
-
-    it('a3', () => {
-      expect(plain(fromRuleId('a3')(basic))).toBe('a3')
-    })
-
     it('cut', () => {
       expect(plain(fromRuleId('cut')(basic))).toBe('✂️')
-    })
-
-    it('mp', () => {
-      expect(plain(fromRuleId('mp')(basic))).toBe('mp')
     })
   })
 

@@ -171,7 +171,6 @@ describe('focus', () => {
       const f = focus(premise(sequent([p], [p])))
       const rules = applicableRules(f)
       expect(rules).toContain('i')
-      expect(rules).toContain('scl')
     })
   })
 

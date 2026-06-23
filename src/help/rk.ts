@@ -19,9 +19,7 @@ import { ruleIR } from '../rules/ir'
 import { ruleNL } from '../rules/nl'
 import { ruleNR } from '../rules/nr'
 import { ruleSRotLB } from '../rules/srotlb'
-import { ruleSRotLF } from '../rules/srotlf'
 import { ruleSRotRB } from '../rules/srotrb'
-import { ruleSRotRF } from '../rules/srotrf'
 import { ruleV } from '../rules/v'
 import { ruleF } from '../rules/f'
 import { ruleSWL } from '../rules/swl'
@@ -79,7 +77,6 @@ export const meta = {
       title: 'Structural Rules',
       examples: [
         [ruleSWL.example, ruleSWR.example],
-        [ruleSRotLF.example, ruleSRotRF.example],
         [ruleSRotLB.example, ruleSRotRB.example],
       ],
     },

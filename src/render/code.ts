@@ -58,70 +58,21 @@ export function fromTransformation(t: AnyTransformation): string {
     i: ({ result }) => `i.i(${fromProp(result.antecedent[0])})`,
     f: () => 'i.f()',
     v: () => 'i.v()',
-    a1: ({ result }) => {
-      const p2qp = result.succedent[0]
-      const p = p2qp.antecedent
-      const q = p2qp.consequent.antecedent
-      return `i.a1(${fromProp(p)},${fromProp(q)})`
-    },
-    a2: ({ result }) => {
-      const pqr2pq2pr = result.succedent[0]
-      const p2q2r = pqr2pq2pr.antecedent
-      const p = p2q2r.antecedent
-      const q2r = p2q2r.consequent
-      const q = q2r.antecedent
-      const r = q2r.consequent
-      return `i.a2(${fromProp(p)},${fromProp(q)},${fromProp(r)})`
-    },
-    a3: ({ result }) => {
-      const np2nq2q2p = result.succedent[0]
-      const np2nq = np2nq2q2p.antecedent
-      const p = np2nq.antecedent.negand
-      const q = np2nq.consequent.negand
-      return `i.a3(${fromProp(p)},${fromProp(q)})`
-    },
     ir: () => `z.ir(${d.join(',')})`,
     il: () => `z.il(${d.join(',')})`,
     nl: () => `z.nl(${d.join(',')})`,
     nr: () => `z.nr(${d.join(',')})`,
     cl: () => `z.cl(${d.join(',')})`,
     cr: () => `z.cr(${d.join(',')})`,
-    cl1: ({ result }) => {
-      const conj = tuple.last(result.antecedent)
-      return `z.cl1(${fromProp(conj.rightConjunct)},${d.join(',')})`
-    },
-    cl2: ({ result }) => {
-      const conj = tuple.last(result.antecedent)
-      return `z.cl2(${fromProp(conj.leftConjunct)},${d.join(',')})`
-    },
     dl: () => `z.dl(${d.join(',')})`,
     dr: () => `z.dr(${d.join(',')})`,
-    dr1: ({ result }) => {
-      const disj = tuple.head(result.succedent)
-      return `z.dr1(${fromProp(disj.rightDisjunct)},${d.join(',')})`
-    },
-    dr2: ({ result }) => {
-      const disj = tuple.head(result.succedent)
-      return `z.dr2(${fromProp(disj.leftDisjunct)},${d.join(',')})`
-    },
     swl: ({ result }) =>
       `z.swl(${fromProp(tuple.last(result.antecedent))},${d.join(',')})`,
     swr: ({ result }) =>
       `z.swr(${fromProp(tuple.head(result.succedent))},${d.join(',')})`,
-    scl: () => `z.scl(${d.join(',')})`,
-    scr: () => `z.scr(${d.join(',')})`,
-    sxl: () => `z.sxl(${d.join(',')})`,
-    sxr: () => `z.sxr(${d.join(',')})`,
-    sRotLF: () => `z.sRotLF(${d.join(',')})`,
     sRotLB: () => `z.sRotLB(${d.join(',')})`,
-    sRotRF: () => `z.sRotRF(${d.join(',')})`,
     sRotRB: () => `z.sRotRB(${d.join(',')})`,
     cut: () => `z.cut(${d.join(',')})`,
-    fcut: () => `z.fcut(${d.join(',')})`,
-    fcr: () => `z.fcr(${d.join(',')})`,
-    fdl: () => `z.fdl(${d.join(',')})`,
-    fil: () => `z.fil(${d.join(',')})`,
-    mp: () => `z.mp(${d.join(',')})`,
   })
 }
 

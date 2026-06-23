@@ -18,12 +18,6 @@ describe('linearize — single-node proofs', () => {
     const events = linearize(leafI(p))
     expect(events).toEqual([reverse0('i')])
   })
-
-  it('emits no event for an unknown / non-reverse rule', () => {
-    // fcr is a reverseSplit2 rule; walker only handles reverse0 and reverse1
-    const node = proofUsing(sequent([], [p]), [], 'fcr' as const)
-    expect(linearize(node)).toEqual([])
-  })
 })
 
 describe('linearize — two-dep walks', () => {
@@ -42,23 +36,6 @@ describe('linearize — two-dep walks', () => {
     const tree = proofUsing(sequent([], []), [left, right], 'cut' as const)
     const [head] = linearize(tree, { shuffle: false })
     expect(head).toEqual(reverse1('cut', aux))
-  })
-
-  it('extracts the fcut aux formula the same way as cut', () => {
-    const left = proofUsing(sequent([], [aux]), [], 'i' as const)
-    const right = leafI(p)
-    const tree = proofUsing(sequent([], []), [left, right], 'fcut' as const)
-    const [head] = linearize(tree, { shuffle: false })
-    expect(head).toEqual(reverse1('fcut', aux))
-  })
-
-  it('extracts the mp aux formula from the first succedent of dep[1]', () => {
-    // For mp the aux is the antecedent P of P → Q, which dep1 proves.
-    const left = leafI(p)
-    const right = proofUsing(sequent([], [aux]), [], 'i' as const)
-    const tree = proofUsing(sequent([], [q]), [left, right], 'mp' as const)
-    const [head] = linearize(tree, { shuffle: false })
-    expect(head).toEqual(reverse1('mp', aux))
   })
 
   it('emits no event when a reverse1 dep has an empty succedent', () => {
@@ -107,7 +84,7 @@ describe('linearize — shuffle', () => {
     const single = proofUsing(
       sequent([p], [p]),
       [leafI(p)],
-      'scl' as const, // structural reverse0 with one dep in the walker's view
+      'swl' as const, // structural reverse0 with one dep in the walker's view
     )
     const events = linearize(single, { shuffle: true })
     // No nextBranch event because deps.length !== 2
