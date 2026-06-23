@@ -1,7 +1,7 @@
 import { equals, AnySequent } from '../../model/sequent'
 import { AnyDerivation, ProofUsing } from '../../model/derivation'
 import { bruteSearch } from '../../solver/brute'
-import { challenges } from '../index'
+import { challenges, isChallengeKey } from '../index'
 import { RuleId } from '../../model/rule'
 import { Configuration } from '../../model/challenge'
 import { isReverseId1 } from '../../rules'
@@ -21,6 +21,20 @@ const countNodes = (d: AnyDerivation): number => {
   if (d.kind === 'premise') return 1
   return 1 + d.deps.reduce((s, c) => s + countNodes(c), 0)
 }
+
+describe('isChallengeKey', () => {
+  it('accepts every registered challenge key', () => {
+    for (const key of Object.keys(challenges)) {
+      expect(isChallengeKey(key)).toBe(true)
+    }
+  })
+
+  it('rejects keys that are not registered challenges', () => {
+    expect(isChallengeKey('not-a-challenge')).toBe(false)
+    expect(isChallengeKey('')).toBe(false)
+    expect(isChallengeKey('ch99nonexistent')).toBe(false)
+  })
+})
 
 describe('challenges', () => {
   describe.each(Object.entries(challenges))(

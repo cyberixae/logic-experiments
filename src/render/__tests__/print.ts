@@ -5,8 +5,11 @@ import {
   fromRuleId,
   fromPremise,
   fromDerivation,
+  fromFormulas,
+  fromFocus,
   type Templates,
 } from '../print'
+import { focus } from '../../interactive/focus'
 import { plain } from '../segment'
 import {
   atom,
@@ -473,6 +476,35 @@ describe('print module', () => {
       expect(fromDerivation(derivation)).toBe(
         '              \n――――――――― (I) \n 🐧 ⊢ 🐧      \n――――――――― (→R)\n ⊢ 🐧→🐧      ',
       )
+    })
+  })
+
+  describe('fromFormulas', () => {
+    it('renders an empty list as an empty string', () => {
+      expect(plain(fromFormulas([])(basic))).toBe('')
+    })
+
+    it('renders a single formula', () => {
+      expect(plain(fromFormulas([atom('p')])(basic))).toBe('🐧')
+    })
+
+    it('joins multiple formulas with the separator', () => {
+      expect(
+        plain(fromFormulas([atom('p'), atom('q'), atom('r')])(basic)),
+      ).toBe('🐧,🦜,🦃')
+    })
+  })
+
+  describe('fromFocus', () => {
+    it('renders the focus derivation the same as fromDerivation', () => {
+      const derivation = z.ir(i.i(a('p')))
+      const f = focus(derivation)
+      expect(fromFocus(f)).toBe(fromDerivation(derivation))
+    })
+
+    it('renders a premise focus as its sequent', () => {
+      const f = focus(premise(conclusion(atom('p'))))
+      expect(fromFocus(f)).toBe('⊢ 🐧')
     })
   })
 })

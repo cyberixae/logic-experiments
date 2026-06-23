@@ -1,4 +1,4 @@
-import { tree, center, treeAuto, align } from '../block'
+import { tree, center, treeAuto, align, centerify, log } from '../block'
 
 describe('block module', () => {
   describe('center function', () => {
@@ -71,6 +71,32 @@ foobs
  ――― omg 
  qux     
 `)
+    })
+  })
+
+  describe('centerify function', () => {
+    it('centers shorter lines to the width of the widest', () => {
+      expect(centerify('abcde', 'x', 'yyy')).toBe('abcde\n  x  \n yyy ')
+    })
+
+    it('leaves a single line unchanged', () => {
+      expect(centerify('abc')).toBe('abc')
+    })
+  })
+
+  describe('log function', () => {
+    it('prints each line with a two-space indent and trailing space trimmed', () => {
+      const spy = jest.spyOn(console, 'log').mockImplementation(() => {})
+      log('foo  \nbar')
+      expect(spy.mock.calls).toEqual([['  foo'], ['  bar']])
+      spy.mockRestore()
+    })
+
+    it('prints a single indented empty line when called with no argument', () => {
+      const spy = jest.spyOn(console, 'log').mockImplementation(() => {})
+      log()
+      expect(spy.mock.calls).toEqual([['  ']])
+      spy.mockRestore()
     })
   })
 
