@@ -22,12 +22,6 @@ export const mountSecret = (
     const modes = document.createElement('div')
     modes.setAttribute('class', 'menu-modes')
 
-    const matchBtn = document.createElement('div')
-    matchBtn.setAttribute('class', 'button menu-mode')
-    matchBtn.innerHTML = t('quiz')
-    matchBtn.onclick = () => navigate('match-curated')
-    modes.appendChild(matchBtn)
-
     const systemsBtn = document.createElement('div')
     systemsBtn.setAttribute('class', 'button menu-mode')
     systemsBtn.innerHTML = t('systems')

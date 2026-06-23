@@ -6,9 +6,6 @@ export type Screen =
   | 'secret'
   | 'system'
   | 'random-config'
-  | 'match-config'
-  | 'match-intro'
-  | 'match-curated'
   | 'versus'
   | 'versus-config'
 export type Navigate = (screen: Screen) => void
