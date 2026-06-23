@@ -8,7 +8,6 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 yarn build          # Compile TypeScript → lib/
 yarn build:web      # Bundle web interface → dist/lk.js + dist/lk.w.js + dist/lk.npc.w.js (via esbuild)
 yarn dev            # Watch + serve web interface locally
-yarn main           # Build + run interactive REPL
 yarn lint           # Lint all files with ESLint
 yarn prettify       # Format all files with Prettier
 yarn test           # Run Jest tests
@@ -17,16 +16,15 @@ yarn brute          # Run brute-force solver script
 yarn ci             # Run all checks (format, lint, typecheck, test, build:web)
 ```
 
-Run a single test file: `yarn jest src/render/__tests__/print.test.ts`
+Run a single test file: `yarn jest src/render/__tests__/print.ts`
 
 ## Architecture
 
-This project implements propositional logic proof systems with an interactive REPL and web interface.
+This project implements **Bird Kalkulus**, a propositional-logic proof game built on the **RK** proof system and delivered as a web interface (no CLI).
 
-### Two logic systems
+### The logic system
 
-- **Gentzen LK** (`src/systems/lk.ts`): Sequent calculus for classical propositional logic. Full language (¬, →, ∧, ∨) with ~20 rules including structural rules (weakening, contraction, exchange, rotation).
-- **Łukasiewicz Axioms 3** (`src/systems/la3.ts`): Axiom-based system with 3 axioms + modus ponens. Only ¬ and → are primitive; ∧ and ∨ are abbreviations.
+- **RK** (`src/systems/rk.ts`, display name `RK`): a sequent calculus for classical propositional logic. Full language (¬, →, ∧, ∨) with ~20 rules including structural rules (weakening, contraction, exchange, rotation). This is the only system the game surfaces.
 
 ### Core domain model (`src/model/`)
 
@@ -40,41 +38,37 @@ This project implements propositional logic proof systems with an interactive RE
 
 ### Rules (`src/rules/`)
 
-~30 individual rule files (e.g., `i.ts`, `ir.ts`, `il.ts`, `cut.ts`, `mp.ts`, `a1/a2/a3.ts`). Each exports a rule object with `apply()`, `tryReverse()`, and an `example` derivation.
+~35 individual rule files (e.g., `i.ts`, `ir.ts`, `il.ts`, `cut.ts`). Each exports a rule object with `apply()`, `tryReverse()`, and an `example` derivation. RK selects a subset of these. Some primitives are **dormant** — the axiom rules (`a1`/`a2`/`a3`), modus ponens (`mp`), and the `fcut`/`cl1`/`dr1`/… family remain in the shared rule union (`src/model/rule.ts`) after the systems that used them (LA3, FK) were removed from this product; no current system references them. They are recoverable in git history if those systems are ever revived.
 
 ### Interactive proof system (`src/interactive/`)
 
-- `repl.ts` — Generator-based REPL; proofs are built backwards by applying rules to open goals
+The proof engine is driven directly by the web UI via events (there is no command-line/REPL layer).
+
+- `session.ts` — `Session`: the top-level mode plus active workspace (`enter` / `returnToMenu` / `replaceWorkspace`)
+- `workspace.ts` — Workspace state combining focus and derivation; also home of the `WorkspaceFactory` type. Moves apply through `workspace.applyEvent`
 - `focus.ts` — Cursor/focus navigation through the proof tree (array of indices = path)
-- `event.ts` — Events: `Reverse`, `Next`, `Prev`, `Undo`, `Reset`
+- `event.ts` — `Event` union: `Reverse0`, `Reverse1`, `Undo`, `Reset`, `Level`, `NextBranch`, `PrevBranch`, with their constructors
 - `action.ts` — Named player actions (e.g. `leftWeakening`, `leftConnective`)
-- `workspace.ts` — Workspace state combining focus and derivation
+- `ghost.ts` — Ghost/hint rule kinds used to preview applicable rules
 
 ### Challenges (`src/challenges/`)
 
-~88 challenges in 10 categories (ch0–ch9: identity → completeness), each specifying allowed rules and a goal sequent. Registered in `challenges/index.ts`.
+~86 challenges across categories ch0–ch9 (identity → completeness), each specifying allowed rules and a goal sequent. Registered in `challenges/index.ts`.
 
 ### Game modes
 
-The web app has three top-level user-facing modes declared in `src/model/mode.ts` (`'random' | 'campaign' | 'match'`), plus auxiliary screens:
+The web app has two top-level `GameMode`s declared in `src/model/mode.ts` (`'random' | 'campaign'`), plus the Versus flow and auxiliary screens:
 
 - **Campaign** (`src/web/campaign.ts`) — sequential progression through curated challenges; embeds the tutorial via the `Tutorial` type with `pinned` rules.
 - **Random** (`src/web/random.ts`, `src/random/`) — endless randomly-generated challenges. `src/random/challenge.ts` builds challenges; `src/random/config.ts` exposes config (rule selection, difficulty).
-- **Match / Versus** (`src/web/match-intro.ts`, `match-curated.ts`, `versus.ts`, `versus-config.ts`) — 5-minute head-to-head where two slots solve the same challenge pool side-by-side. P2 defaults to NPC; either slot can be `'human'` or `'npc'` via the input picker / URL params.
-- **Quiz** (`src/web/quiz.ts`, `quiz-config.ts`, `src/quiz/`) — secret-menu rule-recognition mode that uses the `RuleSchema` type to generate rule cards with random formula/sequence variable bindings. `src/quiz/schema.ts` is the shared schema infrastructure also relevant to future Nightmare / player-defined-systems work.
-- **Sandbox / System docs** (`src/web/system.ts`) — per-system reference shown via `?mode=system`.
+- **Versus** (`src/web/versus.ts`, `versus-config.ts`) — 5-minute head-to-head where two slots solve the same challenge pool side-by-side. P2 defaults to NPC; either slot can be `'human'` or `'npc'` via the input picker / URL params.
+- **Secret menu** (`src/web/secret.ts`) — hidden screen (reached by repeatedly clicking the title) linking to the system docs.
+- **System docs** (`src/web/system.ts`) — per-system reference shown via `?mode=system`.
 
 ### Random configuration (`src/random/`)
 
 - `challenge.ts` — generates a random challenge given a config (selected rules, difficulty).
 - `config.ts` — config type + URL-param plumbing for Random mode.
-
-### Quiz subsystem (`src/quiz/`)
-
-- `schema.ts` — `RuleSchema`: rules-as-data with formula and sequence variables. Shared with future Nightmare / player-defined-systems epics; keep generic.
-- `generate.ts` — instantiates a `RuleSchema` into a concrete rule card by binding variables.
-- `render.ts` — renders a quiz card.
-- `config.ts` — Quiz config type.
 
 ### NPC subsystem (`src/npc/`)
 
@@ -95,9 +89,9 @@ Template-based pretty-printer (`print.ts`) with customizable themes; block-based
 
 ### Entry points
 
-- `src/main.ts` — CLI REPL (commands include `systems` / `system <id>` to view system docs)
 - `src/web.ts` — Web interface (bundled by esbuild into `dist/lk.js`); system docs reachable via `?mode=system`
-- `src/help/` — Per-system documentation (`meta` + example proof) shared by REPL and web
+- `src/web/challenge-worker.ts` / `src/npc/npc-worker.ts` — Web Workers (bundled into `dist/lk.w.js` / `dist/lk.npc.w.js`)
+- `src/help/` — Per-system documentation (`meta` + example proof), shown in the web system-docs screen
 - `src/web/` — Web components (menus, challenge worker, game logic, etc.)
 - `src/solver/` — Brute-force proof search (`brute.ts`, `bruteStructure0.ts`)
 
@@ -105,7 +99,7 @@ Template-based pretty-printer (`print.ts`) with customizable themes; block-based
 
 The codebase has two layers of typing:
 
-- **Static layer**: The `apply` functions on rules (`lk.z.*`, `lk.i.*`) carry precise generic types that encode the logical structure of each inference step. Challenge solutions are built using these functions so TypeScript verifies their correctness at compile time. `any` and `is` are avoided here.
+- **Static layer**: The `apply` functions on rules (`rk.z.*`, `rk.i.*`) carry precise generic types that encode the logical structure of each inference step. Challenge solutions are built using these functions so TypeScript verifies their correctness at compile time. `any` and `is` are avoided here.
 - **Runtime layer**: The interactive proof system works backwards from the goal using `tryReverse`, operating on erased types (`AnySequent`, `AnyDerivation`). Runtime `is` refinements and `| null` returns are accepted here since the player's moves are not known statically.
 
 The utilities in `src/utils/` exist to give standard TypeScript/JavaScript operations more precise types — positional tuple access, structural non-emptiness, composable refinements, typed `Object.entries` — in support of the static layer's goal of avoiding `any` and `is`.
