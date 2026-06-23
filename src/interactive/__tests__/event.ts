@@ -1,5 +1,4 @@
 import {
-  parseEvent,
   reverse0,
   reverse1,
   undo,
@@ -42,31 +41,6 @@ describe('event', () => {
 
     it('prevBranch', () => {
       expect(prevBranch()).toEqual({ kind: 'prevBranch' })
-    })
-  })
-
-  describe('parseEvent', () => {
-    it('parses undo', () => {
-      expect(parseEvent('undo')).toEqual({ kind: 'undo' })
-    })
-
-    it('parses reset', () => {
-      expect(parseEvent('reset')).toEqual({ kind: 'reset' })
-    })
-
-    it('parses a reverse0 rule id', () => {
-      expect(parseEvent('ir')).toEqual({ kind: 'reverse0', rev: 'ir' })
-    })
-
-    it('returns null for an unknown command', () => {
-      expect(parseEvent('unknown')).toBeNull()
-    })
-
-    it('returns null for a reverse1 rule (not yet implemented)', () => {
-      const spy = jest.spyOn(console, 'error').mockImplementation(() => {})
-      expect(parseEvent('cut')).toBeNull()
-      expect(spy).toHaveBeenCalledWith('TBD, parse:[]')
-      spy.mockRestore()
     })
   })
 })

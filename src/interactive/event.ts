@@ -1,6 +1,5 @@
 import { Prop } from '../model/prop'
-import { isReverseId0, isReverseId1, ReverseId0, ReverseId1 } from '../rules'
-import { split } from '../utils/string'
+import { ReverseId0, ReverseId1 } from '../rules'
 
 export type Reverse0<R extends ReverseId0> = { kind: 'reverse0'; rev: R }
 export const reverse0 = <R extends ReverseId0>(rev: R): Reverse0<R> => ({
@@ -45,21 +44,3 @@ export type Event =
   | Level
   | NextBranch
   | PrevBranch
-
-export const parseEvent = (str: string): Event | null => {
-  switch (str) {
-    case 'undo':
-      return undo()
-    case 'reset':
-      return reset()
-  }
-  if (isReverseId0(str)) {
-    return reverse0(str)
-  }
-  const [cmd, ...args] = split(str, ' ')
-  if (isReverseId1(cmd)) {
-    console.error('TBD, parse:' + JSON.stringify(args))
-    //return reverse1(cmd)
-  }
-  return null
-}
