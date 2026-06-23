@@ -1,6 +1,5 @@
 import * as print from '../render/print'
 import * as rk from './rk'
-import * as la3 from './la3'
 
 export const helpSystems = {
   rk: {
@@ -8,12 +7,6 @@ export const helpSystems = {
     name: rk.meta.name,
     meta: rk.meta,
     exampleProof: rk.exampleProof,
-  },
-  la3: {
-    id: 'la3',
-    name: la3.meta.name,
-    meta: la3.meta,
-    exampleProof: la3.exampleProof,
   },
 } as const
 
