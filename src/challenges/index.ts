@@ -197,4 +197,5 @@ export const challenges = {
 } satisfies Record<string, AnyChallenge>
 
 export type ChallengeKey = keyof typeof challenges
-export const isChallengeKey = (k: string): k is ChallengeKey => k in challenges
+export const isChallengeKey = (k: string): k is ChallengeKey =>
+  Object.hasOwn(challenges, k)

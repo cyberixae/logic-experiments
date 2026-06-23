@@ -34,6 +34,12 @@ describe('isChallengeKey', () => {
     expect(isChallengeKey('')).toBe(false)
     expect(isChallengeKey('ch99nonexistent')).toBe(false)
   })
+
+  it('rejects inherited Object.prototype keys', () => {
+    expect(isChallengeKey('toString')).toBe(false)
+    expect(isChallengeKey('constructor')).toBe(false)
+    expect(isChallengeKey('hasOwnProperty')).toBe(false)
+  })
 })
 
 describe('challenges', () => {
