@@ -1,7 +1,6 @@
 import { GameMode, gameModes } from './model/mode'
-import { WorkspaceFactory } from './interactive/repl'
 import { Session } from './interactive/session'
-import { Workspace } from './interactive/workspace'
+import { Workspace, WorkspaceFactory } from './interactive/workspace'
 import { challenges } from './challenges'
 import { MountResult, Screen } from './web/types'
 import { mountMenu } from './web/menu'

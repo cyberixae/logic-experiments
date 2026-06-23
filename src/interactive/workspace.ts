@@ -9,11 +9,16 @@ import { Configuration, isChallenge, isTutorial } from '../model/challenge'
 import { AnyDerivation } from '../model/derivation'
 import { AnySequent } from '../model/sequent'
 import { GhostKind } from './ghost'
+import { GameMode } from '../model/mode'
 
 export type AnyWorkspace = Workspace<
   string,
   Record<string, Configuration<AnySequent>>
 >
+
+export type WorkspaceFactory = {
+  [K in GameMode]: () => AnyWorkspace
+}
 
 export type Gaze = { side: 'left' | 'right'; index: number }
 
