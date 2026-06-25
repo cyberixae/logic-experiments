@@ -130,12 +130,18 @@ const actionPadHintHot = buildActionPadHint(ps5HotKeyMap)
 
 // === Mode state ===
 
-let gamepadActive = false
+type ActiveInput = 'pointer' | 'keyboard' | 'gamepad'
+
+// The device the player most recently used. Drives both hint text (keyboard
+// letters vs gamepad glyphs) and — via the `input-*` html class — whether the
+// single-player on-screen control bar is shown. Defaults to 'pointer' so the
+// buttons are visible on first paint and on touch devices.
+let activeInput: ActiveInput = 'pointer'
 let hotMode = false
 let gazeModeActive = false
 const gamepadListeners = new Set<() => void>()
 
-export const isGamepadActive = (): boolean => gamepadActive
+export const isGamepadActive = (): boolean => activeInput === 'gamepad'
 export const isHotMode = (): boolean => hotMode
 export const isGazeModeActive = (): boolean => gazeModeActive
 
@@ -159,18 +165,42 @@ const activeActionPadHint = (): Partial<Record<Action, string>> =>
 
 // === Mode setters ===
 
-const setGamepadActive = (v: boolean): void => {
-  if (gamepadActive === v) return
-  gamepadActive = v
-  notifyGamepadListeners()
+const inputClass: Record<ActiveInput, string> = {
+  pointer: 'input-pointer',
+  keyboard: 'input-keyboard',
+  gamepad: 'input-gamepad',
+}
+
+const setActiveInput = (v: ActiveInput): void => {
+  if (activeInput === v) return
+  const wasGamepad = activeInput === 'gamepad'
+  activeInput = v
+  if (typeof document !== 'undefined') {
+    const el = document.documentElement
+    el.classList.remove('input-pointer', 'input-keyboard', 'input-gamepad')
+    el.classList.add(inputClass[v])
+  }
+  // Only re-render when the gamepad-ness changes: that's the only thing that
+  // alters *rendered* content (pad glyphs vs key letters). Control-bar/topbar
+  // visibility is driven purely by the html class via CSS, so a keyboard↔pointer
+  // switch needs no re-render — and must not trigger one, or a pointer click
+  // that switches modes would wipe the DOM out from under its own click target.
+  if (wasGamepad !== (v === 'gamepad')) notifyGamepadListeners()
+}
+
+// Reflect the default state on the html element at module init so the
+// single-player control bar is visible on first paint and on touch devices.
+if (typeof document !== 'undefined') {
+  document.documentElement.classList.add('input-pointer')
 }
 
 // Called from input handlers so the hint display follows the device the player
 // is *currently* using, not just whether a controller is plugged in. A player
-// who flips between gamepad and keyboard gets hints for whichever they touched
-// last.
+// who flips between devices gets hints for whichever they touched last.
+export const markPointerInput = (): void => setActiveInput('pointer')
+
 export const markKeyboardInput = (): void => {
-  setGamepadActive(false)
+  setActiveInput('keyboard')
   if (typeof document !== 'undefined') {
     document.documentElement.classList.add('keyboard-detected')
   }
@@ -186,11 +216,11 @@ if (
   document.documentElement.classList.add('keyboard-detected')
 }
 
-export const markGamepadInput = (): void => setGamepadActive(true)
+export const markGamepadInput = (): void => setActiveInput('gamepad')
 
 // Lifecycle entry points used by setupGamepad on connect/disconnect.
-export const onGamepadConnected = (): void => setGamepadActive(true)
-export const onGamepadDisconnected = (): void => setGamepadActive(false)
+export const onGamepadConnected = (): void => setActiveInput('gamepad')
+export const onGamepadDisconnected = (): void => setActiveInput('pointer')
 
 export const setGazeModeActive = (active: boolean): void => {
   gazeModeActive = active
@@ -209,20 +239,20 @@ export const toggleHotMode = (): void => {
 // === Hint accessors ===
 
 export const getActionHint = (action: Action): string | undefined =>
-  gamepadActive ? activeActionPadHint()[action] : actionKeyHint[action]
+  isGamepadActive() ? activeActionPadHint()[action] : actionKeyHint[action]
 
 export const kbdHint = (s: string): string | undefined =>
-  gamepadActive ? undefined : s
+  isGamepadActive() ? undefined : s
 
 // For buttons whose primary trigger differs between keyboard and gamepad —
 // e.g. congrats-screen "New Challenge" is triggered by `'n'` on the keyboard
 // but by `axiom` (R2/Cross) on the gamepad. Shows the literal in keyboard
 // mode, the pad hint for the given action in pad mode.
 export const dualHint = (kbd: string, padAction: Action): string | undefined =>
-  gamepadActive ? activeActionPadHint()[padAction] : kbd
+  isGamepadActive() ? activeActionPadHint()[padAction] : kbd
 
 // Pure variants that take an explicit isGamepad flag instead of reading the
-// global gamepadActive — used by per-bench contexts (e.g. versus mode).
+// global activeInput — used by per-bench contexts (e.g. versus mode).
 export const getActionHintPure = (
   action: Action,
   isGamepad: boolean,
@@ -234,7 +264,7 @@ export const getActionHintPure = (
 // Resets all module state. Intended for use from tests via `beforeEach`. Not
 // for production code paths — production should use the explicit setters.
 export const resetInputModeForTest = (): void => {
-  gamepadActive = false
+  activeInput = 'pointer'
   hotMode = false
   gazeModeActive = false
   gamepadListeners.clear()

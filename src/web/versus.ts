@@ -197,6 +197,12 @@ export const mountVersus = (
   const isNpc1 = versusConfig.p1Input === 'npc'
   const isNpc2 = versusConfig.p2Input === 'npc'
 
+  // The on-screen control bar / topbar buttons are the pointer/touch UI. A
+  // keyboard or gamepad slot drives the game with physical keys/buttons, so hide
+  // them there (NPC halves are already fully hidden via .versus-half-npc).
+  const hideControls1 = versusConfig.p1Input !== 'mouse' && !isNpc1
+  const hideControls2 = versusConfig.p2Input !== 'mouse' && !isNpc2
+
   // Refs to the current arena regions, refreshed every full rerender. Surgical
   // updates swap just one of these so the opposite player's in-flight animation
   // is never disturbed by their opponent's moves.
@@ -235,7 +241,9 @@ export const mountVersus = (
     const half = document.createElement('div')
     half.setAttribute(
       'class',
-      'versus-half' + (isNpc1 ? ' versus-half-npc' : ''),
+      'versus-half' +
+        (isNpc1 ? ' versus-half-npc' : '') +
+        (hideControls1 ? ' versus-half-keys' : ''),
     )
     half.appendChild(
       createBench(
@@ -259,7 +267,9 @@ export const mountVersus = (
     const half = document.createElement('div')
     half.setAttribute(
       'class',
-      'versus-half' + (isNpc2 ? ' versus-half-npc' : ''),
+      'versus-half' +
+        (isNpc2 ? ' versus-half-npc' : '') +
+        (hideControls2 ? ' versus-half-keys' : ''),
     )
     half.appendChild(
       createBench(

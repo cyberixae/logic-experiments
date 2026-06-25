@@ -69,6 +69,7 @@ export {
   isHotMode,
   kbdHint,
   markKeyboardInput,
+  markPointerInput,
   qwertyKeyMap,
   setGazeModeActive,
   subscribeGamepad,

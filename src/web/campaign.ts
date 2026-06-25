@@ -19,6 +19,7 @@ import {
   getActionHint,
   isGazeModeActive,
   markKeyboardInput,
+  markPointerInput,
   setDefaultRulesVisible,
   setGazeModeActive,
   setupGamepad,
@@ -408,12 +409,16 @@ export const mountCampaign = (
     const action = qwertyKeyMap[ev.code]
     if (action) dispatch(action)
   }
+  document.documentElement.classList.add('mode-single')
   document.addEventListener('keydown', handleKey)
+  document.addEventListener('pointerdown', markPointerInput)
   const cleanupGamepad = setupGamepad(dispatch)
   const unsubscribeGamepad = subscribeGamepad(rerender)
 
   const cleanup = () => {
+    document.documentElement.classList.remove('mode-single')
     document.removeEventListener('keydown', handleKey)
+    document.removeEventListener('pointerdown', markPointerInput)
     cleanupGamepad()
     unsubscribeGamepad()
   }

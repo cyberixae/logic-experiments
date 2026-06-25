@@ -412,6 +412,25 @@ html.loading body {
 .button.disabled > .gaze-hint-stack {
   visibility: hidden;
 }
+
+/* Single-player (Random/Campaign): the on-screen control bar and topbar */
+/* buttons are the pointer/touch UI. Show them only while pointer/touch is the */
+/* active device; a keyboard or gamepad player uses physical keys/buttons and */
+/* gets a cleaner view. Scoped to .mode-single so Versus is unaffected. */
+html.mode-single .controls .button .key-hint {
+  display: none;
+}
+/* visibility (not display) so the buttons reserve their space and the layout */
+/* stays put when the active device changes. */
+html.mode-single:not(.input-pointer) .controls:not(:has(.congrabuttons)) {
+  visibility: hidden;
+}
+html.mode-single:not(.input-pointer) .bench-topbar .quiz-menu-btn,
+html.mode-single:not(.input-pointer) .bench-topbar .bench-skip-btn,
+html.mode-single:not(.input-pointer) .bench-topbar .bench-rules-btn {
+  visibility: hidden;
+}
+
 .button {
   user-select: none;
   cursor: pointer;
@@ -1751,6 +1770,15 @@ html.loading body {
 .versus-half-npc .bench-topbar,
 .versus-half-npc .rules-sheet,
 .versus-half-npc .controls {
+  visibility: hidden;
+}
+/* Keyboard/gamepad slots: hide the pointer/touch control bar and topbar */
+/* buttons (rule cards stay visible). Congrats buttons remain visible. */
+.versus-half-keys .controls:not(:has(.congrabuttons)) {
+  visibility: hidden;
+}
+.versus-half-keys .bench-topbar .bench-skip-btn,
+.versus-half-keys .bench-topbar .bench-rules-btn {
   visibility: hidden;
 }
 .versus-half .playarea {
