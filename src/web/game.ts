@@ -25,7 +25,6 @@ import { renderDerivation, layoutTree } from './tree'
 import {
   center,
   isReverseId0,
-  isReverseId1,
   left,
   leftLogical,
   reverseAxiom0,
@@ -521,24 +520,18 @@ const createRuleCard = (
   disabled: boolean,
   pinned: ReadonlyArray<RuleId>,
   hideRules: boolean,
-  onApply: (key: RuleId) => void,
   gazeHints: GazeHintInfo,
   panelClass: string,
-  interactive: boolean,
   getHint: (action: Action) => string | undefined,
 ): HTMLElement => {
   const isPinned = pinned.includes(key)
   const pre = document.createElement('pre')
   pre.setAttribute(
     'class',
-    'rule ' +
-      (interactive ? 'button' : 'hint') +
-      (disabled ? ' disabled' : '') +
-      (isPinned ? ' pinned' : ''),
+    'rule hint' + (disabled ? ' disabled' : '') + (isPinned ? ' pinned' : ''),
   )
   pre.dataset['rule'] = key
   pre.dataset['group'] = ruleCategory[key]
-  if (interactive && !disabled) pre.onclick = () => onApply(key)
   const withLabel = fromDerivation(
     rule.example,
     t('sideLeft'),
@@ -584,7 +577,6 @@ const createPanel = <K extends RuleId>(
   pinned: ReadonlyArray<RuleId>,
   hideRules: boolean,
   solved: boolean,
-  onApply: (key: RuleId) => void,
   gazeHints: GazeHintInfo,
   getHint: (action: Action) => string | undefined,
 ): HTMLElement => {
@@ -593,7 +585,6 @@ const createPanel = <K extends RuleId>(
   entries(ruleRecord).forEach(([key, rule]) => {
     if (!rules.includes(key)) return
     const disabled = solved || !ls.includes(key)
-    const interactive = !(pinned.includes(key) && hideRules)
     panel.appendChild(
       createRuleCard(
         key,
@@ -601,10 +592,8 @@ const createPanel = <K extends RuleId>(
         disabled,
         pinned,
         hideRules,
-        onApply,
         gazeHints,
         className,
-        interactive,
         getHint,
       ),
     )
@@ -660,31 +649,6 @@ export const createBench = (
   const branchClosed = activeDeriv?.kind === 'transformation'
   const inactive = solved || branchClosed
 
-  const apply = (key: RuleId) => {
-    ctx.setGazeModeActive(false)
-    if (isReverseId0(key)) {
-      workspace.applyEvent(reverse0(key))
-      rerender()
-    } else if (isReverseId1(key) && onApplyReverse1 !== undefined) {
-      onApplyReverse1(key, (formula) => {
-        workspace.applyEvent(reverse1(key, formula))
-        rerender()
-      })
-    }
-  }
-  const applyCenter = (key: RuleId) => {
-    ctx.setGazeModeActive(false)
-    if (isReverseId0(key)) {
-      workspace.applyEvent(reverse0(key))
-      rerender()
-    } else if (isReverseId1(key) && onApplyReverse1 !== undefined) {
-      onApplyReverse1(key, (formula) => {
-        workspace.applyEvent(reverse1(key, formula))
-        rerender()
-      })
-    }
-  }
-
   const seq = activeSequent(workspace.currentConjecture())
   const available = workspace.availableRules()
   const buildKindHints = (
@@ -733,7 +697,6 @@ export const createBench = (
       pinned,
       hideRules,
       inactive,
-      apply,
       gazeHints,
       ctx.getActionHint,
     ),
@@ -751,7 +714,6 @@ export const createBench = (
         pinned,
         hideRules,
         inactive,
-        applyCenter,
         gazeHints,
         ctx.getActionHint,
       ),
@@ -766,7 +728,6 @@ export const createBench = (
       pinned,
       hideRules,
       inactive,
-      apply,
       gazeHints,
       ctx.getActionHint,
     ),
@@ -849,17 +810,14 @@ export const createBench = (
     entries(center).forEach(([key, rule]) => {
       if (!rules.includes(key)) return
       const disabled = solved || !ls.includes(key)
-      const interactive = !(pinned.includes(key) && hideRules)
       const card = createRuleCard(
         key,
         rule,
         disabled,
         pinned,
         hideRules,
-        applyCenter,
         gazeHints,
         'main',
-        interactive,
         ctx.getActionHint,
       )
       sheetCenter.appendChild(card)
@@ -873,17 +831,14 @@ export const createBench = (
   entries(left).forEach(([key, rule]) => {
     if (!rules.includes(key)) return
     const disabled = inactive || !ls.includes(key)
-    const interactive = !(pinned.includes(key) && hideRules)
     const card = createRuleCard(
       key,
       rule,
       disabled,
       pinned,
       hideRules,
-      apply,
       gazeHints,
       'left',
-      interactive,
       ctx.getActionHint,
     )
     leftCol.appendChild(card)
@@ -893,17 +848,14 @@ export const createBench = (
   entries(right).forEach(([key, rule]) => {
     if (!rules.includes(key)) return
     const disabled = inactive || !ls.includes(key)
-    const interactive = !(pinned.includes(key) && hideRules)
     const card = createRuleCard(
       key,
       rule,
       disabled,
       pinned,
       hideRules,
-      apply,
       gazeHints,
       'right',
-      interactive,
       ctx.getActionHint,
     )
     rightCol.appendChild(card)
@@ -1116,17 +1068,14 @@ export const createBench = (
       if (rule === undefined || !rules.includes(key)) continue
       const disabled = inactive || !ls.includes(key)
       const panelClass = key in left ? 'left' : key in right ? 'right' : 'main'
-      const onApplyPinned = panelClass === 'main' ? applyCenter : apply
       const card = createRuleCard(
         key,
         rule,
         disabled,
         pinned,
         false,
-        onApplyPinned,
         gazeHints,
         panelClass,
-        !hideRules,
         ctx.getActionHint,
       )
       pinnedStrip.appendChild(card)

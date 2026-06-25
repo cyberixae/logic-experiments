@@ -464,6 +464,13 @@ html.loading body {
   color: #3a2a14;
   box-shadow: 1px 1px 0 rgba(80, 50, 20, 0.25);
 }
+.rule.disabled {
+  opacity: 0.5;
+}
+.rule.disabled > .key-hint,
+.rule.disabled > .gaze-hint-stack {
+  visibility: hidden;
+}
 .button.toggle {
   position: relative;
 }
