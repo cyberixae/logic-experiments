@@ -777,10 +777,10 @@ export const createBench = (
 
   const hud = document.createElement('div')
   hud.setAttribute('class', 'hud' + (solved ? ' solved' : ''))
-  if (ctx.showHud) {
+  if (ctx.showHud && solved) {
     const hudCounts = formatHudCounts(countRuleUsage(focus.derivation))
-    hud.innerHTML = solved ? t('moves') + ' ' + hudCounts : hudCounts
-    if (solved && ctx.showPar) {
+    hud.innerHTML = t('moves') + ' ' + hudCounts
+    if (ctx.showPar) {
       const solution = workspace.currentSolution()
       const par = document.createElement('div')
       par.setAttribute('class', 'par')
