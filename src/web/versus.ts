@@ -408,12 +408,7 @@ export const mountVersus = (
     // Global pause-menu button, shared by both players and below the scoreboard
     // since it's not the main attraction. Keyboard/gamepad open the menu via the
     // always-on control listeners; this is the pointer affordance.
-    const menuBtn = createButton(
-      '⋮',
-      false,
-      () => setPaused(true),
-      getActionHintPure('menu', false),
-    )
+    const menuBtn = createButton('⋮', false, () => setPaused(true))
     menuBtn.classList.add('versus-menu-btn')
     menuBtn.setAttribute('aria-label', t('menu'))
     thermo.appendChild(menuBtn)

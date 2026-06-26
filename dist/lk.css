@@ -417,7 +417,10 @@ html.loading body {
 /* buttons are the pointer/touch UI. Show them only while pointer/touch is the */
 /* active device; a keyboard or gamepad player uses physical keys/buttons and */
 /* gets a cleaner view. Scoped to .mode-single so Versus is unaffected. */
-html.mode-single .controls .button .key-hint {
+html.mode-single .controls .button .key-hint,
+html.mode-single .bench-topbar .quiz-menu-btn .key-hint,
+html.mode-single .bench-topbar .bench-skip-btn .key-hint,
+html.mode-single .bench-topbar .bench-rules-btn .key-hint {
   display: none;
 }
 /* visibility (not display) so the buttons reserve their space and the layout */
@@ -1814,18 +1817,6 @@ html.mode-single:not(.input-pointer) .bench-topbar .bench-rules-btn {
   font-size: 1.5em;
   border-color: transparent;
   margin: 1.2em 0 0.6em;
-}
-.versus-menu-btn .key-hint {
-  position: absolute;
-  width: 30px;
-  height: 30px;
-  line-height: 28px;
-  top: 0;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background: #fff6;
-  color: #000a;
-  border: 2px solid #fed;
 }
 .versus-thermo-clock {
   flex-shrink: 0;
