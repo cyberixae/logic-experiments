@@ -3,6 +3,16 @@
 :root {
   --gaze-color: #48f;
   --branch-color: #fcaa;
+  /* `mutating` buttons (Undo, Close, Drop, Destruct, Skip) directly change the
+     proof state and take their control group's accent as a border, via the
+     cascading --btn-mutating-border each group sets. Out-of-group mutating
+     buttons (Skip, in the topbar) fall back to transparent, matching the other
+     borderless topbar icons. `inert` navigation/select buttons keep the default
+     border. */
+  --btn-mutating-border: transparent;
+  /* Darkened branch accent for nav-group mutating borders; the raw
+     --branch-color is too faint to read as a 3px border. */
+  --branch-border: #d97a55;
 }
 
 html {
@@ -227,12 +237,15 @@ html.loading body {
 }
 .controls-group.gaze {
   border-bottom-color: var(--gaze-color);
+  --btn-mutating-border: var(--gaze-color);
 }
 .controls-group.hot {
   border-bottom-color: #c33;
+  --btn-mutating-border: #c33;
 }
 .controls-nav {
   border-bottom-color: var(--branch-color);
+  --btn-mutating-border: var(--branch-border);
 }
 .controls-undo-inner {
   display: contents;
@@ -448,6 +461,9 @@ html.mode-single:not(.input-pointer) .bench-topbar .bench-zoom {
   opacity: 1;
   text-wrap: nowrap;
   margin: 0;
+}
+.button.mutating {
+  border-color: var(--btn-mutating-border);
 }
 .button:not(.disabled):hover {
   background-color: #fff;

@@ -762,7 +762,7 @@ export const createBench = (
   }
   if (!solved && onSkip !== undefined) {
     const skipBtn = document.createElement('div')
-    skipBtn.setAttribute('class', 'button bench-skip-btn')
+    skipBtn.setAttribute('class', 'button bench-skip-btn mutating')
     skipBtn.setAttribute('aria-label', t('skip'))
     skipBtn.textContent = '»'
     skipBtn.onclick = onSkip
@@ -1015,6 +1015,18 @@ export const createBench = (
     },
     ctx.getActionHint('nextBranch'),
   )
+
+  // Two button families distinguished by border color: `inert` buttons only
+  // navigate or select and never change the proof; `mutating` buttons directly
+  // change game state (apply/undo a rule, skip the challenge).
+  gazeLeftBtn.classList.add('inert')
+  gazeRightBtn.classList.add('inert')
+  lemmaBtn.classList.add('inert')
+  prevBranchBtn.classList.add('inert')
+  nextBranchBtn.classList.add('inert')
+  gazeWeakeningBtn.classList.add('mutating')
+  gazeConnectiveBtn.classList.add('mutating')
+  axiomBtn.classList.add('mutating')
 
   const navGroup = makeGroup('controls-nav')
   navGroup.appendChild(prevBranchBtn)

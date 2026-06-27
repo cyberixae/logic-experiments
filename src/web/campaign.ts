@@ -125,21 +125,21 @@ const createControls = (
       createButton(t('level'), false, onLevel, getActionHint('level')),
     )
   }
-  panel.appendChild(
-    createButton(
-      t('undo'),
-      !undoEnabled,
-      () => {
-        if (canUndo) {
-          ws.applyEvent({ kind: 'undo' })
-        } else {
-          setGazeModeActive(false)
-        }
-        rerender()
-      },
-      getActionHint('undo'),
-    ),
+  const undoBtn = createButton(
+    t('undo'),
+    !undoEnabled,
+    () => {
+      if (canUndo) {
+        ws.applyEvent({ kind: 'undo' })
+      } else {
+        setGazeModeActive(false)
+      }
+      rerender()
+    },
+    getActionHint('undo'),
   )
+  undoBtn.classList.add('mutating')
+  panel.appendChild(undoBtn)
   return panel
 }
 
