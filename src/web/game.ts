@@ -999,9 +999,6 @@ export const createBench = (
   gazeGroup.appendChild(gazeConnectiveBtn)
   gazeGroup.appendChild(gazeRightBtn)
 
-  const axiomGroup = makeGroup('controls-axiom')
-  axiomGroup.appendChild(axiomBtn)
-
   const zoomGroup = makeGroup('controls-zoom')
   zoomGroup.appendChild(zoomOut)
   zoomGroup.appendChild(zoomReset)
@@ -1033,6 +1030,7 @@ export const createBench = (
   const navGroup = makeGroup('controls-nav')
   navGroup.appendChild(prevBranchBtn)
   navGroup.appendChild(controlsEl)
+  navGroup.appendChild(axiomBtn)
   navGroup.appendChild(nextBranchBtn)
 
   const controlsBar = document.createElement('div')
@@ -1049,7 +1047,6 @@ export const createBench = (
     controlsBar.appendChild(gazeGroup)
     const rightWing = document.createElement('div')
     rightWing.setAttribute('class', 'controls-wing controls-wing-right')
-    rightWing.appendChild(axiomGroup)
     rightWing.appendChild(zoomGroup)
     controlsBar.appendChild(rightWing)
   }
