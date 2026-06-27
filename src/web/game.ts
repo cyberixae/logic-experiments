@@ -760,16 +760,6 @@ export const createBench = (
     if (menuHint !== undefined) menuBtn.appendChild(keyHintBadge(menuHint))
     topbarLeft.appendChild(menuBtn)
   }
-  if (!solved && onSkip !== undefined) {
-    const skipBtn = document.createElement('div')
-    skipBtn.setAttribute('class', 'button bench-skip-btn mutating')
-    skipBtn.setAttribute('aria-label', t('skip'))
-    skipBtn.textContent = '»'
-    skipBtn.onclick = onSkip
-    const skipHint = ctx.getActionHint('skip')
-    if (skipHint !== undefined) skipBtn.appendChild(keyHintBadge(skipHint))
-    topbarLeft.appendChild(skipBtn)
-  }
   topbar.appendChild(topbarLeft)
 
   const topbarCenter = document.createElement('div')
@@ -976,6 +966,13 @@ export const createBench = (
   )
 
   const lemmaGroup = makeGroup('controls-lemma')
+  if (onSkip !== undefined) {
+    // No key hint: the whole control bar is hidden while keyboard/gamepad is the
+    // active input, so the badge would never be seen.
+    const skipBtn = createButton(t('skip'), false, onSkip)
+    skipBtn.classList.add('mutating')
+    lemmaGroup.appendChild(skipBtn)
+  }
   lemmaGroup.appendChild(lemmaBtn)
 
   const gazeGroup = makeGroup(ctx.isGazeModeActive() ? 'gaze' : 'hot')
@@ -1095,7 +1092,6 @@ export const createPausePopup = (
   onExit: () => void,
   onReset: () => void,
   resetDisabled: boolean,
-  onFresh?: () => void,
   onSettings?: () => void,
   onCustom?: () => void,
 ): HTMLElement => {
@@ -1135,11 +1131,6 @@ export const createPausePopup = (
   if (onCustom) {
     buttons.appendChild(
       createButton(t('customChallenge'), false, onCustom, kbdHint('b')),
-    )
-  }
-  if (onFresh) {
-    buttons.appendChild(
-      createButton(t('freshChallenge'), false, onFresh, kbdHint('n')),
     )
   }
   if (onSettings) {

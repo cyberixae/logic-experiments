@@ -3,12 +3,12 @@
 :root {
   --gaze-color: #48f;
   --branch-color: #fcaa;
+  --lemma-color: #9b72c2;
   /* `mutating` buttons (Undo, Close, Drop, Destruct, Skip) directly change the
      proof state and take their control group's accent as a border, via the
      cascading --btn-mutating-border each group sets. Out-of-group mutating
-     buttons (Skip, in the topbar) fall back to transparent, matching the other
-     borderless topbar icons. `inert` navigation/select buttons keep the default
-     border. */
+     buttons fall back to transparent. `inert` navigation/select buttons keep
+     the default border. */
   --btn-mutating-border: transparent;
   /* Darkened branch accent for nav-group mutating borders; the raw
      --branch-color is too faint to read as a 3px border. */
@@ -88,15 +88,7 @@ html.loading body {
   line-height: 1.2em;
   border-color: transparent;
 }
-.bench-topbar .bench-skip-btn {
-  position: relative;
-  width: 1.2em;
-  height: 1.2em;
-  line-height: 1.2em;
-  border-color: transparent;
-}
-.bench-topbar .quiz-menu-btn .key-hint,
-.bench-topbar .bench-skip-btn .key-hint {
+.bench-topbar .quiz-menu-btn .key-hint {
   position: absolute;
   width: 30px;
   height: 30px;
@@ -192,6 +184,10 @@ html.loading body {
 .controls-nav {
   border-bottom-color: var(--branch-color);
   --btn-mutating-border: var(--branch-border);
+}
+.controls-lemma {
+  border-bottom-color: var(--lemma-color);
+  --btn-mutating-border: var(--lemma-color);
 }
 .controls-undo-inner {
   display: contents;
@@ -378,7 +374,6 @@ html.loading body {
 /* gets a cleaner view. Scoped to .mode-single so Versus is unaffected. */
 html.mode-single .controls .button .key-hint,
 html.mode-single .bench-topbar .quiz-menu-btn .key-hint,
-html.mode-single .bench-topbar .bench-skip-btn .key-hint,
 html.mode-single .bench-topbar .bench-rules-btn .key-hint {
   display: none;
 }
@@ -388,7 +383,6 @@ html.mode-single:not(.input-pointer) .controls:not(:has(.congrabuttons)) {
   visibility: hidden;
 }
 html.mode-single:not(.input-pointer) .bench-topbar .quiz-menu-btn,
-html.mode-single:not(.input-pointer) .bench-topbar .bench-skip-btn,
 html.mode-single:not(.input-pointer) .bench-topbar .bench-rules-btn,
 html.mode-single:not(.input-pointer) .bench-topbar .bench-zoom {
   visibility: hidden;
@@ -1743,7 +1737,6 @@ html.mode-single:not(.input-pointer) .bench-topbar .bench-zoom {
 .versus-half-keys .controls:not(:has(.congrabuttons)) {
   visibility: hidden;
 }
-.versus-half-keys .bench-topbar .bench-skip-btn,
 .versus-half-keys .bench-topbar .bench-rules-btn,
 .versus-half-keys .bench-topbar .bench-zoom {
   visibility: hidden;

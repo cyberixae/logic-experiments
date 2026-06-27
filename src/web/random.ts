@@ -175,6 +175,9 @@ export const mountRandom = (
         rerender,
         togglePausePopup,
         onApplyReverse1,
+        undefined,
+        undefined,
+        freshFromPopup,
       ),
     )
     if (pausePopupOpen) {
@@ -186,7 +189,6 @@ export const mountRandom = (
           exitToMenu,
           resetFromPopup,
           !resetEnabled,
-          freshFromPopup,
           openSettings,
         ),
       )
