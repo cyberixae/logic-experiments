@@ -2,17 +2,8 @@
 
 :root {
   --gaze-color: #48f;
-  --branch-color: #fcaa;
+  --branch-color: #fca;
   --misc-color: transparent;
-  /* `mutating` buttons (Undo, Close, Drop, Destruct, Skip) directly change the
-     proof state and take their control group's accent as a border, via the
-     cascading --btn-mutating-border each group sets. Out-of-group mutating
-     buttons fall back to transparent. `inert` navigation/select buttons keep
-     the default border. */
-  --btn-mutating-border: transparent;
-  /* Darkened branch accent for nav-group mutating borders; the raw
-     --branch-color is too faint to read as a 3px border. */
-  --branch-border: #d97a55;
 }
 
 html {
@@ -175,19 +166,15 @@ html.loading body {
 }
 .controls-group.gaze {
   border-bottom-color: var(--gaze-color);
-  --btn-mutating-border: var(--gaze-color);
 }
 .controls-group.hot {
   border-bottom-color: #c33;
-  --btn-mutating-border: #c33;
 }
 .controls-nav {
   border-bottom-color: var(--branch-color);
-  --btn-mutating-border: var(--branch-border);
 }
 .controls-misc {
   border-bottom-color: var(--misc-color);
-  --btn-mutating-border: var(--misc-color);
 }
 .controls-undo-inner {
   display: contents;
@@ -325,9 +312,6 @@ html.loading body {
   align-items: center;
   gap: 5px;
 }
-.key-hint.hot {
-  background: #c33;
-}
 .key-hint.cold {
   background: #36c;
 }
@@ -339,6 +323,12 @@ html.loading body {
   min-width: 40px;
   padding: 0 8px;
   border-radius: 999px;
+}
+/* Rule-card key hints (the primary keybind badge, not the nested gaze stack)
+   take the branch accent. */
+.rule > .key-hint {
+  background: var(--branch-color);
+  color: #444;
 }
 .main .rule .key-hint {
   position: absolute;
