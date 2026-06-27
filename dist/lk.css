@@ -3,7 +3,7 @@
 :root {
   --gaze-color: #48f;
   --branch-color: #fcaa;
-  --misc-color: #9b72c2;
+  --misc-color: transparent;
   /* `mutating` buttons (Undo, Close, Drop, Destruct, Skip) directly change the
      proof state and take their control group's accent as a border, via the
      cascading --btn-mutating-border each group sets. Out-of-group mutating
@@ -403,10 +403,15 @@ html.mode-single:not(.input-pointer) .bench-topbar .bench-zoom {
   margin: 0;
 }
 .button.mutating {
-  border-color: var(--btn-mutating-border);
+  background-color: #000;
+  border-color: #000;
+  color: #fed;
 }
 .button:not(.disabled):hover {
   background-color: #fff;
+}
+.button.mutating:not(.disabled):hover {
+  background-color: #222;
 }
 .button.active,
 .button.active:hover {
