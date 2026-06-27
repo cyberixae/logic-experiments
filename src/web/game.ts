@@ -1040,11 +1040,10 @@ export const createBench = (
     congrats.buttons.setAttribute('class', 'congrabuttons controls-group')
     controlsBar.appendChild(congrats.buttons)
   } else {
-    const leftWing = document.createElement('div')
-    leftWing.setAttribute('class', 'controls-wing controls-wing-left')
-    leftWing.appendChild(navGroup)
-    if (hideLemma !== true) leftWing.appendChild(lemmaGroup)
-    controlsBar.appendChild(leftWing)
+    // Order: Lemma · Branch · Gaze — a centered row that wraps group-by-group
+    // onto extra lines when they no longer all fit (see .controls in lk.css).
+    if (hideLemma !== true) controlsBar.appendChild(lemmaGroup)
+    controlsBar.appendChild(navGroup)
     controlsBar.appendChild(gazeGroup)
   }
   panel.appendChild(controlsBar)
