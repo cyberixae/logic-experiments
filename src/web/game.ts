@@ -965,15 +965,14 @@ export const createBench = (
     ctx.getActionHint('lemma'),
   )
 
-  const lemmaGroup = makeGroup('controls-lemma')
+  const miscGroup = makeGroup('controls-misc')
   if (onSkip !== undefined) {
     // No key hint: the whole control bar is hidden while keyboard/gamepad is the
     // active input, so the badge would never be seen.
     const skipBtn = createButton(t('skip'), false, onSkip)
     skipBtn.classList.add('mutating')
-    lemmaGroup.appendChild(skipBtn)
+    miscGroup.appendChild(skipBtn)
   }
-  lemmaGroup.appendChild(lemmaBtn)
 
   const gazeGroup = makeGroup(ctx.isGazeModeActive() ? 'gaze' : 'hot')
   gazeGroup.appendChild(gazeLeftBtn)
@@ -1027,6 +1026,9 @@ export const createBench = (
 
   const navGroup = makeGroup('controls-nav')
   navGroup.appendChild(prevBranchBtn)
+  // Lemma sits with the branch controls: it operates on the active branch. Still
+  // gated by hideLemma so Campaign keeps it out.
+  if (hideLemma !== true) navGroup.appendChild(lemmaBtn)
   navGroup.appendChild(controlsEl)
   navGroup.appendChild(axiomBtn)
   navGroup.appendChild(nextBranchBtn)
@@ -1037,9 +1039,9 @@ export const createBench = (
     congrats.buttons.setAttribute('class', 'congrabuttons controls-group')
     controlsBar.appendChild(congrats.buttons)
   } else {
-    // Order: Lemma · Branch · Gaze — a centered row that wraps group-by-group
+    // Order: Skip · Branch · Gaze — a centered row that wraps group-by-group
     // onto extra lines when they no longer all fit (see .controls in lk.css).
-    if (hideLemma !== true) controlsBar.appendChild(lemmaGroup)
+    if (hideLemma !== true) controlsBar.appendChild(miscGroup)
     controlsBar.appendChild(navGroup)
     controlsBar.appendChild(gazeGroup)
   }

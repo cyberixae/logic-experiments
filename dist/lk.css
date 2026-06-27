@@ -3,7 +3,7 @@
 :root {
   --gaze-color: #48f;
   --branch-color: #fcaa;
-  --lemma-color: #9b72c2;
+  --misc-color: #9b72c2;
   /* `mutating` buttons (Undo, Close, Drop, Destruct, Skip) directly change the
      proof state and take their control group's accent as a border, via the
      cascading --btn-mutating-border each group sets. Out-of-group mutating
@@ -185,9 +185,9 @@ html.loading body {
   border-bottom-color: var(--branch-color);
   --btn-mutating-border: var(--branch-border);
 }
-.controls-lemma {
-  border-bottom-color: var(--lemma-color);
-  --btn-mutating-border: var(--lemma-color);
+.controls-misc {
+  border-bottom-color: var(--misc-color);
+  --btn-mutating-border: var(--misc-color);
 }
 .controls-undo-inner {
   display: contents;
