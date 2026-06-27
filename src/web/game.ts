@@ -201,7 +201,6 @@ export type BenchCtx = {
   isGazeModeActive: () => boolean
   setGazeModeActive: (v: boolean) => void
   getActionHint: (action: Action) => string | undefined
-  kbdHint: (s: string) => string | undefined
   getTreeZoom: () => number
   setTreeZoom: (v: number) => void
   tryAutoZoom: (d: AnyDerivation) => boolean
@@ -233,7 +232,6 @@ export const createBenchCtx = (
       gazeModeActive = v
     },
     getActionHint: (action) => getActionHintPure(action, isGamepadMode),
-    kbdHint: (s) => (isGamepadMode ? undefined : s),
     getTreeZoom: () => zoom,
     setTreeZoom: (v) => {
       zoom = v
@@ -265,7 +263,6 @@ const defaultCtx: BenchCtx = {
   isGazeModeActive,
   setGazeModeActive,
   getActionHint,
-  kbdHint,
   getTreeZoom: () => treeZoom,
   setTreeZoom: (v) => {
     treeZoom = v
@@ -775,6 +772,8 @@ export const createBench = (
   }
   topbar.appendChild(topbarLeft)
 
+  const topbarCenter = document.createElement('div')
+  topbarCenter.setAttribute('class', 'bench-topbar-center')
   const hud = document.createElement('div')
   hud.setAttribute('class', 'hud' + (solved ? ' solved' : ''))
   if (ctx.showHud && solved) {
@@ -790,7 +789,8 @@ export const createBench = (
       hud.appendChild(par)
     }
   }
-  topbar.appendChild(hud)
+  topbarCenter.appendChild(hud)
+  topbar.appendChild(topbarCenter)
 
   const topbarRight = document.createElement('div')
   topbarRight.setAttribute('class', 'bench-topbar-right')
@@ -866,34 +866,19 @@ export const createBench = (
   rulesSheet.appendChild(sheetSides)
   panel.appendChild(rulesSheet)
   panel.appendChild(createPlayArea(workspace, ctx))
-  const zoomOut = createButton(
-    '−',
-    false,
-    () => {
-      ctx.setTreeZoom(Math.max(ZOOM_MIN, ctx.getTreeZoom() - ZOOM_STEP))
-      rerender()
-    },
-    ctx.kbdHint('-'),
-  )
-  const zoomReset = createButton(
-    ':',
-    false,
-    () => {
-      ctx.setTreeZoom(1)
-      rerender()
-    },
-    ctx.kbdHint('0'),
-  )
+  const zoomOut = createButton('−', false, () => {
+    ctx.setTreeZoom(Math.max(ZOOM_MIN, ctx.getTreeZoom() - ZOOM_STEP))
+    rerender()
+  })
+  const zoomReset = createButton(':', false, () => {
+    ctx.setTreeZoom(1)
+    rerender()
+  })
   zoomReset.classList.add('zoom-reset')
-  const zoomIn = createButton(
-    '+',
-    false,
-    () => {
-      ctx.setTreeZoom(Math.min(ZOOM_MAX, ctx.getTreeZoom() + ZOOM_STEP))
-      rerender()
-    },
-    ctx.kbdHint('+'),
-  )
+  const zoomIn = createButton('+', false, () => {
+    ctx.setTreeZoom(Math.min(ZOOM_MAX, ctx.getTreeZoom() + ZOOM_STEP))
+    rerender()
+  })
   const gazeMovable =
     !inactive && seq.antecedent.length + seq.succedent.length > 1
   const leftDisabled = ctx.isGazeModeActive()
@@ -999,10 +984,14 @@ export const createBench = (
   gazeGroup.appendChild(gazeConnectiveBtn)
   gazeGroup.appendChild(gazeRightBtn)
 
-  const zoomGroup = makeGroup('controls-zoom')
+  zoomOut.classList.add('zoom-step')
+  zoomIn.classList.add('zoom-step')
+  const zoomGroup = document.createElement('div')
+  zoomGroup.setAttribute('class', 'bench-zoom')
   zoomGroup.appendChild(zoomOut)
   zoomGroup.appendChild(zoomReset)
   zoomGroup.appendChild(zoomIn)
+  if (!solved) topbarCenter.appendChild(zoomGroup)
 
   controlsEl.setAttribute('class', 'controls-undo-inner')
 
@@ -1045,10 +1034,6 @@ export const createBench = (
     if (hideLemma !== true) leftWing.appendChild(lemmaGroup)
     controlsBar.appendChild(leftWing)
     controlsBar.appendChild(gazeGroup)
-    const rightWing = document.createElement('div')
-    rightWing.setAttribute('class', 'controls-wing controls-wing-right')
-    rightWing.appendChild(zoomGroup)
-    controlsBar.appendChild(rightWing)
   }
   panel.appendChild(controlsBar)
 

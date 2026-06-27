@@ -110,8 +110,32 @@ html.loading body {
   color: #000a;
   border: 2px solid #fed;
 }
+.bench-topbar-center {
+  display: flex;
+  justify-content: center;
+  align-items: start;
+}
+.bench-zoom {
+  display: flex;
+  gap: 0.5em;
+}
+.bench-zoom .button {
+  position: relative;
+  font-family: inherit;
+  height: 1.2em;
+  line-height: 1.2em;
+  border-color: transparent;
+}
+.bench-zoom .button.zoom-reset {
+  width: 1.2em;
+}
+.bench-zoom .button.zoom-step {
+  width: 1.9em;
+  padding-left: 0;
+  padding-right: 0;
+}
 
-/* Mobile (default): gaze / lemma-zoom / nav */
+/* Mobile (default): gaze / lemma / nav */
 .controls {
   grid-area: controls;
   position: relative;
@@ -120,7 +144,7 @@ html.loading body {
   grid-template-columns: 1fr auto 1fr;
   grid-template-areas:
     'gaze  gaze  gaze'
-    'lemma zoom  .'
+    'lemma .     .'
     'nav   nav   nav';
   gap: 0.5em;
   padding: 20px 0.5em 0.5em;
@@ -135,9 +159,6 @@ html.loading body {
 .controls > .hot {
   grid-area: gaze;
 }
-.controls .controls-zoom {
-  grid-area: zoom;
-}
 .controls > .congrabuttons {
   grid-column: 1 / -1;
   justify-self: center;
@@ -151,13 +172,7 @@ html.loading body {
 .controls-wing {
   display: contents;
 }
-/* Mobile only */
-@container bench (max-width: 639px) {
-  .button.zoom-reset {
-    min-width: 1.4em;
-  }
-}
-/* Tablet: lemma-gaze / nav-zoom */
+/* Tablet: lemma-gaze / nav */
 @container bench (min-width: 640px) {
   .bench {
     padding: 1em 0;
@@ -173,7 +188,7 @@ html.loading body {
     grid-template-columns: 1fr auto auto 1fr;
     grid-template-areas:
       'lemma gaze  gaze  .'
-      'nav   nav   zoom  zoom';
+      'nav   nav   .     .';
     padding-left: 1em;
     padding-right: 1em;
   }
@@ -182,9 +197,6 @@ html.loading body {
   }
   .controls .controls-nav {
     justify-self: start;
-  }
-  .controls .controls-zoom {
-    justify-self: end;
   }
 }
 /* Desktop: wings left/right of centered gaze */
@@ -204,10 +216,6 @@ html.loading body {
   }
   .controls-wing-left {
     grid-area: left;
-  }
-  .controls-wing-right {
-    grid-area: right;
-    justify-content: flex-end;
   }
 }
 .controls-group {
@@ -422,7 +430,8 @@ html.mode-single:not(.input-pointer) .controls:not(:has(.congrabuttons)) {
 }
 html.mode-single:not(.input-pointer) .bench-topbar .quiz-menu-btn,
 html.mode-single:not(.input-pointer) .bench-topbar .bench-skip-btn,
-html.mode-single:not(.input-pointer) .bench-topbar .bench-rules-btn {
+html.mode-single:not(.input-pointer) .bench-topbar .bench-rules-btn,
+html.mode-single:not(.input-pointer) .bench-topbar .bench-zoom {
   visibility: hidden;
 }
 
@@ -1773,7 +1782,8 @@ html.mode-single:not(.input-pointer) .bench-topbar .bench-rules-btn {
   visibility: hidden;
 }
 .versus-half-keys .bench-topbar .bench-skip-btn,
-.versus-half-keys .bench-topbar .bench-rules-btn {
+.versus-half-keys .bench-topbar .bench-rules-btn,
+.versus-half-keys .bench-topbar .bench-zoom {
   visibility: hidden;
 }
 .versus-half .playarea {

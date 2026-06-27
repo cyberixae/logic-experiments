@@ -174,7 +174,7 @@ export const mountVersus = (
   const makeCtx = (input: typeof versusConfig.p1Input): BenchCtx => {
     const base = createBenchCtx(input !== 'keyboard', true, false, false, 1)
     if (input !== 'mouse') return base
-    return { ...base, getActionHint: () => undefined, kbdHint: () => undefined }
+    return { ...base, getActionHint: () => undefined }
   }
   const ctx1 = makeCtx(versusConfig.p1Input)
   const ctx2 = makeCtx(versusConfig.p2Input)
