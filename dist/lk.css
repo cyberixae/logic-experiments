@@ -656,15 +656,6 @@ html.mode-single:not(.input-pointer) .bench-topbar .bench-zoom {
   padding: 0.5em 1.2em;
   color: #000;
 }
-.pause-buttons .button .key-hint {
-  position: absolute;
-  width: 30px;
-  height: 30px;
-  line-height: 30px;
-  top: 50%;
-  transform: translateY(-50%);
-  left: -15px;
-}
 .level-select {
   position: absolute;
   width: 80%;
@@ -1044,7 +1035,7 @@ html.mode-single:not(.input-pointer) .bench-topbar .bench-zoom {
 .gazed {
   border-bottom: 0.15em solid var(--gaze-color);
 }
-.formula-editor-popup .button.cursor {
+.button.cursor {
   outline: 3px solid #f80;
   outline-offset: 2px;
 }

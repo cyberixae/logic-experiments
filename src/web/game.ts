@@ -44,13 +44,13 @@ import { t } from './i18n'
 import { createLangSwitcher } from './lang-switcher'
 import { entries, keys } from '../utils/record'
 import { isNonNullable } from '../utils/utils'
+import { createButtonCursor } from './button-cursor'
+import type { CursorCell } from './button-cursor'
 import {
   activePadKeyMap,
-  dualHint,
   getActionHint,
   getActionHintPure,
   isGazeModeActive,
-  kbdHint,
   markGamepadInput,
   onGamepadConnected,
   onGamepadDisconnected,
@@ -1096,7 +1096,7 @@ export const createPausePopup = (
   resetDisabled: boolean,
   onSettings?: () => void,
   onCustom?: () => void,
-): HTMLElement => {
+): { el: HTMLElement; onAction: (action: Action) => void } => {
   const shroud = document.createElement('div')
   shroud.setAttribute('class', 'shroud pause-shroud')
   shroud.onclick = (ev) => {
@@ -1116,37 +1116,59 @@ export const createPausePopup = (
   panel.appendChild(title)
   const buttons = document.createElement('div')
   buttons.setAttribute('class', 'pause-buttons')
-  buttons.appendChild(
-    createButton(t('resumeGame'), false, onResume, dualHint('m', 'undo')),
+
+  // Each button is one cursor row; the keyboard / gamepad cursor moves up / down
+  // and axiom presses the focused one. Direct-access keybindings still work via
+  // the mode's dispatch, so the on-screen key badges are gone.
+  const cells: CursorCell[] = []
+  const addButton = (
+    el: HTMLElement,
+    activate: () => void,
+    isEnabled: () => boolean,
+  ): void => {
+    buttons.appendChild(el)
+    cells.push({ btn: el, activate, isEnabled })
+  }
+
+  addButton(
+    createButton(t('resumeGame'), false, onResume),
+    onResume,
+    () => true,
   )
   const spacer = document.createElement('div')
   spacer.setAttribute('class', 'pause-buttons-spacer')
   buttons.appendChild(spacer)
-  buttons.appendChild(
-    createButton(
-      t('resetChallenge'),
-      resetDisabled,
-      onReset,
-      getActionHint('reset'),
-    ),
+  addButton(
+    createButton(t('resetChallenge'), resetDisabled, onReset),
+    onReset,
+    () => !resetDisabled,
   )
   if (onCustom) {
-    buttons.appendChild(
-      createButton(t('customChallenge'), false, onCustom, kbdHint('b')),
+    addButton(
+      createButton(t('customChallenge'), false, onCustom),
+      onCustom,
+      () => true,
     )
   }
   if (onSettings) {
-    buttons.appendChild(
-      createButton(t('customChallenge'), false, onSettings, kbdHint('b')),
+    addButton(
+      createButton(t('customChallenge'), false, onSettings),
+      onSettings,
+      () => true,
     )
   }
-  buttons.appendChild(
-    createButton(t('exitToMainMenu'), false, onExit, getActionHint('exit')),
+  addButton(
+    createButton(t('exitToMainMenu'), false, onExit),
+    onExit,
+    () => true,
   )
+
   panel.appendChild(buttons)
   shroud.appendChild(panel)
   shroud.appendChild(createLangSwitcher())
-  return shroud
+
+  const cursor = createButtonCursor(cells.map((c) => [c]))
+  return { el: shroud, onAction: cursor.onAction }
 }
 
 const RULE_APPLY_ACTIONS: ReadonlySet<Action> = new Set<Action>([

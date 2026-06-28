@@ -12,6 +12,7 @@ import type { Action } from '../interactive/action'
 import { fromAtom, fromProp, basic } from '../render/print'
 import * as segment from '../render/segment'
 import { t } from './i18n'
+import { createButtonCursor } from './button-cursor'
 
 type Stack = ReadonlyArray<Prop>
 
@@ -41,9 +42,6 @@ const setDisabled = (
   btn.onclick = disabled ? null : handler
 }
 
-const clamp = (v: number, lo: number, hi: number): number =>
-  Math.max(lo, Math.min(hi, v))
-
 export const createFormulaEditor = (
   title: string,
   confirmLabel: string,
@@ -56,12 +54,6 @@ export const createFormulaEditor = (
 } => {
   let stack: Stack = []
   let history: ReadonlyArray<Stack> = []
-
-  // Keyboard / gamepad focus cursor. Hidden until the first navigation action so
-  // pure mouse / touch players never see a highlight they didn't ask for.
-  let cursorRow = 0
-  let cursorCol = 0
-  let cursorVisible = false
 
   const saveAndSet = (next: Stack): void => {
     history = [...history, stack]
@@ -236,6 +228,8 @@ export const createFormulaEditor = (
     controlCells,
   ]
 
+  const cursor = createButtonCursor(rows)
+
   const renderState = (): void => {
     stackDisplay.innerHTML =
       stack.length === 0
@@ -266,77 +260,17 @@ export const createFormulaEditor = (
     confirmBtn.onclick = formula !== undefined ? confirmCurrent : null
 
     // Cursor highlight, applied last so it survives the class resets above.
-    for (const row of rows) {
-      for (const cell of row) cell.btn.classList.remove('cursor')
-    }
-    const focused = cursorVisible ? rows[cursorRow]?.[cursorCol] : undefined
-    if (focused !== undefined) focused.btn.classList.add('cursor')
-  }
-
-  const moveCursor = (dRow: number, dCol: number): void => {
-    // The first navigation action only reveals the cursor at a sensible start.
-    if (!cursorVisible) {
-      cursorVisible = true
-      cursorRow = 0
-      cursorCol = 0
-      renderState()
-      return
-    }
-    cursorRow = clamp(cursorRow + dRow, 0, rows.length - 1)
-    const row = rows[cursorRow]
-    if (row !== undefined)
-      cursorCol = clamp(cursorCol + dCol, 0, row.length - 1)
-    renderState()
-  }
-
-  const activateFocused = (): void => {
-    if (!cursorVisible) {
-      cursorVisible = true
-      cursorRow = 0
-      cursorCol = 0
-      renderState()
-      return
-    }
-    const cell = rows[cursorRow]?.[cursorCol]
-    if (cell !== undefined && cell.isEnabled()) cell.activate()
-  }
-
-  // Keyboard arrows / gamepad D-pad drive the cursor via the gaze actions; the
-  // left* aliases keep the D-pad usable even when a gamepad is in "hot" mode,
-  // which otherwise remaps the D-pad away from gaze. axiom (Enter / Space /
-  // Cross / R2) activates the focused button.
-  const onAction = (action: Action): void => {
-    switch (action) {
-      case 'gazeLeft':
-      case 'leftRotateLeft':
-        moveCursor(0, -1)
-        break
-      case 'gazeRight':
-      case 'leftRotateRight':
-        moveCursor(0, 1)
-        break
-      case 'gazeConnective':
-      case 'leftConnective':
-        moveCursor(-1, 0)
-        break
-      case 'gazeWeakening':
-      case 'leftWeakening':
-        moveCursor(1, 0)
-        break
-      case 'axiom':
-        activateFocused()
-        break
-    }
+    cursor.refresh()
   }
 
   renderState()
   return {
     el: shroud,
+    onAction: cursor.onAction,
     tryUndo: () => {
       if (history.length === 0) return false
       doUndo()
       return true
     },
-    onAction,
   }
 }

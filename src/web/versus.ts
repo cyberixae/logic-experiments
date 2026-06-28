@@ -22,6 +22,8 @@ import {
   subscribeGamepad,
 } from './game'
 import { createLangSwitcher } from './lang-switcher'
+import { createButtonCursor } from './button-cursor'
+import type { CursorCell } from './button-cursor'
 import { createFormulaEditor } from './formula-editor'
 import { basic, fromSequent } from '../render/print'
 import { html } from '../render/segment'
@@ -179,6 +181,10 @@ export const mountVersus = (
   let timeLeft = versusConfig.gameDurationSeconds
   let gameOver = false
   let paused = false
+  let pauseMenu: {
+    el: HTMLElement
+    onAction: (action: Action) => void
+  } | null = null
   // Reference kept so the ticker can patch text without rebuilding the DOM.
   let timerEl: HTMLElement | null = null
 
@@ -419,8 +425,13 @@ export const mountVersus = (
 
   // Standard in-game pause menu, mirroring createPausePopup's structure but with
   // versus-appropriate actions (no per-player Reset; a Play Again that restarts
-  // the match with the same settings).
-  const buildPauseMenu = (): HTMLElement => {
+  // the match with the same settings). The keyboard / gamepad cursor moves
+  // through the buttons; direct-access keys still work via handleControlAction,
+  // so the on-screen key badges are gone.
+  const buildPauseMenu = (): {
+    el: HTMLElement
+    onAction: (action: Action) => void
+  } => {
     const shroud = document.createElement('div')
     shroud.setAttribute('class', 'shroud pause-shroud')
     shroud.onclick = (ev) => {
@@ -440,37 +451,24 @@ export const mountVersus = (
     panel.appendChild(title)
     const buttons = document.createElement('div')
     buttons.setAttribute('class', 'pause-buttons')
-    buttons.appendChild(
-      createButton(
-        t('resumeGame'),
-        false,
-        () => setPaused(false),
-        getActionHintPure('menu', false),
-      ),
-    )
-    buttons.appendChild(
-      createButton(
-        t('playAgain'),
-        false,
-        () => navigate('versus'),
-        getActionHintPure('skip', false),
-      ),
-    )
-    buttons.appendChild(
-      createButton(t('settings'), false, () => navigate('versus-config')),
-    )
-    buttons.appendChild(
-      createButton(
-        t('exitToMainMenu'),
-        false,
-        () => navigate('menu'),
-        getActionHintPure('exit', false),
-      ),
-    )
+
+    const cells: CursorCell[] = []
+    const addButton = (label: string, activate: () => void): void => {
+      const el = createButton(label, false, activate)
+      buttons.appendChild(el)
+      cells.push({ btn: el, activate })
+    }
+    addButton(t('resumeGame'), () => setPaused(false))
+    addButton(t('playAgain'), () => navigate('versus'))
+    addButton(t('settings'), () => navigate('versus-config'))
+    addButton(t('exitToMainMenu'), () => navigate('menu'))
+
     panel.appendChild(buttons)
     shroud.appendChild(panel)
     shroud.appendChild(createLangSwitcher())
-    return shroud
+
+    const cursor = createButtonCursor(cells.map((c) => [c]))
+    return { el: shroud, onAction: cursor.onAction }
   }
 
   // rerender is defined before solvePlayer* so they can reference it
@@ -500,7 +498,14 @@ export const mountVersus = (
 
     // End-of-match breakdown screen when time expires.
     if (gameOver) root.appendChild(buildResultScreen())
-    else if (paused) root.appendChild(buildPauseMenu())
+    else if (paused) {
+      // Build once per pause so the cursor survives the per-second timer
+      // rerenders; rebuild on the next pause.
+      if (!pauseMenu) pauseMenu = buildPauseMenu()
+      root.appendChild(pauseMenu.el)
+    } else {
+      pauseMenu = null
+    }
   }
 
   // ── End-of-match breakdown ────────────────────────────────────────────────
@@ -1127,6 +1132,7 @@ export const mountVersus = (
       if (action === 'menu' || action === 'undo') setPaused(false)
       else if (action === 'skip') navigate('versus')
       else if (action === 'exit') navigate('menu')
+      else pauseMenu?.onAction(action)
       return
     }
     if (action !== 'menu') return

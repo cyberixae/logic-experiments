@@ -93,6 +93,10 @@ export const mountRandom = (
   }
 
   let pausePopupOpen = false
+  let pausePopup: {
+    el: HTMLElement
+    onAction: (action: Action) => void
+  } | null = null
   const togglePausePopup = () => {
     pausePopupOpen = !pausePopupOpen
     rerender()
@@ -179,17 +183,22 @@ export const mountRandom = (
       ),
     )
     if (pausePopupOpen) {
-      const canReset = activePath(ws.currentConjecture()).length > 0
-      const resetEnabled = canReset || isGazeModeActive()
-      container.appendChild(
-        createPausePopup(
+      // Build once per open so the cursor position survives the rerenders that
+      // gamepad polling triggers while paused; rebuild on the next open.
+      if (!pausePopup) {
+        const canReset = activePath(ws.currentConjecture()).length > 0
+        const resetEnabled = canReset || isGazeModeActive()
+        pausePopup = createPausePopup(
           closePausePopup,
           exitToMenu,
           resetFromPopup,
           !resetEnabled,
           openSettings,
-        ),
-      )
+        )
+      }
+      container.appendChild(pausePopup.el)
+    } else {
+      pausePopup = null
     }
   }
 
@@ -240,7 +249,10 @@ export const mountRandom = (
       closePausePopup()
       return
     }
-    if (pausePopupOpen && action !== 'menu') return
+    if (pausePopupOpen && action !== 'menu') {
+      pausePopup?.onAction(action)
+      return
+    }
     baseDispatch(action)
   }
 
