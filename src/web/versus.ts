@@ -15,7 +15,6 @@ import {
   createBenchCtx,
   createButton,
   createDispatch,
-  getActionHintPure,
   markKeyboardInput,
   qwertyKeyMap,
   setupGamepad,
@@ -182,6 +181,10 @@ export const mountVersus = (
   let gameOver = false
   let paused = false
   let pauseMenu: {
+    el: HTMLElement
+    onAction: (action: Action) => void
+  } | null = null
+  let resultScreen: {
     el: HTMLElement
     onAction: (action: Action) => void
   } | null = null
@@ -497,8 +500,12 @@ export const mountVersus = (
     root.appendChild(screen)
 
     // End-of-match breakdown screen when time expires.
-    if (gameOver) root.appendChild(buildResultScreen())
-    else if (paused) {
+    if (gameOver) {
+      // Build once so the cursor survives any rerender; the match is over, so
+      // the breakdown's contents are settled.
+      if (!resultScreen) resultScreen = buildResultScreen()
+      root.appendChild(resultScreen.el)
+    } else if (paused) {
       // Build once per pause so the cursor survives the per-second timer
       // rerenders; rebuild on the next pause.
       if (!pauseMenu) pauseMenu = buildPauseMenu()
@@ -583,7 +590,10 @@ export const mountVersus = (
     return String(Object.values(counts).reduce((a, b) => a + b, 0))
   }
 
-  const buildResultScreen = (): HTMLElement => {
+  const buildResultScreen = (): {
+    el: HTMLElement
+    onAction: (action: Action) => void
+  } => {
     const ci1 = currentChallengeIdx1()
     const ci2 = currentChallengeIdx2()
     const maxIdx = Math.max(
@@ -715,25 +725,21 @@ export const mountVersus = (
 
     const actions = document.createElement('div')
     actions.setAttribute('class', 'versus-breakdown-actions')
-    actions.appendChild(
-      createButton(
-        t('settings'),
-        false,
-        () => navigate('versus-config'),
-        getActionHintPure('lemma', false),
-      ),
-    )
-    actions.appendChild(
-      createButton(
-        t('playAgain'),
-        false,
-        () => navigate('versus'),
-        getActionHintPure('skip', false),
-      ),
-    )
+
+    const cells: CursorCell[] = []
+    const addButton = (label: string, activate: () => void): void => {
+      const el = createButton(label, false, activate)
+      actions.appendChild(el)
+      cells.push({ btn: el, activate })
+    }
+    addButton(t('settings'), () => navigate('versus-config'))
+    addButton(t('playAgain'), () => navigate('versus'))
     overlay.appendChild(actions)
 
-    return overlay
+    // The buttons sit side by side, so they form one row the cursor moves
+    // through left / right.
+    const cursor = createButtonCursor([cells])
+    return { el: overlay, onAction: cursor.onAction }
   }
 
   const commitScore1 = () => {
@@ -1116,6 +1122,7 @@ export const mountVersus = (
   const handleResultAction = (action: Action) => {
     if (action === 'lemma') navigate('versus-config')
     else if (action === 'skip') navigate('versus')
+    else resultScreen?.onAction(action)
   }
 
   // Match-control actions are handled globally (see the always-on listeners

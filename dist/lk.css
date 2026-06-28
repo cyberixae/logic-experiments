@@ -1910,24 +1910,6 @@ html.mode-single:not(.input-pointer) .bench-topbar .bench-zoom {
   gap: 1em;
   justify-content: center;
 }
-.versus-breakdown-actions .button {
-  position: relative;
-}
-.versus-breakdown-actions .button .key-hint {
-  position: absolute;
-  width: 30px;
-  height: 30px;
-  line-height: 30px;
-  top: -20px;
-  right: 10px;
-}
-.versus-breakdown-actions .button .key-hint.wide {
-  width: auto;
-  min-width: 30px;
-  padding: 0 7px;
-  top: -20px;
-  right: 10px;
-}
 
 /* Minimal safe fallback when too narrow for the table: rows stack into cards and
    the latent per-cell labels appear. A polished card design is a later pass. */
