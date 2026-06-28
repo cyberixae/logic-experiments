@@ -15,7 +15,6 @@ import {
   createButton,
   createDispatch,
   createPausePopup,
-  getActionHint,
   isGazeModeActive,
   markKeyboardInput,
   markPointerInput,
@@ -122,23 +121,16 @@ const createControls = (
   panel.setAttribute('class', 'controls')
 
   if (showLevelButton) {
-    panel.appendChild(
-      createButton(t('level'), false, onLevel, getActionHint('level')),
-    )
+    panel.appendChild(createButton(t('level'), false, onLevel))
   }
-  const undoBtn = createButton(
-    t('undo'),
-    !undoEnabled,
-    () => {
-      if (canUndo) {
-        ws.applyEvent({ kind: 'undo' })
-      } else {
-        setGazeModeActive(false)
-      }
-      rerender()
-    },
-    getActionHint('undo'),
-  )
+  const undoBtn = createButton(t('undo'), !undoEnabled, () => {
+    if (canUndo) {
+      ws.applyEvent({ kind: 'undo' })
+    } else {
+      setGazeModeActive(false)
+    }
+    rerender()
+  })
   undoBtn.classList.add('mutating')
   panel.appendChild(undoBtn)
   return panel

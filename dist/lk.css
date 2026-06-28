@@ -79,30 +79,6 @@ html.loading body {
   line-height: 1.2em;
   border-color: transparent;
 }
-.bench-topbar .quiz-menu-btn .key-hint {
-  position: absolute;
-  width: 30px;
-  height: 30px;
-  line-height: 28px;
-  top: 50%;
-  right: -15px;
-  transform: translateY(-50%);
-  background: #fff6;
-  color: #000a;
-  border: 2px solid #fed;
-}
-.bench-topbar .bench-rules-btn .key-hint {
-  position: absolute;
-  width: 30px;
-  height: 30px;
-  line-height: 28px;
-  top: 50%;
-  left: -15px;
-  transform: translateY(-50%);
-  background: #fff6;
-  color: #000a;
-  border: 2px solid #fed;
-}
 .bench-topbar-center {
   display: flex;
   justify-content: center;
@@ -335,38 +311,11 @@ html.loading body {
   bottom: -20px;
   left: 20px;
 }
-.controls .button {
-  position: relative;
-}
-.controls .button .key-hint {
-  position: absolute;
-  width: 30px;
-  height: 30px;
-  line-height: 30px;
-  top: -20px;
-  right: 10px;
-}
-.controls .button .key-hint.wide {
-  width: auto;
-  min-width: 30px;
-  padding: 0 7px;
-  top: -20px;
-  right: 10px;
-}
-.button.disabled > .key-hint,
-.button.disabled > .gaze-hint-stack {
-  visibility: hidden;
-}
 
 /* Single-player (Random/Campaign): the on-screen control bar and topbar */
 /* buttons are the pointer/touch UI. Show them only while pointer/touch is the */
 /* active device; a keyboard or gamepad player uses physical keys/buttons and */
 /* gets a cleaner view. Scoped to .mode-single so Versus is unaffected. */
-html.mode-single .controls .button .key-hint,
-html.mode-single .bench-topbar .quiz-menu-btn .key-hint,
-html.mode-single .bench-topbar .bench-rules-btn .key-hint {
-  display: none;
-}
 /* visibility (not display) so the buttons reserve their space and the layout */
 /* stays put when the active device changes. */
 html.mode-single:not(.input-pointer) .controls:not(:has(.congrabuttons)) {

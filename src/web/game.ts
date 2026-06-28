@@ -61,13 +61,9 @@ import {
 export { AnyWorkspace }
 
 export {
-  dualHint,
-  getActionHint,
-  getActionHintPure,
   isGamepadActive,
   isGazeModeActive,
   isHotMode,
-  kbdHint,
   markKeyboardInput,
   markPointerInput,
   qwertyKeyMap,
@@ -138,24 +134,12 @@ export const createButton = (
   label: string | { long: string; short: string },
   disabled: boolean,
   onClick?: () => void,
-  hint?: string,
-  hintVariant: 'base' | 'hot' | 'cold' = 'base',
 ): HTMLElement => {
   const el = document.createElement('pre')
   el.setAttribute('class', 'button' + (disabled ? ' disabled' : ''))
   if (!disabled && onClick) el.onclick = onClick
-  if (hint !== undefined) {
-    el.appendChild(keyHintBadge(hint, hintVariant))
-  }
   if (typeof label === 'string') {
-    if (hint !== undefined) {
-      const labelSpan = document.createElement('span')
-      labelSpan.setAttribute('class', 'button-label')
-      labelSpan.textContent = label
-      el.appendChild(labelSpan)
-    } else {
-      el.innerHTML = label
-    }
+    el.innerHTML = label
   } else {
     const longSpan = document.createElement('span')
     longSpan.setAttribute('class', 'button-label long')
@@ -742,8 +726,6 @@ export const createBench = (
   const rulesLed = document.createElement('span')
   rulesLed.setAttribute('class', 'led' + (ctx.isRulesVisible() ? ' on' : ''))
   rulesBtn.appendChild(rulesLed)
-  const rulesHint = ctx.getActionHint('toggleRules')
-  if (rulesHint !== undefined) rulesBtn.appendChild(keyHintBadge(rulesHint))
 
   const topbar = document.createElement('div')
   topbar.setAttribute('class', 'bench-topbar')
@@ -756,8 +738,6 @@ export const createBench = (
     menuBtn.setAttribute('aria-label', t('menu'))
     menuBtn.textContent = '⋮'
     menuBtn.onclick = onMenu
-    const menuHint = ctx.getActionHint('menu')
-    if (menuHint !== undefined) menuBtn.appendChild(keyHintBadge(menuHint))
     topbarLeft.appendChild(menuBtn)
   }
   topbar.appendChild(topbarLeft)
@@ -877,37 +857,27 @@ export const createBench = (
   const rightDisabled = ctx.isGazeModeActive()
     ? !gazeMovable
     : inactive || seq.succedent.length === 0
-  const gazeLeftBtn = createButton(
-    t('left'),
-    leftDisabled,
-    () => {
-      if (!ctx.isGazeModeActive()) {
-        ctx.setGazeModeActive(true)
-        workspace.setGaze({
-          side: 'left',
-          index: seq.antecedent.length - 1,
-        })
-      } else {
-        workspace.moveGaze(-1)
-      }
-      rerender()
-    },
-    ctx.getActionHint('gazeLeft'),
-  )
-  const gazeRightBtn = createButton(
-    t('right'),
-    rightDisabled,
-    () => {
-      if (!ctx.isGazeModeActive()) {
-        ctx.setGazeModeActive(true)
-        workspace.setGaze({ side: 'right', index: 0 })
-      } else {
-        workspace.moveGaze(1)
-      }
-      rerender()
-    },
-    ctx.getActionHint('gazeRight'),
-  )
+  const gazeLeftBtn = createButton(t('left'), leftDisabled, () => {
+    if (!ctx.isGazeModeActive()) {
+      ctx.setGazeModeActive(true)
+      workspace.setGaze({
+        side: 'left',
+        index: seq.antecedent.length - 1,
+      })
+    } else {
+      workspace.moveGaze(-1)
+    }
+    rerender()
+  })
+  const gazeRightBtn = createButton(t('right'), rightDisabled, () => {
+    if (!ctx.isGazeModeActive()) {
+      ctx.setGazeModeActive(true)
+      workspace.setGaze({ side: 'right', index: 0 })
+    } else {
+      workspace.moveGaze(1)
+    }
+    rerender()
+  })
   const gazeWeakeningBtn = createButton(
     t('drop'),
     !ctx.isGazeModeActive() || inactive,
@@ -916,7 +886,6 @@ export const createBench = (
       applyGazeRule(workspace, 'weakening')
       rerender()
     },
-    ctx.getActionHint('gazeWeakening'),
   )
   const connectiveRule = gazeHints.connective?.eventualRule ?? null
   const connectiveLabel =
@@ -931,7 +900,6 @@ export const createBench = (
       applyGazeRule(workspace, 'connective')
       rerender()
     },
-    ctx.getActionHint('gazeConnective'),
   )
   const makeGroup = (...cls: string[]): HTMLElement => {
     const g = document.createElement('div')
@@ -947,28 +915,20 @@ export const createBench = (
       autoRule(workspace, keys(reverseAxiom0))
       rerender()
     },
-    ctx.getActionHint('axiom'),
   )
 
   const lemmaDisabled =
     inactive || onApplyReverse1 === undefined || !ls.includes('cut')
-  const lemmaBtn = createButton(
-    t('lemma'),
-    lemmaDisabled,
-    () => {
-      if (onApplyReverse1 === undefined) return
-      onApplyReverse1('cut', (formula) => {
-        workspace.applyEvent(reverse1('cut', formula))
-        rerender()
-      })
-    },
-    ctx.getActionHint('lemma'),
-  )
+  const lemmaBtn = createButton(t('lemma'), lemmaDisabled, () => {
+    if (onApplyReverse1 === undefined) return
+    onApplyReverse1('cut', (formula) => {
+      workspace.applyEvent(reverse1('cut', formula))
+      rerender()
+    })
+  })
 
   const miscGroup = makeGroup('controls-misc')
   if (onSkip !== undefined) {
-    // No key hint: the whole control bar is hidden while keyboard/gamepad is the
-    // active input, so the badge would never be seen.
     const skipBtn = createButton(t('skip'), false, onSkip)
     skipBtn.classList.add('mutating')
     miscGroup.appendChild(skipBtn)
@@ -993,24 +953,14 @@ export const createBench = (
 
   const branchCount = branches(workspace.currentConjecture().derivation).length
   const canSwitch = !solved && branchCount > 1
-  const prevBranchBtn = createButton(
-    t('prevBranch'),
-    !canSwitch,
-    () => {
-      workspace.applyEvent(prevBranch())
-      rerender()
-    },
-    ctx.getActionHint('prevBranch'),
-  )
-  const nextBranchBtn = createButton(
-    t('nextBranch'),
-    !canSwitch,
-    () => {
-      workspace.applyEvent(nextBranch())
-      rerender()
-    },
-    ctx.getActionHint('nextBranch'),
-  )
+  const prevBranchBtn = createButton(t('prevBranch'), !canSwitch, () => {
+    workspace.applyEvent(prevBranch())
+    rerender()
+  })
+  const nextBranchBtn = createButton(t('nextBranch'), !canSwitch, () => {
+    workspace.applyEvent(nextBranch())
+    rerender()
+  })
 
   // Two button families distinguished by border color: `inert` buttons only
   // navigate or select and never change the proof; `mutating` buttons directly

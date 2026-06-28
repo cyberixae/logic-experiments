@@ -224,19 +224,14 @@ export const mountVersus = (
     el.setAttribute('class', 'controls')
     const canUndo = activePath(ws.currentConjecture()).length > 0
     const enabled = canUndo || ctx.isGazeModeActive()
-    const undoBtn = createButton(
-      t('undo'),
-      !enabled,
-      () => {
-        if (canUndo) {
-          ws.applyEvent(undo())
-        } else {
-          ctx.setGazeModeActive(false)
-        }
-        refresh()
-      },
-      ctx.getActionHint('undo'),
-    )
+    const undoBtn = createButton(t('undo'), !enabled, () => {
+      if (canUndo) {
+        ws.applyEvent(undo())
+      } else {
+        ctx.setGazeModeActive(false)
+      }
+      refresh()
+    })
     undoBtn.classList.add('mutating')
     el.appendChild(undoBtn)
     return el
@@ -1041,12 +1036,7 @@ export const mountVersus = (
     const hurray = document.createElement('div')
     const buttons = document.createElement('div')
     buttons.appendChild(
-      createButton(
-        t('continue'),
-        false,
-        () => dispatch1('axiom'),
-        ctx1.getActionHint('axiom'),
-      ),
+      createButton(t('continue'), false, () => dispatch1('axiom')),
     )
     return { hurray, buttons }
   }
@@ -1054,12 +1044,7 @@ export const mountVersus = (
     const hurray = document.createElement('div')
     const buttons = document.createElement('div')
     buttons.appendChild(
-      createButton(
-        t('continue'),
-        false,
-        () => dispatch2('axiom'),
-        ctx2.getActionHint('axiom'),
-      ),
+      createButton(t('continue'), false, () => dispatch2('axiom')),
     )
     return { hurray, buttons }
   }
