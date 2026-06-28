@@ -562,7 +562,7 @@ html.mode-single:not(.input-pointer) .bench-topbar .bench-zoom {
   position: relative;
 }
 .button-label {
-  user-select: text;
+  user-select: none;
 }
 .button-label.short {
   display: none;
