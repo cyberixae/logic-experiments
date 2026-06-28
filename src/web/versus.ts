@@ -245,19 +245,21 @@ export const mountVersus = (
         (isNpc1 ? ' versus-half-npc' : '') +
         (hideControls1 ? ' versus-half-keys' : ''),
     )
+    // Build the full bar (Undo, Skip, …) even for an NPC slot so both halves
+    // come from one code path and reserve identical height. The NPC half is
+    // non-interactive — `.versus-half-npc` hides the bar and kills pointer
+    // events — so the buttons are present but unreachable.
     half.appendChild(
       createBench(
         ws1,
         makeCongratsP1,
-        isNpc1
-          ? document.createElement('div')
-          : makeUndoControls(ws1, ctx1, refreshP1),
+        makeUndoControls(ws1, ctx1, refreshP1),
         refreshP1,
         undefined,
         onApplyReverse1,
         undefined,
         ctx1,
-        isNpc1 ? undefined : skipPlayer1,
+        skipPlayer1,
       ),
     )
     return half
@@ -275,15 +277,13 @@ export const mountVersus = (
       createBench(
         ws2,
         makeCongratsP2,
-        isNpc2
-          ? document.createElement('div')
-          : makeUndoControls(ws2, ctx2, refreshP2),
+        makeUndoControls(ws2, ctx2, refreshP2),
         refreshP2,
         undefined,
         onApplyReverse2,
         undefined,
         ctx2,
-        isNpc2 ? undefined : skipPlayer2,
+        skipPlayer2,
       ),
     )
     return half
