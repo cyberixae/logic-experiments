@@ -9,8 +9,6 @@ import {
   createButton,
   createDispatch,
   createPausePopup,
-  dualHint,
-  kbdHint,
   getActionHint,
   isGazeModeActive,
   markKeyboardInput,
@@ -25,6 +23,8 @@ import {
   zoomTreeReset,
 } from './game'
 import { createFormulaEditor } from './formula-editor'
+import { createButtonCursor, cursorNavActions } from './button-cursor'
+import type { CursorCell } from './button-cursor'
 import { MountResult, Navigate } from './types'
 import { t } from './i18n'
 
@@ -59,21 +59,37 @@ const createControls = (
 const createCongrats = (
   onNew: () => void,
   onSettings: () => void,
-): { hurray: HTMLElement; buttons: HTMLElement } => {
+): {
+  hurray: HTMLElement
+  buttons: HTMLElement
+  onAction: (action: Action) => void
+  isEngaged: () => boolean
+} => {
   const hurray = document.createElement('div')
   hurray.setAttribute('class', 'hurray')
   hurray.innerHTML = t('congratulations')
 
   const buttons = document.createElement('div')
   buttons.setAttribute('class', 'congrabuttons')
-  buttons.appendChild(
-    createButton(t('customChallenge'), false, onSettings, kbdHint('b')),
-  )
-  buttons.appendChild(
-    createButton(t('newChallenge'), false, onNew, dualHint('n', 'axiom')),
-  )
 
-  return { hurray, buttons }
+  const cells: CursorCell[] = []
+  const addButton = (label: string, activate: () => void): void => {
+    const el = createButton(label, false, activate)
+    buttons.appendChild(el)
+    cells.push({ btn: el, activate })
+  }
+  addButton(t('customChallenge'), onSettings)
+  addButton(t('newChallenge'), onNew)
+
+  // The buttons sit side by side, so they form one row the cursor moves through
+  // left / right.
+  const cursor = createButtonCursor([cells])
+  return {
+    hurray,
+    buttons,
+    onAction: cursor.onAction,
+    isEngaged: cursor.isEngaged,
+  }
 }
 
 export const mountRandom = (
@@ -96,6 +112,12 @@ export const mountRandom = (
   let pausePopup: {
     el: HTMLElement
     onAction: (action: Action) => void
+  } | null = null
+  // The latest end-of-proof congrats, captured so the solved-screen dispatch can
+  // drive its button cursor. Replaced on every rerender that rebuilds it.
+  let congrats: {
+    onAction: (action: Action) => void
+    isEngaged: () => boolean
   } | null = null
   const togglePausePopup = () => {
     pausePopupOpen = !pausePopupOpen
@@ -168,7 +190,11 @@ export const mountRandom = (
     const ws = getWorkspace()
     container.innerHTML = ''
     const controlsEl = createControls(getWorkspace, rerender)
-    const makeCongrats = () => createCongrats(onNew, openSettings)
+    const makeCongrats = () => {
+      const c = createCongrats(onNew, openSettings)
+      congrats = c
+      return c
+    }
     container.appendChild(
       createBench(
         ws,
@@ -252,6 +278,19 @@ export const mountRandom = (
     if (pausePopupOpen && action !== 'menu') {
       pausePopup?.onAction(action)
       return
+    }
+    // On the end-of-proof screen, arrow keys drive the congrats button cursor
+    // (and axiom presses the focused button once engaged) instead of falling
+    // through to onSolved, which replays the completion animation.
+    if (getWorkspace().isSolved() && congrats) {
+      if (cursorNavActions.has(action)) {
+        congrats.onAction(action)
+        return
+      }
+      if (action === 'axiom' && congrats.isEngaged()) {
+        congrats.onAction('axiom')
+        return
+      }
     }
     baseDispatch(action)
   }

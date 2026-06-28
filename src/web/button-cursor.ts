@@ -12,6 +12,20 @@ export type CursorCell = {
 const clamp = (v: number, lo: number, hi: number): number =>
   Math.max(lo, Math.min(hi, v))
 
+// The actions the cursor treats as movement: the gaze arrows plus the hot-mode
+// D-pad aliases. Callers that overlay a cursor on a screen with its own key
+// handling use this to route only navigation through the cursor.
+export const cursorNavActions: ReadonlySet<Action> = new Set<Action>([
+  'gazeLeft',
+  'gazeRight',
+  'gazeConnective',
+  'gazeWeakening',
+  'leftRotateLeft',
+  'leftRotateRight',
+  'leftConnective',
+  'leftWeakening',
+])
+
 // A keyboard / gamepad cursor over a grid of buttons, mirroring the lemma
 // builder. Hidden until the first navigation action so pure mouse / touch
 // players never see a highlight they didn't ask for. Caller arranges cells into
@@ -24,7 +38,11 @@ const clamp = (v: number, lo: number, hi: number): number =>
 // the focused button.
 export const createButtonCursor = (
   rows: ReadonlyArray<ReadonlyArray<CursorCell>>,
-): { onAction: (action: Action) => void; refresh: () => void } => {
+): {
+  onAction: (action: Action) => void
+  refresh: () => void
+  isEngaged: () => boolean
+} => {
   let row = 0
   let col = 0
   let visible = false
@@ -85,5 +103,10 @@ export const createButtonCursor = (
     }
   }
 
-  return { onAction, refresh }
+  // Whether the cursor has been revealed by a navigation action — lets callers
+  // keep a default activation key (e.g. a screen where axiom does something
+  // specific until the player starts navigating).
+  const isEngaged = (): boolean => visible
+
+  return { onAction, refresh, isEngaged }
 }
