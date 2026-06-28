@@ -41,13 +41,6 @@ const setDisabled = (
   btn.onclick = disabled ? null : handler
 }
 
-const makeHintBadge = (text: string): HTMLElement => {
-  const badge = document.createElement('span')
-  badge.setAttribute('class', text.length > 1 ? 'key-hint wide' : 'key-hint')
-  badge.textContent = text
-  return badge
-}
-
 const clamp = (v: number, lo: number, hi: number): number =>
   Math.max(lo, Math.min(hi, v))
 
@@ -56,8 +49,6 @@ export const createFormulaEditor = (
   confirmLabel: string,
   onConfirm: (formula: Prop) => void,
   onCancel: () => void,
-  undoHint?: string,
-  activateHint?: string,
 ): {
   el: HTMLElement
   tryUndo: () => boolean
@@ -245,14 +236,6 @@ export const createFormulaEditor = (
     controlCells,
   ]
 
-  const hintBadge = undoHint !== undefined ? makeHintBadge(undoHint) : null
-
-  // Badge showing the activation key, parked on whichever button the cursor is
-  // on, so keyboard / gamepad players see how to press the focused button.
-  const cursorBadge =
-    activateHint !== undefined ? makeHintBadge(activateHint) : null
-  if (cursorBadge !== null) cursorBadge.classList.add('cursor-hint')
-
   const renderState = (): void => {
     stackDisplay.innerHTML =
       stack.length === 0
@@ -275,15 +258,6 @@ export const createFormulaEditor = (
       doUndo()
     })
 
-    if (hintBadge !== null) {
-      hintBadge.remove()
-      if (history.length > 0) {
-        undoBtn.appendChild(hintBadge)
-      } else {
-        cancelBtn.appendChild(hintBadge)
-      }
-    }
-
     const formula = stack.length === 1 ? stack[0] : undefined
     confirmBtn.setAttribute(
       'class',
@@ -297,15 +271,6 @@ export const createFormulaEditor = (
     }
     const focused = cursorVisible ? rows[cursorRow]?.[cursorCol] : undefined
     if (focused !== undefined) focused.btn.classList.add('cursor')
-
-    // The activation badge follows the cursor, but only onto buttons that can
-    // actually be activated.
-    if (cursorBadge !== null) {
-      cursorBadge.remove()
-      if (focused !== undefined && focused.isEnabled()) {
-        focused.btn.appendChild(cursorBadge)
-      }
-    }
   }
 
   const moveCursor = (dRow: number, dCol: number): void => {

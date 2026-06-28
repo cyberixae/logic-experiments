@@ -153,8 +153,6 @@ export const mountRandom = (
         onFormula(formula)
       },
       cancel,
-      '⌫',
-      getActionHint('axiom'),
     )
     closeFormulaEditor = cancel
     tryUndoInEditor = tryUndo
