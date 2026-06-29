@@ -1,6 +1,6 @@
 const en = {
   title: 'LK',
-  random: 'Random',
+  random: 'Zen',
   campaign: 'Campaign',
   menu: 'Menu',
   undo: 'Undo',
@@ -29,7 +29,7 @@ const en = {
   backToSystems: '\u2190 Systems',
   sideLeft: 'L',
   sideRight: 'R',
-  randomConfig: 'Random',
+  randomConfig: 'Zen',
   formulaShape: 'Settings',
   size: 'Formula Length',
   connectives: 'Connectives',
@@ -77,7 +77,7 @@ const en = {
 
 const fi: Record<MessageKey, string> = {
   title: 'LK',
-  random: 'Satunnainen',
+  random: 'Zen',
   campaign: 'Kampanja',
   menu: 'Valikko',
   undo: 'Kumoa',
@@ -106,7 +106,7 @@ const fi: Record<MessageKey, string> = {
   backToSystems: '\u2190 Järjestelmät',
   sideLeft: 'V',
   sideRight: 'O',
-  randomConfig: 'Satunnainen',
+  randomConfig: 'Zen',
   formulaShape: 'Asetukset',
   size: 'Kaavan pituus',
   connectives: 'Konnektiivit',
@@ -154,7 +154,7 @@ const fi: Record<MessageKey, string> = {
 
 const es: Record<MessageKey, string> = {
   title: 'LK',
-  random: 'Aleatorio',
+  random: 'Zen',
   campaign: 'Campaña',
   menu: 'Menú',
   undo: 'Deshacer',
@@ -183,7 +183,7 @@ const es: Record<MessageKey, string> = {
   backToSystems: '\u2190 Sistemas',
   sideLeft: 'I',
   sideRight: 'D',
-  randomConfig: 'Aleatorio',
+  randomConfig: 'Zen',
   formulaShape: 'Ajustes',
   size: 'Longitud de fórmula',
   connectives: 'Conectivos',
@@ -231,7 +231,7 @@ const es: Record<MessageKey, string> = {
 
 const cs: Record<MessageKey, string> = {
   title: 'LK',
-  random: 'Náhodné',
+  random: 'Zen',
   campaign: 'Kampaň',
   menu: 'Menu',
   undo: 'Zpět',
@@ -260,7 +260,7 @@ const cs: Record<MessageKey, string> = {
   backToSystems: '\u2190 Systémy',
   sideLeft: 'L',
   sideRight: 'P',
-  randomConfig: 'Náhodné',
+  randomConfig: 'Zen',
   formulaShape: 'Nastavení',
   size: 'Délka formule',
   connectives: 'Spojky',
@@ -308,7 +308,7 @@ const cs: Record<MessageKey, string> = {
 
 const pl: Record<MessageKey, string> = {
   title: 'LK',
-  random: 'Losowe',
+  random: 'Zen',
   campaign: 'Kampania',
   menu: 'Menu',
   undo: 'Cofnij',
@@ -337,7 +337,7 @@ const pl: Record<MessageKey, string> = {
   backToSystems: '\u2190 Systemy',
   sideLeft: 'L',
   sideRight: 'P',
-  randomConfig: 'Losowe',
+  randomConfig: 'Zen',
   formulaShape: 'Ustawienia',
   size: 'Długość formuły',
   connectives: 'Spójniki',
