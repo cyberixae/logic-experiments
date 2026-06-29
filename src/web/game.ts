@@ -1095,14 +1095,14 @@ export const createPausePopup = (
   )
   if (onCustom) {
     addButton(
-      createButton(t('customChallenge'), false, onCustom),
+      createButton(t('challengeSetup'), false, onCustom),
       onCustom,
       () => true,
     )
   }
   if (onSettings) {
     addButton(
-      createButton(t('customChallenge'), false, onSettings),
+      createButton(t('challengeSetup'), false, onSettings),
       onSettings,
       () => true,
     )

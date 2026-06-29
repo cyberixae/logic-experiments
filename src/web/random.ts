@@ -72,7 +72,7 @@ const createCongrats = (
     buttons.appendChild(el)
     cells.push({ btn: el, activate })
   }
-  addButton(t('customChallenge'), onSettings)
+  addButton(t('challengeSetup'), onSettings)
   addButton(t('newChallenge'), onNew)
 
   // The buttons sit side by side, so they form one row the cursor moves through

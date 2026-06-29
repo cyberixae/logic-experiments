@@ -458,7 +458,7 @@ export const mountVersus = (
     }
     addButton(t('resumeGame'), () => setPaused(false))
     addButton(t('playAgain'), () => navigate('versus'))
-    addButton(t('settings'), () => navigate('versus-config'))
+    addButton(t('matchSetup'), () => navigate('versus-config'))
     addButton(t('exitToMainMenu'), () => navigate('menu'))
 
     panel.appendChild(buttons)
@@ -727,7 +727,7 @@ export const mountVersus = (
       actions.appendChild(el)
       cells.push({ btn: el, activate })
     }
-    addButton(t('settings'), () => navigate('versus-config'))
+    addButton(t('matchSetup'), () => navigate('versus-config'))
     addButton(t('playAgain'), () => navigate('versus'))
     overlay.appendChild(actions)
 
