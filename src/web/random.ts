@@ -51,6 +51,7 @@ const createControls = (
 }
 
 const createCongrats = (
+  onRetry: () => void,
   onNew: () => void,
   onSettings: () => void,
 ): {
@@ -73,6 +74,8 @@ const createCongrats = (
     cells.push({ btn: el, activate })
   }
   addButton(t('challengeSetup'), onSettings)
+  // Retry the same formula — a chance to find a cleaner proof before moving on.
+  addButton(t('playAgain'), onRetry)
   addButton(t('newChallenge'), onNew)
 
   // The buttons sit side by side, so they form one row the cursor moves through
@@ -129,13 +132,9 @@ export const mountRandom = (
     pausePopupOpen = false
     navigate('random-config')
   }
-  const resetFromPopup = () => {
-    const ws = getWorkspace()
-    if (activePath(ws.currentConjecture()).length > 0) {
-      ws.applyEvent(reset())
-    }
+  const onRetry = () => {
+    getWorkspace().applyEvent(reset())
     setGazeModeActive(false)
-    pausePopupOpen = false
     rerender()
   }
   const freshFromPopup = () => {
@@ -185,7 +184,7 @@ export const mountRandom = (
     container.innerHTML = ''
     const controlsEl = createControls(getWorkspace, rerender)
     const makeCongrats = () => {
-      const c = createCongrats(onNew, openSettings)
+      const c = createCongrats(onRetry, onNew, openSettings)
       congrats = c
       return c
     }
@@ -206,13 +205,9 @@ export const mountRandom = (
       // Build once per open so the cursor position survives the rerenders that
       // gamepad polling triggers while paused; rebuild on the next open.
       if (!pausePopup) {
-        const canReset = activePath(ws.currentConjecture()).length > 0
-        const resetEnabled = canReset || isGazeModeActive()
         pausePopup = createPausePopup(
           closePausePopup,
           exitToMenu,
-          resetFromPopup,
-          !resetEnabled,
           openSettings,
         )
       }
@@ -259,10 +254,6 @@ export const mountRandom = (
     }
     if (action === 'exit') {
       if (pausePopupOpen) exitToMenu()
-      return
-    }
-    if (action === 'reset' && pausePopupOpen) {
-      resetFromPopup()
       return
     }
     if (action === 'undo' && pausePopupOpen) {

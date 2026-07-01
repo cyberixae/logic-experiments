@@ -245,15 +245,6 @@ export const mountCampaign = (
     pausePopupOpen = false
     navigate('menu')
   }
-  const resetFromPopup = () => {
-    if (activePath(ws.currentConjecture()).length > 0) {
-      ws.applyEvent(reset())
-    }
-    setGazeModeActive(false)
-    pausePopupOpen = false
-    rerender()
-  }
-
   let formulaEditorOpen = false
   let closeFormulaEditor: (() => void) | null = null
   let tryUndoInEditor: (() => boolean) | null = null
@@ -322,14 +313,7 @@ export const mountCampaign = (
       // Build once per open so the cursor position survives the rerenders that
       // gamepad polling triggers while paused; rebuild on the next open.
       if (!pausePopup) {
-        const canReset = activePath(ws.currentConjecture()).length > 0
-        const resetEnabled = canReset || isGazeModeActive()
-        pausePopup = createPausePopup(
-          closePausePopup,
-          exitToMenu,
-          resetFromPopup,
-          !resetEnabled,
-        )
+        pausePopup = createPausePopup(closePausePopup, exitToMenu)
       }
       container.appendChild(pausePopup.el)
     } else {
@@ -376,10 +360,6 @@ export const mountCampaign = (
     }
     if (action === 'exit') {
       if (pausePopupOpen) exitToMenu()
-      return
-    }
-    if (action === 'reset' && pausePopupOpen) {
-      resetFromPopup()
       return
     }
     if (action === 'undo' && pausePopupOpen) {

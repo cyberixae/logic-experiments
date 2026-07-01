@@ -9,7 +9,6 @@ export type Action =
   | 'prevBranch'
   | 'nextBranch'
   | 'undo'
-  | 'reset'
   | 'level'
   | 'menu'
   | 'exit'

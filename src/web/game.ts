@@ -2,7 +2,6 @@ import {
   reverse0,
   reverse1,
   undo,
-  reset,
   prevBranch,
   nextBranch,
 } from '../interactive/event'
@@ -1042,8 +1041,6 @@ const autoRule = (workspace: AnyWorkspace, rules: RuleId[]) => {
 export const createPausePopup = (
   onResume: () => void,
   onExit: () => void,
-  onReset: () => void,
-  resetDisabled: boolean,
   onSettings?: () => void,
   onCustom?: () => void,
 ): { el: HTMLElement; onAction: (action: Action) => void } => {
@@ -1088,11 +1085,6 @@ export const createPausePopup = (
   const spacer = document.createElement('div')
   spacer.setAttribute('class', 'pause-buttons-spacer')
   buttons.appendChild(spacer)
-  addButton(
-    createButton(t('resetChallenge'), resetDisabled, onReset),
-    onReset,
-    () => !resetDisabled,
-  )
   if (onCustom) {
     addButton(
       createButton(t('challengeSetup'), false, onCustom),
@@ -1164,10 +1156,7 @@ export const createDispatch =
       }
     } else if (action === 'gazeConnective' || action === 'gazeWeakening') {
       if (!ctx.isGazeModeActive()) return
-    } else if (
-      ctx.isGazeModeActive() &&
-      (RULE_APPLY_ACTIONS.has(action) || action === 'reset')
-    ) {
+    } else if (ctx.isGazeModeActive() && RULE_APPLY_ACTIONS.has(action)) {
       ctx.setGazeModeActive(false)
     } else if (action === 'undo' && ctx.isGazeModeActive()) {
       if (activePath(getWorkspace().currentConjecture()).length === 0) {
@@ -1189,11 +1178,6 @@ export const createDispatch =
       return
     }
     const workspace = getWorkspace()
-    if (action === 'reset') {
-      workspace.applyEvent(reset())
-      rerender()
-      return
-    }
     if (workspace.isSolved()) {
       onSolved(action)
       return
