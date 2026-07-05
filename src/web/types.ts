@@ -8,5 +8,6 @@ export type Screen =
   | 'random-config'
   | 'versus'
   | 'versus-config'
+  | 'tutorial'
 export type Navigate = (screen: Screen) => void
 export type MountResult = { cleanup: () => void; rerender: () => void }

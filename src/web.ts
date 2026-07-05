@@ -9,6 +9,7 @@ import { mountRandom } from './web/random'
 import { mountSystem } from './web/system'
 import { mountSecret } from './web/secret'
 import { mountVersus } from './web/versus'
+import { mountTutorial } from './web/tutorial'
 import {
   mountVersusConfig,
   parseVersusConfigFromParams,
@@ -125,6 +126,13 @@ const mount = (screen: Screen) => {
       current = mountVersus(body, navigate, pool, vConfig)
       break
     }
+    case 'tutorial': {
+      const params = new URLSearchParams(window.location.search)
+      const raw = parseInt(params.get('tutorial_notch') ?? '0', 10)
+      const notch = Number.isFinite(raw) ? raw : 0
+      current = mountTutorial(body, navigate, pool, notch)
+      break
+    }
     case 'versus-config':
       current = mountVersusConfig(body, navigate, (versusConfig) => {
         current.cleanup()
@@ -175,6 +183,8 @@ const init = () => {
     mount('system')
   } else if (mode === 'versus') {
     mount('versus')
+  } else if (mode === 'tutorial') {
+    mount('tutorial')
   } else if (mode === 'versus-config') {
     mount('versus-config')
   } else if (params.get('level') !== null) {

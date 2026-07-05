@@ -26,6 +26,11 @@ import {
 
 export type PlayerInput = 'mouse' | 'keyboard' | 'gamepad1' | 'gamepad2' | 'npc'
 
+// When present, the Versus arena runs as the tutorial: untimed, drawing clamped
+// Logic-chapter practice challenges from the given notch instead of the pool,
+// with a subchapter indicator + advance control in place of the scoreboard.
+export type VersusTutorial = { startNotch: number }
+
 export type VersusConfig = {
   randomConfig: RandomConfig
   gameDurationSeconds: number
@@ -33,6 +38,7 @@ export type VersusConfig = {
   p2Input: PlayerInput
   npc1Knobs: NpcKnobs
   npc2Knobs: NpcKnobs
+  tutorial?: VersusTutorial
 }
 
 export const defaultVersusConfig = (): VersusConfig => ({

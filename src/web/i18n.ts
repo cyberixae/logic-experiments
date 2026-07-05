@@ -73,6 +73,10 @@ const en = {
   gamepad1: 'Gamepad 1',
   gamepad2: 'Gamepad 2',
   npc: 'NPC',
+  tutorial: 'Tutorial',
+  tutorialLogic: 'Logic',
+  tutorialPart: 'Part',
+  tutorialAdvance: 'Next Section',
 } as const
 
 const fi: Record<MessageKey, string> = {
@@ -150,6 +154,10 @@ const fi: Record<MessageKey, string> = {
   gamepad1: 'Ohjain 1',
   gamepad2: 'Ohjain 2',
   npc: 'NPC',
+  tutorial: 'Opastus',
+  tutorialLogic: 'Logiikka',
+  tutorialPart: 'Osa',
+  tutorialAdvance: 'Seuraava osa',
 }
 
 const es: Record<MessageKey, string> = {
@@ -227,6 +235,10 @@ const es: Record<MessageKey, string> = {
   gamepad1: 'Mando 1',
   gamepad2: 'Mando 2',
   npc: 'NPC',
+  tutorial: 'Tutorial',
+  tutorialLogic: 'Lógica',
+  tutorialPart: 'Parte',
+  tutorialAdvance: 'Siguiente sección',
 }
 
 const cs: Record<MessageKey, string> = {
@@ -304,6 +316,10 @@ const cs: Record<MessageKey, string> = {
   gamepad1: 'Ovladač 1',
   gamepad2: 'Ovladač 2',
   npc: 'NPC',
+  tutorial: 'Návod',
+  tutorialLogic: 'Logika',
+  tutorialPart: 'Část',
+  tutorialAdvance: 'Další část',
 }
 
 const pl: Record<MessageKey, string> = {
@@ -381,6 +397,10 @@ const pl: Record<MessageKey, string> = {
   gamepad1: 'Pad 1',
   gamepad2: 'Pad 2',
   npc: 'NPC',
+  tutorial: 'Samouczek',
+  tutorialLogic: 'Logika',
+  tutorialPart: 'Część',
+  tutorialAdvance: 'Następna sekcja',
 }
 
 type MessageKey = keyof typeof en

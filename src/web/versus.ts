@@ -29,6 +29,11 @@ import { html } from '../render/segment'
 import { MountResult, Navigate } from './types'
 import { t } from './i18n'
 import { VersusConfig } from './versus-config'
+import {
+  logicNotches,
+  notchAt,
+  generateSequentChallenge,
+} from '../random/tutorial'
 
 const formatTime = (s: number): string => {
   const m = Math.floor(s / 60)
@@ -94,10 +99,22 @@ export const mountVersus = (
   const root = document.createElement('div')
   container.appendChild(root)
 
+  // Tutorial flavor: when present, the arena runs untimed and sources clamped
+  // Logic-chapter practice challenges from the current notch (generated on the
+  // spot) instead of the pool. The `cut`-free per-notch rule set baked into each
+  // generated challenge is what keeps the player from ever needing an untaught
+  // rule. Non-tutorial Versus is unchanged.
+  const isTutorial = versusConfig.tutorial !== undefined
+  const untimed = isTutorial
+  let notch = versusConfig.tutorial?.startNotch ?? 0
+  const takeChallenge = (): ChallengeResult =>
+    isTutorial ? generateSequentChallenge(notchAt(notch)) : pool.take()
+
   // Shared challenge list — same challenges in same order for both players
   const sharedChallenges: ChallengeResult[] = []
   const ensureChallenge = (i: number) => {
-    while (sharedChallenges.length <= i + 2) sharedChallenges.push(pool.take())
+    while (sharedChallenges.length <= i + 2)
+      sharedChallenges.push(takeChallenge())
   }
   ensureChallenge(0)
 
@@ -290,6 +307,7 @@ export const mountVersus = (
   }
 
   const buildThermo = (): HTMLElement => {
+    if (isTutorial) return buildTutorialThermo()
     const thermo = document.createElement('div')
     thermo.setAttribute('class', 'versus-thermo')
 
@@ -738,6 +756,7 @@ export const mountVersus = (
   }
 
   const commitScore1 = () => {
+    if (isTutorial) return // no scoring / re-queue in the tutorial
     if (scoreCommitted1) return
     scoreCommitted1 = true
     const challengeIdx = currentChallengeIdx1()
@@ -796,6 +815,7 @@ export const mountVersus = (
   }
 
   const commitScore2 = () => {
+    if (isTutorial) return // no scoring / re-queue in the tutorial
     if (scoreCommitted2) return
     scoreCommitted2 = true
     const challengeIdx = currentChallengeIdx2()
@@ -854,6 +874,13 @@ export const mountVersus = (
 
   const skipPlayer1 = () => {
     if (gameOver) return
+    if (isTutorial) {
+      // Skip = draw another random challenge at the same subchapter.
+      advancePlayer1()
+      rerenderHalf1()
+      rebuildThermo()
+      return
+    }
     const challengeIdx = wsIdx1
     resolved1.set(challengeIdx, 'skip')
 
@@ -878,6 +905,13 @@ export const mountVersus = (
   }
   const skipPlayer2 = () => {
     if (gameOver) return
+    if (isTutorial) {
+      // Skip = draw another random challenge at the same subchapter.
+      advancePlayer2()
+      rerenderHalf2()
+      rebuildThermo()
+      return
+    }
     const challengeIdx = wsIdx2
     resolved2.set(challengeIdx, 'skip')
 
@@ -921,6 +955,54 @@ export const mountVersus = (
     const fresh = buildThermo()
     thermoEl.replaceWith(fresh)
     thermoEl = fresh
+  }
+  // Advance the tutorial to the next subchapter: widen the connective clamp and
+  // re-root BOTH players onto a fresh challenge generated under the new notch,
+  // dropping anything buffered under the old clamp.
+  const advanceSubchapter = () => {
+    if (notch >= logicNotches.length - 1) return
+    notch += 1
+    const fresh = Math.max(index1, index2, wsIdx1 + 1, wsIdx2 + 1)
+    sharedChallenges.splice(fresh)
+    pending1 = []
+    pending2 = []
+    scoreCommitted1 = false
+    scoreCommitted2 = false
+    wsIdx1 = fresh
+    index1 = fresh + 1
+    wsIdx2 = fresh
+    index2 = fresh + 1
+    ws1 = makeWorkspace(fresh)
+    ws2 = makeWorkspace(fresh)
+    rerenderHalf1()
+    rerenderHalf2()
+    rebuildThermo()
+  }
+  // Tutorial scoreboard replacement: a plain subchapter indicator + the advance
+  // control + the shared pause button. No clock, rows, or scores (not a race).
+  const buildTutorialThermo = (): HTMLElement => {
+    const thermo = document.createElement('div')
+    thermo.setAttribute('class', 'versus-thermo versus-thermo-tutorial')
+
+    const indicator = document.createElement('div')
+    indicator.setAttribute('class', 'versus-thermo-indicator')
+    indicator.textContent = `${t('tutorialLogic')} · ${t('tutorialPart')} ${
+      notch + 1
+    }/${logicNotches.length} · ${notchAt(notch).glyphs}`
+    thermo.appendChild(indicator)
+
+    const atEnd = notch >= logicNotches.length - 1
+    const advanceBtn = createButton(t('tutorialAdvance'), atEnd, () =>
+      advanceSubchapter(),
+    )
+    advanceBtn.classList.add('versus-tutorial-advance')
+    thermo.appendChild(advanceBtn)
+
+    const menuBtn = createButton('⋮', false, () => setPaused(true))
+    menuBtn.classList.add('versus-menu-btn')
+    menuBtn.setAttribute('aria-label', t('menu'))
+    thermo.appendChild(menuBtn)
+    return thermo
   }
   // refreshP{1,2}: the dispatch callback for that player's regular moves.
   // Commits score on the move that solves the level (so the scoreboard reflects
@@ -1052,7 +1134,7 @@ export const mountVersus = (
   // Only patch the timer text each tick — a full rerender would destroy the DOM
   // mid-animation and prevent the solved zoom + proof-check sweep from completing.
   const ticker = setInterval(() => {
-    if (gameOver || paused) return
+    if (untimed || gameOver || paused) return
     timeLeft -= 1
     if (timeLeft <= 0) {
       timeLeft = 0

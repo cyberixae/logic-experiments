@@ -1742,6 +1742,27 @@ html.mode-single:not(.input-pointer) .bench-topbar .bench-zoom {
   font-weight: bold;
   padding: 0.3em 0;
 }
+/* Tutorial flavor: the center column is a curriculum indicator, not a
+   scoreboard, so it needs room for the subchapter label + the advance control. */
+.versus-thermo-tutorial {
+  width: 8em;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.8em;
+  padding-top: 1em;
+}
+.versus-thermo-indicator {
+  text-align: center;
+  font-size: 0.95em;
+  line-height: 1.4;
+  padding: 0 0.4em;
+}
+.versus-tutorial-advance {
+  align-self: stretch;
+  margin: 0 0.4em;
+  text-align: center;
+  white-space: nowrap;
+}
 .versus-half:first-child .rules-sheet {
   right: calc(50% + 2.5em);
 }

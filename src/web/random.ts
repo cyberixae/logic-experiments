@@ -205,11 +205,7 @@ export const mountRandom = (
       // Build once per open so the cursor position survives the rerenders that
       // gamepad polling triggers while paused; rebuild on the next open.
       if (!pausePopup) {
-        pausePopup = createPausePopup(
-          closePausePopup,
-          exitToMenu,
-          openSettings,
-        )
+        pausePopup = createPausePopup(closePausePopup, exitToMenu, openSettings)
       }
       container.appendChild(pausePopup.el)
     } else {

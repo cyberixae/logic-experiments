@@ -28,6 +28,13 @@ export const mountSecret = (
     systemsBtn.onclick = () => navigate('system')
     modes.appendChild(systemsBtn)
 
+    // Tutorial lives here (not the main menu) until it's more polished.
+    const tutorialBtn = document.createElement('div')
+    tutorialBtn.setAttribute('class', 'button menu-mode')
+    tutorialBtn.innerHTML = t('tutorial')
+    tutorialBtn.onclick = () => navigate('tutorial')
+    modes.appendChild(tutorialBtn)
+
     panel.appendChild(modes)
 
     const backBtn = document.createElement('div')
