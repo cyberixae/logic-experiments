@@ -276,6 +276,7 @@ export const mountVersus = (
         ctx1,
         isTutorial ? undefined : skipPlayer1,
         isTutorial && beatAt(beatIdx).hideGaze,
+        isTutorial,
       ),
     )
     return half
@@ -301,6 +302,7 @@ export const mountVersus = (
         ctx2,
         isTutorial ? undefined : skipPlayer2,
         isTutorial && beatAt(beatIdx).hideGaze,
+        isTutorial,
       ),
     )
     return half
@@ -998,20 +1000,29 @@ export const mountVersus = (
     const ladder = document.createElement('div')
     ladder.setAttribute('class', 'tutorial-ladder')
     let lastChapter: TutorialBeat['chapter'] | null = null
+    let chapterNo = 0
+    let beatNo = 0
     tutorialCurriculum.forEach((beat, i) => {
       if (beat.chapter !== lastChapter) {
         lastChapter = beat.chapter
+        chapterNo += 1
+        beatNo = 0
         const header = document.createElement('div')
         header.setAttribute('class', 'tutorial-ladder-chapter')
-        header.textContent = t(chapterKey[beat.chapter])
+        header.textContent = `${chapterNo} · ${t(chapterKey[beat.chapter])}`
         ladder.appendChild(header)
       }
+      beatNo += 1
       const row = document.createElement('div')
       row.setAttribute(
         'class',
         'tutorial-ladder-row' + (i === beatIdx ? ' current' : ''),
       )
-      row.textContent = t(beatNameKey[beat.nameId])
+      const number = document.createElement('span')
+      number.setAttribute('class', 'tutorial-ladder-number')
+      number.textContent = `${chapterNo}.${beatNo}`
+      row.appendChild(number)
+      row.appendChild(document.createTextNode(t(beatNameKey[beat.nameId])))
       if (beat.glyphs !== '') {
         const glyphs = document.createElement('span')
         glyphs.setAttribute('class', 'tutorial-ladder-glyphs')

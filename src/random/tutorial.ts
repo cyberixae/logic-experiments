@@ -518,10 +518,13 @@ export const tutorialCurriculum: ReadonlyArray<TutorialBeat> = [
     hideGaze: false,
     generate: () => generateBasicsChallenge('drop'),
   },
+  // No glyphs on the Logic rows: the behavior names are unique there, and
+  // ladder rows should carry symbols only where the name alone is ambiguous
+  // (the two Close beats).
   ...logicNotches.map((notch, i) => ({
     chapter: 'logic' as const,
     nameId: LOGIC_NAME_IDS[i] ?? 'split',
-    glyphs: notch.glyphs,
+    glyphs: '',
     hideGaze: false,
     generate: () => generateSequentChallenge(notch),
   })),

@@ -629,6 +629,7 @@ export const createBench = (
   ctx: BenchCtx = defaultCtx,
   onSkip?: () => void,
   hideGaze?: boolean,
+  hideRulesButton?: boolean,
 ): HTMLElement => {
   const ls = workspace.applicableRules()
   const rules = workspace.availableRules()
@@ -771,7 +772,9 @@ export const createBench = (
 
   const topbarRight = document.createElement('div')
   topbarRight.setAttribute('class', 'bench-topbar-right')
-  if (!solved) {
+  // The rules sheet is a quick reference for rules already learned — the
+  // tutorial hides the toggle so the player doesn't reach for it mid-lesson.
+  if (!solved && hideRulesButton !== true) {
     topbarRight.appendChild(rulesBtn)
   }
   topbar.appendChild(topbarRight)
