@@ -1751,6 +1751,11 @@ html.mode-single:not(.input-pointer) .bench-topbar .bench-zoom {
   gap: 0.8em;
   padding-top: 1em;
 }
+/* Pin the pause button to the column bottom, where Versus has it (there the
+   flexing score rows push it down; the ladder doesn't flex). */
+.versus-thermo-tutorial .versus-menu-btn {
+  margin-top: auto;
+}
 /* Curriculum ladder: the tutorial's roadmap and navigation in one — every
    beat is a clickable row, the current one highlighted, chapters as muted
    headers between groups. */
