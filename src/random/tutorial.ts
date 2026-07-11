@@ -52,8 +52,8 @@ export type Notch = {
 // the tutorial's Input chapter.
 const tutorialRules: ReadonlyArray<RuleId> = rkRules.filter((r) => r !== 'cut')
 
-// A small atom pool keeps generated goals readable; no constants (⊥/⊤ belong to
-// a later chapter, so their symbol weights are 0).
+// A small atom pool keeps generated goals readable; no constants — ⊥/⊤ are
+// the constants beat's material (see constantsNotch), zero-weighted elsewhere.
 const ATOMS: SymbolWeights = {
   p: 3,
   q: 2,
@@ -191,6 +191,35 @@ export const notchAt = (i: number): Notch => {
   return logicNotches[clamped] ?? logicNotches[0]
 }
 
+// Source clamp for the Basics constants beat: like the branching notch but
+// with ⊥/⊤ in the symbol pool and the constant closings featured — the
+// necessity check then guarantees every accepted goal has some branch that
+// can only close by f or v. Constants at the inert polarity (⊥ on the
+// right, ⊤ on the left) contribute nothing to the closure, so they may
+// appear but end up dropped inside the frozen foundation, never at the
+// player's frontier.
+const constantsNotch: Notch = {
+  glyphs: '⊥ ⊤',
+  featured: ['f', 'v'],
+  taught: ['cl', 'dr', 'nl', 'nr', 'ir', 'cr', 'dl', 'f', 'v'],
+  anteConnectives: {
+    conjunction: 1,
+    disjunction: 1,
+    negation: 1,
+    implication: 1,
+  },
+  succConnectives: {
+    conjunction: 1,
+    disjunction: 1,
+    negation: 1,
+    implication: 1,
+  },
+  symbols: { ...ATOMS, falsum: 2, verum: 2 },
+  maxFormulaSize: 2,
+  minAnte: 0,
+  fallback: sequent([prop.disjunction(prop.falsum, P)], [P]),
+}
+
 // Depth cap on the brute search per candidate — tutorial goals are meant to be
 // easy, and a low cap bounds the synchronous work so generation can't hang the
 // UI (implication goals in particular blow up the search at higher depths).
@@ -325,41 +354,58 @@ const needsRotation = (seq: AnySequent): boolean => {
 
 const BASICS_TRIES = 50
 
-// A presolved Basics challenge: a branching-notch challenge (its necessity
+// A leaf that closes by a constant rule: bare `⊥ ⊢` or bare `⊢ ⊤`.
+const isConstantClose = (seq: AnySequent): boolean =>
+  (seq.antecedent.length === 1 &&
+    seq.succedent.length === 0 &&
+    seq.antecedent[0]?.kind === 'falsum') ||
+  (seq.antecedent.length === 0 &&
+    seq.succedent.length === 1 &&
+    seq.succedent[0]?.kind === 'verum')
+
+export type BasicsBeatKind = 'identity' | 'constants' | 'drop'
+
+// A presolved Basics challenge: a branching-notch challenge (the necessity
 // check forces a forking rule into every solution) truncated at a frontier,
 // required to leave several open leaves — one button press should never win
 // instantly, and drops deferred past branch points repeat across branches,
-// which is more practice exactly where it's wanted. Stage 1 (Close): only
-// the closing moves reopen. Stage 2 (Drop): each branch cut above its
-// topmost connective rule; accepted only when the open leaves are all-atomic
-// (which rejects brute solutions not in drop-at-end form) AND at least one
-// leaf actually forces a Drop — otherwise the beat's lesson is dodgeable by
-// closing everything directly — AND at least one leaf forces a rotation, so
-// the distance mechanic (aiming past the keeper costs presses) is
-// guaranteed to be encountered in the beat where Drop is first taught.
-export const generateBasicsChallenge = (stage: 1 | 2): ChallengeResult => {
+// which is more practice exactly where it's wanted. The three beats:
+// - identity: only the closing moves reopen; every leaf is one Close away.
+// - constants: same format, sourced with ⊥/⊤ featured — at least one leaf
+//   is a bare constant closing, so the new winning conditions are
+//   discovered the same way the first one was (the Close button lights up).
+// - drop: each branch cut above its topmost connective rule; accepted only
+//   when the open leaves are all-atomic (rejects brute solutions not in
+//   drop-at-end form) AND at least one leaf forces a Drop (all-identity
+//   frontiers would make the lesson dodgeable) AND at least one leaf forces
+//   a rotation, so the distance mechanic is met where Drop is first taught.
+export const generateBasicsChallenge = (
+  kind: BasicsBeatKind,
+): ChallengeResult => {
+  const source = kind === 'constants' ? constantsNotch : logicNotches[3]
+  const prune = kind === 'drop' ? pruneStructural : pruneClosings
   for (let tries = 0; tries < BASICS_TRIES; tries += 1) {
-    const res = generateSequentChallenge(logicNotches[3])
+    const res = generateSequentChallenge(source)
     const solution = res.challenge.solution
     if (solution === undefined) continue // ChallengeResult types it optional
-    const start =
-      stage === 1 ? pruneClosings(solution) : pruneStructural(solution)
+    const start = prune(solution)
     if (start.kind === 'premise') continue // no frozen foundation at all
     const leaves = frontierLeaves(start)
     if (leaves.length < 2) continue
-    if (stage === 2 && !leaves.every(isAtomic)) continue
-    if (stage === 2 && !leaves.some(needsDrop)) continue
-    if (stage === 2 && !leaves.some(needsRotation)) continue
+    if (kind === 'constants' && !leaves.some(isConstantClose)) continue
+    if (kind === 'drop') {
+      if (!leaves.every(isAtomic)) continue
+      if (!leaves.some(needsDrop)) continue
+      if (!leaves.some(needsRotation)) continue
+    }
     return { ...res, challenge: { ...res.challenge, start } }
   }
-  // Last resort: the branching notch's fixed fallback goal (the disjunction
-  // swap, which forks), truncated the same way.
-  const res = fallbackChallenge(logicNotches[3])
+  // Last resort: the source notch's fixed fallback goal, truncated the same
+  // way (both fallbacks fork: the disjunction swap, and falsum-or-p ⊢ p).
+  const res = fallbackChallenge(source)
   const solution = res.challenge.solution
   if (solution === undefined) return res
-  const start =
-    stage === 1 ? pruneClosings(solution) : pruneStructural(solution)
-  return { ...res, challenge: { ...res.challenge, start } }
+  return { ...res, challenge: { ...res.challenge, start: prune(solution) } }
 }
 
 // --- The curriculum: the tutorial as one addressable, ordered list ------
@@ -398,14 +444,23 @@ export const tutorialCurriculum: ReadonlyArray<TutorialBeat> = [
     nameId: 'close',
     glyphs: '',
     hideGaze: true,
-    generate: () => generateBasicsChallenge(1),
+    generate: () => generateBasicsChallenge('identity'),
+  },
+  {
+    // Same verb as the first beat (the ladder shows "Close ⊥ ⊤"), new
+    // winning conditions — still pure closing, so gaze stays hidden.
+    chapter: 'basics',
+    nameId: 'close',
+    glyphs: '⊥ ⊤',
+    hideGaze: true,
+    generate: () => generateBasicsChallenge('constants'),
   },
   {
     chapter: 'basics',
     nameId: 'drop',
     glyphs: '',
     hideGaze: false,
-    generate: () => generateBasicsChallenge(2),
+    generate: () => generateBasicsChallenge('drop'),
   },
   ...logicNotches.map((notch, i) => ({
     chapter: 'logic' as const,
