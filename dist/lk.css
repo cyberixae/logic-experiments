@@ -1757,6 +1757,10 @@ html.mode-single:not(.input-pointer) .bench-topbar .bench-zoom {
   line-height: 1.4;
   padding: 0 0.4em;
 }
+.versus-thermo-shape {
+  font-size: 0.9em;
+  opacity: 0.75;
+}
 .versus-tutorial-advance {
   align-self: stretch;
   margin: 0 0.4em;

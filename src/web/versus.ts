@@ -989,9 +989,26 @@ export const mountVersus = (
 
     const indicator = document.createElement('div')
     indicator.setAttribute('class', 'versus-thermo-indicator')
-    indicator.textContent = `${t('tutorialLogic')} · ${t('tutorialPart')} ${
+    const partLine = document.createElement('div')
+    partLine.textContent = `${t('tutorialLogic')} · ${t('tutorialPart')} ${
       notch + 1
-    }/${logicNotches.length} · ${notchAt(notch).glyphs}`
+    }/${logicNotches.length}`
+    indicator.appendChild(partLine)
+    // Subchapters are shape-based, so connective glyphs alone collide (parts
+    // 1/4 share ∧∨ and 3/5 share →) — the behavior name disambiguates.
+    const shapeKeys = [
+      'tutorialShape1',
+      'tutorialShape2',
+      'tutorialShape3',
+      'tutorialShape4',
+      'tutorialShape5',
+    ] as const
+    const shapeLine = document.createElement('div')
+    shapeLine.setAttribute('class', 'versus-thermo-shape')
+    shapeLine.textContent = `${t(shapeKeys[notch] ?? 'tutorialShape1')} · ${
+      notchAt(notch).glyphs
+    }`
+    indicator.appendChild(shapeLine)
     thermo.appendChild(indicator)
 
     const atEnd = notch >= logicNotches.length - 1

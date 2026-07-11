@@ -77,6 +77,11 @@ const en = {
   tutorialLogic: 'Logic',
   tutorialPart: 'Part',
   tutorialAdvance: 'Next Section',
+  tutorialShape1: 'Split',
+  tutorialShape2: 'Side flip',
+  tutorialShape3: 'Crossing',
+  tutorialShape4: 'Branching',
+  tutorialShape5: 'Branching crossing',
 } as const
 
 const fi: Record<MessageKey, string> = {
@@ -158,6 +163,11 @@ const fi: Record<MessageKey, string> = {
   tutorialLogic: 'Logiikka',
   tutorialPart: 'Osa',
   tutorialAdvance: 'Seuraava osa',
+  tutorialShape1: 'Halkaisu',
+  tutorialShape2: 'Puolenvaihto',
+  tutorialShape3: 'Ylitys',
+  tutorialShape4: 'Haarautuminen',
+  tutorialShape5: 'Haarautuva ylitys',
 }
 
 const es: Record<MessageKey, string> = {
@@ -239,6 +249,11 @@ const es: Record<MessageKey, string> = {
   tutorialLogic: 'Lógica',
   tutorialPart: 'Parte',
   tutorialAdvance: 'Siguiente sección',
+  tutorialShape1: 'División',
+  tutorialShape2: 'Cambio de lado',
+  tutorialShape3: 'Cruce',
+  tutorialShape4: 'Ramificación',
+  tutorialShape5: 'Cruce con ramas',
 }
 
 const cs: Record<MessageKey, string> = {
@@ -320,6 +335,11 @@ const cs: Record<MessageKey, string> = {
   tutorialLogic: 'Logika',
   tutorialPart: 'Část',
   tutorialAdvance: 'Další část',
+  tutorialShape1: 'Rozdělení',
+  tutorialShape2: 'Změna strany',
+  tutorialShape3: 'Přechod',
+  tutorialShape4: 'Větvení',
+  tutorialShape5: 'Větvený přechod',
 }
 
 const pl: Record<MessageKey, string> = {
@@ -401,6 +421,11 @@ const pl: Record<MessageKey, string> = {
   tutorialLogic: 'Logika',
   tutorialPart: 'Część',
   tutorialAdvance: 'Następna sekcja',
+  tutorialShape1: 'Podział',
+  tutorialShape2: 'Zmiana strony',
+  tutorialShape3: 'Przejście',
+  tutorialShape4: 'Rozgałęzienie',
+  tutorialShape5: 'Rozgałęzione przejście',
 }
 
 type MessageKey = keyof typeof en
