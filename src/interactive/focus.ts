@@ -1,5 +1,6 @@
 import * as array from '../utils/array'
 import {
+  AnyDerivation,
   Derivation,
   Edit,
   editDerivation,
@@ -113,11 +114,23 @@ export const apply = <J extends AnySequent>(
   return cursor
 }
 
-export const undo = <J extends AnySequent>(s: Focus<J>): Focus<J> => {
+// A node is frozen when the presolved `start` derivation already applied a
+// rule there — the player may build above the frontier but never dismantle
+// the foundation below it.
+const isFrozen = (start: AnyDerivation | null, path: Path): boolean =>
+  start !== null && subDerivation(start, path)?.kind === 'transformation'
+
+export const undo = <J extends AnySequent>(
+  s: Focus<J>,
+  start: Derivation<J> | null = null,
+): Focus<J> => {
   const path = activePath(s)
   const current = subDerivation(s.derivation, path)
   if (current?.kind === 'transformation') {
     // Active path points to a closed axiom — undo it directly
+    if (isFrozen(start, path)) {
+      return s
+    }
     const derivation = editDerivation(s.derivation, path, (d) =>
       premise(d.result),
     )
@@ -129,6 +142,9 @@ export const undo = <J extends AnySequent>(s: Focus<J>): Focus<J> => {
   if (array.isNonEmptyArray(path)) {
     // Active path points to an open premise — undo the rule that introduced it
     const parentPath = array.init(path)
+    if (isFrozen(start, parentPath)) {
+      return s
+    }
     const derivation = editDerivation(s.derivation, parentPath, (parent) =>
       premise(parent.result),
     )
@@ -146,13 +162,19 @@ export const undo = <J extends AnySequent>(s: Focus<J>): Focus<J> => {
   return s
 }
 
-export const reset = <J extends AnySequent>(s: Focus<J>): Focus<J> => {
-  return focus(premise(s.derivation.result))
+// Reset returns to the presolved checkpoint when one exists — this is also
+// the tutorial's replay primitive — and to the bare goal otherwise.
+export const reset = <J extends AnySequent>(
+  s: Focus<J>,
+  start: Derivation<J> | null = null,
+): Focus<J> => {
+  return focus(start ?? premise(s.derivation.result))
 }
 
 export const applyEvent = <J extends AnySequent>(
   state: Focus<J>,
   ev: Event,
+  start: Derivation<J> | null = null,
 ): Focus<J> => {
   switch (ev.kind) {
     case 'reverse0': {
@@ -166,10 +188,10 @@ export const applyEvent = <J extends AnySequent>(
       break
     }
     case 'undo':
-      state = undo(state)
+      state = undo(state, start)
       break
     case 'reset':
-      state = reset(state)
+      state = reset(state, start)
       break
     case 'nextBranch':
       state = next(state)

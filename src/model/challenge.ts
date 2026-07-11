@@ -1,4 +1,4 @@
-import { ProofUsing } from './derivation'
+import { Derivation, ProofUsing } from './derivation'
 import { RuleId } from './rule'
 import { AnySequent } from './sequent'
 
@@ -8,6 +8,10 @@ export type Configuration<
 > = {
   goal: J
   rules: S
+  // Presolved opening: a partial derivation of the goal whose open premises
+  // are the player's starting frontier. Undo and Reset floor at this
+  // derivation instead of the bare goal, and its nodes render frozen.
+  start?: Derivation<J>
 }
 export const configuration = <
   J extends AnySequent,

@@ -1,4 +1,4 @@
-import { AnyDerivation, Path } from '../model/derivation'
+import { AnyDerivation, Path, subDerivation } from '../model/derivation'
 import {
   basic,
   fromDerivation,
@@ -53,6 +53,7 @@ export const renderDerivation = (
   gaze: GazeMark | null = null,
   currentPath: Path = [],
   ghostPath: Path | null = null,
+  start: AnyDerivation | null = null,
 ): HTMLElement => {
   // Ghost: nodes strictly deeper than ghostPath are fully ghost-styled.
   // The node AT ghostPath is the "boundary": its sequent keeps active
@@ -69,6 +70,12 @@ export const renderDerivation = (
     isActive && derivation.kind === 'premise' && !isGhostBoundary
   const isClosedActive =
     isActive && derivation.kind === 'transformation' && !isGhostBoundary
+  // Presolved foundation: the node is frozen when `start` already applied a
+  // rule at this path. Each frozen node dims only its own sequent and
+  // inference line (see .tree-frozen) so nested frozen nodes don't compound.
+  const isFrozen =
+    start !== null &&
+    subDerivation(start, currentPath)?.kind === 'transformation'
 
   const node = document.createElement('div')
   const cls =
@@ -76,7 +83,8 @@ export const renderDerivation = (
     (isOpenActive ? ' tree-active' : '') +
     (isClosedActive ? ' tree-closed-active' : '') +
     (isGhostBoundary ? ' tree-active' : '') +
-    (isGhostNode ? ' ghost-node' : '')
+    (isGhostNode ? ' ghost-node' : '') +
+    (isFrozen ? ' tree-frozen' : '')
   node.setAttribute('class', cls)
 
   let leafDepth = 0
@@ -96,6 +104,7 @@ export const renderDerivation = (
         gaze,
         [...currentPath, i],
         ghostPath,
+        start,
       )
       const childDepth = Number(child.dataset['leafDepth'] ?? '0')
       if (childDepth > maxChildDepth) maxChildDepth = childDepth

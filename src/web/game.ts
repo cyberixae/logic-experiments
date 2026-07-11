@@ -364,7 +364,14 @@ const createPlayArea = (
       ghostPath = path
     }
   }
-  const tree = renderDerivation(derivation, path, gaze, [], ghostPath)
+  const tree = renderDerivation(
+    derivation,
+    path,
+    gaze,
+    [],
+    ghostPath,
+    workspace.currentStart() ?? null,
+  )
   const isFresh = focus.derivation.kind === 'premise'
   tree.style.visibility = 'hidden'
   panel.appendChild(tree)

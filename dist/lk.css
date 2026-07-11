@@ -1761,6 +1761,13 @@ html.mode-single:not(.input-pointer) .bench-topbar .bench-zoom {
   font-size: 0.9em;
   opacity: 0.75;
 }
+/* Presolved foundation: the frozen part of the tree the player can't undo.
+   Only the node's own sequent and inference line dim, so nested frozen
+   nodes don't compound their opacity. */
+.tree-frozen > .tree-sequent,
+.tree-frozen > .tree-inference {
+  opacity: 0.45;
+}
 .versus-tutorial-advance {
   align-self: stretch;
   margin: 0 0.4em;

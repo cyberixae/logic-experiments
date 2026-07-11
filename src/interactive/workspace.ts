@@ -53,7 +53,7 @@ export class Workspace<
     if (c) return c
     console.warn(`Conjecture '${this.selected}' not initialized, recovering`)
     const conf = get(this.theorems, this.selected)
-    const f = focus(premise(conf.goal))
+    const f = focus(conf.start ?? premise(conf.goal))
     this.conjectures[this.selected] = f
     return f
   }
@@ -74,6 +74,11 @@ export class Workspace<
     const conf = get(this.theorems, this.selected)
     return isChallenge(conf) ? conf.solution : undefined
   }
+  // The presolved foundation, when the challenge has one: Undo/Reset floor
+  // here and the renderer shows its nodes frozen.
+  currentStart(): AnyDerivation | undefined {
+    return get(this.theorems, this.selected).start
+  }
   pinnedRules(): ReadonlyArray<RuleId> {
     const conf = get(this.theorems, this.selected)
     return isTutorial(conf) ? conf.pinned : []
@@ -86,7 +91,7 @@ export class Workspace<
   selectConjecture(id: K) {
     if (!(id in this.conjectures)) {
       const conf = get(this.theorems, id)
-      this.conjectures[id] = focus(premise(conf.goal))
+      this.conjectures[id] = focus(conf.start ?? premise(conf.goal))
     }
     this.selected = id
   }
@@ -99,7 +104,7 @@ export class Workspace<
   applyEvent(ev: Event) {
     const oldGaze = this.gaze()
     const cursor = this.currentConjecture()
-    const update = applyEvent(cursor, ev)
+    const update = applyEvent(cursor, ev, this.currentStart() ?? null)
     this.conjectures[this.selected] = update
     if (
       ev.kind === 'nextBranch' ||
@@ -125,7 +130,7 @@ export class Workspace<
 
   applyEventWithGaze(ev: Event, nextGaze: Gaze) {
     const cursor = this.currentConjecture()
-    const update = applyEvent(cursor, ev)
+    const update = applyEvent(cursor, ev, this.currentStart() ?? null)
     this.conjectures[this.selected] = update
     this._gaze = nextGaze
   }
