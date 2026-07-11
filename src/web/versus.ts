@@ -1034,13 +1034,6 @@ export const mountVersus = (
     })
     thermo.appendChild(ladder)
 
-    const atEnd = beatIdx >= tutorialCurriculum.length - 1
-    const advanceBtn = createButton(t('tutorialAdvance'), atEnd, () =>
-      jumpToBeat(beatIdx + 1),
-    )
-    advanceBtn.classList.add('versus-tutorial-advance')
-    thermo.appendChild(advanceBtn)
-
     const menuBtn = createButton('⋮', false, () => setPaused(true))
     menuBtn.classList.add('versus-menu-btn')
     menuBtn.setAttribute('aria-label', t('menu'))

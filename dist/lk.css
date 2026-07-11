@@ -1807,15 +1807,6 @@ html.mode-single:not(.input-pointer) .bench-topbar .bench-zoom {
 .tree-frozen > .tree-inference {
   opacity: 0.45;
 }
-.versus-tutorial-advance {
-  align-self: stretch;
-  margin: 0 0.4em;
-  text-align: center;
-  white-space: nowrap;
-  font-size: 0.85em;
-  padding-left: 0.2em;
-  padding-right: 0.2em;
-}
 .versus-half:first-child .rules-sheet {
   right: calc(50% + 2.5em);
 }
