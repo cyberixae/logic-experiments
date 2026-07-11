@@ -990,7 +990,7 @@ export const createBench = (
   } else {
     // Order: Skip · Branch · Gaze — a centered row that wraps group-by-group
     // onto extra lines when they no longer all fit (see .controls in lk.css).
-    if (hideLemma !== true) controlsBar.appendChild(miscGroup)
+    if (onSkip !== undefined) controlsBar.appendChild(miscGroup)
     controlsBar.appendChild(navGroup)
     controlsBar.appendChild(gazeGroup)
   }

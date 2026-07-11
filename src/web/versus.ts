@@ -274,7 +274,9 @@ export const mountVersus = (
         refreshP1,
         undefined,
         onApplyReverse1,
-        undefined,
+        // The tutorial hides Lemma outright (Cut belongs to the Input chapter);
+        // a permanently-disabled button would only draw the learner's eye.
+        isTutorial,
         ctx1,
         skipPlayer1,
       ),
@@ -298,7 +300,7 @@ export const mountVersus = (
         refreshP2,
         undefined,
         onApplyReverse2,
-        undefined,
+        isTutorial,
         ctx2,
         skipPlayer2,
       ),
