@@ -309,6 +309,20 @@ const isAtomic = (seq: AnySequent): boolean =>
 const needsDrop = (seq: AnySequent): boolean =>
   seq.antecedent.length + seq.succedent.length > 2
 
+// Whether solving an atomic leaf forces at least one rotation. Drops always
+// remove the ACTIVE formula (last antecedent / first succedent), so a leaf
+// closes rotation-free exactly when the same atom sits at the first
+// antecedent slot and the last succedent slot — every drop then peels an
+// extra without ever touching the keeper. Any other arrangement makes the
+// player aim past the keeper, which the gaze UI pays for in rotation
+// presses ("far formulas cost more").
+const needsRotation = (seq: AnySequent): boolean => {
+  const keepLeft = seq.antecedent[0]
+  const keepRight = seq.succedent[seq.succedent.length - 1]
+  if (keepLeft === undefined || keepRight === undefined) return false
+  return !prop.equals(keepLeft, keepRight)
+}
+
 const BASICS_TRIES = 50
 
 // A presolved Basics challenge: a branching-notch challenge (its necessity
@@ -320,7 +334,9 @@ const BASICS_TRIES = 50
 // topmost connective rule; accepted only when the open leaves are all-atomic
 // (which rejects brute solutions not in drop-at-end form) AND at least one
 // leaf actually forces a Drop — otherwise the beat's lesson is dodgeable by
-// closing everything directly.
+// closing everything directly — AND at least one leaf forces a rotation, so
+// the distance mechanic (aiming past the keeper costs presses) is
+// guaranteed to be encountered in the beat where Drop is first taught.
 export const generateBasicsChallenge = (stage: 1 | 2): ChallengeResult => {
   for (let tries = 0; tries < BASICS_TRIES; tries += 1) {
     const res = generateSequentChallenge(logicNotches[3])
@@ -333,6 +349,7 @@ export const generateBasicsChallenge = (stage: 1 | 2): ChallengeResult => {
     if (leaves.length < 2) continue
     if (stage === 2 && !leaves.every(isAtomic)) continue
     if (stage === 2 && !leaves.some(needsDrop)) continue
+    if (stage === 2 && !leaves.some(needsRotation)) continue
     return { ...res, challenge: { ...res.challenge, start } }
   }
   // Last resort: the branching notch's fixed fallback goal (the disjunction
