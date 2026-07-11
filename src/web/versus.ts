@@ -279,7 +279,7 @@ export const mountVersus = (
         // a permanently-disabled button would only draw the learner's eye.
         isTutorial,
         ctx1,
-        skipPlayer1,
+        isTutorial ? undefined : skipPlayer1,
       ),
     )
     return half
@@ -303,7 +303,7 @@ export const mountVersus = (
         onApplyReverse2,
         isTutorial,
         ctx2,
-        skipPlayer2,
+        isTutorial ? undefined : skipPlayer2,
       ),
     )
     return half
@@ -877,13 +877,10 @@ export const mountVersus = (
 
   const skipPlayer1 = () => {
     if (gameOver) return
-    if (isTutorial) {
-      // Skip = draw another random challenge at the same subchapter.
-      advancePlayer1()
-      rerenderHalf1()
-      rebuildThermo()
-      return
-    }
+    // No Skip in the tutorial: every goal is solvable and the give-up verb is
+    // taught in the Input chapter; between-subchapter motion is the Next
+    // Section button. (Also guards the keyboard/gamepad skip bindings.)
+    if (isTutorial) return
     const challengeIdx = wsIdx1
     resolved1.set(challengeIdx, 'skip')
 
@@ -908,13 +905,7 @@ export const mountVersus = (
   }
   const skipPlayer2 = () => {
     if (gameOver) return
-    if (isTutorial) {
-      // Skip = draw another random challenge at the same subchapter.
-      advancePlayer2()
-      rerenderHalf2()
-      rebuildThermo()
-      return
-    }
+    if (isTutorial) return
     const challengeIdx = wsIdx2
     resolved2.set(challengeIdx, 'skip')
 
