@@ -27,7 +27,12 @@ import { basic, fromSequent } from '../render/print'
 import { html } from '../render/segment'
 import { MountResult, Navigate } from './types'
 import { MessageKey, t } from './i18n'
-import { VersusConfig } from './versus-config'
+import {
+  inputLabel,
+  isInputAvailable,
+  PlayerInput,
+  VersusConfig,
+} from './versus-config'
 import { beatAt, tutorialCurriculum, TutorialBeat } from '../random/tutorial'
 
 const formatTime = (s: number): string => {
@@ -40,6 +45,11 @@ const totalMoves = (ws: AnyWorkspace): number => {
   const counts = countRuleUsage(ws.currentConjecture().derivation)
   return Object.values(counts).reduce((a, b) => a + b, 0)
 }
+
+// One-shot flag: cycling an input in the tutorial's pause menu remounts the
+// arena, which would land unpaused — set this before the remount so the menu
+// reopens and multi-step cycling doesn't need reopening by hand.
+let reopenPauseMenu = false
 
 // Build a formula-editor shroud scoped to one half of the versus screen.
 // The shroud is appended to document.body so it survives rerenders triggered
@@ -193,6 +203,10 @@ export const mountVersus = (
   let timeLeft = versusConfig.gameDurationSeconds
   let gameOver = false
   let paused = false
+  if (isTutorial && reopenPauseMenu) {
+    reopenPauseMenu = false
+    paused = true
+  }
   let pauseMenu: {
     el: HTMLElement
     onAction: (action: Action) => void
@@ -477,8 +491,26 @@ export const mountVersus = (
       cells.push({ btn: el, activate })
     }
     addButton(t('resumeGame'), () => setPaused(false))
-    addButton(t('playAgain'), () => navigate('versus'))
-    addButton(t('matchSetup'), () => navigate('versus-config'))
+    if (isTutorial) {
+      // The tutorial owns its pause menu: input-method cyclers instead of
+      // Versus's Play Again / Match Setup, which would launch a real match.
+      // Cycling remounts the tutorial at the current beat via URL params.
+      addButton(`${t('player1')}: ${inputLabel(versusConfig.p1Input)}`, () =>
+        applyTutorialInputs(
+          nextHumanInput(versusConfig.p1Input, versusConfig.p2Input),
+          versusConfig.p2Input,
+        ),
+      )
+      addButton(`${t('player2')}: ${inputLabel(versusConfig.p2Input)}`, () =>
+        applyTutorialInputs(
+          versusConfig.p1Input,
+          nextHumanInput(versusConfig.p2Input, versusConfig.p1Input),
+        ),
+      )
+    } else {
+      addButton(t('playAgain'), () => navigate('versus'))
+      addButton(t('matchSetup'), () => navigate('versus-config'))
+    }
     addButton(t('exitToMainMenu'), () => navigate('menu'))
 
     panel.appendChild(buttons)
@@ -487,6 +519,42 @@ export const mountVersus = (
 
     const cursor = createButtonCursor(cells.map((c) => [c]))
     return { el: shroud, onAction: cursor.onAction }
+  }
+
+  // Tutorial input cycling: step to the next connected human input device,
+  // skipping the other player's device (two mice are fine — each half has its
+  // own buttons — but a shared keyboard or gamepad would double-drive).
+  const HUMAN_INPUTS: ReadonlyArray<PlayerInput> = [
+    'mouse',
+    'keyboard',
+    'gamepad1',
+    'gamepad2',
+  ]
+  const nextHumanInput = (
+    current: PlayerInput,
+    other: PlayerInput,
+  ): PlayerInput => {
+    const start = HUMAN_INPUTS.indexOf(current)
+    for (let step = 1; step <= HUMAN_INPUTS.length; step += 1) {
+      const candidate = HUMAN_INPUTS[(start + step) % HUMAN_INPUTS.length]
+      if (candidate === undefined) continue
+      if (!isInputAvailable(candidate)) continue
+      if (candidate === other && candidate !== 'mouse') continue
+      return candidate
+    }
+    return current
+  }
+  // Remount the tutorial with the chosen inputs, staying on the current beat.
+  // The state lives in URL params (shareable WoZ setup links); navigate's
+  // tutorial carry-list preserves them through the remount.
+  const applyTutorialInputs = (p1: PlayerInput, p2: PlayerInput) => {
+    const params = new URLSearchParams(window.location.search)
+    params.set('tutorial_beat', String(beatIdx))
+    params.set('tutorial_p1', p1)
+    params.set('tutorial_p2', p2)
+    history.replaceState(history.state, '', `?${params.toString()}`)
+    reopenPauseMenu = true
+    navigate('tutorial')
   }
 
   // rerender is defined before solvePlayer* so they can reference it

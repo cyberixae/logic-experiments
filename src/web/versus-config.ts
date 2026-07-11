@@ -116,7 +116,7 @@ export const setVersusConfigParams = (
   setNpcKnobsParams(config.npc2Knobs, params, 'npc2_')
 }
 
-const inputLabel = (input: PlayerInput): string => {
+export const inputLabel = (input: PlayerInput): string => {
   if (input === 'mouse') return t('mouse')
   if (input === 'keyboard') return t('keyboard')
   if (input === 'gamepad1') return t('gamepad1')
@@ -135,7 +135,7 @@ const inputEmoji = (input: PlayerInput): string => {
 const connectedGamepadCount = (): number =>
   Array.from(navigator.getGamepads()).filter((gp) => gp !== null).length
 
-const isInputAvailable = (input: PlayerInput): boolean => {
+export const isInputAvailable = (input: PlayerInput): boolean => {
   if (input === 'mouse' || input === 'keyboard' || input === 'npc') return true
   const needed = input === 'gamepad1' ? 1 : 2
   return connectedGamepadCount() >= needed

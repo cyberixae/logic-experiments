@@ -14,6 +14,7 @@ import {
   mountVersusConfig,
   parseVersusConfigFromParams,
   setVersusConfigParams,
+  PlayerInput,
 } from './web/versus-config'
 import {
   mountRandomConfig,
@@ -39,6 +40,24 @@ let current: MountResult = { cleanup: () => {}, rerender: () => {} }
 
 const enterMode = (mode: GameMode) => {
   session.enter(mode, factory[mode]())
+}
+
+// The tutorial's inputs come from URL params (no NPC — the tutor is a human
+// until the NPC-tutor era).
+const pickHumanInput = (
+  params: URLSearchParams,
+  key: string,
+  fallback: PlayerInput,
+): PlayerInput => {
+  const raw = params.get(key)
+  if (
+    raw === 'mouse' ||
+    raw === 'keyboard' ||
+    raw === 'gamepad1' ||
+    raw === 'gamepad2'
+  )
+    return raw
+  return fallback
 }
 
 const navigate = (screen: Screen) => {
@@ -90,6 +109,12 @@ const navigate = (screen: Screen) => {
         if (val !== null) nextParams.set(key, val)
       }
     }
+    if (screen === 'tutorial') {
+      for (const key of ['tutorial_beat', 'tutorial_p1', 'tutorial_p2']) {
+        const val = currentParams.get(key)
+        if (val !== null) nextParams.set(key, val)
+      }
+    }
     url = `?${nextParams.toString()}`
   }
   history.pushState({ screen }, '', url)
@@ -130,7 +155,14 @@ const mount = (screen: Screen) => {
       const params = new URLSearchParams(window.location.search)
       const raw = parseInt(params.get('tutorial_beat') ?? '0', 10)
       const beat = Number.isFinite(raw) ? raw : 0
-      current = mountTutorial(body, navigate, pool, beat)
+      current = mountTutorial(
+        body,
+        navigate,
+        pool,
+        beat,
+        pickHumanInput(params, 'tutorial_p1', 'mouse'),
+        pickHumanInput(params, 'tutorial_p2', 'keyboard'),
+      )
       break
     }
     case 'versus-config':
