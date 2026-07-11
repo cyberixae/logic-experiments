@@ -38,13 +38,22 @@ export const cursorNavActions: ReadonlySet<Action> = new Set<Action>([
 // the focused button.
 export const createButtonCursor = (
   rows: ReadonlyArray<ReadonlyArray<CursorCell>>,
+  opts: {
+    // Where the cursor appears when first revealed (default: first cell).
+    startRow?: number
+    startCol?: number
+    // When the start cell is the screen's implicit default selection, the
+    // hidden cursor is conceptually already ON it — so the revealing press
+    // should also move, not be swallowed.
+    moveOnReveal?: boolean
+  } = {},
 ): {
   onAction: (action: Action) => void
   refresh: () => void
   isEngaged: () => boolean
 } => {
-  let row = 0
-  let col = 0
+  let row = opts.startRow ?? 0
+  let col = opts.startCol ?? 0
   let visible = false
 
   const refresh = (): void => {
@@ -58,15 +67,16 @@ export const createButtonCursor = (
   const reveal = (): boolean => {
     if (visible) return false
     visible = true
-    row = 0
-    col = 0
+    row = opts.startRow ?? 0
+    col = opts.startCol ?? 0
     refresh()
     return true
   }
 
   const move = (dRow: number, dCol: number): void => {
-    // The first navigation action only reveals the cursor at a sensible start.
-    if (reveal()) return
+    // The first navigation action reveals the cursor at its start cell and,
+    // unless moveOnReveal is set, is consumed by the reveal.
+    if (reveal() && opts.moveOnReveal !== true) return
     row = clamp(row + dRow, 0, rows.length - 1)
     const r = rows[row]
     if (r !== undefined) col = clamp(col + dCol, 0, r.length - 1)

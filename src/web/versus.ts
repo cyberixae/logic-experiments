@@ -20,7 +20,7 @@ import {
   subscribeGamepad,
 } from './game'
 import { createLangSwitcher } from './lang-switcher'
-import { createButtonCursor } from './button-cursor'
+import { createButtonCursor, cursorNavActions } from './button-cursor'
 import type { CursorCell } from './button-cursor'
 import { createFormulaEditor } from './formula-editor'
 import { basic, fromSequent } from '../render/print'
@@ -1062,8 +1062,19 @@ export const mountVersus = (
     rebuildThermo()
   }
 
+  // The latest solved-screen button cursor per half, captured when the
+  // congrats is built so the post-solve dispatch can drive it.
+  type SolvedCursor = {
+    onAction: (action: Action) => void
+    isEngaged: () => boolean
+  }
+  let congrats1: SolvedCursor | null = null
+  let congrats2: SolvedCursor | null = null
+
   // Post-solve: only the Continue action (axiom) advances; menu navigates away;
   // every other mapped key replays this player's animation on their own half.
+  // (Cursor navigation over the solved-screen buttons is intercepted before
+  // the base dispatch — see makeCursorDispatch.)
   const onSolved1 = (action: Action) => {
     if (gameOver) return
     if (action === 'menu') {
@@ -1140,47 +1151,118 @@ export const mountVersus = (
   // actions must be inert too — checked per dispatch since the beat changes
   // at runtime.
   const gazeBlocked = () => isTutorial && beatAt(beatIdx).hideGaze
-  const dispatch1 = createDispatch(
+  // On the solved screen, arrow / D-pad actions drive the congrats button
+  // cursor and axiom activates the focused button once engaged — mirroring
+  // the other completion screens. This must run BEFORE createDispatch, whose
+  // gaze handling (and the tutorial's gaze block) would swallow the arrows.
+  const makeCursorDispatch =
+    (
+      base: (action: Action) => void,
+      getWs: () => AnyWorkspace,
+      getCursor: () => SolvedCursor | null,
+    ) =>
+    (action: Action): void => {
+      const cursor = getCursor()
+      if (getWs().isSolved() && cursor !== null) {
+        if (cursorNavActions.has(action)) {
+          cursor.onAction(action)
+          return
+        }
+        if (action === 'axiom' && cursor.isEngaged()) {
+          cursor.onAction('axiom')
+          return
+        }
+      }
+      base(action)
+    }
+  const dispatch1 = makeCursorDispatch(
+    createDispatch(
+      () => ws1,
+      refreshP1,
+      navigate,
+      onSolved1,
+      undefined,
+      undefined,
+      onApplyReverse1,
+      ctx1,
+      undefined,
+      gazeBlocked,
+    ),
     () => ws1,
-    refreshP1,
-    navigate,
-    onSolved1,
-    undefined,
-    undefined,
-    onApplyReverse1,
-    ctx1,
-    undefined,
-    gazeBlocked,
+    () => congrats1,
   )
-  const dispatch2 = createDispatch(
+  const dispatch2 = makeCursorDispatch(
+    createDispatch(
+      () => ws2,
+      refreshP2,
+      navigate,
+      onSolved2,
+      undefined,
+      undefined,
+      onApplyReverse2,
+      ctx2,
+      undefined,
+      gazeBlocked,
+    ),
     () => ws2,
-    refreshP2,
-    navigate,
-    onSolved2,
-    undefined,
-    undefined,
-    onApplyReverse2,
-    ctx2,
-    undefined,
-    gazeBlocked,
+    () => congrats2,
   )
 
-  const makeCongratsP1 = () => {
-    const hurray = document.createElement('div')
-    const buttons = document.createElement('div')
-    buttons.appendChild(
-      createButton(t('continue'), false, () => dispatch1('axiom')),
-    )
-    return { hurray, buttons }
-  }
-  const makeCongratsP2 = () => {
-    const hurray = document.createElement('div')
-    const buttons = document.createElement('div')
-    buttons.appendChild(
-      createButton(t('continue'), false, () => dispatch2('axiom')),
-    )
-    return { hurray, buttons }
-  }
+  // In the tutorial the solved screen is also a navigation moment: Continue
+  // stays in the current section (fresh challenge), flanked by section jumps
+  // so the natural "I've got this" step forward happens right where the win
+  // lands, without reaching for the ladder. The buttons form one cursor row
+  // (registered via setCursor) so keyboard / gamepad players can pick them
+  // like on the other completion screens.
+  const makeCongrats =
+    (onContinue: () => void, setCursor: (cursor: SolvedCursor) => void) =>
+    () => {
+      const hurray = document.createElement('div')
+      const buttons = document.createElement('div')
+      const cells: CursorCell[] = []
+      const add = (
+        label: string,
+        disabled: boolean,
+        activate: () => void,
+      ): void => {
+        const el = createButton(label, disabled, activate)
+        buttons.appendChild(el)
+        cells.push({ btn: el, activate, isEnabled: () => !disabled })
+      }
+      if (isTutorial) {
+        add(t('tutorialPrevious'), beatIdx <= 0, () => jumpToBeat(beatIdx - 1))
+      }
+      add(isTutorial ? t('tutorialOneMore') : t('continue'), false, onContinue)
+      if (isTutorial) {
+        add(
+          t('tutorialAdvance'),
+          beatIdx >= tutorialCurriculum.length - 1,
+          () => jumpToBeat(beatIdx + 1),
+        )
+      }
+      // Continue is the screen's default (an unengaged axiom presses it), so
+      // the cursor starts there and the first arrow moves immediately —
+      // one press right lands on Next Section, not on a swallowed reveal.
+      const continueCol = isTutorial ? 1 : 0
+      const cursor = createButtonCursor([cells], {
+        startCol: continueCol,
+        moveOnReveal: true,
+      })
+      setCursor({ onAction: cursor.onAction, isEngaged: cursor.isEngaged })
+      return { hurray, buttons }
+    }
+  const makeCongratsP1 = makeCongrats(
+    () => solvePlayer1(),
+    (c) => {
+      congrats1 = c
+    },
+  )
+  const makeCongratsP2 = makeCongrats(
+    () => solvePlayer2(),
+    (c) => {
+      congrats2 = c
+    },
+  )
 
   // Only patch the timer text each tick — a full rerender would destroy the DOM
   // mid-animation and prevent the solved zoom + proof-check sweep from completing.
