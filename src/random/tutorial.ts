@@ -365,12 +365,63 @@ const isConstantClose = (seq: AnySequent): boolean =>
 
 export type BasicsBeatKind = 'identity' | 'constants' | 'drop'
 
+// A leaf whose identity close matches a compound formula, not a bare atom.
+const isCompositeClose = (seq: AnySequent): boolean =>
+  seq.antecedent.some((f) => f.kind !== 'atom')
+
+// Mined goals rarely place a compound matched pair inside a forced branch —
+// the source notch's necessity check rejects pairs that offer a branch-free
+// close — so half the identity candidates come from a template family whose
+// fork is necessary and whose branch closes ARE the pair: [A, B] ⊢ A∧B and
+// its mirror A∨B ⊢ [A, B], with one of A/B always compound. No implication
+// inside the pair, so the goal's closure stays inside the source's taught
+// set. The depth cap makes brute close the compound whole (the destructing
+// proof is deeper), which is exactly the exemplar the beat wants.
+const TEMPLATE_WEIGHTS: ConnectiveWeights = {
+  negation: 1,
+  implication: 0,
+  conjunction: 1,
+  disjunction: 1,
+}
+
+const templateFormula = (notch: Notch, compound: boolean): prop.Prop => {
+  for (;;) {
+    // The free slot leans atomic so the guaranteed compound stays the
+    // variation, not the norm — most closes in the beat remain bare atoms.
+    const size = compound
+      ? Math.floor(Math.random() * notch.maxFormulaSize) + 1
+      : Math.random() < 0.8
+        ? 0
+        : Math.floor(Math.random() * notch.maxFormulaSize) + 1
+    const f = prop.randomWeighted(size, TEMPLATE_WEIGHTS, notch.symbols)()
+    if (!compound || f.kind !== 'atom') return f
+  }
+}
+
+const identityTemplate = (notch: Notch): ChallengeResult | null => {
+  const compound = templateFormula(notch, true)
+  const other = templateFormula(notch, false)
+  const [a, b] = Math.random() < 0.5 ? [compound, other] : [other, compound]
+  const goal =
+    Math.random() < 0.5
+      ? sequent([a, b], [prop.conjunction(a, b)])
+      : sequent([prop.disjunction(a, b)], [a, b])
+  const closure = reachableRules(goal)
+  if (!closure.every((r) => logicNotches[3].taught.includes(r))) return null
+  const [solution] = bruteLimit({ goal, rules: tutorialRules }, MAX_LIMIT)
+  return solution === undefined ? null : asResult(solution, 1)
+}
+
 // A presolved Basics challenge: a branching-notch challenge (the necessity
 // check forces a forking rule into every solution) truncated at a frontier,
 // required to leave several open leaves — one button press should never win
 // instantly, and drops deferred past branch points repeat across branches,
 // which is more practice exactly where it's wanted. The three beats:
-// - identity: only the closing moves reopen; every leaf is one Close away.
+// - identity: only the closing moves reopen; every leaf is one Close away,
+//   and at least one leaf matches a COMPOUND pair — the winning condition
+//   is "the sides match" over arbitrary formulas, so exemplars must vary
+//   formula complexity or the player induces the narrower "matching
+//   letters win" (and later destructs matches needlessly).
 // - constants: same format, sourced with ⊥/⊤ featured — at least one leaf
 //   is a bare constant closing, so the new winning conditions are
 //   discovered the same way the first one was (the Close button lights up).
@@ -385,13 +436,18 @@ export const generateBasicsChallenge = (
   const source = kind === 'constants' ? constantsNotch : logicNotches[3]
   const prune = kind === 'drop' ? pruneStructural : pruneClosings
   for (let tries = 0; tries < BASICS_TRIES; tries += 1) {
-    const res = generateSequentChallenge(source)
+    const res =
+      kind === 'identity' && Math.random() < 0.5
+        ? identityTemplate(source)
+        : generateSequentChallenge(source)
+    if (res === null) continue
     const solution = res.challenge.solution
     if (solution === undefined) continue // ChallengeResult types it optional
     const start = prune(solution)
     if (start.kind === 'premise') continue // no frozen foundation at all
     const leaves = frontierLeaves(start)
     if (leaves.length < 2) continue
+    if (kind === 'identity' && !leaves.some(isCompositeClose)) continue
     if (kind === 'constants' && !leaves.some(isConstantClose)) continue
     if (kind === 'drop') {
       if (!leaves.every(isAtomic)) continue
