@@ -1,5 +1,10 @@
 import { RuleId } from '../model/rule'
-import { applyEvent, activeSequent, focus } from '../interactive/focus'
+import {
+  applyEvent,
+  activeSequent,
+  canUndo as canUndoFocus,
+  focus,
+} from '../interactive/focus'
 import { Event } from '../interactive/event'
 import { isProof, premise } from '../model/derivation'
 import { head, isNonEmptyArray, last, NonEmptyArray } from '../utils/array'
@@ -78,6 +83,11 @@ export class Workspace<
   // here and the renderer shows its nodes frozen.
   currentStart(): AnyDerivation | undefined {
     return get(this.theorems, this.selected).start
+  }
+  // Whether undo would change anything (false at the bare goal and at a
+  // presolved floor) — for honest Undo-button rendering.
+  canUndo(): boolean {
+    return canUndoFocus(this.currentConjecture(), this.currentStart() ?? null)
   }
   pinnedRules(): ReadonlyArray<RuleId> {
     const conf = get(this.theorems, this.selected)

@@ -1,5 +1,4 @@
 import { reset } from '../interactive/event'
-import { activePath } from '../interactive/focus'
 import { Session } from '../interactive/session'
 import { isChallenge, Configuration } from '../model/challenge'
 import { AnyDerivation } from '../model/derivation'
@@ -115,7 +114,7 @@ const createControls = (
   showLevelButton: boolean,
   onLevel: () => void,
 ): HTMLElement => {
-  const canUndo = activePath(ws.currentConjecture()).length > 0
+  const canUndo = ws.canUndo()
   const undoEnabled = canUndo || isGazeModeActive()
   const panel = document.createElement('div')
   panel.setAttribute('class', 'controls')

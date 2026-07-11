@@ -120,6 +120,24 @@ export const apply = <J extends AnySequent>(
 const isFrozen = (start: AnyDerivation | null, path: Path): boolean =>
   start !== null && subDerivation(start, path)?.kind === 'transformation'
 
+// Whether undo would actually change anything — mirrors undo()'s guards, so
+// UI can render the button honestly (disabled at the bare goal AND at a
+// presolved floor).
+export const canUndo = <J extends AnySequent>(
+  s: Focus<J>,
+  start: Derivation<J> | null = null,
+): boolean => {
+  const path = activePath(s)
+  const current = subDerivation(s.derivation, path)
+  if (current?.kind === 'transformation') {
+    return !isFrozen(start, path)
+  }
+  if (array.isNonEmptyArray(path)) {
+    return !isFrozen(start, array.init(path))
+  }
+  return false
+}
+
 export const undo = <J extends AnySequent>(
   s: Focus<J>,
   start: Derivation<J> | null = null,

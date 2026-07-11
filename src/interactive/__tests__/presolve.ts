@@ -64,6 +64,15 @@ describe('presolved challenges', () => {
     )
   })
 
+  it('reports canUndo honestly at the floor and above it', () => {
+    const { ws } = makeWorkspace()
+    expect(ws.canUndo()).toBe(false) // at the presolved floor
+    ws.applyEvent(reverse0('swl'))
+    expect(ws.canUndo()).toBe(true) // the player's own move can go back
+    ws.applyEvent(undo())
+    expect(ws.canUndo()).toBe(false) // back at the floor
+  })
+
   it('remains solvable above the frontier', () => {
     const { ws } = makeWorkspace()
     ws.applyEvent(reverse0('swl'))

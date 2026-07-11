@@ -1,5 +1,4 @@
 import { reset } from '../interactive/event'
-import { activePath } from '../interactive/focus'
 import { Session } from '../interactive/session'
 import { Action } from '../interactive/action'
 import {
@@ -32,7 +31,7 @@ const createControls = (
   rerender: () => void,
 ): HTMLElement => {
   const ws = getWorkspace()
-  const canUndo = activePath(ws.currentConjecture()).length > 0
+  const canUndo = ws.canUndo()
   const undoEnabled = canUndo || isGazeModeActive()
   const panel = document.createElement('div')
   panel.setAttribute('class', 'controls')

@@ -1,5 +1,4 @@
 import { undo } from '../interactive/event'
-import { activePath } from '../interactive/focus'
 import { Workspace } from '../interactive/workspace'
 import { Action } from '../interactive/action'
 import type { Prop } from '../model/prop'
@@ -240,7 +239,7 @@ export const mountVersus = (
   ): HTMLElement => {
     const el = document.createElement('div')
     el.setAttribute('class', 'controls')
-    const canUndo = activePath(ws.currentConjecture()).length > 0
+    const canUndo = ws.canUndo()
     const enabled = canUndo || ctx.isGazeModeActive()
     const undoBtn = createButton(t('undo'), !enabled, () => {
       if (canUndo) {
