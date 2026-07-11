@@ -128,9 +128,9 @@ const mount = (screen: Screen) => {
     }
     case 'tutorial': {
       const params = new URLSearchParams(window.location.search)
-      const raw = parseInt(params.get('tutorial_notch') ?? '0', 10)
-      const notch = Number.isFinite(raw) ? raw : 0
-      current = mountTutorial(body, navigate, pool, notch)
+      const raw = parseInt(params.get('tutorial_beat') ?? '0', 10)
+      const beat = Number.isFinite(raw) ? raw : 0
+      current = mountTutorial(body, navigate, pool, beat)
       break
     }
     case 'versus-config':

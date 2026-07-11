@@ -26,13 +26,9 @@ import { createFormulaEditor } from './formula-editor'
 import { basic, fromSequent } from '../render/print'
 import { html } from '../render/segment'
 import { MountResult, Navigate } from './types'
-import { t } from './i18n'
+import { MessageKey, t } from './i18n'
 import { VersusConfig } from './versus-config'
-import {
-  logicNotches,
-  notchAt,
-  generateSequentChallenge,
-} from '../random/tutorial'
+import { beatAt, tutorialCurriculum, TutorialBeat } from '../random/tutorial'
 
 const formatTime = (s: number): string => {
   const m = Math.floor(s / 60)
@@ -99,16 +95,16 @@ export const mountVersus = (
   container.appendChild(root)
 
   // Tutorial flavor: when present, the arena runs untimed and sources clamped
-  // Logic-chapter practice challenges from the current notch (generated on the
+  // practice challenges from the current curriculum beat (generated on the
   // spot) instead of the pool. The clamp is purely generative — untaught rules
   // are never applicable because goals only contain taught connectives and
   // backward play only decomposes (Cut, the exception, is hidden until the
   // Input chapter). Non-tutorial Versus is unchanged.
   const isTutorial = versusConfig.tutorial !== undefined
   const untimed = isTutorial
-  let notch = versusConfig.tutorial?.startNotch ?? 0
+  let beatIdx = versusConfig.tutorial?.startBeat ?? 0
   const takeChallenge = (): ChallengeResult =>
-    isTutorial ? generateSequentChallenge(notchAt(notch)) : pool.take()
+    isTutorial ? beatAt(beatIdx).generate() : pool.take()
 
   // Shared challenge list — same challenges in same order for both players
   const sharedChallenges: ChallengeResult[] = []
@@ -949,12 +945,13 @@ export const mountVersus = (
     thermoEl.replaceWith(fresh)
     thermoEl = fresh
   }
-  // Advance the tutorial to the next subchapter: widen the connective clamp and
-  // re-root BOTH players onto a fresh challenge generated under the new notch,
-  // dropping anything buffered under the old clamp.
-  const advanceSubchapter = () => {
-    if (notch >= logicNotches.length - 1) return
-    notch += 1
+  // Jump the tutorial to a curriculum beat (forward or back): switch the
+  // clamp and re-root BOTH players onto a fresh challenge generated under the
+  // new beat, dropping anything buffered under the old one.
+  const jumpToBeat = (target: number) => {
+    const clamped = Math.max(0, Math.min(target, tutorialCurriculum.length - 1))
+    if (clamped === beatIdx) return
+    beatIdx = clamped
     const fresh = Math.max(index1, index2, wsIdx1 + 1, wsIdx2 + 1)
     sharedChallenges.splice(fresh)
     pending1 = []
@@ -971,39 +968,59 @@ export const mountVersus = (
     rerenderHalf2()
     rebuildThermo()
   }
-  // Tutorial scoreboard replacement: a plain subchapter indicator + the advance
-  // control + the shared pause button. No clock, rows, or scores (not a race).
+  // Beat rows name the behavior, never the schema; Basics rows reuse the
+  // exact words on the buttons they teach (Close, Drop).
+  const beatNameKey: Record<TutorialBeat['nameId'], MessageKey> = {
+    close: 'axiom',
+    drop: 'drop',
+    split: 'tutorialShape1',
+    sideFlip: 'tutorialShape2',
+    crossing: 'tutorialShape3',
+    branching: 'tutorialShape4',
+    branchingCrossing: 'tutorialShape5',
+  }
+  const chapterKey: Record<TutorialBeat['chapter'], MessageKey> = {
+    basics: 'tutorialBasics',
+    logic: 'tutorialLogic',
+  }
+  // Tutorial scoreboard replacement: the curriculum ladder (every beat a
+  // clickable row, current highlighted, chapter headers between groups), the
+  // forward control, and the shared pause button. No clock or scores.
   const buildTutorialThermo = (): HTMLElement => {
     const thermo = document.createElement('div')
     thermo.setAttribute('class', 'versus-thermo versus-thermo-tutorial')
 
-    const indicator = document.createElement('div')
-    indicator.setAttribute('class', 'versus-thermo-indicator')
-    const partLine = document.createElement('div')
-    partLine.textContent = `${t('tutorialLogic')} · ${t('tutorialPart')} ${
-      notch + 1
-    }/${logicNotches.length}`
-    indicator.appendChild(partLine)
-    // Subchapters are shape-based, so connective glyphs alone collide (parts
-    // 1/4 share ∧∨ and 3/5 share →) — the behavior name disambiguates.
-    const shapeKeys = [
-      'tutorialShape1',
-      'tutorialShape2',
-      'tutorialShape3',
-      'tutorialShape4',
-      'tutorialShape5',
-    ] as const
-    const shapeLine = document.createElement('div')
-    shapeLine.setAttribute('class', 'versus-thermo-shape')
-    shapeLine.textContent = `${t(shapeKeys[notch] ?? 'tutorialShape1')} · ${
-      notchAt(notch).glyphs
-    }`
-    indicator.appendChild(shapeLine)
-    thermo.appendChild(indicator)
+    const ladder = document.createElement('div')
+    ladder.setAttribute('class', 'tutorial-ladder')
+    let lastChapter: TutorialBeat['chapter'] | null = null
+    tutorialCurriculum.forEach((beat, i) => {
+      if (beat.chapter !== lastChapter) {
+        lastChapter = beat.chapter
+        const header = document.createElement('div')
+        header.setAttribute('class', 'tutorial-ladder-chapter')
+        header.textContent = t(chapterKey[beat.chapter])
+        ladder.appendChild(header)
+      }
+      const row = document.createElement('div')
+      row.setAttribute(
+        'class',
+        'tutorial-ladder-row' + (i === beatIdx ? ' current' : ''),
+      )
+      row.textContent = t(beatNameKey[beat.nameId])
+      if (beat.glyphs !== '') {
+        const glyphs = document.createElement('span')
+        glyphs.setAttribute('class', 'tutorial-ladder-glyphs')
+        glyphs.textContent = beat.glyphs
+        row.appendChild(glyphs)
+      }
+      row.onclick = () => jumpToBeat(i)
+      ladder.appendChild(row)
+    })
+    thermo.appendChild(ladder)
 
-    const atEnd = notch >= logicNotches.length - 1
+    const atEnd = beatIdx >= tutorialCurriculum.length - 1
     const advanceBtn = createButton(t('tutorialAdvance'), atEnd, () =>
-      advanceSubchapter(),
+      jumpToBeat(beatIdx + 1),
     )
     advanceBtn.classList.add('versus-tutorial-advance')
     thermo.appendChild(advanceBtn)

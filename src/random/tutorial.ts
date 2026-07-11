@@ -5,8 +5,14 @@ import {
   isTautology as isValidSequent,
 } from '../model/sequent'
 import { RuleId } from '../model/rule'
-import { ProofUsing } from '../model/derivation'
+import {
+  AnyDerivation,
+  ProofUsing,
+  openBranches,
+  subDerivation,
+} from '../model/derivation'
 import { reachableRules } from '../model/closure'
+import { pruneClosings, pruneStructural } from '../model/presolve'
 import { brute, bruteLimit } from '../solver/brute'
 import { rules as rkRules } from '../systems/rk'
 import { countNonStructural } from './challenge'
@@ -285,4 +291,113 @@ export const generateSequentChallenge = (notch: Notch): ChallengeResult => {
     return asResult(solution, tries + 1)
   }
   return fallbackChallenge(notch)
+}
+
+// --- Basics chapter: presolved challenges -------------------------------
+
+const frontierLeaves = (start: AnyDerivation): ReadonlyArray<AnySequent> =>
+  openBranches(start).flatMap((path) => {
+    const node = subDerivation(start, path)
+    return node === null ? [] : [node.result]
+  })
+
+const isAtomic = (seq: AnySequent): boolean =>
+  [...seq.antecedent, ...seq.succedent].every((f) => f.kind === 'atom')
+
+// An atomic provable leaf closes directly iff it is exactly the identity
+// shape (one formula per side); anything larger forces a Drop first.
+const needsDrop = (seq: AnySequent): boolean =>
+  seq.antecedent.length + seq.succedent.length > 2
+
+const BASICS_TRIES = 50
+
+// A presolved Basics challenge: a branching-notch challenge (its necessity
+// check forces a forking rule into every solution) truncated at a frontier,
+// required to leave several open leaves — one button press should never win
+// instantly, and drops deferred past branch points repeat across branches,
+// which is more practice exactly where it's wanted. Stage 1 (Close): only
+// the closing moves reopen. Stage 2 (Drop): each branch cut above its
+// topmost connective rule; accepted only when the open leaves are all-atomic
+// (which rejects brute solutions not in drop-at-end form) AND at least one
+// leaf actually forces a Drop — otherwise the beat's lesson is dodgeable by
+// closing everything directly.
+export const generateBasicsChallenge = (stage: 1 | 2): ChallengeResult => {
+  for (let tries = 0; tries < BASICS_TRIES; tries += 1) {
+    const res = generateSequentChallenge(logicNotches[3])
+    const solution = res.challenge.solution
+    if (solution === undefined) continue // ChallengeResult types it optional
+    const start =
+      stage === 1 ? pruneClosings(solution) : pruneStructural(solution)
+    if (start.kind === 'premise') continue // no frozen foundation at all
+    const leaves = frontierLeaves(start)
+    if (leaves.length < 2) continue
+    if (stage === 2 && !leaves.every(isAtomic)) continue
+    if (stage === 2 && !leaves.some(needsDrop)) continue
+    return { ...res, challenge: { ...res.challenge, start } }
+  }
+  // Last resort: the branching notch's fixed fallback goal (the disjunction
+  // swap, which forks), truncated the same way.
+  const res = fallbackChallenge(logicNotches[3])
+  const solution = res.challenge.solution
+  if (solution === undefined) return res
+  const start =
+    stage === 1 ? pruneClosings(solution) : pruneStructural(solution)
+  return { ...res, challenge: { ...res.challenge, start } }
+}
+
+// --- The curriculum: the tutorial as one addressable, ordered list ------
+
+// A beat = one subchapter: a chapter tag, a name the web layer maps to i18n,
+// display glyphs, and a challenge generator for its practice stream.
+export type TutorialBeat = {
+  chapter: 'basics' | 'logic'
+  nameId:
+    | 'close'
+    | 'drop'
+    | 'split'
+    | 'sideFlip'
+    | 'crossing'
+    | 'branching'
+    | 'branchingCrossing'
+  glyphs: string
+  generate: () => ChallengeResult
+}
+
+const LOGIC_NAME_IDS = [
+  'split',
+  'sideFlip',
+  'crossing',
+  'branching',
+  'branchingCrossing',
+] as const
+
+export const tutorialCurriculum: ReadonlyArray<TutorialBeat> = [
+  {
+    chapter: 'basics',
+    nameId: 'close',
+    glyphs: '',
+    generate: () => generateBasicsChallenge(1),
+  },
+  {
+    chapter: 'basics',
+    nameId: 'drop',
+    glyphs: '',
+    generate: () => generateBasicsChallenge(2),
+  },
+  ...logicNotches.map((notch, i) => ({
+    chapter: 'logic' as const,
+    nameId: LOGIC_NAME_IDS[i] ?? 'split',
+    glyphs: notch.glyphs,
+    generate: () => generateSequentChallenge(notch),
+  })),
+]
+
+// Clamp an index into the curriculum, returning a guaranteed beat.
+export const beatAt = (i: number): TutorialBeat => {
+  const clamped = Math.max(0, Math.min(i, tutorialCurriculum.length - 1))
+  return tutorialCurriculum[clamped] ?? tutorialCurriculum[0] ?? beatFail()
+}
+
+const beatFail = (): TutorialBeat => {
+  throw new Error('empty tutorial curriculum')
 }

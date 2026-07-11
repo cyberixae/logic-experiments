@@ -74,6 +74,7 @@ const en = {
   gamepad2: 'Gamepad 2',
   npc: 'NPC',
   tutorial: 'Tutorial',
+  tutorialBasics: 'Basics',
   tutorialLogic: 'Logic',
   tutorialPart: 'Part',
   tutorialAdvance: 'Next Section',
@@ -160,6 +161,7 @@ const fi: Record<MessageKey, string> = {
   gamepad2: 'Ohjain 2',
   npc: 'NPC',
   tutorial: 'Opastus',
+  tutorialBasics: 'Perusteet',
   tutorialLogic: 'Logiikka',
   tutorialPart: 'Osa',
   tutorialAdvance: 'Seuraava osa',
@@ -246,6 +248,7 @@ const es: Record<MessageKey, string> = {
   gamepad2: 'Mando 2',
   npc: 'NPC',
   tutorial: 'Tutorial',
+  tutorialBasics: 'Fundamentos',
   tutorialLogic: 'Lógica',
   tutorialPart: 'Parte',
   tutorialAdvance: 'Siguiente sección',
@@ -332,6 +335,7 @@ const cs: Record<MessageKey, string> = {
   gamepad2: 'Ovladač 2',
   npc: 'NPC',
   tutorial: 'Návod',
+  tutorialBasics: 'Základy',
   tutorialLogic: 'Logika',
   tutorialPart: 'Část',
   tutorialAdvance: 'Další část',
@@ -418,6 +422,7 @@ const pl: Record<MessageKey, string> = {
   gamepad2: 'Pad 2',
   npc: 'NPC',
   tutorial: 'Samouczek',
+  tutorialBasics: 'Podstawy',
   tutorialLogic: 'Logika',
   tutorialPart: 'Część',
   tutorialAdvance: 'Następna sekcja',
@@ -428,7 +433,7 @@ const pl: Record<MessageKey, string> = {
   tutorialShape5: 'Rozgałęzione przejście',
 }
 
-type MessageKey = keyof typeof en
+export type MessageKey = keyof typeof en
 
 const messages: Record<string, Record<MessageKey, string>> = {
   cs,
