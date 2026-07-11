@@ -7,27 +7,28 @@ import {
 import { RuleId } from '../model/rule'
 import { ProofUsing } from '../model/derivation'
 import { brute, bruteLimit } from '../solver/brute'
+import { rules as rkRules } from '../systems/rk'
 import { countNonStructural } from './challenge'
 import { ConnectiveWeights, SymbolWeights } from './config'
 import { ChallengeResult } from '../web/challenge-protocol'
 
-// A tutorial "subchapter": a connective clamp plus the cut-free rule allow-list
-// the player is limited to. The two halves must stay consistent — the generated
-// goal only uses connectives whose rules are in `rules`, so a restricted rule set
-// can always solve it. Excluding `cut` (the only rule whose backward application
-// can introduce a fresh connective) guarantees the reachable proof space stays
-// closed under the taught rules.
+// A tutorial "subchapter": a connective clamp on challenge generation. The
+// clamp is purely generative — the player keeps the full rule set, but rules
+// for untaught connectives are never *applicable*, because the goal contains
+// only taught connectives and (cut-free) backward play can only decompose, so
+// no move ever introduces a connective the goal didn't already have.
 export type Notch = {
   // Display glyphs for the connectives in scope (not localized — math symbols).
   glyphs: string
   connectives: ConnectiveWeights
   symbols: SymbolWeights
   maxFormulaSize: number
-  rules: ReadonlyArray<RuleId>
 }
 
-const AXIOMS: ReadonlyArray<RuleId> = ['i', 'f', 'v']
-const STRUCTURAL: ReadonlyArray<RuleId> = ['swl', 'swr', 'sRotLB', 'sRotRB']
+// Cut is the one rule the generative clamp cannot make inapplicable (it applies
+// in any state), so it is excluded here and its button hidden — Cut belongs to
+// the tutorial's Input chapter.
+const tutorialRules: ReadonlyArray<RuleId> = rkRules.filter((r) => r !== 'cut')
 
 // A small atom pool keeps generated goals readable; no constants (⊥/⊤ belong to
 // a later chapter, so their symbol weights are 0).
@@ -57,7 +58,6 @@ export const logicNotches: readonly [Notch, Notch, Notch] = [
     },
     symbols: ATOMS,
     maxFormulaSize: 2,
-    rules: [...AXIOMS, ...STRUCTURAL, 'cl', 'cr', 'dl', 'dr'],
   },
   {
     glyphs: '∧ ∨ ¬',
@@ -69,7 +69,6 @@ export const logicNotches: readonly [Notch, Notch, Notch] = [
     },
     symbols: ATOMS,
     maxFormulaSize: 2,
-    rules: [...AXIOMS, ...STRUCTURAL, 'cl', 'cr', 'dl', 'dr', 'nl', 'nr'],
   },
   {
     glyphs: '∧ ∨ ¬ →',
@@ -81,18 +80,6 @@ export const logicNotches: readonly [Notch, Notch, Notch] = [
     },
     symbols: ATOMS,
     maxFormulaSize: 2,
-    rules: [
-      ...AXIOMS,
-      ...STRUCTURAL,
-      'cl',
-      'cr',
-      'dl',
-      'dr',
-      'nl',
-      'nr',
-      'il',
-      'ir',
-    ],
   },
 ]
 
@@ -121,11 +108,10 @@ const hasConnective = (fs: ReadonlyArray<prop.Prop>): boolean =>
   fs.some((p) => prop.connectives(p).length > 0)
 
 const asResult = (
-  notch: Notch,
   solution: ProofUsing<AnySequent, RuleId>,
   formulasTried: number,
 ): ChallengeResult => ({
-  challenge: { rules: notch.rules, goal: solution.result, solution },
+  challenge: { rules: tutorialRules, goal: solution.result, solution },
   nonStructuralCount: countNonStructural(solution),
   bypassed: false,
   formulasTried,
@@ -133,19 +119,18 @@ const asResult = (
 
 // A guaranteed valid, connective-bearing goal for any notch (∧ and the identity
 // axiom are always in scope), used only if rejection sampling comes up empty.
-const fallbackChallenge = (notch: Notch): ChallengeResult => {
+const fallbackChallenge = (): ChallengeResult => {
   const goal = sequent(
     [prop.conjunction(prop.atom('p'), prop.atom('q'))],
     [prop.atom('p')],
   )
-  const [solution] = brute({ goal, rules: notch.rules })
-  return asResult(notch, solution, 0)
+  const [solution] = brute({ goal, rules: tutorialRules })
+  return asResult(solution, 0)
 }
 
-// Generate a random valid sequent over the notch's clamped connectives, solvable
-// with the notch's rule set. Mixed shape: 0–2 formulas per side (at least one
-// total), including the occasional empty antecedent `⊢ φ` when it happens to be
-// valid.
+// Generate a random valid sequent over the notch's clamped connectives. Mixed
+// shape: 0–2 formulas per side (at least one total), including the occasional
+// empty antecedent `⊢ φ` when it happens to be valid.
 export const generateSequentChallenge = (notch: Notch): ChallengeResult => {
   for (let tries = 0; tries < MAX_TRIES; tries += 1) {
     const nAnte = randomCount()
@@ -157,9 +142,9 @@ export const generateSequentChallenge = (notch: Notch): ChallengeResult => {
     if (!hasConnective([...antecedent, ...succedent])) continue
     const goal = sequent(antecedent, succedent)
     if (!isValidSequent(goal)) continue
-    const [solution] = bruteLimit({ goal, rules: notch.rules }, MAX_LIMIT)
+    const [solution] = bruteLimit({ goal, rules: tutorialRules }, MAX_LIMIT)
     if (solution === undefined) continue
-    return asResult(notch, solution, tries + 1)
+    return asResult(solution, tries + 1)
   }
-  return fallbackChallenge(notch)
+  return fallbackChallenge()
 }

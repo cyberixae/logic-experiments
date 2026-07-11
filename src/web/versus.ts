@@ -101,9 +101,10 @@ export const mountVersus = (
 
   // Tutorial flavor: when present, the arena runs untimed and sources clamped
   // Logic-chapter practice challenges from the current notch (generated on the
-  // spot) instead of the pool. The `cut`-free per-notch rule set baked into each
-  // generated challenge is what keeps the player from ever needing an untaught
-  // rule. Non-tutorial Versus is unchanged.
+  // spot) instead of the pool. The clamp is purely generative — untaught rules
+  // are never applicable because goals only contain taught connectives and
+  // backward play only decomposes (Cut, the exception, is hidden until the
+  // Input chapter). Non-tutorial Versus is unchanged.
   const isTutorial = versusConfig.tutorial !== undefined
   const untimed = isTutorial
   let notch = versusConfig.tutorial?.startNotch ?? 0
