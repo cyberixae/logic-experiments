@@ -32,6 +32,13 @@ export type Notch = {
   succConnectives: ConnectiveWeights
   symbols: SymbolWeights
   maxFormulaSize: number
+  // Minimum antecedent formulas. Rules like il can't be *needed* by a goal
+  // with an empty left side, so notches whose featured rule lives there floor
+  // the draw to keep the rejection-sampling hit rate workable.
+  minAnte: number
+  // A hand-picked goal that features this notch's rules unavoidably, used
+  // only if rejection sampling comes up empty.
+  fallback: AnySequent
 }
 
 // Cut is the one rule the generative clamp cannot make inapplicable (it applies
@@ -59,6 +66,9 @@ const NONE: ConnectiveWeights = {
   disjunction: 0,
 }
 
+const P = prop.atom('p')
+const Q = prop.atom('q')
+
 // The Logic chapter as five shape-based subchapters, ordered so each step adds
 // one idea: same-side split, gate-flip, cross-gate split, branching split, and
 // finally implication-left, which combines gate-crossing with branching. Pure
@@ -77,6 +87,8 @@ export const logicNotches: readonly [Notch, Notch, Notch, Notch, Notch] = [
     succConnectives: { ...NONE, disjunction: 1 },
     symbols: ATOMS,
     maxFormulaSize: 2,
+    minAnte: 0,
+    fallback: sequent([prop.conjunction(P, Q)], [P]),
   },
   {
     // Whole-formula gate-flip: negation on either side. From here on the
@@ -92,6 +104,8 @@ export const logicNotches: readonly [Notch, Notch, Notch, Notch, Notch] = [
     succConnectives: { ...NONE, conjunction: 1, disjunction: 1, negation: 2 },
     symbols: ATOMS,
     maxFormulaSize: 2,
+    minAnte: 0,
+    fallback: sequent([P], [prop.negation(prop.negation(P))]),
   },
   {
     // Cross-gate split: implication-right — split and one piece hops the
@@ -114,6 +128,8 @@ export const logicNotches: readonly [Notch, Notch, Notch, Notch, Notch] = [
     },
     symbols: ATOMS,
     maxFormulaSize: 2,
+    minAnte: 0,
+    fallback: sequent([], [prop.implication(P, P)]),
   },
   {
     // Branching split: conjunction-right and disjunction-left — the proof
@@ -135,6 +151,8 @@ export const logicNotches: readonly [Notch, Notch, Notch, Notch, Notch] = [
     },
     symbols: ATOMS,
     maxFormulaSize: 2,
+    minAnte: 0,
+    fallback: sequent([prop.disjunction(P, Q)], [prop.disjunction(Q, P)]),
   },
   {
     // The capstone: implication-left — gate-crossing and branching combined.
@@ -146,7 +164,7 @@ export const logicNotches: readonly [Notch, Notch, Notch, Notch, Notch] = [
       conjunction: 1,
       disjunction: 1,
       negation: 1,
-      implication: 2,
+      implication: 3,
     },
     succConnectives: {
       conjunction: 1,
@@ -156,6 +174,8 @@ export const logicNotches: readonly [Notch, Notch, Notch, Notch, Notch] = [
     },
     symbols: ATOMS,
     maxFormulaSize: 2,
+    minAnte: 1,
+    fallback: sequent([prop.implication(P, Q), P], [Q]),
   },
 ]
 
@@ -169,7 +189,7 @@ export const notchAt = (i: number): Notch => {
 // easy, and a low cap bounds the synchronous work so generation can't hang the
 // UI (implication goals in particular blow up the search at higher depths).
 const MAX_LIMIT = 3
-const MAX_TRIES = 500
+const MAX_TRIES = 1000
 // Keep sequents small so proofs stay shallow and generation stays snappy.
 const MAX_FORMULAS = 3
 
@@ -179,6 +199,34 @@ const makeFormula = (weights: ConnectiveWeights, notch: Notch): prop.Prop => {
   const size = Math.floor(Math.random() * (notch.maxFormulaSize + 1))
   return prop.randomWeighted(size, weights, notch.symbols)()
 }
+
+const subformulas = (f: prop.Prop): prop.Prop[] => {
+  switch (f.kind) {
+    case 'atom':
+    case 'falsum':
+    case 'verum':
+      return [f]
+    case 'negation':
+      return [f, ...subformulas(f.negand)]
+    case 'implication':
+      return [f, ...subformulas(f.antecedent), ...subformulas(f.consequent)]
+    case 'conjunction':
+      return [
+        f,
+        ...subformulas(f.leftConjunct),
+        ...subformulas(f.rightConjunct),
+      ]
+    case 'disjunction':
+      return [
+        f,
+        ...subformulas(f.leftDisjunct),
+        ...subformulas(f.rightDisjunct),
+      ]
+  }
+}
+
+const pick = <T>(xs: ReadonlyArray<T>): T | undefined =>
+  xs[Math.floor(Math.random() * xs.length)]
 
 const asResult = (
   solution: ProofUsing<AnySequent, RuleId>,
@@ -190,14 +238,8 @@ const asResult = (
   formulasTried,
 })
 
-// A guaranteed valid goal whose closure ({cl}) fits every subchapter, used
-// only if rejection sampling comes up empty.
-const fallbackChallenge = (): ChallengeResult => {
-  const goal = sequent(
-    [prop.conjunction(prop.atom('p'), prop.atom('q'))],
-    [prop.atom('p')],
-  )
-  const [solution] = brute({ goal, rules: tutorialRules })
+const fallbackChallenge = (notch: Notch): ChallengeResult => {
+  const [solution] = brute({ goal: notch.fallback, rules: tutorialRules })
   return asResult(solution, 0)
 }
 
@@ -206,25 +248,41 @@ const fallbackChallenge = (): ChallengeResult => {
 // antecedent `⊢ φ` when it happens to be valid.
 export const generateSequentChallenge = (notch: Notch): ChallengeResult => {
   for (let tries = 0; tries < MAX_TRIES; tries += 1) {
-    const nAnte = randomCount()
+    const nAnte = Math.max(notch.minAnte, randomCount())
     const nSucc = randomCount()
     if (nAnte + nSucc === 0 || nAnte + nSucc > MAX_FORMULAS) continue
     const antecedent = Array.from({ length: nAnte }, () =>
       makeFormula(notch.anteConnectives, notch),
     )
-    const succedent = Array.from({ length: nSucc }, () =>
-      makeFormula(notch.succConnectives, notch),
-    )
+    // Validity needs the two sides to share content, so half the time a
+    // succedent slot borrows a subformula of the antecedent instead of
+    // drawing fresh — drawing `q` out of `p→q` is what makes modus-ponens
+    // shapes (and their kin) findable at all.
+    const borrowPool = antecedent.flatMap(subformulas)
+    const succedent = Array.from({ length: nSucc }, () => {
+      const borrowed =
+        borrowPool.length > 0 && Math.random() < 0.5
+          ? pick(borrowPool)
+          : undefined
+      return borrowed ?? makeFormula(notch.succConnectives, notch)
+    })
     const goal = sequent(antecedent, succedent)
     const closure = reachableRules(goal)
     // The clamp: nothing untaught is ever reachable…
     if (!closure.every((r) => notch.taught.includes(r))) continue
-    // …and the newly taught shape is (practice stays on topic).
+    // …and the newly taught shape is (cheap pre-filter; necessity below).
     if (!notch.featured.some((r) => closure.includes(r))) continue
     if (!isValidSequent(goal)) continue
     const [solution] = bruteLimit({ goal, rules: tutorialRules }, MAX_LIMIT)
     if (solution === undefined) continue
+    // The featured shape must be unavoidable, not merely reachable: if a
+    // proof exists that never uses a featured rule (say, Drop the featured
+    // formula and Close on the rest), the player can complete the level
+    // while dodging the lesson — reject such goals.
+    const dodgeRules = tutorialRules.filter((r) => !notch.featured.includes(r))
+    const [dodge] = bruteLimit({ goal, rules: dodgeRules }, MAX_LIMIT)
+    if (dodge !== undefined) continue
     return asResult(solution, tries + 1)
   }
-  return fallbackChallenge()
+  return fallbackChallenge(notch)
 }
