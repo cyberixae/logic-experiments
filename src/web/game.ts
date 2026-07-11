@@ -628,6 +628,7 @@ export const createBench = (
   hideLemma?: boolean,
   ctx: BenchCtx = defaultCtx,
   onSkip?: () => void,
+  hideGaze?: boolean,
 ): HTMLElement => {
   const ls = workspace.applicableRules()
   const rules = workspace.availableRules()
@@ -999,7 +1000,7 @@ export const createBench = (
     // onto extra lines when they no longer all fit (see .controls in lk.css).
     if (onSkip !== undefined) controlsBar.appendChild(miscGroup)
     controlsBar.appendChild(navGroup)
-    controlsBar.appendChild(gazeGroup)
+    if (hideGaze !== true) controlsBar.appendChild(gazeGroup)
   }
   panel.appendChild(controlsBar)
 
@@ -1140,8 +1141,21 @@ export const createDispatch =
     onApplyReverse1?: ApplyReverse1,
     ctx: BenchCtx = defaultCtx,
     onJustSolved?: () => void,
+    blockGaze?: () => boolean,
   ) =>
   (action: Action): void => {
+    // Gaze can be disabled per bench state (the tutorial's Close beat hides
+    // the buttons; this keeps the keyboard/gamepad paths consistent).
+    if (
+      blockGaze !== undefined &&
+      blockGaze() &&
+      (action === 'gazeLeft' ||
+        action === 'gazeRight' ||
+        action === 'gazeConnective' ||
+        action === 'gazeWeakening')
+    ) {
+      return
+    }
     if (action === 'gazeLeft' || action === 'gazeRight') {
       if (!ctx.isGazeModeActive()) {
         const workspace = getWorkspace()

@@ -360,6 +360,10 @@ export type TutorialBeat = {
     | 'branching'
     | 'branchingCrossing'
   glyphs: string
+  // The Close beat's only verbs are branch navigation and Close — the Gaze
+  // controls (Drop/Destruct selection) aren't relevant yet, so they stay
+  // hidden until the Drop beat introduces them.
+  hideGaze: boolean
   generate: () => ChallengeResult
 }
 
@@ -376,18 +380,21 @@ export const tutorialCurriculum: ReadonlyArray<TutorialBeat> = [
     chapter: 'basics',
     nameId: 'close',
     glyphs: '',
+    hideGaze: true,
     generate: () => generateBasicsChallenge(1),
   },
   {
     chapter: 'basics',
     nameId: 'drop',
     glyphs: '',
+    hideGaze: false,
     generate: () => generateBasicsChallenge(2),
   },
   ...logicNotches.map((notch, i) => ({
     chapter: 'logic' as const,
     nameId: LOGIC_NAME_IDS[i] ?? 'split',
     glyphs: notch.glyphs,
+    hideGaze: false,
     generate: () => generateSequentChallenge(notch),
   })),
 ]

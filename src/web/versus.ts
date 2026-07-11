@@ -275,6 +275,7 @@ export const mountVersus = (
         isTutorial,
         ctx1,
         isTutorial ? undefined : skipPlayer1,
+        isTutorial && beatAt(beatIdx).hideGaze,
       ),
     )
     return half
@@ -299,6 +300,7 @@ export const mountVersus = (
         isTutorial,
         ctx2,
         isTutorial ? undefined : skipPlayer2,
+        isTutorial && beatAt(beatIdx).hideGaze,
       ),
     )
     return half
@@ -952,6 +954,9 @@ export const mountVersus = (
     const clamped = Math.max(0, Math.min(target, tutorialCurriculum.length - 1))
     if (clamped === beatIdx) return
     beatIdx = clamped
+    // Leave gaze mode on both halves — the target beat may not offer it.
+    ctx1.setGazeModeActive(false)
+    ctx2.setGazeModeActive(false)
     const fresh = Math.max(index1, index2, wsIdx1 + 1, wsIdx2 + 1)
     sharedChallenges.splice(fresh)
     pending1 = []
@@ -1120,6 +1125,10 @@ export const mountVersus = (
   // Independent dispatch per player. Each player's regular-move rerender
   // callback is scoped to their own half + the thermometer, so an opponent's
   // moves can never disturb this player's in-flight animation.
+  // In tutorial beats that hide the Gaze controls, the keyboard/gamepad gaze
+  // actions must be inert too — checked per dispatch since the beat changes
+  // at runtime.
+  const gazeBlocked = () => isTutorial && beatAt(beatIdx).hideGaze
   const dispatch1 = createDispatch(
     () => ws1,
     refreshP1,
@@ -1129,6 +1138,8 @@ export const mountVersus = (
     undefined,
     onApplyReverse1,
     ctx1,
+    undefined,
+    gazeBlocked,
   )
   const dispatch2 = createDispatch(
     () => ws2,
@@ -1139,6 +1150,8 @@ export const mountVersus = (
     undefined,
     onApplyReverse2,
     ctx2,
+    undefined,
+    gazeBlocked,
   )
 
   const makeCongratsP1 = () => {
