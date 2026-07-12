@@ -1667,6 +1667,9 @@ html.mode-single:not(.input-pointer) .bench-topbar .bench-zoom {
   border-bottom-right-radius: 2px;
   padding: 0.5em 0.8em;
   font-size: 0.8em;
+  /* Shift the bubble left of the portrait so its sharp corner points at
+     the owl's mouth — reads more like the owl is talking. */
+  margin-right: 5em;
 }
 .tutor-owl-para + .tutor-owl-para {
   margin-top: 0.5em;
