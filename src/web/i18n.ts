@@ -88,13 +88,25 @@ const en = {
   tutorialShape4: 'Branching',
   tutorialShape5: 'Branching crossing',
   tutorialOwlBasics:
-    'Win by closing every branch: Close lights up when the same bird stands alone on both sides of the gate — ⊥ on the left or ⊤ on the right closes too. Drop the extra birds first.',
-  tutorialOwlBasicsControls:
-    'Controls: {pick} = pick a bird, {drop} = let it go, {close} = seal the branch, {undo} = take it back.',
+    'Welcome to LK! In its challenges you close derivation trees built out of sequents. This first chapter teaches the essentials you need to play.',
   tutorialOwlLogic:
-    'Now for taking birds apart: Destruct unpacks the faded symbol, and each shape moves its own way — watch where the pieces land.',
-  tutorialOwlLogicControls:
-    'Controls: {pick} = pick, {destruct} = unpack it, {branch} = switch branch.',
+    'The second chapter is about dropping the extra connectives ( → ∧ ∨ ¬ ). If you would rather jump straight into the deep end, you can head for the real game as soon as you have found the {destruct} button. The subchapters walk through the consequences of dropping each connective in different situations, one at a time.',
+  tutorialOwlClose:
+    'A branch of the tree can be closed when the same sentence sits on both sides of the gate ( ⊢ ). You can switch branches with the {branch} buttons and close the chosen branch with the {close} button.',
+  tutorialOwlCloseConstants:
+    'Constant sentences can sometimes close a branch on their own — Falsum ( ⊥ ) when it sits alone on the left side of the gate, and Verum ( ⊤ ) when it sits alone on the right.',
+  tutorialOwlDrop:
+    'Any extra sentences on a branch must always be dropped before the branch can close. Remove them by picking the sentence to drop with the {pick} buttons, then pressing the {drop} button repeatedly until the picked sentence falls off the tree. If you drop a sentence the branch needs for closing, you can undo your move by pressing {undo}.',
+  tutorialOwlSplit:
+    'You can drop a connective by picking a sentence with the {pick} buttons, then pressing {destruct} repeatedly until the outermost connective of the picked sentence falls off the tree. Dropping a Conjunction ( ∧ ) or a Disjunction ( ∨ ) from its own natural side of the gate causes no further consequences.',
+  tutorialOwlSideFlip:
+    'Dropping a Negation ( ¬ ) makes the remaining sentence cross over the gate.',
+  tutorialOwlCrossing:
+    'Dropping an Implication ( → ) on the right side of the gate splits its parts across the two sides of the gate.',
+  tutorialOwlBranching:
+    'Dropping a Conjunction ( ∧ ) or a Disjunction ( ∨ ) makes the tree branch when they are unpacked from the unnatural side of the gate.',
+  tutorialOwlBranchingCrossing:
+    'Dropping an Implication ( → ) on the left side of the gate is the most intricate of the rules, as it combines both parts crossing the gate and the tree branching.',
 } as const
 
 const fi: Record<MessageKey, string> = {
@@ -187,13 +199,25 @@ const fi: Record<MessageKey, string> = {
   tutorialShape4: 'Haarautuminen',
   tutorialShape5: 'Haarautuva ylitys',
   tutorialOwlBasics:
-    'Voitat sulkemalla kaikki haarat: Sulje syttyy, kun sama lintu on yksin portin molemmin puolin — myös ⊥ vasemmalla tai ⊤ oikealla sulkee. Pudota ylimääräiset linnut ensin.',
-  tutorialOwlBasicsControls:
-    'Ohjaus: {pick} = valitse lintu, {drop} = päästä irti, {close} = sulje haara, {undo} = peru.',
+    'Tervetuloa pelaamaan LK:ta! Pelin haasteissa suljetaan sekventeistä koostuvia päättelypuita. Ensimmäisessä luvussa opimme pelaamisen kannalta välttämättömiä perusasioita.',
   tutorialOwlLogic:
-    'Nyt puretaan lintuja osiin: Pura purkaa haalean merkin, ja jokainen muoto liikkuu omalla tavallaan — katso, mihin osat päätyvät.',
-  tutorialOwlLogicControls:
-    'Ohjaus: {pick} = valitse, {destruct} = pura osiin, {branch} = vaihda haaraa.',
+    'Toisessa luvussa käsittelemme ylimääräisten konnektiivien ( → ∧ ∨ ¬ ) pudottamista. Mikäli haluat hypätä suoraan syvään päätyyn, voit välittömästi {destruct} painikkeen löydettyäsi siirtyä pelaamaan varsinaista peliä. Tämän luvun aliluvuissa käydään yksitellen läpi eri konnektiivien pudottamisen seuraamuksia eri tilanteissa.',
+  tutorialOwlClose:
+    'Päättelypuun oksa on suljettavissa silloin, kun portin ( ⊢ ) kummallakin puolella on sama lause. Voit vaihtaa oksaa {branch} painikkeilla ja sulkea valitun oksan {close} painikkeella.',
+  tutorialOwlCloseConstants:
+    'Vakiolauseet mahdollistavat joskus oksan sulkemisen yksinään — Falsum ( ⊥ ) ollessaan yksin portin vasemmalla puolella, ja Verum ( ⊤ ) ollessaan yksin portin oikealla puolella.',
+  tutorialOwlDrop:
+    'Oksan sisältämät ylimääräiset lauseet on aina pudotettava ennen kuin oksan voi sulkea. Saat ylimääräiset lauseet poistettua valitsemalla pudotettavan lauseen {pick} painikkeilla, ja painamalla sen jälkeen {drop} painiketta toistuvasti, kunnes valittu lause putoaa puusta. Mikäli pudotat oksan sulkemiseen tarvittavan lauseen, voit perua siirtosi painamalla {undo} painiketta.',
+  tutorialOwlSplit:
+    'Voit pudottaa konnektiivin valitsemalla lauseen {pick} painikkeilla, ja painamalla sen jälkeen {destruct} toistuvasti, kunnes valitun lauseen uloin konnektiivi putoaa puusta. Konjunktion ( ∧ ) tai Disjunktion ( ∨ ) pudottaminen omalta luontaiselta puoleltaan porttia ei aiheuta sen kummempia seuraamuksia.',
+  tutorialOwlSideFlip:
+    'Negaation ( ¬ ) pudottaminen aiheuttaa jäljelle jäävän lauseen siirtymisen portin yli.',
+  tutorialOwlCrossing:
+    'Implikaation ( → ) pudottaminen portin oikealta puolelta aiheuttaa lauseen osien jakautumisen kahdelle puolelle porttia.',
+  tutorialOwlBranching:
+    'Konjunktion ( ∧ ) tai Disjunktion ( ∨ ) pudottaminen aiheuttaa puun haarautumisen, mikäli nämä puretaan epäluonnolliselta puolelta porttia.',
+  tutorialOwlBranchingCrossing:
+    'Implikaation ( → ) pudottaminen portin vasemmalta puolelta on säännöistä monimutkaisin, sillä se yhdistää sekä osien siirtymisen portin yli että puun haarautumisen.',
 }
 
 const es: Record<MessageKey, string> = {
@@ -286,13 +310,25 @@ const es: Record<MessageKey, string> = {
   tutorialShape4: 'Ramificación',
   tutorialShape5: 'Cruce con ramas',
   tutorialOwlBasics:
-    'Gana cerrando todas las ramas: Cerrar se enciende cuando el mismo pájaro está solo a ambos lados de la puerta — ⊥ a la izquierda o ⊤ a la derecha también cierran. Suelta antes los pájaros sobrantes.',
-  tutorialOwlBasicsControls:
-    'Controles: {pick} = elegir pájaro, {drop} = soltarlo, {close} = cerrar la rama, {undo} = deshacer.',
+    '¡Bienvenido a LK! En los desafíos del juego se cierran árboles de deducción compuestos de secuentes. En este primer capítulo aprendemos lo básico imprescindible para jugar.',
   tutorialOwlLogic:
-    'Ahora a desarmar pájaros: Destruir despliega el símbolo tenue, y cada forma se mueve a su manera — observa dónde caen las piezas.',
-  tutorialOwlLogicControls:
-    'Controles: {pick} = elegir, {destruct} = desarmarlo, {branch} = cambiar de rama.',
+    'En el segundo capítulo tratamos cómo soltar los conectivos sobrantes ( → ∧ ∨ ¬ ). Si prefieres lanzarte a lo hondo, en cuanto encuentres el botón {destruct} puedes pasar directamente al juego de verdad. Los subcapítulos repasan una a una las consecuencias de soltar cada conectivo en distintas situaciones.',
+  tutorialOwlClose:
+    'Una rama del árbol se puede cerrar cuando a ambos lados de la puerta ( ⊢ ) está la misma oración. Puedes cambiar de rama con los botones {branch} y cerrar la rama elegida con el botón {close}.',
+  tutorialOwlCloseConstants:
+    'Las oraciones constantes a veces permiten cerrar una rama por sí solas: Falsum ( ⊥ ) cuando está solo a la izquierda de la puerta, y Verum ( ⊤ ) cuando está solo a la derecha.',
+  tutorialOwlDrop:
+    'Las oraciones sobrantes de una rama deben soltarse siempre antes de poder cerrarla. Elimínalas eligiendo la oración a soltar con los botones {pick} y pulsando después el botón {drop} repetidamente, hasta que la oración elegida caiga del árbol. Si sueltas una oración necesaria para cerrar la rama, puedes deshacer el movimiento pulsando {undo}.',
+  tutorialOwlSplit:
+    'Puedes soltar un conectivo eligiendo una oración con los botones {pick} y pulsando después {destruct} repetidamente, hasta que el conectivo más externo de la oración elegida caiga del árbol. Soltar una Conjunción ( ∧ ) o una Disyunción ( ∨ ) desde su lado natural de la puerta no tiene mayores consecuencias.',
+  tutorialOwlSideFlip:
+    'Soltar una Negación ( ¬ ) hace que la oración restante cruce al otro lado de la puerta.',
+  tutorialOwlCrossing:
+    'Soltar una Implicación ( → ) en el lado derecho de la puerta reparte sus partes entre los dos lados de la puerta.',
+  tutorialOwlBranching:
+    'Soltar una Conjunción ( ∧ ) o una Disyunción ( ∨ ) ramifica el árbol si se descomponen desde el lado no natural de la puerta.',
+  tutorialOwlBranchingCrossing:
+    'Soltar una Implicación ( → ) en el lado izquierdo de la puerta es la regla más compleja, pues combina el cruce de las partes al otro lado y la ramificación del árbol.',
 }
 
 const cs: Record<MessageKey, string> = {
@@ -385,13 +421,25 @@ const cs: Record<MessageKey, string> = {
   tutorialShape4: 'Větvení',
   tutorialShape5: 'Větvený přechod',
   tutorialOwlBasics:
-    'Vyhraješ zavřením všech větví: Zavřít se rozsvítí, když stejný pták stojí sám na obou stranách brány — zavírá i ⊥ vlevo nebo ⊤ vpravo. Přebytečné ptáky nejdřív pusť.',
-  tutorialOwlBasicsControls:
-    'Ovládání: {pick} = vybrat ptáka, {drop} = pustit ho, {close} = zavřít větev, {undo} = vzít zpět.',
+    'Vítej ve hře LK! V jejích výzvách se zavírají odvozovací stromy složené ze sekventů. V této první kapitole se naučíme základy, bez kterých se hrát nedá.',
   tutorialOwlLogic:
-    'Teď rozebíráme ptáky: Zničit rozloží vybledlý symbol a každý tvar se pohybuje po svém — sleduj, kam kousky dopadnou.',
-  tutorialOwlLogicControls:
-    'Ovládání: {pick} = výběr, {destruct} = rozložit, {branch} = přepnout větev.',
+    'Ve druhé kapitole se věnujeme pouštění přebytečných spojek ( → ∧ ∨ ¬ ). Chceš-li skočit rovnou do hlubin, můžeš hned po nalezení tlačítka {destruct} přejít ke skutečné hře. Podkapitoly probírají jednu po druhé důsledky puštění jednotlivých spojek v různých situacích.',
+  tutorialOwlClose:
+    'Větev stromu lze zavřít, když na obou stranách brány ( ⊢ ) stojí stejná věta. Větev přepneš tlačítky {branch} a vybranou větev zavřeš tlačítkem {close}.',
+  tutorialOwlCloseConstants:
+    'Konstantní věty někdy dokážou zavřít větev samy — Falsum ( ⊥ ), když stojí samo vlevo od brány, a Verum ( ⊤ ), když stojí samo vpravo.',
+  tutorialOwlDrop:
+    'Přebytečné věty na větvi je vždy nutné pustit, než ji lze zavřít. Odstraníš je tak, že tlačítky {pick} vybereš větu k puštění a pak opakovaně mačkáš tlačítko {drop}, dokud vybraná věta nespadne ze stromu. Pokud pustíš větu potřebnou k zavření větve, můžeš tah vrátit tlačítkem {undo}.',
+  tutorialOwlSplit:
+    'Spojku pustíš tak, že tlačítky {pick} vybereš větu a pak opakovaně mačkáš {destruct}, dokud vnější spojka vybrané věty nespadne ze stromu. Puštění Konjunkce ( ∧ ) nebo Disjunkce ( ∨ ) z její přirozené strany brány nemá žádné zvláštní následky.',
+  tutorialOwlSideFlip:
+    'Puštění Negace ( ¬ ) přesune zbývající větu přes bránu na druhou stranu.',
+  tutorialOwlCrossing:
+    'Puštění Implikace ( → ) na pravé straně brány rozdělí její části na obě strany brány.',
+  tutorialOwlBranching:
+    'Puštění Konjunkce ( ∧ ) nebo Disjunkce ( ∨ ) rozvětví strom, pokud se rozkládají z nepřirozené strany brány.',
+  tutorialOwlBranchingCrossing:
+    'Puštění Implikace ( → ) na levé straně brány je nejsložitější z pravidel: spojuje jak přechod částí přes bránu, tak větvení stromu.',
 }
 
 const pl: Record<MessageKey, string> = {
@@ -484,13 +532,25 @@ const pl: Record<MessageKey, string> = {
   tutorialShape4: 'Rozgałęzienie',
   tutorialShape5: 'Rozgałęzione przejście',
   tutorialOwlBasics:
-    'Wygrywasz, zamykając wszystkie gałęzie: Zamknij zapala się, gdy ten sam ptak stoi sam po obu stronach bramy — zamyka też ⊥ po lewej lub ⊤ po prawej. Najpierw upuść zbędne ptaki.',
-  tutorialOwlBasicsControls:
-    'Sterowanie: {pick} = wybierz ptaka, {drop} = puść go, {close} = zamknij gałąź, {undo} = cofnij.',
+    'Witaj w grze LK! W jej wyzwaniach zamyka się drzewa wnioskowania zbudowane z sekwentów. W tym pierwszym rozdziale poznajemy podstawy niezbędne do gry.',
   tutorialOwlLogic:
-    'Teraz rozbieramy ptaki: Zniszcz rozkłada wyblakły symbol, a każdy kształt porusza się po swojemu — patrz, gdzie lądują części.',
-  tutorialOwlLogicControls:
-    'Sterowanie: {pick} = wybór, {destruct} = rozłóż, {branch} = zmiana gałęzi.',
+    'W drugim rozdziale zajmujemy się upuszczaniem zbędnych spójników ( → ∧ ∨ ¬ ). Jeśli wolisz skoczyć na głęboką wodę, zaraz po znalezieniu przycisku {destruct} możesz przejść do właściwej gry. Podrozdziały omawiają po kolei skutki upuszczania poszczególnych spójników w różnych sytuacjach.',
+  tutorialOwlClose:
+    'Gałąź drzewa można zamknąć, gdy po obu stronach bramy ( ⊢ ) stoi to samo zdanie. Gałąź zmieniasz przyciskami {branch}, a wybraną gałąź zamykasz przyciskiem {close}.',
+  tutorialOwlCloseConstants:
+    'Zdania stałe czasem pozwalają zamknąć gałąź samodzielnie — Falsum ( ⊥ ), gdy stoi samo po lewej stronie bramy, i Verum ( ⊤ ), gdy stoi samo po prawej.',
+  tutorialOwlDrop:
+    'Zbędne zdania na gałęzi trzeba zawsze upuścić, zanim da się ją zamknąć. Usuniesz je, wybierając zdanie do upuszczenia przyciskami {pick}, a następnie naciskając przycisk {drop} wielokrotnie, aż wybrane zdanie spadnie z drzewa. Jeśli upuścisz zdanie potrzebne do zamknięcia gałęzi, możesz cofnąć ruch przyciskiem {undo}.',
+  tutorialOwlSplit:
+    'Spójnik upuszczasz, wybierając zdanie przyciskami {pick}, a następnie naciskając {destruct} wielokrotnie, aż zewnętrzny spójnik wybranego zdania spadnie z drzewa. Upuszczenie Koniunkcji ( ∧ ) lub Alternatywy ( ∨ ) z jej naturalnej strony bramy nie ma szczególnych następstw.',
+  tutorialOwlSideFlip:
+    'Upuszczenie Negacji ( ¬ ) przenosi pozostałe zdanie na drugą stronę bramy.',
+  tutorialOwlCrossing:
+    'Upuszczenie Implikacji ( → ) po prawej stronie bramy rozdziela jej części na obie strony bramy.',
+  tutorialOwlBranching:
+    'Upuszczenie Koniunkcji ( ∧ ) lub Alternatywy ( ∨ ) rozgałęzia drzewo, jeśli rozkłada się je z nienaturalnej strony bramy.',
+  tutorialOwlBranchingCrossing:
+    'Upuszczenie Implikacji ( → ) po lewej stronie bramy to najbardziej złożona z reguł, łączy bowiem przejście części przez bramę i rozgałęzienie drzewa.',
 }
 
 export type MessageKey = keyof typeof en

@@ -1668,28 +1668,28 @@ html.mode-single:not(.input-pointer) .bench-topbar .bench-zoom {
   padding: 0.5em 0.8em;
   font-size: 0.8em;
 }
-/* The bubble's controls sentence follows the device the learner last
-   touched: all three variants are in the DOM and the html input-* class
-   picks one, so switching device updates the text without a re-render. */
-.tutor-owl-controls {
-  display: none;
+.tutor-owl-para + .tutor-owl-para {
+  margin-top: 0.5em;
 }
-html.input-pointer .tutor-owl-controls.for-pointer,
-html.input-keyboard .tutor-owl-controls.for-keyboard,
-html.input-gamepad .tutor-owl-controls.for-gamepad {
-  display: inline;
-}
-/* Injected bind labels render as chips; key / pad glyphs get a keycap
-   look, button words a button look — target via the device variant. */
+/* Injected bind labels render as chips. Each chip exists once per device
+   as a latent variant; the html input-* class shows the one matching the
+   device the learner last touched, so switching device swaps the labels
+   without a re-render. Key / pad glyphs get a keycap look, button words a
+   button look. */
 .owl-bind {
-  display: inline-block;
+  display: none;
   border: 1px solid #964;
   border-radius: 5px;
   padding: 0 0.3em;
   background-color: #ffeedd;
   white-space: nowrap;
 }
-.tutor-owl-controls.for-pointer .owl-bind {
+html.input-pointer .owl-bind.for-pointer,
+html.input-keyboard .owl-bind.for-keyboard,
+html.input-gamepad .owl-bind.for-gamepad {
+  display: inline-block;
+}
+.owl-bind.for-pointer {
   border-radius: 999px;
   background-color: #fff;
   box-shadow: 0 1px 0 #964;
