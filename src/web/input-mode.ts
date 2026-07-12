@@ -55,6 +55,26 @@ for (const [code, action] of Object.entries(qwertyKeyMap)) {
   }
 }
 
+// Gaze-first keyboard hint: prefer the binding from the gaze key family
+// (arrows + Enter + Backspace) over letter hot-keys, falling back to the
+// action's first binding. Beginner-facing surfaces (the tutorial's owl)
+// teach the gaze workflow, and deriving from the live keymap means a future
+// rebind-settings screen flows through without touching those surfaces.
+const gazeKeyFamily = new Set([
+  'ArrowLeft',
+  'ArrowRight',
+  'ArrowUp',
+  'ArrowDown',
+  'Enter',
+  'Backspace',
+])
+export const gazeKeyHint = (action: Action): string | undefined => {
+  for (const [code, a] of Object.entries(qwertyKeyMap)) {
+    if (a === action && gazeKeyFamily.has(code)) return codeToLabel(code)
+  }
+  return actionKeyHint[action]
+}
+
 // === Gamepad button maps ===
 
 // Buttons whose meaning is the same in both gaze and hot mode.
@@ -126,6 +146,11 @@ const buildActionPadHint = (
 
 const actionPadHintGaze = buildActionPadHint(ps5GazeKeyMap)
 const actionPadHintHot = buildActionPadHint(ps5HotKeyMap)
+
+// Gaze-map pad hint regardless of the current hot-mode toggle — the
+// counterpart of gazeKeyHint for beginner-facing surfaces.
+export const gazePadHint = (action: Action): string | undefined =>
+  actionPadHintGaze[action]
 
 // === Mode state ===
 

@@ -88,9 +88,13 @@ const en = {
   tutorialShape4: 'Branching',
   tutorialShape5: 'Branching crossing',
   tutorialOwlBasics:
-    'Win by closing every branch: Close lights up when the same bird stands alone on both sides of the gate — ⊥ on the left or ⊤ on the right closes too. Drop the extra birds first. Keys: ← → = pick a bird, ↓ = Drop, ↵ = Close, ⌫ = Undo.',
+    'Win by closing every branch: Close lights up when the same bird stands alone on both sides of the gate — ⊥ on the left or ⊤ on the right closes too. Drop the extra birds first.',
+  tutorialOwlBasicsControls:
+    'Controls: {pick} = pick a bird, {drop} = let it go, {close} = seal the branch, {undo} = take it back.',
   tutorialOwlLogic:
-    'Now for taking birds apart: Destruct unpacks the faded symbol, and each shape moves its own way — watch where the pieces land. Keys: ← → = pick, ↑ = Destruct, W / O = switch branch.',
+    'Now for taking birds apart: Destruct unpacks the faded symbol, and each shape moves its own way — watch where the pieces land.',
+  tutorialOwlLogicControls:
+    'Controls: {pick} = pick, {destruct} = unpack it, {branch} = switch branch.',
 } as const
 
 const fi: Record<MessageKey, string> = {
@@ -183,9 +187,13 @@ const fi: Record<MessageKey, string> = {
   tutorialShape4: 'Haarautuminen',
   tutorialShape5: 'Haarautuva ylitys',
   tutorialOwlBasics:
-    'Voitat sulkemalla kaikki haarat: Sulje syttyy, kun sama lintu on yksin portin molemmin puolin — myös ⊥ vasemmalla tai ⊤ oikealla sulkee. Pudota ylimääräiset linnut ensin. Näppäimet: ← → = valitse lintu, ↓ = Pudota, ↵ = Sulje, ⌫ = Kumoa.',
+    'Voitat sulkemalla kaikki haarat: Sulje syttyy, kun sama lintu on yksin portin molemmin puolin — myös ⊥ vasemmalla tai ⊤ oikealla sulkee. Pudota ylimääräiset linnut ensin.',
+  tutorialOwlBasicsControls:
+    'Ohjaus: {pick} = valitse lintu, {drop} = päästä irti, {close} = sulje haara, {undo} = peru.',
   tutorialOwlLogic:
-    'Nyt puretaan lintuja osiin: Pura purkaa haalean merkin, ja jokainen muoto liikkuu omalla tavallaan — katso, mihin osat päätyvät. Näppäimet: ← → = valitse, ↑ = Pura, W / O = vaihda haaraa.',
+    'Nyt puretaan lintuja osiin: Pura purkaa haalean merkin, ja jokainen muoto liikkuu omalla tavallaan — katso, mihin osat päätyvät.',
+  tutorialOwlLogicControls:
+    'Ohjaus: {pick} = valitse, {destruct} = pura osiin, {branch} = vaihda haaraa.',
 }
 
 const es: Record<MessageKey, string> = {
@@ -278,9 +286,13 @@ const es: Record<MessageKey, string> = {
   tutorialShape4: 'Ramificación',
   tutorialShape5: 'Cruce con ramas',
   tutorialOwlBasics:
-    'Gana cerrando todas las ramas: Cerrar se enciende cuando el mismo pájaro está solo a ambos lados de la puerta — ⊥ a la izquierda o ⊤ a la derecha también cierran. Suelta antes los pájaros sobrantes. Teclas: ← → = elegir pájaro, ↓ = Soltar, ↵ = Cerrar, ⌫ = Deshacer.',
+    'Gana cerrando todas las ramas: Cerrar se enciende cuando el mismo pájaro está solo a ambos lados de la puerta — ⊥ a la izquierda o ⊤ a la derecha también cierran. Suelta antes los pájaros sobrantes.',
+  tutorialOwlBasicsControls:
+    'Controles: {pick} = elegir pájaro, {drop} = soltarlo, {close} = cerrar la rama, {undo} = deshacer.',
   tutorialOwlLogic:
-    'Ahora a desarmar pájaros: Destruir despliega el símbolo tenue, y cada forma se mueve a su manera — observa dónde caen las piezas. Teclas: ← → = elegir, ↑ = Destruir, W / O = cambiar de rama.',
+    'Ahora a desarmar pájaros: Destruir despliega el símbolo tenue, y cada forma se mueve a su manera — observa dónde caen las piezas.',
+  tutorialOwlLogicControls:
+    'Controles: {pick} = elegir, {destruct} = desarmarlo, {branch} = cambiar de rama.',
 }
 
 const cs: Record<MessageKey, string> = {
@@ -373,9 +385,13 @@ const cs: Record<MessageKey, string> = {
   tutorialShape4: 'Větvení',
   tutorialShape5: 'Větvený přechod',
   tutorialOwlBasics:
-    'Vyhraješ zavřením všech větví: Zavřít se rozsvítí, když stejný pták stojí sám na obou stranách brány — zavírá i ⊥ vlevo nebo ⊤ vpravo. Přebytečné ptáky nejdřív pusť. Klávesy: ← → = vybrat ptáka, ↓ = Pustit, ↵ = Zavřít, ⌫ = Zpět.',
+    'Vyhraješ zavřením všech větví: Zavřít se rozsvítí, když stejný pták stojí sám na obou stranách brány — zavírá i ⊥ vlevo nebo ⊤ vpravo. Přebytečné ptáky nejdřív pusť.',
+  tutorialOwlBasicsControls:
+    'Ovládání: {pick} = vybrat ptáka, {drop} = pustit ho, {close} = zavřít větev, {undo} = vzít zpět.',
   tutorialOwlLogic:
-    'Teď rozebíráme ptáky: Zničit rozloží vybledlý symbol a každý tvar se pohybuje po svém — sleduj, kam kousky dopadnou. Klávesy: ← → = výběr, ↑ = Zničit, W / O = přepnout větev.',
+    'Teď rozebíráme ptáky: Zničit rozloží vybledlý symbol a každý tvar se pohybuje po svém — sleduj, kam kousky dopadnou.',
+  tutorialOwlLogicControls:
+    'Ovládání: {pick} = výběr, {destruct} = rozložit, {branch} = přepnout větev.',
 }
 
 const pl: Record<MessageKey, string> = {
@@ -468,9 +484,13 @@ const pl: Record<MessageKey, string> = {
   tutorialShape4: 'Rozgałęzienie',
   tutorialShape5: 'Rozgałęzione przejście',
   tutorialOwlBasics:
-    'Wygrywasz, zamykając wszystkie gałęzie: Zamknij zapala się, gdy ten sam ptak stoi sam po obu stronach bramy — zamyka też ⊥ po lewej lub ⊤ po prawej. Najpierw upuść zbędne ptaki. Klawisze: ← → = wybierz ptaka, ↓ = Upuść, ↵ = Zamknij, ⌫ = Cofnij.',
+    'Wygrywasz, zamykając wszystkie gałęzie: Zamknij zapala się, gdy ten sam ptak stoi sam po obu stronach bramy — zamyka też ⊥ po lewej lub ⊤ po prawej. Najpierw upuść zbędne ptaki.',
+  tutorialOwlBasicsControls:
+    'Sterowanie: {pick} = wybierz ptaka, {drop} = puść go, {close} = zamknij gałąź, {undo} = cofnij.',
   tutorialOwlLogic:
-    'Teraz rozbieramy ptaki: Zniszcz rozkłada wyblakły symbol, a każdy kształt porusza się po swojemu — patrz, gdzie lądują części. Klawisze: ← → = wybór, ↑ = Zniszcz, W / O = zmiana gałęzi.',
+    'Teraz rozbieramy ptaki: Zniszcz rozkłada wyblakły symbol, a każdy kształt porusza się po swojemu — patrz, gdzie lądują części.',
+  tutorialOwlLogicControls:
+    'Sterowanie: {pick} = wybór, {destruct} = rozłóż, {branch} = zmiana gałęzi.',
 }
 
 export type MessageKey = keyof typeof en

@@ -27,7 +27,12 @@ import { basic, fromSequent } from '../render/print'
 import { html } from '../render/segment'
 import { MountResult, Navigate } from './types'
 import { MessageKey, t } from './i18n'
-import { getActionHint, getActionHintPure } from './input-mode'
+import {
+  getActionHint,
+  getActionHintPure,
+  gazeKeyHint,
+  gazePadHint,
+} from './input-mode'
 import {
   inputLabel,
   isInputAvailable,
@@ -332,18 +337,91 @@ export const mountVersus = (
 
   // The owl: the tutor character's portrait in the tutor half's lower-right
   // corner, with a speech bubble carrying one message per chapter — what the
-  // chapter is about and the keys it needs. Rebuilt with the half, so beat
-  // jumps across a chapter border swap the message.
+  // chapter is about and the controls it needs. Rebuilt with the half, so
+  // beat jumps across a chapter border swap the message.
+  //
+  // The controls sentence is ONE template per chapter ({pick}/{drop}/… i18n
+  // placeholders); the bind labels are injected per device — mouse gets the
+  // localized button words, keyboard / gamepad get labels derived from the
+  // live keymaps (gazeKeyHint / gazePadHint), so rebindable keys flow
+  // through with no copy changes. All three device variants are rendered as
+  // latent spans and CSS shows the one matching the html input-* class, so
+  // the bubble follows the device last touched instantly, without a
+  // re-render (pointer↔keyboard flips never re-render by design — see
+  // setActiveInput).
   const owlMessageKey: Record<TutorialBeat['chapter'], MessageKey> = {
     basics: 'tutorialOwlBasics',
     logic: 'tutorialOwlLogic',
   }
+  const owlControlsKey: Record<TutorialBeat['chapter'], MessageKey> = {
+    basics: 'tutorialOwlBasicsControls',
+    logic: 'tutorialOwlLogicControls',
+  }
+  type OwlDevice = 'pointer' | 'keyboard' | 'gamepad'
+  const owlDevices: ReadonlyArray<OwlDevice> = [
+    'pointer',
+    'keyboard',
+    'gamepad',
+  ]
+  const owlBindLabels = (device: OwlDevice): Map<string, string> => {
+    if (device === 'pointer') {
+      return new Map([
+        ['pick', `${t('left')} / ${t('right')}`],
+        ['drop', t('drop')],
+        ['close', t('axiom')],
+        ['undo', t('undo')],
+        ['destruct', t('destruct')],
+        ['branch', `${t('prevBranch')} / ${t('nextBranch')}`],
+      ])
+    }
+    const hint = device === 'keyboard' ? gazeKeyHint : gazePadHint
+    const label = (action: Action): string => hint(action) ?? '?'
+    return new Map([
+      ['pick', `${label('gazeLeft')} ${label('gazeRight')}`],
+      ['drop', label('gazeWeakening')],
+      ['close', label('axiom')],
+      ['undo', label('undo')],
+      ['destruct', label('gazeConnective')],
+      ['branch', `${label('prevBranch')} / ${label('nextBranch')}`],
+    ])
+  }
+  // Split the template on {token} boundaries; tokens become styleable bind
+  // chips, everything else stays plain text.
+  const appendOwlControls = (
+    into: HTMLElement,
+    template: string,
+    binds: Map<string, string>,
+  ): void => {
+    for (const part of template.split(/(\{\w+\})/)) {
+      if (part === '') continue
+      const bind =
+        part.startsWith('{') && part.endsWith('}')
+          ? binds.get(part.slice(1, -1))
+          : undefined
+      if (bind === undefined) {
+        into.appendChild(document.createTextNode(part))
+      } else {
+        const chip = document.createElement('span')
+        chip.setAttribute('class', 'owl-bind')
+        chip.textContent = bind
+        into.appendChild(chip)
+      }
+    }
+  }
   const buildOwl = (): HTMLElement => {
+    const chapter = beatAt(beatIdx).chapter
     const owl = document.createElement('div')
     owl.setAttribute('class', 'tutor-owl')
     const bubble = document.createElement('div')
     bubble.setAttribute('class', 'tutor-owl-bubble')
-    bubble.textContent = t(owlMessageKey[beatAt(beatIdx).chapter])
+    bubble.appendChild(document.createTextNode(t(owlMessageKey[chapter])))
+    for (const device of owlDevices) {
+      const span = document.createElement('span')
+      span.setAttribute('class', `tutor-owl-controls for-${device}`)
+      span.appendChild(document.createTextNode(' '))
+      appendOwlControls(span, t(owlControlsKey[chapter]), owlBindLabels(device))
+      bubble.appendChild(span)
+    }
     const face = document.createElement('div')
     face.setAttribute('class', 'tutor-owl-face')
     face.textContent = '🦉'
