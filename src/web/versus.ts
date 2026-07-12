@@ -322,6 +322,7 @@ export const mountVersus = (
       'class',
       'versus-half' +
         (isNpc2 || tutorOff ? ' versus-half-npc' : '') +
+        (tutorOff ? ' versus-half-off' : '') +
         (hideControls2 ? ' versus-half-keys' : ''),
     )
     half.appendChild(

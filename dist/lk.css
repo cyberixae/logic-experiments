@@ -1634,6 +1634,14 @@ html.mode-single:not(.input-pointer) .bench-topbar .bench-zoom {
 .versus-half-npc .controls {
   visibility: hidden;
 }
+/* Tutorial with the tutor rig off: the half is fully idle, so hide the
+   proof tree too (versus-half-npc leaves the playarea visible because an
+   NPC's board is worth watching; an unmanned board is just confusing).
+   visibility keeps the half's footprint, so enabling the tutor later
+   doesn't reflow the learner's side. */
+.versus-half-off .playarea {
+  visibility: hidden;
+}
 /* Keyboard/gamepad slots: hide the pointer/touch control bar and topbar */
 /* buttons (rule cards stay visible). Congrats buttons remain visible. */
 .versus-half-keys .controls:not(:has(.congrabuttons)) {
