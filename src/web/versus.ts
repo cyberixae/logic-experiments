@@ -27,7 +27,7 @@ import { basic, fromSequent } from '../render/print'
 import { html } from '../render/segment'
 import { MountResult, Navigate } from './types'
 import { MessageKey, t } from './i18n'
-import { getActionHint } from './input-mode'
+import { getActionHint, getActionHintPure } from './input-mode'
 import {
   inputLabel,
   isInputAvailable,
@@ -47,11 +47,6 @@ const totalMoves = (ws: AnyWorkspace): number => {
   const counts = countRuleUsage(ws.currentConjecture().derivation)
   return Object.values(counts).reduce((a, b) => a + b, 0)
 }
-
-// One-shot flag: cycling an input in the tutorial's pause menu remounts the
-// arena, which would land unpaused — set this before the remount so the menu
-// reopens and multi-step cycling doesn't need reopening by hand.
-let reopenPauseMenu = false
 
 // Build a formula-editor shroud scoped to one half of the versus screen.
 // The shroud is appended to document.body so it survives rerenders triggered
@@ -117,8 +112,11 @@ export const mountVersus = (
   let beatIdx = versusConfig.tutorial?.startBeat ?? 0
   // Tutorial input model: the learner (P1) gets every connected human input
   // device; the tutor (P2) is the opt-in Wizard-of-Oz rig, claiming at most
-  // one device. p1Input / p2Input are Versus-only.
-  const tutorInput: TutorInput = versusConfig.tutorial?.tutorInput ?? 'off'
+  // one device. p1Input / p2Input are Versus-only. Mutable because the
+  // tutor is switched LIVE from the pause menu: a tutor is typically
+  // summoned mid-challenge, in response to a learner's question about the
+  // exact position on the board — a remount would destroy the question.
+  let tutorInput: TutorInput = versusConfig.tutorial?.tutorInput ?? 'off'
   const takeChallenge = (): ChallengeResult =>
     isTutorial ? beatAt(beatIdx).generate() : pool.take()
 
@@ -208,17 +206,21 @@ export const mountVersus = (
     ...createBenchCtx(false, true, false, false, 1),
     getActionHint,
   })
+  // The tutor's hints track the live tutor device (switchable mid-session).
+  const tutorCtx = (): BenchCtx => ({
+    ...createBenchCtx(false, true, false, false, 1),
+    getActionHint: (action) =>
+      tutorInput === 'off' || tutorInput === 'mouse'
+        ? undefined
+        : getActionHintPure(action, tutorInput !== 'keyboard'),
+  })
   const ctx1 = isTutorial ? learnerCtx() : makeCtx(versusConfig.p1Input)
-  const ctx2 = makeCtx(isTutorial ? tutorInput : versusConfig.p2Input)
+  const ctx2 = isTutorial ? tutorCtx() : makeCtx(versusConfig.p2Input)
 
   // Timer
   let timeLeft = versusConfig.gameDurationSeconds
   let gameOver = false
   let paused = false
-  if (isTutorial && reopenPauseMenu) {
-    reopenPauseMenu = false
-    paused = true
-  }
   let pauseMenu: {
     el: HTMLElement
     onAction: (action: Action) => void
@@ -242,7 +244,9 @@ export const mountVersus = (
   const isNpc2 = !isTutorial && versusConfig.p2Input === 'npc'
   // A tutor with no device is a dead half: reuse the NPC half's treatment
   // (controls hidden, pointer events off) so stray clicks can't drive it.
-  const tutorOff = isTutorial && tutorInput === 'off'
+  // A function, not a const: the tutor device switches live from the pause
+  // menu and buildHalf2 re-reads it on every rebuild.
+  const tutorOff = () => isTutorial && tutorInput === 'off'
 
   // The on-screen control bar / topbar buttons are the pointer/touch UI. A
   // keyboard or gamepad slot drives the game with physical keys/buttons, so hide
@@ -251,9 +255,12 @@ export const mountVersus = (
   const hideControls1 = isTutorial
     ? false
     : versusConfig.p1Input !== 'mouse' && !isNpc1
-  const hideControls2 = isTutorial
-    ? tutorInput !== 'mouse' && !tutorOff
-    : versusConfig.p2Input !== 'mouse' && !isNpc2
+  const hideControls2 = () =>
+    isTutorial
+      ? tutorInput === 'keyboard' ||
+        tutorInput === 'gamepad1' ||
+        tutorInput === 'gamepad2'
+      : versusConfig.p2Input !== 'mouse' && !isNpc2
 
   // Refs to the current arena regions, refreshed every full rerender. Surgical
   // updates swap just one of these so the opposite player's in-flight animation
@@ -321,9 +328,9 @@ export const mountVersus = (
     half.setAttribute(
       'class',
       'versus-half' +
-        (isNpc2 || tutorOff ? ' versus-half-npc' : '') +
-        (tutorOff ? ' versus-half-off' : '') +
-        (hideControls2 ? ' versus-half-keys' : ''),
+        (isNpc2 || tutorOff() ? ' versus-half-npc' : '') +
+        (tutorOff() ? ' versus-half-off' : '') +
+        (hideControls2() ? ' versus-half-keys' : ''),
     )
     half.appendChild(
       createBench(
@@ -517,7 +524,7 @@ export const mountVersus = (
       // Match Setup (which would launch a real match), a single cycler for
       // the tutor's device — the Wizard-of-Oz rig, off by default. The
       // learner needs no picker: their half takes every remaining device.
-      // Cycling remounts the tutorial at the current beat via URL params.
+      // Cycling switches the tutor live (no remount — see applyTutorialTutor).
       const tutorLabel =
         tutorInput === 'off' ? t('inputOff') : inputLabel(tutorInput)
       addButton(`${t('tutor')}: ${tutorLabel}`, () =>
@@ -557,16 +564,22 @@ export const mountVersus = (
     }
     return current
   }
-  // Remount the tutorial with the chosen tutor device, staying on the current
-  // beat. The state lives in URL params (shareable WoZ setup links);
-  // navigate's tutorial carry-list preserves them through the remount.
+  // Switch the tutor device LIVE — no remount, both boards untouched. A
+  // tutor is typically summoned mid-challenge to answer a question about
+  // the exact position on the board; a remount would destroy the question.
+  // The input listeners are all attached at mount and route by reading
+  // tutorInput, so flipping the variable re-routes them; the rerender
+  // refreshes the tutor half's visibility and the pause-menu label (menu
+  // stays open — cycling should feel like a settings panel). The URL param
+  // is kept in sync so the session setup stays a shareable link.
   const applyTutorialTutor = (tutor: TutorInput) => {
+    tutorInput = tutor
     const params = new URLSearchParams(window.location.search)
     params.set('tutorial_beat', String(beatIdx))
     params.set('tutorial_tutor', tutor)
     history.replaceState(history.state, '', `?${params.toString()}`)
-    reopenPauseMenu = true
-    navigate('tutorial')
+    pauseMenu = null
+    rerender()
   }
 
   // rerender is defined before solvePlayer* so they can reference it
@@ -1454,9 +1467,13 @@ export const mountVersus = (
   let cleanupP1: () => void
   let cleanupP2: () => void
   if (isTutorial) {
-    // Learner half: every human input device drives P1 — on-screen buttons,
-    // the keyboard, and every gamepad slot (so a pad plugged in mid-session
-    // works without a remount) — minus the device claimed by the tutor.
+    // Every human input device is attached once and ROUTED per event by the
+    // live tutorInput: the tutor's claimed device drives the tutor half,
+    // everything else drives the learner ('off' and 'mouse' claim no
+    // listener — a second mouse needs none, each half has its own buttons).
+    // Event-time routing is what lets the pause menu switch the tutor
+    // without a remount. All four pad slots are wired so a pad plugged in
+    // mid-session drives the learner immediately.
     const padHandler1 = (action: Action) => {
       if (gameOver || paused || action === 'menu') return
       if (handleEditorInput1(action)) return
@@ -1466,40 +1483,35 @@ export const mountVersus = (
       }
       dispatch1(action)
     }
-    const tutorPadIdx =
+    const padHandler2 = (action: Action) => {
+      if (gameOver || paused || action === 'menu') return
+      if (handleEditorInput2(action)) return
+      if (action === 'skip') {
+        skipPlayer2()
+        return
+      }
+      dispatch2(action)
+    }
+    const tutorPadIdx = (): number | null =>
       tutorInput === 'gamepad1' || tutorInput === 'gamepad2'
         ? gpIndex(tutorInput)
         : null
-    const cleanups1: Array<() => void> = []
-    if (tutorInput !== 'keyboard') {
-      document.addEventListener('keydown', handleKey)
-      cleanups1.push(() => document.removeEventListener('keydown', handleKey))
+    const routeKey = (ev: KeyboardEvent) => {
+      if (tutorInput === 'keyboard') handleKey2(ev)
+      else handleKey(ev)
     }
-    for (const idx of [0, 1, 2, 3]) {
-      if (idx === tutorPadIdx) continue
-      cleanups1.push(setupGamepad(padHandler1, idx))
-    }
-    cleanupP1 = () => cleanups1.forEach((c) => c())
-
-    // Tutor half: exactly the claimed device — or nothing for 'off' and
-    // 'mouse' (a second mouse needs no listener; each half has its own
-    // buttons).
-    if (tutorInput === 'keyboard') {
-      document.addEventListener('keydown', handleKey2)
-      cleanupP2 = () => document.removeEventListener('keydown', handleKey2)
-    } else if (tutorPadIdx !== null) {
-      cleanupP2 = setupGamepad((action) => {
-        if (gameOver || paused || action === 'menu') return
-        if (handleEditorInput2(action)) return
-        if (action === 'skip') {
-          skipPlayer2()
-          return
-        }
-        dispatch2(action)
-      }, tutorPadIdx)
-    } else {
-      cleanupP2 = () => {}
-    }
+    document.addEventListener('keydown', routeKey)
+    const cleanups = [
+      () => document.removeEventListener('keydown', routeKey),
+      ...[0, 1, 2, 3].map((idx) =>
+        setupGamepad((action) => {
+          if (idx === tutorPadIdx()) padHandler2(action)
+          else padHandler1(action)
+        }, idx),
+      ),
+    ]
+    cleanupP1 = () => cleanups.forEach((c) => c())
+    cleanupP2 = () => {}
   } else {
     if (versusConfig.p1Input === 'keyboard') {
       document.addEventListener('keydown', handleKey)
