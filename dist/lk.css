@@ -1642,6 +1642,36 @@ html.mode-single:not(.input-pointer) .bench-topbar .bench-zoom {
 .versus-half-off .playarea {
   visibility: hidden;
 }
+/* The tutorial's owl tutor: a portrait (bigger than the proposition birds)
+   pinned to the tutor half's lower-right corner, speech bubble above it
+   with the current chapter's message. Sits outside .bench so the NPC-half
+   treatment of a tutor-less half doesn't hide it; pointer-events off so it
+   never eats the tutor board's clicks. */
+.tutor-owl {
+  position: absolute;
+  right: 0.8em;
+  bottom: 0.8em;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.4em;
+  max-width: 18em;
+  pointer-events: none;
+  /* Above the bench's bottom fade gradient (z-index 3), below popups. */
+  z-index: 4;
+}
+.tutor-owl-bubble {
+  background-color: #fff;
+  border: 2px solid #964;
+  border-radius: 12px;
+  border-bottom-right-radius: 2px;
+  padding: 0.5em 0.8em;
+  font-size: 0.8em;
+}
+.tutor-owl-face {
+  font-size: 3.5em;
+  line-height: 1;
+}
 /* Keyboard/gamepad slots: hide the pointer/touch control bar and topbar */
 /* buttons (rule cards stay visible). Congrats buttons remain visible. */
 .versus-half-keys .controls:not(:has(.congrabuttons)) {

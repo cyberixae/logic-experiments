@@ -87,6 +87,10 @@ const en = {
   tutorialShape3: 'Crossing',
   tutorialShape4: 'Branching',
   tutorialShape5: 'Branching crossing',
+  tutorialOwlBasics:
+    'Win by closing every branch: Close lights up when the same bird stands alone on both sides of the gate — ⊥ on the left or ⊤ on the right closes too. Drop the extra birds first. Keys: space = Close, S / L = Drop, backspace = Undo.',
+  tutorialOwlLogic:
+    'Now for taking birds apart: Destruct unpacks the faded symbol, and each shape moves its own way — watch where the pieces land. Keys: F / J = Destruct, W / O = switch branch.',
 } as const
 
 const fi: Record<MessageKey, string> = {
@@ -178,6 +182,10 @@ const fi: Record<MessageKey, string> = {
   tutorialShape3: 'Ylitys',
   tutorialShape4: 'Haarautuminen',
   tutorialShape5: 'Haarautuva ylitys',
+  tutorialOwlBasics:
+    'Voitat sulkemalla kaikki haarat: Sulje syttyy, kun sama lintu on yksin portin molemmin puolin — myös ⊥ vasemmalla tai ⊤ oikealla sulkee. Pudota ylimääräiset linnut ensin. Näppäimet: välilyönti = Sulje, S / L = Pudota, askelpalautin = Kumoa.',
+  tutorialOwlLogic:
+    'Nyt puretaan lintuja osiin: Pura purkaa haalean merkin, ja jokainen muoto liikkuu omalla tavallaan — katso, mihin osat päätyvät. Näppäimet: F / J = Pura, W / O = vaihda haaraa.',
 }
 
 const es: Record<MessageKey, string> = {
@@ -269,6 +277,10 @@ const es: Record<MessageKey, string> = {
   tutorialShape3: 'Cruce',
   tutorialShape4: 'Ramificación',
   tutorialShape5: 'Cruce con ramas',
+  tutorialOwlBasics:
+    'Gana cerrando todas las ramas: Cerrar se enciende cuando el mismo pájaro está solo a ambos lados de la puerta — ⊥ a la izquierda o ⊤ a la derecha también cierran. Suelta antes los pájaros sobrantes. Teclas: espacio = Cerrar, S / L = Soltar, retroceso = Deshacer.',
+  tutorialOwlLogic:
+    'Ahora a desarmar pájaros: Destruir despliega el símbolo tenue, y cada forma se mueve a su manera — observa dónde caen las piezas. Teclas: F / J = Destruir, W / O = cambiar de rama.',
 }
 
 const cs: Record<MessageKey, string> = {
@@ -360,6 +372,10 @@ const cs: Record<MessageKey, string> = {
   tutorialShape3: 'Přechod',
   tutorialShape4: 'Větvení',
   tutorialShape5: 'Větvený přechod',
+  tutorialOwlBasics:
+    'Vyhraješ zavřením všech větví: Zavřít se rozsvítí, když stejný pták stojí sám na obou stranách brány — zavírá i ⊥ vlevo nebo ⊤ vpravo. Přebytečné ptáky nejdřív pusť. Klávesy: mezerník = Zavřít, S / L = Pustit, backspace = Zpět.',
+  tutorialOwlLogic:
+    'Teď rozebíráme ptáky: Zničit rozloží vybledlý symbol a každý tvar se pohybuje po svém — sleduj, kam kousky dopadnou. Klávesy: F / J = Zničit, W / O = přepnout větev.',
 }
 
 const pl: Record<MessageKey, string> = {
@@ -451,6 +467,10 @@ const pl: Record<MessageKey, string> = {
   tutorialShape3: 'Przejście',
   tutorialShape4: 'Rozgałęzienie',
   tutorialShape5: 'Rozgałęzione przejście',
+  tutorialOwlBasics:
+    'Wygrywasz, zamykając wszystkie gałęzie: Zamknij zapala się, gdy ten sam ptak stoi sam po obu stronach bramy — zamyka też ⊥ po lewej lub ⊤ po prawej. Najpierw upuść zbędne ptaki. Klawisze: spacja = Zamknij, S / L = Upuść, backspace = Cofnij.',
+  tutorialOwlLogic:
+    'Teraz rozbieramy ptaki: Zniszcz rozkłada wyblakły symbol, a każdy kształt porusza się po swojemu — patrz, gdzie lądują części. Klawisze: F / J = Zniszcz, W / O = zmiana gałęzi.',
 }
 
 export type MessageKey = keyof typeof en

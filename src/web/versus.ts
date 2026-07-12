@@ -330,6 +330,28 @@ export const mountVersus = (
     return half
   }
 
+  // The owl: the tutor character's portrait in the tutor half's lower-right
+  // corner, with a speech bubble carrying one message per chapter — what the
+  // chapter is about and the keys it needs. Rebuilt with the half, so beat
+  // jumps across a chapter border swap the message.
+  const owlMessageKey: Record<TutorialBeat['chapter'], MessageKey> = {
+    basics: 'tutorialOwlBasics',
+    logic: 'tutorialOwlLogic',
+  }
+  const buildOwl = (): HTMLElement => {
+    const owl = document.createElement('div')
+    owl.setAttribute('class', 'tutor-owl')
+    const bubble = document.createElement('div')
+    bubble.setAttribute('class', 'tutor-owl-bubble')
+    bubble.textContent = t(owlMessageKey[beatAt(beatIdx).chapter])
+    const face = document.createElement('div')
+    face.setAttribute('class', 'tutor-owl-face')
+    face.textContent = '🦉'
+    owl.appendChild(bubble)
+    owl.appendChild(face)
+    return owl
+  }
+
   const buildHalf2 = (): HTMLElement => {
     const half = document.createElement('div')
     half.setAttribute(
@@ -354,6 +376,9 @@ export const mountVersus = (
         isTutorial,
       ),
     )
+    // Appended after the bench (and outside it), so the owl draws on top
+    // and the NPC-half treatment of a tutor-less half never touches it.
+    if (isTutorial) half.appendChild(buildOwl())
     return half
   }
 
