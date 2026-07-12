@@ -46,6 +46,7 @@ import {
   tutorialCurriculum,
   tutorialStops,
   TutorialBeat,
+  TutorialChapter,
 } from '../random/tutorial'
 
 const formatTime = (s: number): string => {
@@ -399,9 +400,10 @@ export const mountVersus = (
   // so the chips follow the device last touched instantly, without a
   // re-render (pointer↔keyboard flips never re-render by design — see
   // setActiveInput).
-  const owlChapterKey: Record<TutorialBeat['chapter'], MessageKey> = {
+  const owlChapterKey: Record<TutorialChapter, MessageKey> = {
     basics: 'tutorialOwlBasics',
     logic: 'tutorialOwlLogic',
+    done: 'tutorialOwlDone',
   }
   // Keyed by curriculum index — the two Close beats share a nameId, so the
   // name alone cannot address a beat.
@@ -1271,7 +1273,7 @@ export const mountVersus = (
   // stop index addressing: beat i / a chapter's intro page.
   const stopIndexOfBeat = (beat: number): number =>
     tutorialStops.findIndex((s) => s.kind === 'beat' && s.beatIdx === beat)
-  const stopIndexOfIntro = (chapter: TutorialBeat['chapter']): number =>
+  const stopIndexOfIntro = (chapter: TutorialChapter): number =>
     tutorialStops.findIndex((s) => s.kind === 'intro' && s.chapter === chapter)
   // Beat rows name the behavior, never the schema; Basics rows reuse the
   // exact words on the buttons they teach (Close, Drop).
@@ -1340,6 +1342,16 @@ export const mountVersus = (
       row.onclick = () => jumpToStop(stopIndexOfBeat(i))
       ladder.appendChild(row)
     })
+    // The beat-less completion chapter: a header row only.
+    const doneIdx = stopIndexOfIntro('done')
+    const doneHeader = document.createElement('div')
+    doneHeader.setAttribute(
+      'class',
+      'tutorial-ladder-chapter' + (doneIdx === stopIdx ? ' current' : ''),
+    )
+    doneHeader.textContent = `${chapterNo + 1} · ${t('tutorialComplete')}`
+    doneHeader.onclick = () => jumpToStop(doneIdx)
+    ladder.appendChild(doneHeader)
     thermo.appendChild(ladder)
 
     const menuBtn = createButton('⋮', false, () => setPaused(true))

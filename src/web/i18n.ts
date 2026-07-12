@@ -107,6 +107,9 @@ const en = {
     'Dropping a Conjunction ( ∧ ) on the right side of the gate, or a Disjunction ( ∨ ) on the left, makes the tree branch.',
   tutorialOwlBranchingCrossing:
     'Dropping an Implication ( → ) on the left side of the gate is the most intricate of the rules, as it combines both parts crossing the gate and the tree branching.',
+  tutorialComplete: 'Complete',
+  tutorialOwlDone:
+    'The tutorial is complete! You now know everything you need to play. Have fun!',
 } as const
 
 const fi: Record<MessageKey, string> = {
@@ -218,6 +221,9 @@ const fi: Record<MessageKey, string> = {
     'Konjunktion ( ∧ ) pudottaminen portin oikealla puolella tai Disjunktion ( ∨ ) pudottaminen portin vasemmalla puolella aiheuttaa puun haarautumisen.',
   tutorialOwlBranchingCrossing:
     'Implikaation ( → ) pudottaminen portin vasemmalta puolelta on säännöistä monimutkaisin, sillä se yhdistää sekä osien siirtymisen portin yli että puun haarautumisen.',
+  tutorialComplete: 'Valmis',
+  tutorialOwlDone:
+    'Opastus on suoritettu! Tiedät nyt kaiken, mitä pelaamiseen tarvitaan. Pidä hauskaa!',
 }
 
 const es: Record<MessageKey, string> = {
@@ -329,6 +335,9 @@ const es: Record<MessageKey, string> = {
     'Soltar una Conjunción ( ∧ ) en el lado derecho de la puerta, o una Disyunción ( ∨ ) en el izquierdo, ramifica el árbol.',
   tutorialOwlBranchingCrossing:
     'Soltar una Implicación ( → ) en el lado izquierdo de la puerta es la regla más compleja, pues combina el cruce de las partes al otro lado y la ramificación del árbol.',
+  tutorialComplete: 'Completado',
+  tutorialOwlDone:
+    '¡Tutorial completado! Ya sabes todo lo que necesitas para jugar. ¡Diviértete!',
 }
 
 const cs: Record<MessageKey, string> = {
@@ -440,6 +449,9 @@ const cs: Record<MessageKey, string> = {
     'Puštění Konjunkce ( ∧ ) na pravé straně brány nebo Disjunkce ( ∨ ) na levé rozvětví strom.',
   tutorialOwlBranchingCrossing:
     'Puštění Implikace ( → ) na levé straně brány je nejsložitější z pravidel: spojuje jak přechod částí přes bránu, tak větvení stromu.',
+  tutorialComplete: 'Hotovo',
+  tutorialOwlDone:
+    'Návod je u konce! Teď víš vše, co ke hraní potřebuješ. Bav se!',
 }
 
 const pl: Record<MessageKey, string> = {
@@ -551,6 +563,9 @@ const pl: Record<MessageKey, string> = {
     'Upuszczenie Koniunkcji ( ∧ ) po prawej stronie bramy lub Alternatywy ( ∨ ) po lewej rozgałęzia drzewo.',
   tutorialOwlBranchingCrossing:
     'Upuszczenie Implikacji ( → ) po lewej stronie bramy to najbardziej złożona z reguł, łączy bowiem przejście części przez bramę i rozgałęzienie drzewa.',
+  tutorialComplete: 'Gotowe',
+  tutorialOwlDone:
+    'Samouczek ukończony! Wiesz już wszystko, czego potrzeba do gry. Miłej zabawy!',
 }
 
 export type MessageKey = keyof typeof en

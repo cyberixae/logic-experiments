@@ -541,11 +541,13 @@ const beatFail = (): TutorialBeat => {
 }
 
 // The tutorial's navigable positions: each chapter opens with an intro page
-// (no board, only the chapter's framing text) followed by its beats. The
-// web layer walks this list; the curriculum above stays the generation
-// source of truth.
+// (no board, only the chapter's framing text) followed by its beats, and
+// the list ends with a beat-less completion chapter. The web layer walks
+// this list; the curriculum above stays the generation source of truth.
+export type TutorialChapter = TutorialBeat['chapter'] | 'done'
+
 export type TutorialStop =
-  | { kind: 'intro'; chapter: TutorialBeat['chapter'] }
+  | { kind: 'intro'; chapter: TutorialChapter }
   | { kind: 'beat'; beatIdx: number }
 
 export const tutorialStops: ReadonlyArray<TutorialStop> = (() => {
@@ -558,6 +560,7 @@ export const tutorialStops: ReadonlyArray<TutorialStop> = (() => {
     }
     stops.push({ kind: 'beat', beatIdx: i })
   })
+  stops.push({ kind: 'intro', chapter: 'done' })
   return stops
 })()
 
