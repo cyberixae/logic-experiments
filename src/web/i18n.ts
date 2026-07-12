@@ -89,7 +89,7 @@ const en = {
   tutorialShape2: 'Side flip',
   tutorialShape3: 'Dividing',
   tutorialShape4: 'Branching',
-  tutorialShape5: 'Branching division',
+  tutorialShape5: 'Shattering',
   tutorialOwlBasics:
     'Welcome to LK! In its challenges you close derivation trees built out of sequents. This first chapter teaches the essentials you need to play.',
   tutorialOwlLogic:
@@ -109,7 +109,7 @@ const en = {
   tutorialOwlBranching:
     'Dropping a Conjunction ( ∧ ) on the right side of the gate, or a Disjunction ( ∨ ) on the left, makes the tree branch.',
   tutorialOwlBranchingCrossing:
-    'Dropping an Implication ( → ) on the left side of the gate is the most intricate of the rules, as it combines both the parts dividing across the gate and the tree branching.',
+    'Dropping an Implication ( → ) on the left side of the gate shatters the sentence: the most intricate of the rules combines both the parts dividing across the gate and the tree branching.',
   tutorialComplete: 'Graduation',
   tutorialStart: 'Start',
   tutorialOwlDone:
@@ -207,7 +207,7 @@ const fi: Record<MessageKey, string> = {
   tutorialShape2: 'Puolenvaihto',
   tutorialShape3: 'Jakautuminen',
   tutorialShape4: 'Haarautuminen',
-  tutorialShape5: 'Haarautuva jakautuminen',
+  tutorialShape5: 'Sirpaloituminen',
   tutorialOwlBasics:
     'Tervetuloa pelaamaan LK:ta! Pelin haasteissa suljetaan sekventeistä koostuvia päättelypuita. Ensimmäisessä luvussa opimme pelaamisen kannalta välttämättömiä perusasioita.',
   tutorialOwlLogic:
@@ -227,7 +227,7 @@ const fi: Record<MessageKey, string> = {
   tutorialOwlBranching:
     'Konjunktion ( ∧ ) pudottaminen portin oikealla puolella tai Disjunktion ( ∨ ) pudottaminen portin vasemmalla puolella aiheuttaa puun haarautumisen.',
   tutorialOwlBranchingCrossing:
-    'Implikaation ( → ) pudottaminen portin vasemmalta puolelta on säännöistä monimutkaisin, sillä se yhdistää sekä osien jakautumisen portin eri puolille että puun haarautumisen.',
+    'Implikaation ( → ) pudottaminen portin vasemmalta puolelta sirpaloittaa lauseen: säännöistä monimutkaisin yhdistää sekä osien jakautumisen portin eri puolille että puun haarautumisen.',
   tutorialComplete: 'Valmistujaiset',
   tutorialStart: 'Aloita',
   tutorialOwlDone:
@@ -325,7 +325,7 @@ const es: Record<MessageKey, string> = {
   tutorialShape2: 'Cambio de lado',
   tutorialShape3: 'Reparto',
   tutorialShape4: 'Ramificación',
-  tutorialShape5: 'Reparto ramificado',
+  tutorialShape5: 'Fragmentación',
   tutorialOwlBasics:
     '¡Bienvenido a LK! En los desafíos del juego se cierran árboles de deducción compuestos de secuentes. En este primer capítulo aprendemos lo básico imprescindible para jugar.',
   tutorialOwlLogic:
@@ -345,7 +345,7 @@ const es: Record<MessageKey, string> = {
   tutorialOwlBranching:
     'Soltar una Conjunción ( ∧ ) en el lado derecho de la puerta, o una Disyunción ( ∨ ) en el izquierdo, ramifica el árbol.',
   tutorialOwlBranchingCrossing:
-    'Soltar una Implicación ( → ) en el lado izquierdo de la puerta es la regla más compleja, pues combina el reparto de las partes entre ambos lados y la ramificación del árbol.',
+    'Soltar una Implicación ( → ) en el lado izquierdo de la puerta fragmenta la oración: la regla más compleja combina el reparto de las partes entre ambos lados y la ramificación del árbol.',
   tutorialComplete: 'Graduación',
   tutorialStart: 'Empezar',
   tutorialOwlDone:
@@ -443,7 +443,7 @@ const cs: Record<MessageKey, string> = {
   tutorialShape2: 'Změna strany',
   tutorialShape3: 'Rozdělení',
   tutorialShape4: 'Větvení',
-  tutorialShape5: 'Větvené rozdělení',
+  tutorialShape5: 'Tříštění',
   tutorialOwlBasics:
     'Vítej ve hře LK! V jejích výzvách se zavírají odvozovací stromy složené ze sekventů. V této první kapitole se naučíme základy, bez kterých se hrát nedá.',
   tutorialOwlLogic:
@@ -463,7 +463,7 @@ const cs: Record<MessageKey, string> = {
   tutorialOwlBranching:
     'Puštění Konjunkce ( ∧ ) na pravé straně brány nebo Disjunkce ( ∨ ) na levé rozvětví strom.',
   tutorialOwlBranchingCrossing:
-    'Puštění Implikace ( → ) na levé straně brány je nejsložitější z pravidel: spojuje jak rozdělení částí na obě strany brány, tak větvení stromu.',
+    'Puštění Implikace ( → ) na levé straně brány větu roztříští: nejsložitější z pravidel spojuje jak rozdělení částí na obě strany brány, tak větvení stromu.',
   tutorialComplete: 'Promoce',
   tutorialStart: 'Začít',
   tutorialOwlDone:
@@ -561,7 +561,7 @@ const pl: Record<MessageKey, string> = {
   tutorialShape2: 'Zmiana strony',
   tutorialShape3: 'Rozdzielenie',
   tutorialShape4: 'Rozgałęzienie',
-  tutorialShape5: 'Rozgałęzione rozdzielenie',
+  tutorialShape5: 'Rozbicie',
   tutorialOwlBasics:
     'Witaj w grze LK! W jej wyzwaniach zamyka się drzewa wnioskowania zbudowane z sekwentów. W tym pierwszym rozdziale poznajemy podstawy niezbędne do gry.',
   tutorialOwlLogic:
@@ -581,7 +581,7 @@ const pl: Record<MessageKey, string> = {
   tutorialOwlBranching:
     'Upuszczenie Koniunkcji ( ∧ ) po prawej stronie bramy lub Alternatywy ( ∨ ) po lewej rozgałęzia drzewo.',
   tutorialOwlBranchingCrossing:
-    'Upuszczenie Implikacji ( → ) po lewej stronie bramy to najbardziej złożona z reguł, łączy bowiem rozdzielenie części na obie strony bramy i rozgałęzienie drzewa.',
+    'Upuszczenie Implikacji ( → ) po lewej stronie bramy rozbija zdanie: najbardziej złożona z reguł łączy rozdzielenie części na obie strony bramy i rozgałęzienie drzewa.',
   tutorialComplete: 'Zakończenie',
   tutorialStart: 'Rozpocznij',
   tutorialOwlDone:
