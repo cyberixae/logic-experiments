@@ -98,13 +98,13 @@ const en = {
   tutorialOwlDrop:
     'Any extra sentences on a branch must always be dropped before the branch can close. Remove them by picking the sentence to drop with the {pick} buttons, then pressing the {drop} button repeatedly until the picked sentence falls off the tree. If you drop a sentence the branch needs for closing, you can undo your move by pressing {undo}.',
   tutorialOwlSplit:
-    'You can drop a connective by picking a sentence with the {pick} buttons, then pressing {destruct} repeatedly until the outermost connective of the picked sentence falls off the tree. Dropping a Conjunction ( ∧ ) or a Disjunction ( ∨ ) from its own natural side of the gate causes no further consequences.',
+    'You can drop a connective by picking a sentence with the {pick} buttons, then pressing {destruct} repeatedly until the outermost connective of the picked sentence falls off the tree. Dropping a Conjunction ( ∧ ) on the left side of the gate, or a Disjunction ( ∨ ) on the right, causes no further consequences.',
   tutorialOwlSideFlip:
     'Dropping a Negation ( ¬ ) makes the remaining sentence cross over the gate.',
   tutorialOwlCrossing:
     'Dropping an Implication ( → ) on the right side of the gate splits its parts across the two sides of the gate.',
   tutorialOwlBranching:
-    'Dropping a Conjunction ( ∧ ) or a Disjunction ( ∨ ) makes the tree branch when they are unpacked from the unnatural side of the gate.',
+    'Dropping a Conjunction ( ∧ ) on the right side of the gate, or a Disjunction ( ∨ ) on the left, makes the tree branch.',
   tutorialOwlBranchingCrossing:
     'Dropping an Implication ( → ) on the left side of the gate is the most intricate of the rules, as it combines both parts crossing the gate and the tree branching.',
 } as const
@@ -209,13 +209,13 @@ const fi: Record<MessageKey, string> = {
   tutorialOwlDrop:
     'Oksan sisältämät ylimääräiset lauseet on aina pudotettava ennen kuin oksan voi sulkea. Saat ylimääräiset lauseet poistettua valitsemalla pudotettavan lauseen {pick} painikkeilla, ja painamalla sen jälkeen {drop} painiketta toistuvasti, kunnes valittu lause putoaa puusta. Mikäli pudotat oksan sulkemiseen tarvittavan lauseen, voit perua siirtosi painamalla {undo} painiketta.',
   tutorialOwlSplit:
-    'Voit pudottaa konnektiivin valitsemalla lauseen {pick} painikkeilla, ja painamalla sen jälkeen {destruct} toistuvasti, kunnes valitun lauseen uloin konnektiivi putoaa puusta. Konjunktion ( ∧ ) tai Disjunktion ( ∨ ) pudottaminen omalta luontaiselta puoleltaan porttia ei aiheuta sen kummempia seuraamuksia.',
+    'Voit pudottaa konnektiivin valitsemalla lauseen {pick} painikkeilla, ja painamalla sen jälkeen {destruct} toistuvasti, kunnes valitun lauseen uloin konnektiivi putoaa puusta. Konjunktion ( ∧ ) pudottaminen portin vasemmalla puolella tai Disjunktion ( ∨ ) pudottaminen portin oikealla puolella ei aiheuta sen kummempia seuraamuksia.',
   tutorialOwlSideFlip:
     'Negaation ( ¬ ) pudottaminen aiheuttaa jäljelle jäävän lauseen siirtymisen portin yli.',
   tutorialOwlCrossing:
     'Implikaation ( → ) pudottaminen portin oikealta puolelta aiheuttaa lauseen osien jakautumisen kahdelle puolelle porttia.',
   tutorialOwlBranching:
-    'Konjunktion ( ∧ ) tai Disjunktion ( ∨ ) pudottaminen aiheuttaa puun haarautumisen, mikäli nämä puretaan epäluonnolliselta puolelta porttia.',
+    'Konjunktion ( ∧ ) pudottaminen portin oikealla puolella tai Disjunktion ( ∨ ) pudottaminen portin vasemmalla puolella aiheuttaa puun haarautumisen.',
   tutorialOwlBranchingCrossing:
     'Implikaation ( → ) pudottaminen portin vasemmalta puolelta on säännöistä monimutkaisin, sillä se yhdistää sekä osien siirtymisen portin yli että puun haarautumisen.',
 }
@@ -320,13 +320,13 @@ const es: Record<MessageKey, string> = {
   tutorialOwlDrop:
     'Las oraciones sobrantes de una rama deben soltarse siempre antes de poder cerrarla. Elimínalas eligiendo la oración a soltar con los botones {pick} y pulsando después el botón {drop} repetidamente, hasta que la oración elegida caiga del árbol. Si sueltas una oración necesaria para cerrar la rama, puedes deshacer el movimiento pulsando {undo}.',
   tutorialOwlSplit:
-    'Puedes soltar un conectivo eligiendo una oración con los botones {pick} y pulsando después {destruct} repetidamente, hasta que el conectivo más externo de la oración elegida caiga del árbol. Soltar una Conjunción ( ∧ ) o una Disyunción ( ∨ ) desde su lado natural de la puerta no tiene mayores consecuencias.',
+    'Puedes soltar un conectivo eligiendo una oración con los botones {pick} y pulsando después {destruct} repetidamente, hasta que el conectivo más externo de la oración elegida caiga del árbol. Soltar una Conjunción ( ∧ ) en el lado izquierdo de la puerta, o una Disyunción ( ∨ ) en el derecho, no tiene mayores consecuencias.',
   tutorialOwlSideFlip:
     'Soltar una Negación ( ¬ ) hace que la oración restante cruce al otro lado de la puerta.',
   tutorialOwlCrossing:
     'Soltar una Implicación ( → ) en el lado derecho de la puerta reparte sus partes entre los dos lados de la puerta.',
   tutorialOwlBranching:
-    'Soltar una Conjunción ( ∧ ) o una Disyunción ( ∨ ) ramifica el árbol si se descomponen desde el lado no natural de la puerta.',
+    'Soltar una Conjunción ( ∧ ) en el lado derecho de la puerta, o una Disyunción ( ∨ ) en el izquierdo, ramifica el árbol.',
   tutorialOwlBranchingCrossing:
     'Soltar una Implicación ( → ) en el lado izquierdo de la puerta es la regla más compleja, pues combina el cruce de las partes al otro lado y la ramificación del árbol.',
 }
@@ -431,13 +431,13 @@ const cs: Record<MessageKey, string> = {
   tutorialOwlDrop:
     'Přebytečné věty na větvi je vždy nutné pustit, než ji lze zavřít. Odstraníš je tak, že tlačítky {pick} vybereš větu k puštění a pak opakovaně mačkáš tlačítko {drop}, dokud vybraná věta nespadne ze stromu. Pokud pustíš větu potřebnou k zavření větve, můžeš tah vrátit tlačítkem {undo}.',
   tutorialOwlSplit:
-    'Spojku pustíš tak, že tlačítky {pick} vybereš větu a pak opakovaně mačkáš {destruct}, dokud vnější spojka vybrané věty nespadne ze stromu. Puštění Konjunkce ( ∧ ) nebo Disjunkce ( ∨ ) z její přirozené strany brány nemá žádné zvláštní následky.',
+    'Spojku pustíš tak, že tlačítky {pick} vybereš větu a pak opakovaně mačkáš {destruct}, dokud vnější spojka vybrané věty nespadne ze stromu. Puštění Konjunkce ( ∧ ) na levé straně brány nebo Disjunkce ( ∨ ) na pravé nemá žádné zvláštní následky.',
   tutorialOwlSideFlip:
     'Puštění Negace ( ¬ ) přesune zbývající větu přes bránu na druhou stranu.',
   tutorialOwlCrossing:
     'Puštění Implikace ( → ) na pravé straně brány rozdělí její části na obě strany brány.',
   tutorialOwlBranching:
-    'Puštění Konjunkce ( ∧ ) nebo Disjunkce ( ∨ ) rozvětví strom, pokud se rozkládají z nepřirozené strany brány.',
+    'Puštění Konjunkce ( ∧ ) na pravé straně brány nebo Disjunkce ( ∨ ) na levé rozvětví strom.',
   tutorialOwlBranchingCrossing:
     'Puštění Implikace ( → ) na levé straně brány je nejsložitější z pravidel: spojuje jak přechod částí přes bránu, tak větvení stromu.',
 }
@@ -542,13 +542,13 @@ const pl: Record<MessageKey, string> = {
   tutorialOwlDrop:
     'Zbędne zdania na gałęzi trzeba zawsze upuścić, zanim da się ją zamknąć. Usuniesz je, wybierając zdanie do upuszczenia przyciskami {pick}, a następnie naciskając przycisk {drop} wielokrotnie, aż wybrane zdanie spadnie z drzewa. Jeśli upuścisz zdanie potrzebne do zamknięcia gałęzi, możesz cofnąć ruch przyciskiem {undo}.',
   tutorialOwlSplit:
-    'Spójnik upuszczasz, wybierając zdanie przyciskami {pick}, a następnie naciskając {destruct} wielokrotnie, aż zewnętrzny spójnik wybranego zdania spadnie z drzewa. Upuszczenie Koniunkcji ( ∧ ) lub Alternatywy ( ∨ ) z jej naturalnej strony bramy nie ma szczególnych następstw.',
+    'Spójnik upuszczasz, wybierając zdanie przyciskami {pick}, a następnie naciskając {destruct} wielokrotnie, aż zewnętrzny spójnik wybranego zdania spadnie z drzewa. Upuszczenie Koniunkcji ( ∧ ) po lewej stronie bramy lub Alternatywy ( ∨ ) po prawej nie ma szczególnych następstw.',
   tutorialOwlSideFlip:
     'Upuszczenie Negacji ( ¬ ) przenosi pozostałe zdanie na drugą stronę bramy.',
   tutorialOwlCrossing:
     'Upuszczenie Implikacji ( → ) po prawej stronie bramy rozdziela jej części na obie strony bramy.',
   tutorialOwlBranching:
-    'Upuszczenie Koniunkcji ( ∧ ) lub Alternatywy ( ∨ ) rozgałęzia drzewo, jeśli rozkłada się je z nienaturalnej strony bramy.',
+    'Upuszczenie Koniunkcji ( ∧ ) po prawej stronie bramy lub Alternatywy ( ∨ ) po lewej rozgałęzia drzewo.',
   tutorialOwlBranchingCrossing:
     'Upuszczenie Implikacji ( → ) po lewej stronie bramy to najbardziej złożona z reguł, łączy bowiem przejście części przez bramę i rozgałęzienie drzewa.',
 }
