@@ -1,15 +1,9 @@
-import { gameModes, GameMode } from '../model/mode'
 import { MountResult, Navigate } from './types'
 import { t } from './i18n'
 import { createLangSwitcher } from './lang-switcher'
 import { createButtonCursor } from './button-cursor'
 import type { CursorCell } from './button-cursor'
 import { markKeyboardInput, qwertyKeyMap, setupGamepad } from './game'
-
-const modeLabel: Record<GameMode, () => string> = {
-  random: () => t('random'),
-  campaign: () => t('campaign'),
-}
 
 export const mountMenu = (
   container: HTMLElement,
@@ -42,23 +36,19 @@ export const mountMenu = (
 
     const cells: CursorCell[] = []
 
-    const versusBtn = document.createElement('div')
-    versusBtn.setAttribute('class', 'button menu-mode')
-    versusBtn.textContent = t('versus')
-    const versusActivate = () => navigate('versus-config')
-    versusBtn.onclick = versusActivate
-    modes.appendChild(versusBtn)
-    cells.push({ btn: versusBtn, activate: versusActivate })
-
-    for (const mode of gameModes) {
+    const addMode = (label: string, activate: () => void) => {
       const btn = document.createElement('div')
       btn.setAttribute('class', 'button menu-mode')
-      btn.innerHTML = modeLabel[mode]()
-      const activate = () => navigate(mode)
+      btn.textContent = label
       btn.onclick = activate
       modes.appendChild(btn)
       cells.push({ btn, activate })
     }
+    addMode(t('versus'), () => navigate('versus-config'))
+    addMode(t('random'), () => navigate('random'))
+    // The tutorial holds the learning-path slot; the legacy Campaign it
+    // replaced is archived in the secret menu.
+    addMode(t('tutorial'), () => navigate('tutorial'))
 
     panel.appendChild(modes)
     container.appendChild(panel)

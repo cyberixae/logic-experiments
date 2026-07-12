@@ -28,12 +28,13 @@ export const mountSecret = (
     systemsBtn.onclick = () => navigate('system')
     modes.appendChild(systemsBtn)
 
-    // Tutorial lives here (not the main menu) until it's more polished.
-    const tutorialBtn = document.createElement('div')
-    tutorialBtn.setAttribute('class', 'button menu-mode')
-    tutorialBtn.innerHTML = t('tutorial')
-    tutorialBtn.onclick = () => navigate('tutorial')
-    modes.appendChild(tutorialBtn)
+    // The legacy Campaign track is archived here (not deleted) since the
+    // tutorial took its main-menu slot.
+    const campaignBtn = document.createElement('div')
+    campaignBtn.setAttribute('class', 'button menu-mode')
+    campaignBtn.innerHTML = t('campaign')
+    campaignBtn.onclick = () => navigate('campaign')
+    modes.appendChild(campaignBtn)
 
     panel.appendChild(modes)
 
