@@ -76,8 +76,8 @@ const en = {
   tutor: 'Tutor',
   inputOff: 'Off',
   tutorial: 'Tutorial',
-  tutorialBasics: 'Must Know',
-  tutorialLogic: 'Good to Know',
+  tutorialBasics: 'Basics',
+  tutorialLogic: 'Destruct Rules',
   tutorialPart: 'Part',
   tutorialAdvance: 'Next Topic',
   tutorialPrevious: 'Previous Topic',
@@ -107,7 +107,7 @@ const en = {
     'Dropping a Conjunction ( ∧ ) on the right side of the gate, or a Disjunction ( ∨ ) on the left, makes the tree branch.',
   tutorialOwlBranchingCrossing:
     'Dropping an Implication ( → ) on the left side of the gate is the most intricate of the rules, as it combines both the parts dividing across the gate and the tree branching.',
-  tutorialComplete: 'Complete',
+  tutorialComplete: 'Graduation',
   tutorialStart: 'Start',
   tutorialOwlDone:
     'The tutorial is complete! You now know everything you need to play. Have fun!',
@@ -191,8 +191,8 @@ const fi: Record<MessageKey, string> = {
   tutor: 'Tuutori',
   inputOff: 'Pois',
   tutorial: 'Opastus',
-  tutorialBasics: 'Pakko tietää',
-  tutorialLogic: 'Hyvä tietää',
+  tutorialBasics: 'Perusteet',
+  tutorialLogic: 'Purkusäännöt',
   tutorialPart: 'Osa',
   tutorialAdvance: 'Seuraava aihe',
   tutorialPrevious: 'Edellinen aihe',
@@ -222,7 +222,7 @@ const fi: Record<MessageKey, string> = {
     'Konjunktion ( ∧ ) pudottaminen portin oikealla puolella tai Disjunktion ( ∨ ) pudottaminen portin vasemmalla puolella aiheuttaa puun haarautumisen.',
   tutorialOwlBranchingCrossing:
     'Implikaation ( → ) pudottaminen portin vasemmalta puolelta on säännöistä monimutkaisin, sillä se yhdistää sekä osien jakautumisen portin eri puolille että puun haarautumisen.',
-  tutorialComplete: 'Valmis',
+  tutorialComplete: 'Valmistujaiset',
   tutorialStart: 'Aloita',
   tutorialOwlDone:
     'Opastus on suoritettu! Tiedät nyt kaiken, mitä pelaamiseen tarvitaan. Pidä hauskaa!',
@@ -306,8 +306,8 @@ const es: Record<MessageKey, string> = {
   tutor: 'Tutor',
   inputOff: 'Desactivado',
   tutorial: 'Tutorial',
-  tutorialBasics: 'Imprescindible',
-  tutorialLogic: 'Recomendado',
+  tutorialBasics: 'Fundamentos',
+  tutorialLogic: 'Reglas de destrucción',
   tutorialPart: 'Parte',
   tutorialAdvance: 'Siguiente tema',
   tutorialPrevious: 'Tema anterior',
@@ -337,7 +337,7 @@ const es: Record<MessageKey, string> = {
     'Soltar una Conjunción ( ∧ ) en el lado derecho de la puerta, o una Disyunción ( ∨ ) en el izquierdo, ramifica el árbol.',
   tutorialOwlBranchingCrossing:
     'Soltar una Implicación ( → ) en el lado izquierdo de la puerta es la regla más compleja, pues combina el reparto de las partes entre ambos lados y la ramificación del árbol.',
-  tutorialComplete: 'Completado',
+  tutorialComplete: 'Graduación',
   tutorialStart: 'Empezar',
   tutorialOwlDone:
     '¡Tutorial completado! Ya sabes todo lo que necesitas para jugar. ¡Diviértete!',
@@ -421,8 +421,8 @@ const cs: Record<MessageKey, string> = {
   tutor: 'Tutor',
   inputOff: 'Vypnuto',
   tutorial: 'Návod',
-  tutorialBasics: 'Nutné vědět',
-  tutorialLogic: 'Dobré vědět',
+  tutorialBasics: 'Základy',
+  tutorialLogic: 'Pravidla ničení',
   tutorialPart: 'Část',
   tutorialAdvance: 'Další téma',
   tutorialPrevious: 'Předchozí téma',
@@ -452,7 +452,7 @@ const cs: Record<MessageKey, string> = {
     'Puštění Konjunkce ( ∧ ) na pravé straně brány nebo Disjunkce ( ∨ ) na levé rozvětví strom.',
   tutorialOwlBranchingCrossing:
     'Puštění Implikace ( → ) na levé straně brány je nejsložitější z pravidel: spojuje jak rozdělení částí na obě strany brány, tak větvení stromu.',
-  tutorialComplete: 'Hotovo',
+  tutorialComplete: 'Promoce',
   tutorialStart: 'Začít',
   tutorialOwlDone:
     'Návod je u konce! Teď víš vše, co ke hraní potřebuješ. Bav se!',
@@ -536,8 +536,8 @@ const pl: Record<MessageKey, string> = {
   tutor: 'Tutor',
   inputOff: 'Wyłączony',
   tutorial: 'Samouczek',
-  tutorialBasics: 'Trzeba wiedzieć',
-  tutorialLogic: 'Warto wiedzieć',
+  tutorialBasics: 'Podstawy',
+  tutorialLogic: 'Zasady niszczenia',
   tutorialPart: 'Część',
   tutorialAdvance: 'Następny temat',
   tutorialPrevious: 'Poprzedni temat',
@@ -567,7 +567,7 @@ const pl: Record<MessageKey, string> = {
     'Upuszczenie Koniunkcji ( ∧ ) po prawej stronie bramy lub Alternatywy ( ∨ ) po lewej rozgałęzia drzewo.',
   tutorialOwlBranchingCrossing:
     'Upuszczenie Implikacji ( → ) po lewej stronie bramy to najbardziej złożona z reguł, łączy bowiem rozdzielenie części na obie strony bramy i rozgałęzienie drzewa.',
-  tutorialComplete: 'Gotowe',
+  tutorialComplete: 'Zakończenie',
   tutorialStart: 'Rozpocznij',
   tutorialOwlDone:
     'Samouczek ukończony! Wiesz już wszystko, czego potrzeba do gry. Miłej zabawy!',
