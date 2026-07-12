@@ -14,7 +14,7 @@ import {
   mountVersusConfig,
   parseVersusConfigFromParams,
   setVersusConfigParams,
-  PlayerInput,
+  TutorInput,
 } from './web/versus-config'
 import {
   mountRandomConfig,
@@ -42,14 +42,11 @@ const enterMode = (mode: GameMode) => {
   session.enter(mode, factory[mode]())
 }
 
-// The tutorial's inputs come from URL params (no NPC — the tutor is a human
-// until the NPC-tutor era).
-const pickHumanInput = (
-  params: URLSearchParams,
-  key: string,
-  fallback: PlayerInput,
-): PlayerInput => {
-  const raw = params.get(key)
+// The tutorial's tutor device comes from a URL param (no NPC — the tutor is
+// a human until the NPC-tutor era). Absent or unrecognized means off: a solo
+// learner with every input device.
+const pickTutorInput = (params: URLSearchParams): TutorInput => {
+  const raw = params.get('tutorial_tutor')
   if (
     raw === 'mouse' ||
     raw === 'keyboard' ||
@@ -57,7 +54,7 @@ const pickHumanInput = (
     raw === 'gamepad2'
   )
     return raw
-  return fallback
+  return 'off'
 }
 
 const navigate = (screen: Screen) => {
@@ -110,7 +107,7 @@ const navigate = (screen: Screen) => {
       }
     }
     if (screen === 'tutorial') {
-      for (const key of ['tutorial_beat', 'tutorial_p1', 'tutorial_p2']) {
+      for (const key of ['tutorial_beat', 'tutorial_tutor']) {
         const val = currentParams.get(key)
         if (val !== null) nextParams.set(key, val)
       }
@@ -160,8 +157,7 @@ const mount = (screen: Screen) => {
         navigate,
         pool,
         beat,
-        pickHumanInput(params, 'tutorial_p1', 'mouse'),
-        pickHumanInput(params, 'tutorial_p2', 'keyboard'),
+        pickTutorInput(params),
       )
       break
     }
