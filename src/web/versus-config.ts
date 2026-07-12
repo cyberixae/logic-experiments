@@ -32,11 +32,12 @@ export type PlayerInput = 'mouse' | 'keyboard' | 'gamepad1' | 'gamepad2' | 'npc'
 export type TutorInput = 'off' | 'mouse' | 'keyboard' | 'gamepad1' | 'gamepad2'
 
 // When present, the Versus arena runs as the tutorial: untimed, drawing
-// clamped practice challenges from the given curriculum beat instead of the
-// pool, with the curriculum ladder in place of the scoreboard. p1Input /
-// p2Input are ignored — the learner gets every human input device except
-// the tutor's.
-export type VersusTutorial = { startBeat: number; tutorInput: TutorInput }
+// clamped practice challenges from the current curriculum beat instead of
+// the pool, with the curriculum ladder in place of the scoreboard.
+// startStop indexes the tutorial's stop list (chapter intro pages
+// interleaved with beats). p1Input / p2Input are ignored — the learner
+// gets every human input device except the tutor's.
+export type VersusTutorial = { startStop: number; tutorInput: TutorInput }
 
 export type VersusConfig = {
   randomConfig: RandomConfig

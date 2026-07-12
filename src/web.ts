@@ -107,7 +107,7 @@ const navigate = (screen: Screen) => {
       }
     }
     if (screen === 'tutorial') {
-      for (const key of ['tutorial_beat', 'tutorial_tutor']) {
+      for (const key of ['tutorial_stop', 'tutorial_tutor']) {
         const val = currentParams.get(key)
         if (val !== null) nextParams.set(key, val)
       }
@@ -150,13 +150,13 @@ const mount = (screen: Screen) => {
     }
     case 'tutorial': {
       const params = new URLSearchParams(window.location.search)
-      const raw = parseInt(params.get('tutorial_beat') ?? '0', 10)
-      const beat = Number.isFinite(raw) ? raw : 0
+      const raw = parseInt(params.get('tutorial_stop') ?? '0', 10)
+      const stop = Number.isFinite(raw) ? raw : 0
       current = mountTutorial(
         body,
         navigate,
         pool,
-        beat,
+        stop,
         pickTutorInput(params),
       )
       break

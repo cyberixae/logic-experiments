@@ -1671,6 +1671,15 @@ html.mode-single:not(.input-pointer) .bench-topbar .bench-zoom {
 .tutor-owl-para + .tutor-owl-para {
   margin-top: 0.5em;
 }
+/* Chapter intro page: no board, just the topic navigation centered in the
+   learner half. */
+.tutorial-intro {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1em;
+}
 /* Injected bind labels render as chips. Each chip exists once per device
    as a latent variant; the html input-* class shows the one matching the
    device the learner last touched, so switching device swaps the labels
@@ -1838,6 +1847,16 @@ html.input-gamepad .owl-bind.for-gamepad {
   text-transform: uppercase;
   letter-spacing: 0.12em;
   opacity: 0.45;
+  cursor: pointer;
+  border-radius: 4px;
+  padding: 0.12em 0.2em;
+}
+.tutorial-ladder-chapter:hover {
+  opacity: 0.85;
+}
+.tutorial-ladder-chapter.current {
+  opacity: 1;
+  font-weight: bold;
 }
 .tutorial-ladder-chapter:first-child {
   margin-top: 0;

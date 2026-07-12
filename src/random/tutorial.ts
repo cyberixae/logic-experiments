@@ -539,3 +539,34 @@ export const beatAt = (i: number): TutorialBeat => {
 const beatFail = (): TutorialBeat => {
   throw new Error('empty tutorial curriculum')
 }
+
+// The tutorial's navigable positions: each chapter opens with an intro page
+// (no board, only the chapter's framing text) followed by its beats. The
+// web layer walks this list; the curriculum above stays the generation
+// source of truth.
+export type TutorialStop =
+  | { kind: 'intro'; chapter: TutorialBeat['chapter'] }
+  | { kind: 'beat'; beatIdx: number }
+
+export const tutorialStops: ReadonlyArray<TutorialStop> = (() => {
+  const stops: TutorialStop[] = []
+  let lastChapter: TutorialBeat['chapter'] | null = null
+  tutorialCurriculum.forEach((beat, i) => {
+    if (beat.chapter !== lastChapter) {
+      lastChapter = beat.chapter
+      stops.push({ kind: 'intro', chapter: beat.chapter })
+    }
+    stops.push({ kind: 'beat', beatIdx: i })
+  })
+  return stops
+})()
+
+// Clamp an index into the stop list, returning a guaranteed stop.
+export const stopAt = (i: number): TutorialStop => {
+  const clamped = Math.max(0, Math.min(i, tutorialStops.length - 1))
+  return tutorialStops[clamped] ?? tutorialStops[0] ?? stopFail()
+}
+
+const stopFail = (): TutorialStop => {
+  throw new Error('empty tutorial stop list')
+}

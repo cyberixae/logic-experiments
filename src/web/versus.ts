@@ -40,7 +40,13 @@ import {
   TutorInput,
   VersusConfig,
 } from './versus-config'
-import { beatAt, tutorialCurriculum, TutorialBeat } from '../random/tutorial'
+import {
+  beatAt,
+  stopAt,
+  tutorialCurriculum,
+  tutorialStops,
+  TutorialBeat,
+} from '../random/tutorial'
 
 const formatTime = (s: number): string => {
   const m = Math.floor(s / 60)
@@ -114,7 +120,20 @@ export const mountVersus = (
   // Input chapter). Non-tutorial Versus is unchanged.
   const isTutorial = versusConfig.tutorial !== undefined
   const untimed = isTutorial
-  let beatIdx = versusConfig.tutorial?.startBeat ?? 0
+  // Navigation cursor: an index into tutorialStops (chapter intro pages +
+  // beats). beatIdx tracks the beat the boards are rooted at — on an intro
+  // page it stays at the upcoming chapter's first beat, so stepping forward
+  // onto that beat needs no re-root.
+  let stopIdx = versusConfig.tutorial?.startStop ?? 0
+  const beatForStop = (s: number): number => {
+    for (let i = s; i < tutorialStops.length; i += 1) {
+      const stop = tutorialStops[i]
+      if (stop !== undefined && stop.kind === 'beat') return stop.beatIdx
+    }
+    return tutorialCurriculum.length - 1
+  }
+  let beatIdx = isTutorial ? beatForStop(stopIdx) : 0
+  const onIntro = (): boolean => isTutorial && stopAt(stopIdx).kind === 'intro'
   // Tutorial input model: the learner (P1) gets every connected human input
   // device; the tutor (P2) is the opt-in Wizard-of-Oz rig, claiming at most
   // one device. p1Input / p2Input are Versus-only. Mutable because the
@@ -303,7 +322,38 @@ export const mountVersus = (
     return el
   }
 
+  // Chapter intro page: replaces the learner's bench with just the topic
+  // navigation. No board, no controls — the owl on the other half does the
+  // speaking. The two buttons form a cursor row so keyboard / gamepad can
+  // drive them like the solved screen's.
+  const buildIntroPage = (): HTMLElement => {
+    const half = document.createElement('div')
+    half.setAttribute('class', 'versus-half')
+    const page = document.createElement('div')
+    page.setAttribute('class', 'tutorial-intro')
+    const cells: CursorCell[] = []
+    const add = (label: string, disabled: boolean, activate: () => void) => {
+      const el = createButton(label, disabled, activate)
+      page.appendChild(el)
+      cells.push({ btn: el, activate, isEnabled: () => !disabled })
+    }
+    add(t('tutorialPrevious'), stopIdx <= 0, () => jumpToStop(stopIdx - 1))
+    add(t('tutorialAdvance'), stopIdx >= tutorialStops.length - 1, () =>
+      jumpToStop(stopIdx + 1),
+    )
+    // Next Topic is the page's default (an unengaged axiom presses it), so
+    // the cursor starts there and the first arrow moves immediately.
+    const cursor = createButtonCursor([cells], {
+      startCol: 1,
+      moveOnReveal: true,
+    })
+    introCursor = { onAction: cursor.onAction, isEngaged: cursor.isEngaged }
+    half.appendChild(page)
+    return half
+  }
+
   const buildHalf1 = (): HTMLElement => {
+    if (onIntro()) return buildIntroPage()
     const half = document.createElement('div')
     half.setAttribute(
       'class',
@@ -421,11 +471,17 @@ export const mountVersus = (
     owl.setAttribute('class', 'tutor-owl')
     const bubble = document.createElement('div')
     bubble.setAttribute('class', 'tutor-owl-bubble')
-    const beatKey = owlBeatKey[beatIdx]
-    const paragraphs = [
-      t(owlChapterKey[beatAt(beatIdx).chapter]),
-      ...(beatKey === undefined ? [] : [t(beatKey)]),
-    ]
+    // Chapter intro pages carry the chapter's framing; beats carry only
+    // their own lesson (the intro page exists so the framing text doesn't
+    // haunt every beat).
+    const stop = stopAt(stopIdx)
+    const beatKey = stop.kind === 'beat' ? owlBeatKey[stop.beatIdx] : undefined
+    const paragraphs =
+      stop.kind === 'intro'
+        ? [t(owlChapterKey[stop.chapter])]
+        : beatKey === undefined
+          ? []
+          : [t(beatKey)]
     for (const text of paragraphs) {
       const para = document.createElement('div')
       para.setAttribute('class', 'tutor-owl-para')
@@ -441,6 +497,14 @@ export const mountVersus = (
   }
 
   const buildHalf2 = (): HTMLElement => {
+    if (onIntro()) {
+      // On an intro page the tutor half carries only the owl reading the
+      // chapter text — no board even when the tutor rig has a device.
+      const half = document.createElement('div')
+      half.setAttribute('class', 'versus-half versus-half-npc versus-half-off')
+      half.appendChild(buildOwl())
+      return half
+    }
     const half = document.createElement('div')
     half.setAttribute(
       'class',
@@ -695,7 +759,7 @@ export const mountVersus = (
   const applyTutorialTutor = (tutor: TutorInput) => {
     tutorInput = tutor
     const params = new URLSearchParams(window.location.search)
-    params.set('tutorial_beat', String(beatIdx))
+    params.set('tutorial_stop', String(stopIdx))
     params.set('tutorial_tutor', tutor)
     history.replaceState(history.state, '', `?${params.toString()}`)
     pauseMenu = null
@@ -1162,10 +1226,10 @@ export const mountVersus = (
     thermoEl.replaceWith(fresh)
     thermoEl = fresh
   }
-  // Jump the tutorial to a curriculum beat (forward or back): switch the
-  // clamp and re-root BOTH players onto a fresh challenge generated under the
-  // new beat, dropping anything buffered under the old one.
-  const jumpToBeat = (target: number) => {
+  // Re-root the tutorial onto a curriculum beat: switch the clamp and root
+  // BOTH players onto a fresh challenge generated under the new beat,
+  // dropping anything buffered under the old one.
+  const rerootAtBeat = (target: number) => {
     const clamped = Math.max(0, Math.min(target, tutorialCurriculum.length - 1))
     if (clamped === beatIdx) return
     beatIdx = clamped
@@ -1184,10 +1248,31 @@ export const mountVersus = (
     index2 = fresh + 1
     ws1 = makeWorkspace(fresh)
     ws2 = makeWorkspace(fresh)
+  }
+  // Jump the tutorial to a stop (chapter intro page or beat), forward or
+  // back. Landing on a beat re-roots the boards under its clamp; landing on
+  // an intro page leaves the boards as they are (hidden behind the page).
+  const jumpToStop = (target: number) => {
+    const clamped = Math.max(0, Math.min(target, tutorialStops.length - 1))
+    if (clamped === stopIdx) return
+    stopIdx = clamped
+    const stop = stopAt(stopIdx)
+    if (stop.kind === 'beat') {
+      rerootAtBeat(stop.beatIdx)
+    } else {
+      // Pre-root the boards at the chapter's first beat so stepping forward
+      // from the intro needs no re-root.
+      rerootAtBeat(beatForStop(stopIdx))
+    }
     rerenderHalf1()
     rerenderHalf2()
     rebuildThermo()
   }
+  // stop index addressing: beat i / a chapter's intro page.
+  const stopIndexOfBeat = (beat: number): number =>
+    tutorialStops.findIndex((s) => s.kind === 'beat' && s.beatIdx === beat)
+  const stopIndexOfIntro = (chapter: TutorialBeat['chapter']): number =>
+    tutorialStops.findIndex((s) => s.kind === 'intro' && s.chapter === chapter)
   // Beat rows name the behavior, never the schema; Basics rows reuse the
   // exact words on the buttons they teach (Close, Drop).
   const beatNameKey: Record<TutorialBeat['nameId'], MessageKey> = {
@@ -1220,16 +1305,26 @@ export const mountVersus = (
         lastChapter = beat.chapter
         chapterNo += 1
         beatNo = 0
+        // Chapter headers are the intro pages' ladder rows: clickable, and
+        // highlighted while their intro page is the current stop.
+        const chapter = beat.chapter
+        const introIdx = stopIndexOfIntro(chapter)
         const header = document.createElement('div')
-        header.setAttribute('class', 'tutorial-ladder-chapter')
-        header.textContent = `${chapterNo} · ${t(chapterKey[beat.chapter])}`
+        header.setAttribute(
+          'class',
+          'tutorial-ladder-chapter' + (introIdx === stopIdx ? ' current' : ''),
+        )
+        header.textContent = `${chapterNo} · ${t(chapterKey[chapter])}`
+        header.onclick = () => jumpToStop(introIdx)
         ladder.appendChild(header)
       }
       beatNo += 1
+      const currentStop = stopAt(stopIdx)
+      const isCurrent = currentStop.kind === 'beat' && currentStop.beatIdx === i
       const row = document.createElement('div')
       row.setAttribute(
         'class',
-        'tutorial-ladder-row' + (i === beatIdx ? ' current' : ''),
+        'tutorial-ladder-row' + (isCurrent ? ' current' : ''),
       )
       const number = document.createElement('span')
       number.setAttribute('class', 'tutorial-ladder-number')
@@ -1242,7 +1337,7 @@ export const mountVersus = (
         glyphs.textContent = beat.glyphs
         row.appendChild(glyphs)
       }
-      row.onclick = () => jumpToBeat(i)
+      row.onclick = () => jumpToStop(stopIndexOfBeat(i))
       ladder.appendChild(row)
     })
     thermo.appendChild(ladder)
@@ -1276,6 +1371,9 @@ export const mountVersus = (
   }
   let congrats1: SolvedCursor | null = null
   let congrats2: SolvedCursor | null = null
+  // The chapter intro page's Previous / Next Topic cursor, captured when
+  // the page is built (there is one page, shared by both players' inputs).
+  let introCursor: SolvedCursor | null = null
 
   // Post-solve: only the Continue action (axiom) advances; menu navigates away;
   // every other mapped key replays this player's animation on their own half.
@@ -1368,6 +1466,28 @@ export const mountVersus = (
       getCursor: () => SolvedCursor | null,
     ) =>
     (action: Action): void => {
+      // On a chapter intro page there is no board: arrows drive the topic
+      // buttons, axiom presses the focused one (or Next Topic when the
+      // cursor is unengaged), and every gameplay action is swallowed so
+      // keys can't mutate the hidden workspaces.
+      if (onIntro()) {
+        const cursor = introCursor
+        if (cursor !== null) {
+          if (cursorNavActions.has(action)) {
+            cursor.onAction(action)
+            return
+          }
+          if (action === 'axiom') {
+            if (cursor.isEngaged()) {
+              cursor.onAction('axiom')
+            } else {
+              jumpToStop(stopIdx + 1)
+            }
+            return
+          }
+        }
+        return
+      }
       const cursor = getCursor()
       if (getWs().isSolved() && cursor !== null) {
         if (cursorNavActions.has(action)) {
@@ -1436,14 +1556,12 @@ export const mountVersus = (
         cells.push({ btn: el, activate, isEnabled: () => !disabled })
       }
       if (isTutorial) {
-        add(t('tutorialPrevious'), beatIdx <= 0, () => jumpToBeat(beatIdx - 1))
+        add(t('tutorialPrevious'), stopIdx <= 0, () => jumpToStop(stopIdx - 1))
       }
       add(isTutorial ? t('tutorialOneMore') : t('continue'), false, onContinue)
       if (isTutorial) {
-        add(
-          t('tutorialAdvance'),
-          beatIdx >= tutorialCurriculum.length - 1,
-          () => jumpToBeat(beatIdx + 1),
+        add(t('tutorialAdvance'), stopIdx >= tutorialStops.length - 1, () =>
+          jumpToStop(stopIdx + 1),
         )
       }
       // Continue is the screen's default (an unengaged axiom presses it), so
