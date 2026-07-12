@@ -82,6 +82,9 @@ const en = {
   tutorialAdvance: 'Next Topic',
   tutorialPrevious: 'Previous Topic',
   tutorialOneMore: 'One More Challenge',
+  tutorialIdentity: 'Identity',
+  tutorialConstants: 'Constants',
+  tutorialExtras: 'Extras',
   tutorialShape1: 'Splitting',
   tutorialShape2: 'Side flip',
   tutorialShape3: 'Dividing',
@@ -92,7 +95,7 @@ const en = {
   tutorialOwlLogic:
     'The second chapter is about dropping the extra connectives ( → ∧ ∨ ¬ ). If you would rather jump straight into the deep end, you can head for the real game as soon as you have found the {destruct} button. The subchapters walk through the consequences of dropping each connective in different situations, one at a time.',
   tutorialOwlClose:
-    'A branch of the tree can be closed when the same sentence sits on both sides of the gate ( ⊢ ). You can switch branches with the {branch} buttons and close the chosen branch with the {close} button.',
+    'A branch of the tree can be closed when the same sentence sits on both sides of the gate ( ⊢ ) — this situation is called an identity. You can switch branches with the {branch} buttons and close the chosen branch with the {close} button.',
   tutorialOwlCloseConstants:
     'Constant sentences can sometimes close a branch on their own — Falsum ( ⊥ ) when it sits alone on the left side of the gate, and Verum ( ⊤ ) when it sits alone on the right.',
   tutorialOwlDrop:
@@ -197,6 +200,9 @@ const fi: Record<MessageKey, string> = {
   tutorialAdvance: 'Seuraava aihe',
   tutorialPrevious: 'Edellinen aihe',
   tutorialOneMore: 'Vielä yksi haaste',
+  tutorialIdentity: 'Identiteetti',
+  tutorialConstants: 'Vakiot',
+  tutorialExtras: 'Ylimääräiset',
   tutorialShape1: 'Halkeaminen',
   tutorialShape2: 'Puolenvaihto',
   tutorialShape3: 'Jakautuminen',
@@ -207,7 +213,7 @@ const fi: Record<MessageKey, string> = {
   tutorialOwlLogic:
     'Toisessa luvussa käsittelemme ylimääräisten konnektiivien ( → ∧ ∨ ¬ ) pudottamista. Mikäli haluat hypätä suoraan syvään päätyyn, voit välittömästi {destruct} painikkeen löydettyäsi siirtyä pelaamaan varsinaista peliä. Tämän luvun aliluvuissa käydään yksitellen läpi eri konnektiivien pudottamisen seuraamuksia eri tilanteissa.',
   tutorialOwlClose:
-    'Päättelypuun oksa on suljettavissa silloin, kun portin ( ⊢ ) kummallakin puolella on sama lause. Voit vaihtaa oksaa {branch} painikkeilla ja sulkea valitun oksan {close} painikkeella.',
+    'Päättelypuun oksa on suljettavissa silloin, kun portin ( ⊢ ) kummallakin puolella on sama lause — tällaista tilannetta kutsutaan identiteetiksi. Voit vaihtaa oksaa {branch} painikkeilla ja sulkea valitun oksan {close} painikkeella.',
   tutorialOwlCloseConstants:
     'Vakiolauseet mahdollistavat joskus oksan sulkemisen yksinään — Falsum ( ⊥ ) ollessaan yksin portin vasemmalla puolella, ja Verum ( ⊤ ) ollessaan yksin portin oikealla puolella.',
   tutorialOwlDrop:
@@ -312,6 +318,9 @@ const es: Record<MessageKey, string> = {
   tutorialAdvance: 'Siguiente tema',
   tutorialPrevious: 'Tema anterior',
   tutorialOneMore: 'Un desafío más',
+  tutorialIdentity: 'Identidad',
+  tutorialConstants: 'Constantes',
+  tutorialExtras: 'Sobrantes',
   tutorialShape1: 'Partición',
   tutorialShape2: 'Cambio de lado',
   tutorialShape3: 'Reparto',
@@ -322,7 +331,7 @@ const es: Record<MessageKey, string> = {
   tutorialOwlLogic:
     'En el segundo capítulo tratamos cómo soltar los conectivos sobrantes ( → ∧ ∨ ¬ ). Si prefieres lanzarte a lo hondo, en cuanto encuentres el botón {destruct} puedes pasar directamente al juego de verdad. Los subcapítulos repasan una a una las consecuencias de soltar cada conectivo en distintas situaciones.',
   tutorialOwlClose:
-    'Una rama del árbol se puede cerrar cuando a ambos lados de la puerta ( ⊢ ) está la misma oración. Puedes cambiar de rama con los botones {branch} y cerrar la rama elegida con el botón {close}.',
+    'Una rama del árbol se puede cerrar cuando a ambos lados de la puerta ( ⊢ ) está la misma oración — esta situación se llama identidad. Puedes cambiar de rama con los botones {branch} y cerrar la rama elegida con el botón {close}.',
   tutorialOwlCloseConstants:
     'Las oraciones constantes a veces permiten cerrar una rama por sí solas: Falsum ( ⊥ ) cuando está solo a la izquierda de la puerta, y Verum ( ⊤ ) cuando está solo a la derecha.',
   tutorialOwlDrop:
@@ -427,6 +436,9 @@ const cs: Record<MessageKey, string> = {
   tutorialAdvance: 'Další téma',
   tutorialPrevious: 'Předchozí téma',
   tutorialOneMore: 'Ještě jedna výzva',
+  tutorialIdentity: 'Identita',
+  tutorialConstants: 'Konstanty',
+  tutorialExtras: 'Přebytky',
   tutorialShape1: 'Rozštěpení',
   tutorialShape2: 'Změna strany',
   tutorialShape3: 'Rozdělení',
@@ -437,7 +449,7 @@ const cs: Record<MessageKey, string> = {
   tutorialOwlLogic:
     'Ve druhé kapitole se věnujeme pouštění přebytečných spojek ( → ∧ ∨ ¬ ). Chceš-li skočit rovnou do hlubin, můžeš hned po nalezení tlačítka {destruct} přejít ke skutečné hře. Podkapitoly probírají jednu po druhé důsledky puštění jednotlivých spojek v různých situacích.',
   tutorialOwlClose:
-    'Větev stromu lze zavřít, když na obou stranách brány ( ⊢ ) stojí stejná věta. Větev přepneš tlačítky {branch} a vybranou větev zavřeš tlačítkem {close}.',
+    'Větev stromu lze zavřít, když na obou stranách brány ( ⊢ ) stojí stejná věta — takové situaci se říká identita. Větev přepneš tlačítky {branch} a vybranou větev zavřeš tlačítkem {close}.',
   tutorialOwlCloseConstants:
     'Konstantní věty někdy dokážou zavřít větev samy — Falsum ( ⊥ ), když stojí samo vlevo od brány, a Verum ( ⊤ ), když stojí samo vpravo.',
   tutorialOwlDrop:
@@ -542,6 +554,9 @@ const pl: Record<MessageKey, string> = {
   tutorialAdvance: 'Następny temat',
   tutorialPrevious: 'Poprzedni temat',
   tutorialOneMore: 'Jeszcze jedno wyzwanie',
+  tutorialIdentity: 'Tożsamość',
+  tutorialConstants: 'Stałe',
+  tutorialExtras: 'Zbędne',
   tutorialShape1: 'Rozszczepienie',
   tutorialShape2: 'Zmiana strony',
   tutorialShape3: 'Rozdzielenie',
@@ -552,7 +567,7 @@ const pl: Record<MessageKey, string> = {
   tutorialOwlLogic:
     'W drugim rozdziale zajmujemy się upuszczaniem zbędnych spójników ( → ∧ ∨ ¬ ). Jeśli wolisz skoczyć na głęboką wodę, zaraz po znalezieniu przycisku {destruct} możesz przejść do właściwej gry. Podrozdziały omawiają po kolei skutki upuszczania poszczególnych spójników w różnych sytuacjach.',
   tutorialOwlClose:
-    'Gałąź drzewa można zamknąć, gdy po obu stronach bramy ( ⊢ ) stoi to samo zdanie. Gałąź zmieniasz przyciskami {branch}, a wybraną gałąź zamykasz przyciskiem {close}.',
+    'Gałąź drzewa można zamknąć, gdy po obu stronach bramy ( ⊢ ) stoi to samo zdanie — taką sytuację nazywamy tożsamością. Gałąź zmieniasz przyciskami {branch}, a wybraną gałąź zamykasz przyciskiem {close}.',
   tutorialOwlCloseConstants:
     'Zdania stałe czasem pozwalają zamknąć gałąź samodzielnie — Falsum ( ⊥ ), gdy stoi samo po lewej stronie bramy, i Verum ( ⊤ ), gdy stoi samo po prawej.',
   tutorialOwlDrop:

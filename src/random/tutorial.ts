@@ -471,7 +471,8 @@ export const generateBasicsChallenge = (
 export type TutorialBeat = {
   chapter: 'basics' | 'logic'
   nameId:
-    | 'close'
+    | 'identity'
+    | 'constants'
     | 'drop'
     | 'split'
     | 'sideFlip'
@@ -497,17 +498,17 @@ const LOGIC_NAME_IDS = [
 export const tutorialCurriculum: ReadonlyArray<TutorialBeat> = [
   {
     chapter: 'basics',
-    nameId: 'close',
+    nameId: 'identity',
     glyphs: '',
     hideGaze: true,
     generate: () => generateBasicsChallenge('identity'),
   },
   {
-    // Same verb as the first beat (the ladder shows "Close ⊥ ⊤"), new
-    // winning conditions — still pure closing, so gaze stays hidden.
+    // Same verb as the first beat, new winning conditions — still pure
+    // closing, so gaze stays hidden.
     chapter: 'basics',
-    nameId: 'close',
-    glyphs: '⊥ ⊤',
+    nameId: 'constants',
+    glyphs: '',
     hideGaze: true,
     generate: () => generateBasicsChallenge('constants'),
   },

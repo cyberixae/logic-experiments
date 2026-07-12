@@ -1285,11 +1285,14 @@ export const mountVersus = (
     tutorialStops.findIndex((s) => s.kind === 'beat' && s.beatIdx === beat)
   const stopIndexOfIntro = (chapter: TutorialChapter): number =>
     tutorialStops.findIndex((s) => s.kind === 'intro' && s.chapter === chapter)
-  // Beat rows name the behavior, never the schema; Basics rows reuse the
-  // exact words on the buttons they teach (Close, Drop).
+  // Beat rows name the concept, never the schema: Basics rows name what
+  // you find on the branch (identity, constants, extras), Logic rows the
+  // consequence of the drop. Each name's word appears in its own owl beat
+  // text and nowhere else.
   const beatNameKey: Record<TutorialBeat['nameId'], MessageKey> = {
-    close: 'axiom',
-    drop: 'drop',
+    identity: 'tutorialIdentity',
+    constants: 'tutorialConstants',
+    drop: 'tutorialExtras',
     split: 'tutorialShape1',
     sideFlip: 'tutorialShape2',
     crossing: 'tutorialShape3',
