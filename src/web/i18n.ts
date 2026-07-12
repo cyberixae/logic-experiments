@@ -108,6 +108,7 @@ const en = {
   tutorialOwlBranchingCrossing:
     'Dropping an Implication ( → ) on the left side of the gate is the most intricate of the rules, as it combines both parts crossing the gate and the tree branching.',
   tutorialComplete: 'Complete',
+  tutorialStart: 'Start',
   tutorialOwlDone:
     'The tutorial is complete! You now know everything you need to play. Have fun!',
 } as const
@@ -222,6 +223,7 @@ const fi: Record<MessageKey, string> = {
   tutorialOwlBranchingCrossing:
     'Implikaation ( → ) pudottaminen portin vasemmalta puolelta on säännöistä monimutkaisin, sillä se yhdistää sekä osien siirtymisen portin yli että puun haarautumisen.',
   tutorialComplete: 'Valmis',
+  tutorialStart: 'Aloita',
   tutorialOwlDone:
     'Opastus on suoritettu! Tiedät nyt kaiken, mitä pelaamiseen tarvitaan. Pidä hauskaa!',
 }
@@ -336,6 +338,7 @@ const es: Record<MessageKey, string> = {
   tutorialOwlBranchingCrossing:
     'Soltar una Implicación ( → ) en el lado izquierdo de la puerta es la regla más compleja, pues combina el cruce de las partes al otro lado y la ramificación del árbol.',
   tutorialComplete: 'Completado',
+  tutorialStart: 'Empezar',
   tutorialOwlDone:
     '¡Tutorial completado! Ya sabes todo lo que necesitas para jugar. ¡Diviértete!',
 }
@@ -450,6 +453,7 @@ const cs: Record<MessageKey, string> = {
   tutorialOwlBranchingCrossing:
     'Puštění Implikace ( → ) na levé straně brány je nejsložitější z pravidel: spojuje jak přechod částí přes bránu, tak větvení stromu.',
   tutorialComplete: 'Hotovo',
+  tutorialStart: 'Začít',
   tutorialOwlDone:
     'Návod je u konce! Teď víš vše, co ke hraní potřebuješ. Bav se!',
 }
@@ -564,6 +568,7 @@ const pl: Record<MessageKey, string> = {
   tutorialOwlBranchingCrossing:
     'Upuszczenie Implikacji ( → ) po lewej stronie bramy to najbardziej złożona z reguł, łączy bowiem przejście części przez bramę i rozgałęzienie drzewa.',
   tutorialComplete: 'Gotowe',
+  tutorialStart: 'Rozpocznij',
   tutorialOwlDone:
     'Samouczek ukończony! Wiesz już wszystko, czego potrzeba do gry. Miłej zabawy!',
 }

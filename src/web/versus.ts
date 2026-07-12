@@ -325,30 +325,40 @@ export const mountVersus = (
 
   // Chapter intro page: replaces the learner's bench with just the topic
   // navigation. No board, no controls — the owl on the other half does the
-  // speaking. The two buttons form a cursor row so keyboard / gamepad can
-  // drive them like the solved screen's.
+  // speaking. The buttons form a cursor row so keyboard / gamepad can
+  // drive them like the solved screen's. The edge pages have a single
+  // purpose and a single button: the welcome page starts the tutorial, the
+  // completion page exits to the main menu; middle intros navigate both
+  // ways.
   const buildIntroPage = (): HTMLElement => {
     const half = document.createElement('div')
     half.setAttribute('class', 'versus-half')
     const page = document.createElement('div')
     page.setAttribute('class', 'tutorial-intro')
     const cells: CursorCell[] = []
-    const add = (label: string, disabled: boolean, activate: () => void) => {
-      const el = createButton(label, disabled, activate)
+    const add = (label: string, activate: () => void) => {
+      const el = createButton(label, false, activate)
       page.appendChild(el)
-      cells.push({ btn: el, activate, isEnabled: () => !disabled })
+      cells.push({ btn: el, activate })
     }
-    add(t('tutorialPrevious'), stopIdx <= 0, () => jumpToStop(stopIdx - 1))
-    add(t('tutorialAdvance'), stopIdx >= tutorialStops.length - 1, () =>
-      jumpToStop(stopIdx + 1),
-    )
-    // Next Topic is the page's default (an unengaged axiom presses it), so
-    // the cursor starts there and the first arrow moves immediately.
+    const stop = stopAt(stopIdx)
+    if (stopIdx <= 0) {
+      add(t('tutorialStart'), () => jumpToStop(stopIdx + 1))
+    } else if (stop.kind === 'intro' && stop.chapter === 'done') {
+      add(t('exitToMainMenu'), () => navigate('menu'))
+    } else {
+      add(t('tutorialPrevious'), () => jumpToStop(stopIdx - 1))
+      add(t('tutorialAdvance'), () => jumpToStop(stopIdx + 1))
+    }
+    // The last button is the page's default (an unengaged axiom presses
+    // it), so the cursor starts there and the first arrow moves
+    // immediately.
     const cursor = createButtonCursor([cells], {
-      startCol: 1,
+      startCol: cells.length - 1,
       moveOnReveal: true,
     })
     introCursor = { onAction: cursor.onAction, isEngaged: cursor.isEngaged }
+    introDefault = cells[cells.length - 1]?.activate ?? null
     half.appendChild(page)
     return half
   }
@@ -1383,9 +1393,11 @@ export const mountVersus = (
   }
   let congrats1: SolvedCursor | null = null
   let congrats2: SolvedCursor | null = null
-  // The chapter intro page's Previous / Next Topic cursor, captured when
-  // the page is built (there is one page, shared by both players' inputs).
+  // The chapter intro page's button cursor and default action, captured
+  // when the page is built (there is one page, shared by both players'
+  // inputs). The default is what an unengaged axiom press activates.
   let introCursor: SolvedCursor | null = null
+  let introDefault: (() => void) | null = null
 
   // Post-solve: only the Continue action (axiom) advances; menu navigates away;
   // every other mapped key replays this player's animation on their own half.
@@ -1493,7 +1505,7 @@ export const mountVersus = (
             if (cursor.isEngaged()) {
               cursor.onAction('axiom')
             } else {
-              jumpToStop(stopIdx + 1)
+              introDefault?.()
             }
             return
           }
