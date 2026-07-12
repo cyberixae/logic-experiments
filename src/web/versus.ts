@@ -200,15 +200,22 @@ export const mountVersus = (
     if (input !== 'mouse') return base
     return { ...base, getActionHint: () => undefined }
   }
+  // The rules sheet stays closed throughout the tutorial: it's a quick
+  // reference for rules already learned, not something to reach for
+  // mid-lesson. The button is hidden (hideRulesButton) and this no-op
+  // deadens the toggle bindings too — the state simply can't flip.
+  const noRulesToggle = { toggleRulesVisible: () => {} }
   // The learner half accepts every input device, so its hints follow the
   // device last touched (the global input mode) instead of a fixed one.
   const learnerCtx = (): BenchCtx => ({
     ...createBenchCtx(false, true, false, false, 1),
+    ...noRulesToggle,
     getActionHint,
   })
   // The tutor's hints track the live tutor device (switchable mid-session).
   const tutorCtx = (): BenchCtx => ({
     ...createBenchCtx(false, true, false, false, 1),
+    ...noRulesToggle,
     getActionHint: (action) =>
       tutorInput === 'off' || tutorInput === 'mouse'
         ? undefined
