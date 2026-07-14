@@ -20,7 +20,8 @@ import {
   zoomTreeOut,
   zoomTreeReset,
 } from './game'
-import { createFormulaEditor } from './formula-editor'
+import { createLemmaEditorSession } from './lemma-editor'
+import type { LemmaEditorSession } from './lemma-editor'
 import { createButtonCursor, cursorNavActions } from './button-cursor'
 import type { CursorCell } from './button-cursor'
 import { MountResult, Navigate } from './types'
@@ -101,6 +102,7 @@ export const mountRandom = (
   const onNew = () => {
     onNewChallenge()
     setGazeModeActive(false)
+    lemmaSession = null
     rerender()
   }
 
@@ -141,41 +143,24 @@ export const mountRandom = (
     onNew()
   }
 
-  let formulaEditorOpen = false
-  let closeFormulaEditor: (() => void) | null = null
-  let tryUndoInEditor: (() => boolean) | null = null
-  let editorOnAction: ((action: Action) => void) | null = null
+  // Inline lemma editing: while a session is live, createBench swaps the
+  // bottom bar for the editor and the play area shows the reverse-cut
+  // pre-split ghost. The session ends on confirm (the cut applies) or cancel.
+  let lemmaSession: LemmaEditorSession | null = null
   const onApplyReverse1: ApplyReverse1 = (_key, onFormula) => {
-    if (formulaEditorOpen) return
-    formulaEditorOpen = true
-    const cancel = () => {
-      formulaEditorOpen = false
-      closeFormulaEditor = null
-      tryUndoInEditor = null
-      editorOnAction = null
-      container.removeChild(modal)
-    }
-    const {
-      el: modal,
-      tryUndo,
-      onAction,
-    } = createFormulaEditor(
-      t('lemmaTitle'),
-      t('lemmaConfirm'),
+    if (lemmaSession !== null) return
+    setGazeModeActive(false)
+    lemmaSession = createLemmaEditorSession(
       (formula) => {
-        formulaEditorOpen = false
-        closeFormulaEditor = null
-        tryUndoInEditor = null
-        editorOnAction = null
-        container.removeChild(modal)
+        lemmaSession = null
         onFormula(formula)
       },
-      cancel,
+      () => {
+        lemmaSession = null
+        rerender()
+      },
     )
-    closeFormulaEditor = cancel
-    tryUndoInEditor = tryUndo
-    editorOnAction = onAction
-    container.appendChild(modal)
+    rerender()
   }
 
   const rerender = () => {
@@ -198,6 +183,9 @@ export const mountRandom = (
         undefined,
         undefined,
         freshFromPopup,
+        undefined,
+        undefined,
+        lemmaSession,
       ),
     )
     if (pausePopupOpen) {
@@ -237,13 +225,14 @@ export const mountRandom = (
     onApplyReverse1,
   )
   const dispatch = (action: Action) => {
-    if (formulaEditorOpen) {
+    if (lemmaSession !== null) {
+      const session = lemmaSession
       if (action === 'undo') {
-        if (!(tryUndoInEditor?.() ?? false)) closeFormulaEditor?.()
+        // Undo-past-the-beginning backs out of the editor entirely.
+        if (session.undo()) rerender()
+        else session.cancel()
       } else if (action === 'menu' || action === 'exit') {
-        closeFormulaEditor?.()
-      } else {
-        editorOnAction?.(action)
+        session.cancel()
       }
       return
     }

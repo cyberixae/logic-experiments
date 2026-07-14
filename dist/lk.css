@@ -321,6 +321,12 @@ html.loading body {
 html.mode-single:not(.input-pointer) .controls:not(:has(.congrabuttons)) {
   visibility: hidden;
 }
+/* The inline lemma editor bar stays visible on every input device: it is the
+   editor, not an on-screen mirror of physical keys. Revisit for keyboard
+   once the editor grows its own key layer (digit atoms + operator keys). */
+html.mode-single:not(.input-pointer) .controls.lemma-editor {
+  visibility: visible;
+}
 html.mode-single:not(.input-pointer) .bench-topbar .quiz-menu-btn,
 html.mode-single:not(.input-pointer) .bench-topbar .bench-rules-btn,
 html.mode-single:not(.input-pointer) .bench-topbar .bench-zoom {

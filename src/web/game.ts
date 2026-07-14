@@ -19,8 +19,12 @@ import {
   transformation,
 } from '../model/derivation'
 import { fromDerivation } from '../render/print'
+import { lemmaGhostPremises } from '../render/draft'
 import { RuleId } from '../model/rule'
 import { renderDerivation, layoutTree } from './tree'
+import type { DraftPremises } from './tree'
+import { createLemmaEditorBar } from './lemma-editor'
+import type { LemmaEditorSession } from './lemma-editor'
 import {
   center,
   isReverseId0,
@@ -333,6 +337,7 @@ let lastScrollLeft = 0
 const createPlayArea = (
   workspace: AnyWorkspace,
   ctx: BenchCtx,
+  draftPremises: DraftPremises | null = null,
 ): HTMLElement => {
   const panel = document.createElement('div')
   const solvedClass = workspace.isSolved() ? ' solved' : ''
@@ -371,6 +376,7 @@ const createPlayArea = (
     [],
     ghostPath,
     workspace.currentStart() ?? null,
+    draftPremises,
   )
   const isFresh = focus.derivation.kind === 'premise'
   tree.style.visibility = 'hidden'
@@ -630,6 +636,7 @@ export const createBench = (
   onSkip?: () => void,
   hideGaze?: boolean,
   hideRulesButton?: boolean,
+  lemmaEditor: LemmaEditorSession | null = null,
 ): HTMLElement => {
   const ls = workspace.applicableRules()
   const rules = workspace.availableRules()
@@ -845,7 +852,11 @@ export const createBench = (
   sheetSides.appendChild(rightCol)
   rulesSheet.appendChild(sheetSides)
   panel.appendChild(rulesSheet)
-  panel.appendChild(createPlayArea(workspace, ctx))
+  const editing = lemmaEditor !== null && !solved
+  const draftPremises = editing
+    ? lemmaGhostPremises(seq, lemmaEditor.draft())
+    : null
+  panel.appendChild(createPlayArea(workspace, ctx, draftPremises))
   const zoomOut = createButton('−', false, () => {
     ctx.setTreeZoom(Math.max(ZOOM_MIN, ctx.getTreeZoom() - ZOOM_STEP))
     rerender()
@@ -992,6 +1003,13 @@ export const createBench = (
   navGroup.appendChild(controlsEl)
   navGroup.appendChild(axiomBtn)
   navGroup.appendChild(nextBranchBtn)
+
+  if (editing) {
+    // Inline lemma editing takes over the whole bottom bar; the play controls
+    // return when the session confirms or cancels.
+    panel.appendChild(createLemmaEditorBar(lemmaEditor, rerender))
+    return panel
+  }
 
   const controlsBar = document.createElement('div')
   controlsBar.setAttribute('class', 'controls')
