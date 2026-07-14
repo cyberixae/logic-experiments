@@ -126,13 +126,6 @@ export const createLemmaEditorBar = (
     ),
   )
 
-  const confirmGroup = group()
-  const confirmBtn = makeButton(t('lemmaConfirm'), !full, () => {
-    session.confirm()
-  })
-  confirmBtn.classList.add('mutating')
-  confirmGroup.appendChild(confirmBtn)
-
   const atomGroup = group('lemma-palette')
   for (const name of ['p', 'q', 'r', 's', 'u', 'v'] as const) {
     atomGroup.appendChild(
@@ -205,6 +198,16 @@ export const createLemmaEditorBar = (
       ),
     ),
   )
+
+  // Confirm is the rightmost group: the bar reads left to right as
+  // escape → take back → build → commit, with the terminal action at the
+  // end of the line.
+  const confirmGroup = group()
+  const confirmBtn = makeButton(t('lemmaConfirm'), !full, () => {
+    session.confirm()
+  })
+  confirmBtn.classList.add('mutating')
+  confirmGroup.appendChild(confirmBtn)
 
   return bar
 }
