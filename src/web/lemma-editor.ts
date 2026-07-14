@@ -117,15 +117,6 @@ export const createLemmaEditorBar = (
     ),
   )
 
-  const undoGroup = group()
-  undoGroup.appendChild(
-    inert(
-      makeButton(t('undo'), !session.canUndo(), () => {
-        if (session.undo()) rerender()
-      }),
-    ),
-  )
-
   const atomGroup = group('lemma-palette')
   for (const name of ['p', 'q', 'r', 's', 'u', 'v'] as const) {
     atomGroup.appendChild(
@@ -199,9 +190,19 @@ export const createLemmaEditorBar = (
     ),
   )
 
-  // Confirm is the rightmost group: the bar reads left to right as
-  // escape → take back → build → commit, with the terminal action at the
-  // end of the line.
+  // The bar reads left to right in temporal order: escape → build →
+  // take back → commit. Undo sits after the palette because undoing only
+  // makes sense once some input exists; Confirm is the terminal action at
+  // the end of the line.
+  const undoGroup = group()
+  undoGroup.appendChild(
+    inert(
+      makeButton(t('undo'), !session.canUndo(), () => {
+        if (session.undo()) rerender()
+      }),
+    ),
+  )
+
   const confirmGroup = group()
   const confirmBtn = makeButton(t('lemmaConfirm'), !full, () => {
     session.confirm()
