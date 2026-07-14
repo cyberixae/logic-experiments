@@ -113,19 +113,25 @@ export const createLemmaEditorBar = (
     ),
   )
 
-  const navGroup = group('controls-nav')
-  navGroup.appendChild(
+  // Undo edits the draft, not the branch the orange cursor points at, so it
+  // sits in a plain (gray, draft-scoped) group like the palette. Only Confirm
+  // wears the branch color: it is the one button that commits to the active
+  // goal.
+  const undoGroup = group()
+  undoGroup.appendChild(
     inert(
       makeButton(t('undo'), !session.canUndo(), () => {
         if (session.undo()) rerender()
       }),
     ),
   )
+
+  const confirmGroup = group('controls-nav')
   const confirmBtn = makeButton(t('lemmaConfirm'), !full, () => {
     session.confirm()
   })
   confirmBtn.classList.add('mutating')
-  navGroup.appendChild(confirmBtn)
+  confirmGroup.appendChild(confirmBtn)
 
   const atomGroup = group('lemma-palette')
   for (const name of ['p', 'q', 'r', 's', 'u', 'v'] as const) {
