@@ -26,7 +26,8 @@ import {
   zoomTreeOut,
   zoomTreeReset,
 } from './game'
-import { createFormulaEditor } from './formula-editor'
+import { createLemmaEditorSession, editorKeyPieces } from './lemma-editor'
+import type { LemmaEditorSession } from './lemma-editor'
 import { createButtonCursor, cursorNavActions } from './button-cursor'
 import type { CursorCell } from './button-cursor'
 import { MountResult, Navigate } from './types'
@@ -210,6 +211,7 @@ export const mountCampaign = (
     if (ws.isConjectureId(id)) {
       ws.selectConjecture(id)
       setGazeModeActive(false)
+      lemmaSession = null
       history.pushState(
         { screen: 'campaign', selected: id },
         '',
@@ -244,41 +246,24 @@ export const mountCampaign = (
     pausePopupOpen = false
     navigate('menu')
   }
-  let formulaEditorOpen = false
-  let closeFormulaEditor: (() => void) | null = null
-  let tryUndoInEditor: (() => boolean) | null = null
-  let editorOnAction: ((action: Action) => void) | null = null
+  // Inline lemma editing, same shape as Zen: while a session is live,
+  // createBench swaps the bottom bar for the editor and the play area shows
+  // the reverse-cut pre-split ghost.
+  let lemmaSession: LemmaEditorSession | null = null
   const onApplyReverse1: ApplyReverse1 = (_key, onFormula) => {
-    if (formulaEditorOpen) return
-    formulaEditorOpen = true
-    const cancel = () => {
-      formulaEditorOpen = false
-      closeFormulaEditor = null
-      tryUndoInEditor = null
-      editorOnAction = null
-      container.removeChild(modal)
-    }
-    const {
-      el: modal,
-      tryUndo,
-      onAction,
-    } = createFormulaEditor(
-      t('lemmaTitle'),
-      t('lemmaConfirm'),
+    if (lemmaSession !== null) return
+    setGazeModeActive(false)
+    lemmaSession = createLemmaEditorSession(
       (formula) => {
-        formulaEditorOpen = false
-        closeFormulaEditor = null
-        tryUndoInEditor = null
-        editorOnAction = null
-        container.removeChild(modal)
+        lemmaSession = null
         onFormula(formula)
       },
-      cancel,
+      () => {
+        lemmaSession = null
+        rerender()
+      },
     )
-    closeFormulaEditor = cancel
-    tryUndoInEditor = tryUndo
-    editorOnAction = onAction
-    container.appendChild(modal)
+    rerender()
   }
 
   const rerender = () => {
@@ -306,6 +291,11 @@ export const mountCampaign = (
         togglePausePopup,
         onApplyReverse1,
         true,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        lemmaSession,
       ),
     )
     if (pausePopupOpen) {
@@ -347,13 +337,16 @@ export const mountCampaign = (
     onApplyReverse1,
   )
   const dispatch = (action: Action) => {
-    if (formulaEditorOpen) {
+    if (lemmaSession !== null) {
+      const session = lemmaSession
       if (action === 'undo') {
-        if (!(tryUndoInEditor?.() ?? false)) closeFormulaEditor?.()
+        // Undo-past-the-beginning backs out of the editor entirely.
+        if (session.undo()) rerender()
+        else session.cancel()
       } else if (action === 'menu' || action === 'exit') {
-        closeFormulaEditor?.()
-      } else {
-        editorOnAction?.(action)
+        session.cancel()
+      } else if (session.handleAction(action)) {
+        rerender()
       }
       return
     }
@@ -397,7 +390,14 @@ export const mountCampaign = (
   const handleKey = (ev: KeyboardEvent) => {
     if (ev.ctrlKey || ev.metaKey || ev.altKey) return
     markKeyboardInput()
-    console.log(ev.code)
+    // Editor-mode key layer, checked before the play-mode map (see random.ts).
+    if (lemmaSession !== null) {
+      const piece = editorKeyPieces[ev.code]
+      if (piece !== undefined) {
+        if (lemmaSession.fill(piece())) rerender()
+        return
+      }
+    }
     if (ev.code === 'KeyP' && ws.isSolved()) {
       selectLevel(ws.previousConjectureId())
       return

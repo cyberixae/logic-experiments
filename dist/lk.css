@@ -577,40 +577,6 @@ html.mode-single:not(.input-pointer) .bench-topbar .bench-zoom {
 .pause-buttons-spacer {
   height: 1em;
 }
-.formula-editor-popup {
-  background-color: #fff2;
-  border: 4px solid #f80;
-  border-radius: 20px;
-  padding: 2em 3em;
-  color: #fff;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1.2em;
-}
-.formula-editor-title {
-  font-size: 2em;
-  font-weight: bold;
-  user-select: text;
-}
-.formula-editor-stack {
-  font-size: 1.4em;
-  min-height: 1.8em;
-  min-width: 10em;
-  text-align: center;
-  background: #fff2;
-  border-radius: 6px;
-  padding: 0.3em 0.8em;
-  user-select: text;
-}
-.formula-editor-controls {
-  display: flex;
-  gap: 0.8em;
-}
-.formula-editor-controls .button {
-  padding: 0.5em 1.2em;
-  color: #000;
-}
 .level-select {
   position: absolute;
   width: 80%;
@@ -981,10 +947,7 @@ html.mode-single:not(.input-pointer) .bench-topbar .bench-zoom {
 .ghost-node .parenthesis,
 .level-select .connective,
 .level-select .connective.active,
-.level-select .parenthesis,
-.formula-editor-stack .connective,
-.formula-editor-stack .connective.active,
-.formula-editor-stack .parenthesis {
+.level-select .parenthesis {
   color: inherit;
 }
 .gazed {
@@ -1720,6 +1683,11 @@ html.input-gamepad .owl-bind.for-gamepad {
 /* buttons (rule cards stay visible). Congrats buttons remain visible. */
 .versus-half-keys .controls:not(:has(.congrabuttons)) {
   visibility: hidden;
+}
+/* The inline lemma editor bar stays visible in keyboard/gamepad slots: it is
+   the cursor's canvas, not an on-screen mirror of physical keys. */
+.versus-half-keys .controls.lemma-editor {
+  visibility: visible;
 }
 .versus-half-keys .bench-topbar .bench-rules-btn,
 .versus-half-keys .bench-topbar .bench-zoom {

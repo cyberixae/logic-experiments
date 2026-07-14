@@ -1,7 +1,6 @@
 import { undo } from '../interactive/event'
 import { Workspace } from '../interactive/workspace'
 import { Action } from '../interactive/action'
-import type { Prop } from '../model/prop'
 import { ChallengeResult } from './challenge-protocol'
 import { ChallengePool } from './challenge-pool'
 import { createNpcDriver } from '../npc/driver'
@@ -22,7 +21,8 @@ import {
 import { createLangSwitcher } from './lang-switcher'
 import { createButtonCursor, cursorNavActions } from './button-cursor'
 import type { CursorCell } from './button-cursor'
-import { createFormulaEditor } from './formula-editor'
+import { createLemmaEditorSession, editorKeyPieces } from './lemma-editor'
+import type { LemmaEditorSession } from './lemma-editor'
 import { basic, fromSequent } from '../render/print'
 import { html } from '../render/segment'
 import { MountResult, Navigate } from './types'
@@ -60,55 +60,15 @@ const totalMoves = (ws: AnyWorkspace): number => {
   return Object.values(counts).reduce((a, b) => a + b, 0)
 }
 
-// Build a formula-editor shroud scoped to one half of the versus screen.
-// The shroud is appended to document.body so it survives rerenders triggered
-// by the other player solving. 'left' scopes it to the left half (right: 50%),
-// 'right' to the right half (left: 50%).
-const makeVersusFormulaEditor = (
-  side: 'left' | 'right',
-  onFormula: (formula: Prop) => void,
-  onCancel: () => void,
-): {
-  close: () => void
-  tryUndo: () => boolean
-  onAction: (action: Action) => void
-} => {
-  let modalEl: HTMLElement | null = null
-  const close = () => {
-    modalEl?.remove()
-    modalEl = null
-    onCancel()
-  }
-  const { el, tryUndo, onAction } = createFormulaEditor(
-    t('lemmaTitle'),
-    t('lemmaConfirm'),
-    (formula) => {
-      modalEl?.remove()
-      modalEl = null
-      onFormula(formula)
-    },
-    close,
-  )
-  modalEl = el
-  if (side === 'left') {
-    el.style.right = 'calc(50% + 2.5em)'
-  } else {
-    el.style.left = 'calc(50% + 2.5em)'
-  }
-  document.body.appendChild(el)
-  return { close, tryUndo, onAction }
-}
-
 export const mountVersus = (
   container: HTMLElement,
   navigate: Navigate,
   pool: ChallengePool,
   versusConfig: VersusConfig,
 ): MountResult => {
-  // container is document.body — clearing it on each rerender would remove the
-  // formula-editor shroud (also appended to body). Use a dedicated child as
-  // the rerender root so the editor survives opponent moves; the one-shot
-  // container clear at mount drops any DOM left by the previous screen.
+  // container is document.body; a dedicated child is the rerender root, and
+  // the one-shot container clear at mount drops any DOM left by the previous
+  // screen.
   container.innerHTML = ''
   const root = document.createElement('div')
   container.appendChild(root)
@@ -265,12 +225,11 @@ export const mountVersus = (
   let timerEl: HTMLElement | null = null
 
   // Formula editor state — tracked separately per player so each half is independent.
-  let closeEditor1: (() => void) | null = null
-  let tryUndoEditor1: (() => boolean) | null = null
-  let onActionEditor1: ((action: Action) => void) | null = null
-  let closeEditor2: (() => void) | null = null
-  let tryUndoEditor2: (() => boolean) | null = null
-  let onActionEditor2: ((action: Action) => void) | null = null
+  // Inline lemma editing, one session per human slot. The session owns the
+  // draft and cursor, so it survives any rerender — including full rebuilds
+  // triggered by the opponent solving — with no DOM-preservation tricks.
+  let lemmaSession1: LemmaEditorSession | null = null
+  let lemmaSession2: LemmaEditorSession | null = null
 
   const isNpc1 = !isTutorial && versusConfig.p1Input === 'npc'
   const isNpc2 = !isTutorial && versusConfig.p2Input === 'npc'
@@ -391,6 +350,7 @@ export const mountVersus = (
         isTutorial ? undefined : skipPlayer1,
         isTutorial && beatAt(beatIdx).hideGaze,
         isTutorial,
+        lemmaSession1,
       ),
     )
     return half
@@ -538,6 +498,7 @@ export const mountVersus = (
         isTutorial ? undefined : skipPlayer2,
         isTutorial && beatAt(beatIdx).hideGaze,
         isTutorial,
+        lemmaSession2,
       ),
     )
     // Appended after the bench (and outside it), so the owl draws on top
@@ -1431,48 +1392,35 @@ export const mountVersus = (
     rerenderHalf2()
   }
 
-  // Formula editors — appended to document.body so a rerender from the other
-  // player solving doesn't remove them. The shroud is clamped to one half via
-  // an inline left/right override on the fixed-position element.
   const onApplyReverse1: ApplyReverse1 = (_key, onFormula) => {
-    if (closeEditor1 !== null) return
-    const ed1 = makeVersusFormulaEditor(
-      'left',
+    if (lemmaSession1 !== null) return
+    ctx1.setGazeModeActive(false)
+    lemmaSession1 = createLemmaEditorSession(
       (formula) => {
-        closeEditor1 = null
-        tryUndoEditor1 = null
-        onActionEditor1 = null
+        lemmaSession1 = null
         onFormula(formula)
       },
       () => {
-        closeEditor1 = null
-        tryUndoEditor1 = null
-        onActionEditor1 = null
+        lemmaSession1 = null
+        refreshP1()
       },
     )
-    closeEditor1 = ed1.close
-    tryUndoEditor1 = ed1.tryUndo
-    onActionEditor1 = ed1.onAction
+    refreshP1()
   }
   const onApplyReverse2: ApplyReverse1 = (_key, onFormula) => {
-    if (closeEditor2 !== null) return
-    const ed2 = makeVersusFormulaEditor(
-      'right',
+    if (lemmaSession2 !== null) return
+    ctx2.setGazeModeActive(false)
+    lemmaSession2 = createLemmaEditorSession(
       (formula) => {
-        closeEditor2 = null
-        tryUndoEditor2 = null
-        onActionEditor2 = null
+        lemmaSession2 = null
         onFormula(formula)
       },
       () => {
-        closeEditor2 = null
-        tryUndoEditor2 = null
-        onActionEditor2 = null
+        lemmaSession2 = null
+        refreshP2()
       },
     )
-    closeEditor2 = ed2.close
-    tryUndoEditor2 = ed2.tryUndo
-    onActionEditor2 = ed2.onAction
+    refreshP2()
   }
 
   // Independent dispatch per player. Each player's regular-move rerender
@@ -1624,8 +1572,8 @@ export const mountVersus = (
       timeLeft = 0
       gameOver = true
       clearInterval(ticker)
-      closeEditor1?.()
-      closeEditor2?.()
+      lemmaSession1?.cancel()
+      lemmaSession2?.cancel()
       rerender()
       return
     }
@@ -1645,24 +1593,25 @@ export const mountVersus = (
   }
 
   const handleEditorInput1 = (action: Action): boolean => {
-    if (closeEditor1 === null) return false
+    const session = lemmaSession1
+    if (session === null) return false
     if (action === 'undo') {
-      if (!(tryUndoEditor1?.() ?? false)) closeEditor1()
-    } else if (action === 'menu') {
-      closeEditor1()
-    } else {
-      onActionEditor1?.(action)
+      // Undo-past-the-beginning backs out of the editor entirely.
+      if (session.undo()) refreshP1()
+      else session.cancel()
+    } else if (session.handleAction(action)) {
+      refreshP1()
     }
     return true
   }
   const handleEditorInput2 = (action: Action): boolean => {
-    if (closeEditor2 === null) return false
+    const session = lemmaSession2
+    if (session === null) return false
     if (action === 'undo') {
-      if (!(tryUndoEditor2?.() ?? false)) closeEditor2()
-    } else if (action === 'menu') {
-      closeEditor2()
-    } else {
-      onActionEditor2?.(action)
+      if (session.undo()) refreshP2()
+      else session.cancel()
+    } else if (session.handleAction(action)) {
+      refreshP2()
     }
     return true
   }
@@ -1694,10 +1643,10 @@ export const mountVersus = (
       return
     }
     if (action !== 'menu') return
-    // First menu press cancels an open formula editor; otherwise it pauses.
-    if (closeEditor1 !== null || closeEditor2 !== null) {
-      closeEditor1?.()
-      closeEditor2?.()
+    // First menu press cancels an open lemma editor; otherwise it pauses.
+    if (lemmaSession1 !== null || lemmaSession2 !== null) {
+      lemmaSession1?.cancel()
+      lemmaSession2?.cancel()
     } else {
       setPaused(true)
     }
@@ -1705,6 +1654,15 @@ export const mountVersus = (
 
   const handleKey = (ev: KeyboardEvent) => {
     if (ev.ctrlKey || ev.metaKey || ev.altKey || gameOver || paused) return
+    // Editor-mode key layer, checked before the play-mode map (see random.ts).
+    if (lemmaSession1 !== null) {
+      const piece = editorKeyPieces[ev.code]
+      if (piece !== undefined) {
+        markKeyboardInput()
+        if (lemmaSession1.fill(piece())) refreshP1()
+        return
+      }
+    }
     const action = qwertyKeyMap[ev.code]
     if (action === undefined || action === 'menu') return
     markKeyboardInput()
@@ -1718,6 +1676,14 @@ export const mountVersus = (
 
   const handleKey2 = (ev: KeyboardEvent) => {
     if (ev.ctrlKey || ev.metaKey || ev.altKey || gameOver || paused) return
+    if (lemmaSession2 !== null) {
+      const piece = editorKeyPieces[ev.code]
+      if (piece !== undefined) {
+        markKeyboardInput()
+        if (lemmaSession2.fill(piece())) refreshP2()
+        return
+      }
+    }
     const action = qwertyKeyMap[ev.code]
     if (action === undefined || action === 'menu') return
     markKeyboardInput()
@@ -1879,8 +1845,6 @@ export const mountVersus = (
       document.removeEventListener('keydown', handleControlKey)
       cleanupControlPads.forEach((c) => c())
       unsubGamepad()
-      closeEditor1?.()
-      closeEditor2?.()
     },
     rerender,
   }

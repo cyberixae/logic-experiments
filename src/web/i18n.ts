@@ -54,7 +54,6 @@ const en = {
   statsTemplate:
     'Generated {formulas} formulas ({rate}/s), {tautologies} tautologies, {solved} solved. Updated {sinceUpdate}s ago.',
   challengeSetup: 'Challenge Setup',
-  lemmaTitle: 'Build Lemma',
   lemmaConfirm: 'Confirm',
   lemma: 'Lemma',
   secret: 'Secret',
@@ -172,7 +171,6 @@ const fi: Record<MessageKey, string> = {
   statsTemplate:
     'Tuotettu {formulas} kaavaa ({rate}/s), {tautologies} tautologiaa, {solved} ratkaisua. Päivitetty {sinceUpdate}s sitten.',
   challengeSetup: 'Haasteen asetukset',
-  lemmaTitle: 'Rakenna lemma',
   lemmaConfirm: 'Vahvista',
   lemma: 'Lemma',
   secret: 'Salainen',
@@ -290,7 +288,6 @@ const es: Record<MessageKey, string> = {
   statsTemplate:
     'Generadas {formulas} fórmulas ({rate}/s), {tautologies} tautologías, {solved} resueltas. Actualizado hace {sinceUpdate}s.',
   challengeSetup: 'Configuración del desafío',
-  lemmaTitle: 'Construir lema',
   lemmaConfirm: 'Confirmar',
   lemma: 'Lema',
   secret: 'Secreto',
@@ -408,7 +405,6 @@ const cs: Record<MessageKey, string> = {
   statsTemplate:
     'Vygenerováno {formulas} formulí ({rate}/s), {tautologies} tautologií, {solved} vyřešeno. Aktualizováno před {sinceUpdate}s.',
   challengeSetup: 'Nastavení výzvy',
-  lemmaTitle: 'Sestavit lemma',
   lemmaConfirm: 'Potvrdit',
   lemma: 'Lemma',
   secret: 'Tajné',
@@ -526,7 +522,6 @@ const pl: Record<MessageKey, string> = {
   statsTemplate:
     'Wygenerowano {formulas} formuł ({rate}/s), {tautologies} tautologii, {solved} rozwiązanych. Zaktualizowano {sinceUpdate}s temu.',
   challengeSetup: 'Ustawienia wyzwania',
-  lemmaTitle: 'Zbuduj lemat',
   lemmaConfirm: 'Zatwierdź',
   lemma: 'Lemat',
   secret: 'Tajne',
