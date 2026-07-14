@@ -123,6 +123,16 @@ export const fillLeftmost = (d: Draft, filler: Draft): Draft | null => {
   }
 }
 
+// One palette press: fill the draft's leftmost hole with the piece — or,
+// when the draft is already complete, wrap it as the piece's first operand
+// (pressing an operator on a finished formula extends it at the root:
+// `p` then `→` gives `p → ▢`). Atoms never wrap since they have no hole to
+// receive the draft; both directions failing returns null.
+export const fillOrWrap = (d: Draft, piece: Draft): Draft | null => {
+  const filled = fillLeftmost(d, piece)
+  return filled !== null ? filled : fillLeftmost(piece, d)
+}
+
 // The finished proposition, or null while holes remain.
 export const toProp = (d: Draft): Prop | null => {
   switch (d.kind) {

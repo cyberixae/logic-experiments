@@ -4,7 +4,7 @@ import {
   draftDisjunction,
   draftImplication,
   draftNegation,
-  fillLeftmost,
+  fillOrWrap,
   hole,
   isComplete,
   toProp,
@@ -38,7 +38,7 @@ export const createLemmaEditorSession = (
     draft: () => current,
     canUndo: () => history.length > 0,
     fill: (piece) => {
-      const next = fillLeftmost(current, piece)
+      const next = fillOrWrap(current, piece)
       if (next === null) return false
       history = [...history, current]
       current = next
@@ -150,12 +150,15 @@ export const createLemmaEditorBar = (
     ),
   )
 
+  // Operators stay live on a complete draft: they wrap it at the root
+  // (fillOrWrap), so a bird-first start extends naturally. Only the
+  // leaf groups above dim when nothing is left to fill.
   const negGroup = group('lemma-palette')
   negGroup.appendChild(
     inert(
       makeButton(
         '¬',
-        full,
+        false,
         fillWith(() => draftNegation(hole)),
       ),
     ),
@@ -166,7 +169,7 @@ export const createLemmaEditorBar = (
     inert(
       makeButton(
         '∧',
-        full,
+        false,
         fillWith(() => draftConjunction(hole, hole)),
       ),
     ),
@@ -175,7 +178,7 @@ export const createLemmaEditorBar = (
     inert(
       makeButton(
         '∨',
-        full,
+        false,
         fillWith(() => draftDisjunction(hole, hole)),
       ),
     ),
@@ -184,7 +187,7 @@ export const createLemmaEditorBar = (
     inert(
       makeButton(
         '→',
-        full,
+        false,
         fillWith(() => draftImplication(hole, hole)),
       ),
     ),

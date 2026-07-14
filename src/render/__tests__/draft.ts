@@ -10,6 +10,7 @@ import {
   draftConjunction,
   draftDisjunction,
   fillLeftmost,
+  fillOrWrap,
   toProp,
   isComplete,
 } from '../../model/draft'
@@ -122,5 +123,51 @@ describe('draft editing', () => {
     const open = draftNegation(hole)
     expect(isComplete(open)).toBe(false)
     expect(isComplete(fill(open, atom('q')))).toBe(true)
+  })
+})
+
+describe('wrapping a complete draft', () => {
+  const wrap = (d: Draft, piece: Draft): Draft => {
+    const next = fillOrWrap(d, piece)
+    if (next === null) throw new Error('expected fill or wrap to succeed')
+    return next
+  }
+
+  it('an operator on a complete draft wraps it as the left operand', () => {
+    const d = wrap(atom('p'), draftImplication(hole, hole))
+    expect(plain(fromDraft(d)(basic))).toBe('🐧→▢')
+  })
+
+  it('negation wraps a complete draft', () => {
+    const d = wrap(atom('p'), draftNegation(hole))
+    expect(plain(fromDraft(d)(basic))).toBe('¬🐧')
+  })
+
+  it('an atom on a complete draft still fails', () => {
+    expect(fillOrWrap(atom('p'), atom('q'))).toBeNull()
+  })
+
+  it('fills a hole in preference to wrapping', () => {
+    const d = wrap(draftImplication(hole, hole), draftNegation(hole))
+    expect(plain(fromDraft(d)(basic))).toBe('¬▢→▢')
+  })
+
+  it('supports pure left-to-right entry', () => {
+    let d: Draft = hole
+    for (const piece of [
+      atom('p'),
+      draftConjunction(hole, hole),
+      atom('q'),
+      draftImplication(hole, hole),
+      atom('r'),
+    ]) {
+      d = wrap(d, piece)
+    }
+    expect(plain(fromDraft(d)(basic))).toBe('🐧∧🦜→🦃')
+    const p = toProp(d)
+    expect(
+      p !== null &&
+        equals(p, implication(conjunction(atom('p'), atom('q')), atom('r'))),
+    ).toBe(true)
   })
 })
