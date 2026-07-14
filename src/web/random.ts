@@ -20,7 +20,7 @@ import {
   zoomTreeOut,
   zoomTreeReset,
 } from './game'
-import { createLemmaEditorSession } from './lemma-editor'
+import { createLemmaEditorSession, editorKeyPieces } from './lemma-editor'
 import type { LemmaEditorSession } from './lemma-editor'
 import { createButtonCursor, cursorNavActions } from './button-cursor'
 import type { CursorCell } from './button-cursor'
@@ -233,6 +233,10 @@ export const mountRandom = (
         else session.cancel()
       } else if (action === 'menu' || action === 'exit') {
         session.cancel()
+      } else if (session.handleAction(action)) {
+        // Cursor navigation and activation (arrows / D-pad, Enter / Cross,
+        // branch binds jump palette groups).
+        rerender()
       }
       return
     }
@@ -269,6 +273,16 @@ export const mountRandom = (
   const handleKey = (ev: KeyboardEvent) => {
     if (ev.ctrlKey || ev.metaKey || ev.altKey) return
     markKeyboardInput()
+    // Editor-mode key layer: digits type atom slots, the (otherwise inert)
+    // proof-move letters type operators. Checked before the play-mode map so
+    // the same physical keys carry editor meanings while a session is live.
+    if (lemmaSession !== null) {
+      const piece = editorKeyPieces[ev.code]
+      if (piece !== undefined) {
+        if (lemmaSession.fill(piece())) rerender()
+        return
+      }
+    }
     if (ev.code === 'KeyN') {
       onNew()
       return
