@@ -30,6 +30,7 @@ const { a, z, i } = rk
 const custom: Templates = {
   falsum: ['F'],
   verum: ['T'],
+  hole: ['_'],
   atom: ['[', ']'],
   optional: ['', ''],
   parenthesis: ['{', '}'],

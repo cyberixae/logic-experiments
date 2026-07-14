@@ -18,6 +18,7 @@ export type NullaryTemplate = [string]
 export const NullaryTemplateId = {
   falsum: null,
   verum: null,
+  hole: null,
 }
 export type NullaryTemplateId = keyof typeof NullaryTemplateId
 export const isNullaryTemplateId = (s: string): s is NullaryTemplateId =>
@@ -55,6 +56,7 @@ export type Templates = NullaryTemplates & UnaryTemplates & BinaryTemplates
 export const basic: Templates = {
   falsum: ['⊥'],
   verum: ['⊤'],
+  hole: ['▢'],
   atom: ['', ''],
   optional: ['', ''],
   parenthesis: ['(', ')'],
