@@ -104,8 +104,12 @@ export const createLemmaEditorBar = (
     return btn
   }
 
-  const miscGroup = group('controls-misc')
-  miscGroup.appendChild(
+  // The play bar's group underline colors are an operand map (branch cursor,
+  // gaze cursor, challenge) that doesn't exist in editor mode, so every
+  // editor group stays the neutral default. Spacing carries the kind/arity
+  // grouping; the inert/mutating button borders carry the commit distinction.
+  const cancelGroup = group()
+  cancelGroup.appendChild(
     inert(
       makeButton(t('back'), false, () => {
         session.cancel()
@@ -113,10 +117,6 @@ export const createLemmaEditorBar = (
     ),
   )
 
-  // Undo edits the draft, not the branch the orange cursor points at, so it
-  // sits in a plain (gray, draft-scoped) group like the palette. Only Confirm
-  // wears the branch color: it is the one button that commits to the active
-  // goal.
   const undoGroup = group()
   undoGroup.appendChild(
     inert(
@@ -126,7 +126,7 @@ export const createLemmaEditorBar = (
     ),
   )
 
-  const confirmGroup = group('controls-nav')
+  const confirmGroup = group()
   const confirmBtn = makeButton(t('lemmaConfirm'), !full, () => {
     session.confirm()
   })
