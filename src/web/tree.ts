@@ -5,10 +5,15 @@ import {
   fromRuleId,
   fromSequent,
   GazeMark,
+  Printer,
 } from '../render/print'
 import { html } from '../render/segment'
 import { RuleId } from '../model/rule'
 import { t } from './i18n'
+
+// Premises of the inline lemma editor's reverse-cut pre-split, rendered as
+// ghost leaves above the active sequent while the draft is being built.
+export type DraftPremises = [Printer, Printer]
 
 const equalPaths = (a: Path, b: Path): boolean =>
   a.length === b.length && a.every((v, i) => v === b[i])
@@ -54,6 +59,7 @@ export const renderDerivation = (
   currentPath: Path = [],
   ghostPath: Path | null = null,
   start: AnyDerivation | null = null,
+  draftPremises: DraftPremises | null = null,
 ): HTMLElement => {
   // Ghost: nodes strictly deeper than ghostPath are fully ghost-styled.
   // The node AT ghostPath is the "boundary": its sequent keeps active
@@ -105,6 +111,7 @@ export const renderDerivation = (
         [...currentPath, i],
         ghostPath,
         start,
+        draftPremises,
       )
       const childDepth = Number(child.dataset['leafDepth'] ?? '0')
       if (childDepth > maxChildDepth) maxChildDepth = childDepth
@@ -123,6 +130,26 @@ export const renderDerivation = (
         isGhostNode,
       ),
     )
+  } else if (draftPremises !== null && isOpenActive) {
+    // Inline lemma editing: the active leaf shows the reverse-cut pre-split
+    // as ghost premises containing the draft, mirroring the ghost-boundary
+    // shape — the conclusion keeps active styling, everything above is ghost.
+    const premises = document.createElement('div')
+    premises.setAttribute('class', 'tree-premises')
+    for (const printer of draftPremises) {
+      const child = document.createElement('div')
+      child.setAttribute('class', 'tree-node ghost-node')
+      const seqEl = document.createElement('div')
+      seqEl.setAttribute('class', 'tree-sequent ghost')
+      seqEl.innerHTML = html(printer(basic))
+      child.appendChild(seqEl)
+      child.dataset['leafDepth'] = '0'
+      premises.appendChild(child)
+    }
+    node.appendChild(premises)
+    node.appendChild(renderInferenceLine('cut', true))
+    node.appendChild(renderSequent(derivation, true, null, false))
+    leafDepth = 1
   } else {
     node.appendChild(renderSequent(derivation, isOpenActive, gaze, isGhostNode))
   }

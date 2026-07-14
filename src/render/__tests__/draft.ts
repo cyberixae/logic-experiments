@@ -1,6 +1,7 @@
 import { plain, html } from '../segment'
 import { basic } from '../print'
-import { fromDraft } from '../draft'
+import { fromDraft, lemmaGhostPremises } from '../draft'
+import { sequent } from '../../model/sequent'
 import {
   Draft,
   hole,
@@ -58,6 +59,25 @@ describe('draft rendering', () => {
 
   it('marks holes in html output', () => {
     expect(html(fromDraft(hole)(basic))).toBe('<span class="hole">▢</span>')
+  })
+})
+
+describe('lemma ghost premises', () => {
+  it('splices the draft into both reverse-cut premises', () => {
+    const goal = sequent([atom('p')], [atom('q')])
+    const [proveIt, useIt] = lemmaGhostPremises(
+      goal,
+      draftImplication(hole, hole),
+    )
+    expect(plain(proveIt(basic))).toBe('🐧 ⊢ 🦜,▢→▢')
+    expect(plain(useIt(basic))).toBe('▢→▢,🐧 ⊢ 🦜')
+  })
+
+  it('handles an empty succedent', () => {
+    const goal = sequent([atom('p')], [])
+    const [proveIt, useIt] = lemmaGhostPremises(goal, hole)
+    expect(plain(proveIt(basic))).toBe('🐧 ⊢ ▢')
+    expect(plain(useIt(basic))).toBe('▢,🐧 ⊢')
   })
 })
 

@@ -1,11 +1,14 @@
 import { Draft } from '../model/draft'
+import { AnySequent } from '../model/sequent'
 import {
   Printer,
   print,
+  printArray,
   printUnary,
   printBinary,
   fromAtom,
   fromFalsum,
+  fromProp,
   fromVerum,
 } from './print'
 import * as segment from './segment'
@@ -75,4 +78,28 @@ export function fromDraft(d: Draft): Printer {
         true,
       )(expand(2, d.antecedent), expand(2, d.consequent))
   }
+}
+
+const spliceSequent = (ant: Printer[], suc: Printer[]): Printer => {
+  const p = print('sequent')(
+    printArray('formulas')(ant),
+    printArray('formulas')(suc),
+  )
+  return (theme) => segment.trim(p(theme))
+}
+
+// The two premises of a reverse cut on `goal` with the draft as the lemma:
+// prove-it (goal succedent extended with the draft) and use-it (the draft
+// assumed at the head of the antecedent). Rendered like fromSequent, with the
+// draft spliced in where the finished formula will land on confirm.
+export const lemmaGhostPremises = (
+  goal: AnySequent,
+  d: Draft,
+): [Printer, Printer] => {
+  const ant = goal.antecedent.map((f) => fromProp(f))
+  const suc = goal.succedent.map((f) => fromProp(f))
+  return [
+    spliceSequent(ant, [...suc, fromDraft(d)]),
+    spliceSequent([fromDraft(d), ...ant], suc),
+  ]
 }
