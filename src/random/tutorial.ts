@@ -625,7 +625,6 @@ export type TutorialBeat = {
 }
 
 const LOGIC_NAME_IDS = [
-  'split',
   'sideFlip',
   'crossing',
   'branching',
@@ -665,12 +664,28 @@ export const tutorialCurriculum: ReadonlyArray<TutorialBeat> = [
     conjecture: false,
     generate: () => generateBasicsChallenge('drop'),
   },
-  // No glyphs on the Logic rows: the behavior names are unique there, and
-  // ladder rows should carry symbols only where the name alone is ambiguous
-  // (the two Close beats).
-  ...logicNotches.map((notch, i) => ({
+  {
+    // The Destruct beat closes Basics: it introduces the third verb on the
+    // gentlest rules (∧ left / ∨ right — the pieces stay put), so the verb
+    // and its binding are learned before any of its consequences. The
+    // Consequences chapter then covers what destructing does everywhere
+    // else. Not presolved like the other Basics beats — a full challenge is
+    // the point (Close and Drop are already fluent).
+    chapter: 'basics',
+    nameId: 'split',
+    glyphs: '',
+    hideGaze: false,
+    hideSkip: true,
+    hideLemma: true,
+    conjecture: false,
+    generate: () => generateSequentChallenge(logicNotches[0]),
+  },
+  // No glyphs on the Consequences rows: the behavior names are unique
+  // there, and ladder rows should carry symbols only where the name alone
+  // is ambiguous (the two Close beats).
+  ...logicNotches.slice(1).map((notch, i) => ({
     chapter: 'logic' as const,
-    nameId: LOGIC_NAME_IDS[i] ?? 'split',
+    nameId: LOGIC_NAME_IDS[i] ?? 'sideFlip',
     glyphs: '',
     hideGaze: false,
     hideSkip: true,

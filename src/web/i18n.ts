@@ -76,7 +76,7 @@ const en = {
   inputOff: 'Off',
   tutorial: 'Tutorial',
   tutorialBasics: 'Basics',
-  tutorialLogic: 'Destruct Rules',
+  tutorialLogic: 'Consequences',
   tutorialPart: 'Part',
   tutorialAdvance: 'Next Topic',
   tutorialPrevious: 'Previous Topic',
@@ -84,7 +84,7 @@ const en = {
   tutorialIdentity: 'Identity',
   tutorialConstants: 'Constants',
   tutorialExtras: 'Extras',
-  tutorialShape1: 'Splitting',
+  tutorialShape1: 'Destruct',
   tutorialShape2: 'Side flip',
   tutorialShape3: 'Dividing',
   tutorialShape4: 'Branching',
@@ -97,7 +97,7 @@ const en = {
   tutorialOwlBasics:
     'Welcome to LK! In its challenges you close derivation trees built out of sequents. This first chapter teaches the essentials you need to play.',
   tutorialOwlLogic:
-    'The second chapter is about dropping the extra connectives ( → ∧ ∨ ¬ ). If you would rather jump straight into the deep end, you can head for the real game as soon as you have found the {destruct} button. The subchapters walk through the consequences of dropping each connective in different situations, one at a time.',
+    'The second chapter walks through the consequences of dropping each connective ( → ∧ ∨ ¬ ) in different situations, one at a time. If you would rather jump straight into the deep end, you already know every move — feel free to head for the real game.',
   tutorialOwlClose:
     'A branch of the tree can be closed when the same sentence sits on both sides of the gate ( ⊢ ) — this situation is called an identity. You can switch branches with the {branch} buttons and close the chosen branch with the {close} button.',
   tutorialOwlCloseConstants:
@@ -209,7 +209,7 @@ const fi: Record<MessageKey, string> = {
   inputOff: 'Pois',
   tutorial: 'Opastus',
   tutorialBasics: 'Perusteet',
-  tutorialLogic: 'Purkusäännöt',
+  tutorialLogic: 'Seuraamukset',
   tutorialPart: 'Osa',
   tutorialAdvance: 'Seuraava aihe',
   tutorialPrevious: 'Edellinen aihe',
@@ -217,7 +217,7 @@ const fi: Record<MessageKey, string> = {
   tutorialIdentity: 'Identiteetti',
   tutorialConstants: 'Vakiot',
   tutorialExtras: 'Ylimääräiset',
-  tutorialShape1: 'Halkeaminen',
+  tutorialShape1: 'Purkaminen',
   tutorialShape2: 'Puolenvaihto',
   tutorialShape3: 'Jakautuminen',
   tutorialShape4: 'Haarautuminen',
@@ -230,7 +230,7 @@ const fi: Record<MessageKey, string> = {
   tutorialOwlBasics:
     'Tervetuloa pelaamaan LK:ta! Pelin haasteissa suljetaan sekventeistä koostuvia päättelypuita. Ensimmäisessä luvussa opimme pelaamisen kannalta välttämättömiä perusasioita.',
   tutorialOwlLogic:
-    'Toisessa luvussa käsittelemme ylimääräisten konnektiivien ( → ∧ ∨ ¬ ) pudottamista. Mikäli haluat hypätä suoraan syvään päätyyn, voit välittömästi {destruct} painikkeen löydettyäsi siirtyä pelaamaan varsinaista peliä. Tämän luvun aliluvuissa käydään yksitellen läpi eri konnektiivien pudottamisen seuraamuksia eri tilanteissa.',
+    'Toisessa luvussa käydään yksitellen läpi eri konnektiivien ( → ∧ ∨ ¬ ) pudottamisen seuraamuksia eri tilanteissa. Mikäli haluat hypätä suoraan syvään päätyyn, osaat jo kaikki siirrot — voit siirtyä pelaamaan varsinaista peliä vaikka heti.',
   tutorialOwlClose:
     'Päättelypuun oksa on suljettavissa silloin, kun portin ( ⊢ ) kummallakin puolella on sama lause — tällaista tilannetta kutsutaan identiteetiksi. Voit vaihtaa oksaa {branch} painikkeilla ja sulkea valitun oksan {close} painikkeella.',
   tutorialOwlCloseConstants:
@@ -344,7 +344,7 @@ const es: Record<MessageKey, string> = {
   inputOff: 'Desactivado',
   tutorial: 'Tutorial',
   tutorialBasics: 'Fundamentos',
-  tutorialLogic: 'Reglas de destrucción',
+  tutorialLogic: 'Consecuencias',
   tutorialPart: 'Parte',
   tutorialAdvance: 'Siguiente tema',
   tutorialPrevious: 'Tema anterior',
@@ -352,7 +352,7 @@ const es: Record<MessageKey, string> = {
   tutorialIdentity: 'Identidad',
   tutorialConstants: 'Constantes',
   tutorialExtras: 'Sobrantes',
-  tutorialShape1: 'Partición',
+  tutorialShape1: 'Destrucción',
   tutorialShape2: 'Cambio de lado',
   tutorialShape3: 'Reparto',
   tutorialShape4: 'Ramificación',
@@ -365,7 +365,7 @@ const es: Record<MessageKey, string> = {
   tutorialOwlBasics:
     '¡Bienvenido a LK! En los desafíos del juego se cierran árboles de deducción compuestos de secuentes. En este primer capítulo aprendemos lo básico imprescindible para jugar.',
   tutorialOwlLogic:
-    'En el segundo capítulo tratamos cómo soltar los conectivos sobrantes ( → ∧ ∨ ¬ ). Si prefieres lanzarte a lo hondo, en cuanto encuentres el botón {destruct} puedes pasar directamente al juego de verdad. Los subcapítulos repasan una a una las consecuencias de soltar cada conectivo en distintas situaciones.',
+    'El segundo capítulo repasa una a una las consecuencias de soltar cada conectivo ( → ∧ ∨ ¬ ) en distintas situaciones. Si prefieres lanzarte a lo hondo, ya conoces todos los movimientos: puedes pasar directamente al juego de verdad.',
   tutorialOwlClose:
     'Una rama del árbol se puede cerrar cuando a ambos lados de la puerta ( ⊢ ) está la misma oración — esta situación se llama identidad. Puedes cambiar de rama con los botones {branch} y cerrar la rama elegida con el botón {close}.',
   tutorialOwlCloseConstants:
@@ -478,7 +478,7 @@ const cs: Record<MessageKey, string> = {
   inputOff: 'Vypnuto',
   tutorial: 'Návod',
   tutorialBasics: 'Základy',
-  tutorialLogic: 'Pravidla ničení',
+  tutorialLogic: 'Důsledky',
   tutorialPart: 'Část',
   tutorialAdvance: 'Další téma',
   tutorialPrevious: 'Předchozí téma',
@@ -486,7 +486,7 @@ const cs: Record<MessageKey, string> = {
   tutorialIdentity: 'Identita',
   tutorialConstants: 'Konstanty',
   tutorialExtras: 'Přebytky',
-  tutorialShape1: 'Rozštěpení',
+  tutorialShape1: 'Ničení',
   tutorialShape2: 'Změna strany',
   tutorialShape3: 'Rozdělení',
   tutorialShape4: 'Větvení',
@@ -499,7 +499,7 @@ const cs: Record<MessageKey, string> = {
   tutorialOwlBasics:
     'Vítej ve hře LK! V jejích výzvách se zavírají odvozovací stromy složené ze sekventů. V této první kapitole se naučíme základy, bez kterých se hrát nedá.',
   tutorialOwlLogic:
-    'Ve druhé kapitole se věnujeme pouštění přebytečných spojek ( → ∧ ∨ ¬ ). Chceš-li skočit rovnou do hlubin, můžeš hned po nalezení tlačítka {destruct} přejít ke skutečné hře. Podkapitoly probírají jednu po druhé důsledky puštění jednotlivých spojek v různých situacích.',
+    'Druhá kapitola probírá jeden po druhém důsledky puštění jednotlivých spojek ( → ∧ ∨ ¬ ) v různých situacích. Chceš-li skočit rovnou do hlubin, všechny tahy už znáš — můžeš přejít ke skutečné hře hned.',
   tutorialOwlClose:
     'Větev stromu lze zavřít, když na obou stranách brány ( ⊢ ) stojí stejná věta — takové situaci se říká identita. Větev přepneš tlačítky {branch} a vybranou větev zavřeš tlačítkem {close}.',
   tutorialOwlCloseConstants:
@@ -611,7 +611,7 @@ const pl: Record<MessageKey, string> = {
   inputOff: 'Wyłączony',
   tutorial: 'Samouczek',
   tutorialBasics: 'Podstawy',
-  tutorialLogic: 'Zasady niszczenia',
+  tutorialLogic: 'Skutki',
   tutorialPart: 'Część',
   tutorialAdvance: 'Następny temat',
   tutorialPrevious: 'Poprzedni temat',
@@ -619,7 +619,7 @@ const pl: Record<MessageKey, string> = {
   tutorialIdentity: 'Tożsamość',
   tutorialConstants: 'Stałe',
   tutorialExtras: 'Zbędne',
-  tutorialShape1: 'Rozszczepienie',
+  tutorialShape1: 'Niszczenie',
   tutorialShape2: 'Zmiana strony',
   tutorialShape3: 'Rozdzielenie',
   tutorialShape4: 'Rozgałęzienie',
@@ -632,7 +632,7 @@ const pl: Record<MessageKey, string> = {
   tutorialOwlBasics:
     'Witaj w grze LK! W jej wyzwaniach zamyka się drzewa wnioskowania zbudowane z sekwentów. W tym pierwszym rozdziale poznajemy podstawy niezbędne do gry.',
   tutorialOwlLogic:
-    'W drugim rozdziale zajmujemy się upuszczaniem zbędnych spójników ( → ∧ ∨ ¬ ). Jeśli wolisz skoczyć na głęboką wodę, zaraz po znalezieniu przycisku {destruct} możesz przejść do właściwej gry. Podrozdziały omawiają po kolei skutki upuszczania poszczególnych spójników w różnych sytuacjach.',
+    'Drugi rozdział omawia po kolei skutki upuszczania poszczególnych spójników ( → ∧ ∨ ¬ ) w różnych sytuacjach. Jeśli wolisz skoczyć na głęboką wodę, znasz już wszystkie ruchy — możesz przejść do właściwej gry od razu.',
   tutorialOwlClose:
     'Gałąź drzewa można zamknąć, gdy po obu stronach bramy ( ⊢ ) stoi to samo zdanie — taką sytuację nazywamy tożsamością. Gałąź zmieniasz przyciskami {branch}, a wybraną gałąź zamykasz przyciskiem {close}.',
   tutorialOwlCloseConstants:
