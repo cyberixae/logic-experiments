@@ -406,6 +406,8 @@ export const mountVersus = (
         openConjecture1()
         refreshP1()
       },
+      // No board behind the entry to back out to — hide the Back cell.
+      true,
     )
   }
   const openConjecture2 = (): void => {
@@ -421,6 +423,7 @@ export const mountVersus = (
         openConjecture2()
         refreshP2()
       },
+      true,
     )
   }
 

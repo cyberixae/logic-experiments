@@ -131,11 +131,16 @@ export type LemmaEditorSession = {
   // the press changed editor state and the caller should rerender; confirm
   // and cancel trigger their own rerender through the session callbacks.
   handleAction: (action: Action) => boolean
+  // Whether the bar renders without its Back cell (and the cursor skips
+  // it) — for hosts with no state to back out to, like the conjecture
+  // entry, where cancel merely restarts the draft.
+  hideCancel: boolean
 }
 
 export const createLemmaEditorSession = (
   onConfirm: (formula: Prop) => void,
   onCancel: () => void,
+  hideCancel = false,
 ): LemmaEditorSession => {
   let current: Draft = hole
   let history: ReadonlyArray<Draft> = []
@@ -173,10 +178,14 @@ export const createLemmaEditorSession = (
     return true
   }
 
+  // With the Back cell hidden the cursor floor moves past it.
+  const minIndex = hideCancel ? firstIndexOfGroup(1) : 0
+  const minGroup = hideCancel ? 1 : 0
+
   const moveCursor = (delta: number): boolean => {
     if (reveal()) return true
     if (cursorIndex === null) return false
-    cursorIndex = clamp(cursorIndex + delta, 0, cellSpecs.length - 1)
+    cursorIndex = clamp(cursorIndex + delta, minIndex, cellSpecs.length - 1)
     return true
   }
 
@@ -184,7 +193,7 @@ export const createLemmaEditorSession = (
     if (reveal()) return true
     if (cursorIndex === null) return false
     const g = cellSpecs[cursorIndex]?.group ?? 0
-    cursorIndex = firstIndexOfGroup(clamp(g + dir, 0, lastGroup))
+    cursorIndex = firstIndexOfGroup(clamp(g + dir, minGroup, lastGroup))
     return true
   }
 
@@ -235,6 +244,7 @@ export const createLemmaEditorSession = (
     cancel: onCancel,
     cursor: () => cursorIndex,
     handleAction,
+    hideCancel,
   }
 }
 
@@ -268,6 +278,7 @@ export const createLemmaEditorBar = (
   let groupNo = -1
 
   cellSpecs.forEach((spec, i) => {
+    if (spec.kind === 'cancel' && session.hideCancel) return
     if (spec.group !== groupNo) {
       groupNo = spec.group
       groupEl = document.createElement('div')
