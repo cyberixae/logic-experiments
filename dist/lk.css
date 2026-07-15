@@ -1663,6 +1663,28 @@ html.mode-single:not(.input-pointer) .bench-topbar .bench-zoom {
   flex-basis: 100%;
   text-align: center;
 }
+/* Conjecture entry: the live goal preview centered above the formula
+   editor bar. The tutor-off half hides and deadens it like the board. */
+.conjecture-entry {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+.conjecture-preview-area {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.conjecture-preview {
+  font-size: 1.6em;
+}
+.versus-half-off .conjecture-entry {
+  visibility: hidden;
+}
+.versus-half-npc .conjecture-entry {
+  pointer-events: none;
+}
 /* Injected bind labels render as chips. Each chip exists once per device
    as a latent variant; the html input-* class shows the one matching the
    device the learner last touched, so switching device swaps the labels

@@ -50,7 +50,9 @@ export type Notch = {
 // Cut is the one rule the generative clamp cannot make inapplicable (it applies
 // in any state), so it is excluded here and its button hidden — Cut belongs to
 // a later beat of the tutorial's Solvability chapter.
-const tutorialRules: ReadonlyArray<RuleId> = rkRules.filter((r) => r !== 'cut')
+export const tutorialRules: ReadonlyArray<RuleId> = rkRules.filter(
+  (r) => r !== 'cut',
+)
 
 // A small atom pool keeps generated goals readable; no constants — ⊥/⊤ are
 // the constants beat's material (see constantsNotch), zero-weighted elsewhere.
@@ -556,6 +558,7 @@ export type TutorialBeat = {
     | 'branching'
     | 'branchingCrossing'
     | 'unsolvable'
+    | 'conjecture'
   glyphs: string
   // The Close beat's only verbs are branch navigation and Close — the Gaze
   // controls (Drop/Destruct selection) aren't relevant yet, so they stay
@@ -565,6 +568,10 @@ export type TutorialBeat = {
   // solvable — a give-up verb there is pointless or invites quitting; the
   // Solvability chapter's Skip beat introduces it as the correct exit.
   hideSkip: boolean
+  // Conjecture beats replace the generated board with the conjecture entry
+  // flow: the player composes a formula φ and plays the goal `⊢ φ` they
+  // authored. The web layer owns that flow; `generate` is never shown.
+  conjecture: boolean
   generate: () => ChallengeResult
 }
 
@@ -583,6 +590,7 @@ export const tutorialCurriculum: ReadonlyArray<TutorialBeat> = [
     glyphs: '',
     hideGaze: true,
     hideSkip: true,
+    conjecture: false,
     generate: () => generateBasicsChallenge('identity'),
   },
   {
@@ -593,6 +601,7 @@ export const tutorialCurriculum: ReadonlyArray<TutorialBeat> = [
     glyphs: '',
     hideGaze: true,
     hideSkip: true,
+    conjecture: false,
     generate: () => generateBasicsChallenge('constants'),
   },
   {
@@ -601,6 +610,7 @@ export const tutorialCurriculum: ReadonlyArray<TutorialBeat> = [
     glyphs: '',
     hideGaze: false,
     hideSkip: true,
+    conjecture: false,
     generate: () => generateBasicsChallenge('drop'),
   },
   // No glyphs on the Logic rows: the behavior names are unique there, and
@@ -612,6 +622,7 @@ export const tutorialCurriculum: ReadonlyArray<TutorialBeat> = [
     glyphs: '',
     hideGaze: false,
     hideSkip: true,
+    conjecture: false,
     generate: () => generateSequentChallenge(notch),
   })),
   {
@@ -624,7 +635,23 @@ export const tutorialCurriculum: ReadonlyArray<TutorialBeat> = [
     glyphs: '',
     hideGaze: false,
     hideSkip: false,
+    conjecture: false,
     generate: generateUnsolvableChallenge,
+  },
+  {
+    // The Solvability chapter's Conjecture beat: the player composes an
+    // arbitrary formula and plays the goal they authored — the first
+    // challenge whose solvability nobody has checked. Skip (taught in the
+    // previous beat) is the exit when the conjecture turns out false.
+    chapter: 'solvability',
+    nameId: 'conjecture',
+    glyphs: '',
+    hideGaze: false,
+    hideSkip: false,
+    conjecture: true,
+    // Never shown: the web layer swaps this beat's boards for the entry
+    // flow; a fixed cheap result keeps the challenge buffer machinery fed.
+    generate: () => asUnsolvableResult(UNSOLVABLE_FALLBACK, 0),
   },
 ]
 

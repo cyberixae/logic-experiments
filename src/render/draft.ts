@@ -88,6 +88,11 @@ const spliceSequent = (ant: Printer[], suc: Printer[]): Printer => {
   return (theme) => segment.trim(p(theme))
 }
 
+// The conjecture entry's live preview: the draft as the sole succedent of an
+// otherwise empty sequent — the goal `⊢ φ` the player is composing.
+export const conjectureGhost = (d: Draft): Printer =>
+  spliceSequent([], [fromDraft(d)])
+
 // The two premises of a reverse cut on `goal` with the draft as the lemma:
 // prove-it (goal succedent extended with the draft) and use-it (the draft
 // assumed at the head of the antecedent). Rendered like fromSequent, with the

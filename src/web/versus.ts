@@ -21,10 +21,16 @@ import {
 import { createLangSwitcher } from './lang-switcher'
 import { createButtonCursor, cursorNavActions } from './button-cursor'
 import type { CursorCell } from './button-cursor'
-import { createLemmaEditorSession, editorKeyPieces } from './lemma-editor'
+import {
+  createLemmaEditorBar,
+  createLemmaEditorSession,
+  editorKeyPieces,
+} from './lemma-editor'
 import type { LemmaEditorSession } from './lemma-editor'
 import { basic, fromSequent } from '../render/print'
+import { conjectureGhost } from '../render/draft'
 import { html } from '../render/segment'
+import { isTautology, sequent } from '../model/sequent'
 import { MountResult, Navigate } from './types'
 import { MessageKey, t } from './i18n'
 import {
@@ -44,6 +50,7 @@ import {
   beatAt,
   stopAt,
   tutorialCurriculum,
+  tutorialRules,
   tutorialStops,
   TutorialBeat,
   TutorialChapter,
@@ -95,6 +102,7 @@ export const mountVersus = (
   }
   let beatIdx = isTutorial ? beatForStop(stopIdx) : 0
   const onIntro = (): boolean => isTutorial && stopAt(stopIdx).kind === 'intro'
+  const onConjecture = (): boolean => isTutorial && beatAt(beatIdx).conjecture
   // Tutorial input model: the learner (P1) gets every connected human input
   // device; the tutor (P2) is the opt-in Wizard-of-Oz rig, claiming at most
   // one device. p1Input / p2Input are Versus-only. Mutable because the
@@ -237,8 +245,14 @@ export const mountVersus = (
   // screen — the unsolvable-beat counterpart of the solved screen. Skip must
   // resolve into a screen that carries the topic navigation, or a keyboard/
   // gamepad learner in an all-unsolvable beat could never leave it.
+  // The verdict flags pick the screen's confirmation line: goals are small
+  // enough that a truth-table check at skip time settles honestly whether a
+  // proof existed (in the Skip beat it never does; a conjecture may go
+  // either way).
   let skipped1 = false
   let skipped2 = false
+  let skipHadSolution1 = false
+  let skipHadSolution2 = false
 
   const isNpc1 = !isTutorial && versusConfig.p1Input === 'npc'
   const isNpc2 = !isTutorial && versusConfig.p2Input === 'npc'
@@ -337,6 +351,7 @@ export const mountVersus = (
   // hurray — in the Skip beat every goal is verifiably unsolvable, so the
   // reveal is honest.
   const buildSkippedPage = (
+    hadSolution: boolean,
     onContinue: () => void,
     setCursor: (cursor: SolvedCursor) => void,
     setDefault: (dflt: () => void) => void,
@@ -347,7 +362,9 @@ export const mountVersus = (
     page.setAttribute('class', 'tutorial-intro tutorial-skipped')
     const note = document.createElement('div')
     note.setAttribute('class', 'tutorial-skipped-note')
-    note.textContent = t('tutorialSkipped')
+    note.textContent = t(
+      hadSolution ? 'tutorialSkippedSolvable' : 'tutorialSkipped',
+    )
     page.appendChild(note)
     const cells: CursorCell[] = []
     const add = (label: string, disabled: boolean, activate: () => void) => {
@@ -370,24 +387,96 @@ export const mountVersus = (
     return half
   }
 
-  // Continue off the skip screen: a fresh challenge in the current beat —
-  // the skip-side twin of solvePlayer, minus the (tutorial-inert) scoring.
-  const skipContinue1 = (): void => {
-    advancePlayer1()
+  // Conjecture entry: in a conjecture beat each half composes its own goal.
+  // The entry reuses the lemma editor session slot, so all the existing
+  // input routing (bar clicks, editor pro keys, cursor actions) drives it
+  // unchanged; on confirm the half's workspace is replaced with the
+  // authored `⊢ φ` challenge, bypassing the shared challenge list. Cancel
+  // (Back / undo past the beginning) starts the draft over.
+  const openConjecture1 = (): void => {
+    lemmaSession1 = createLemmaEditorSession(
+      (formula) => {
+        lemmaSession1 = null
+        ws1 = new Workspace({
+          challenge: { rules: tutorialRules, goal: sequent([], [formula]) },
+        })
+        refreshP1()
+      },
+      () => {
+        openConjecture1()
+        refreshP1()
+      },
+    )
+  }
+  const openConjecture2 = (): void => {
+    lemmaSession2 = createLemmaEditorSession(
+      (formula) => {
+        lemmaSession2 = null
+        ws2 = new Workspace({
+          challenge: { rules: tutorialRules, goal: sequent([], [formula]) },
+        })
+        refreshP2()
+      },
+      () => {
+        openConjecture2()
+        refreshP2()
+      },
+    )
+  }
+
+  // The next challenge in the current beat: fresh entry in a conjecture
+  // beat, the shared stream everywhere else. Both the solved screen's One
+  // More and the skip screen's continue land here.
+  const nextChallenge1 = (): void => {
+    if (onConjecture()) {
+      skipped1 = false
+      openConjecture1()
+    } else {
+      advancePlayer1()
+    }
     rerenderHalf1()
     rebuildThermo()
   }
-  const skipContinue2 = (): void => {
-    advancePlayer2()
+  const nextChallenge2 = (): void => {
+    if (onConjecture()) {
+      skipped2 = false
+      openConjecture2()
+    } else {
+      advancePlayer2()
+    }
     rerenderHalf2()
     rebuildThermo()
+  }
+
+  // Conjecture entry page: the live `⊢ φ` preview above the formula editor
+  // bar. The board (and its Skip/Undo controls) only exists once the player
+  // confirms; menu/pause stay reachable through the global bindings.
+  const buildConjecturePage = (
+    session: LemmaEditorSession,
+    refresh: () => void,
+  ): HTMLElement => {
+    const half = document.createElement('div')
+    half.setAttribute('class', 'versus-half')
+    const page = document.createElement('div')
+    page.setAttribute('class', 'conjecture-entry')
+    const previewArea = document.createElement('div')
+    previewArea.setAttribute('class', 'conjecture-preview-area')
+    const preview = document.createElement('div')
+    preview.setAttribute('class', 'tree-sequent ghost conjecture-preview')
+    preview.innerHTML = html(conjectureGhost(session.draft())(basic))
+    previewArea.appendChild(preview)
+    page.appendChild(previewArea)
+    page.appendChild(createLemmaEditorBar(session, refresh))
+    half.appendChild(page)
+    return half
   }
 
   const buildHalf1 = (): HTMLElement => {
     if (onIntro()) return buildIntroPage()
     if (isTutorial && skipped1)
       return buildSkippedPage(
-        skipContinue1,
+        skipHadSolution1,
+        nextChallenge1,
         (c) => {
           skipCursor1 = c
         },
@@ -395,6 +484,8 @@ export const mountVersus = (
           skipDefault1 = d
         },
       )
+    if (onConjecture() && lemmaSession1 !== null)
+      return buildConjecturePage(lemmaSession1, refreshP1)
     const half = document.createElement('div')
     half.setAttribute(
       'class',
@@ -461,6 +552,7 @@ export const mountVersus = (
     'tutorialOwlBranching',
     'tutorialOwlBranchingCrossing',
     'tutorialOwlUnsolvable',
+    'tutorialOwlConjecture',
   ]
   type OwlDevice = 'pointer' | 'keyboard' | 'gamepad'
   const owlDevices: ReadonlyArray<OwlDevice> = [
@@ -478,6 +570,10 @@ export const mountVersus = (
         ['destruct', t('destruct')],
         ['branch', `${t('prevBranch')} / ${t('nextBranch')}`],
         ['skip', t('skip')],
+        // The formula editor's palette has no single button word; a glyph
+        // sample stands in for the row of piece buttons.
+        ['pieces', '🐧 ¬ ∧ …'],
+        ['confirm', t('lemmaConfirm')],
       ])
     }
     const hint = device === 'keyboard' ? gazeKeyHint : gazePadHint
@@ -490,6 +586,13 @@ export const mountVersus = (
       ['destruct', label('gazeConnective')],
       ['branch', `${label('prevBranch')} / ${label('nextBranch')}`],
       ['skip', label('skip')],
+      // In the editor the gaze keys drive the bar cursor: aim with the
+      // arrows / D-pad, take the aimed piece with the confirm press.
+      [
+        'pieces',
+        `${label('gazeLeft')} ${label('gazeRight')} ${label('axiom')}`,
+      ],
+      ['confirm', label('axiom')],
     ])
   }
   // Split the template on {token} boundaries; tokens become bind chips (one
@@ -557,13 +660,25 @@ export const mountVersus = (
     if (isTutorial && skipped2) {
       // The tutor rig can skip too (modeling the gesture); the owl stays.
       const half = buildSkippedPage(
-        skipContinue2,
+        skipHadSolution2,
+        nextChallenge2,
         (c) => {
           skipCursor2 = c
         },
         (d) => {
           skipDefault2 = d
         },
+      )
+      half.appendChild(buildOwl())
+      return half
+    }
+    if (onConjecture() && lemmaSession2 !== null) {
+      const half = buildConjecturePage(lemmaSession2, refreshP2)
+      half.setAttribute(
+        'class',
+        'versus-half' +
+          (tutorOff() ? ' versus-half-npc versus-half-off' : '') +
+          (hideControls2() ? ' versus-half-keys' : ''),
       )
       half.appendChild(buildOwl())
       return half
@@ -1152,9 +1267,7 @@ export const mountVersus = (
   }
   const solvePlayer1 = () => {
     commitScore1()
-    advancePlayer1()
-    rerenderHalf1()
-    rebuildThermo()
+    nextChallenge1()
   }
 
   const commitScore2 = () => {
@@ -1210,9 +1323,7 @@ export const mountVersus = (
   }
   const solvePlayer2 = () => {
     commitScore2()
-    advancePlayer2()
-    rerenderHalf2()
-    rebuildThermo()
+    nextChallenge2()
   }
 
   const skipPlayer1 = () => {
@@ -1224,11 +1335,13 @@ export const mountVersus = (
     // to a fresh challenge, like One More.
     if (isTutorial) {
       if (onIntro() || beatAt(beatIdx).hideSkip || ws1.isSolved()) return
+      if (lemmaSession1 !== null) return
       if (skipped1) {
-        skipContinue1()
+        nextChallenge1()
         return
       }
       ctx1.setGazeModeActive(false)
+      skipHadSolution1 = isTautology(ws1.currentConjecture().derivation.result)
       skipped1 = true
       rerenderHalf1()
       return
@@ -1259,11 +1372,13 @@ export const mountVersus = (
     if (gameOver) return
     if (isTutorial) {
       if (onIntro() || beatAt(beatIdx).hideSkip || ws2.isSolved()) return
+      if (lemmaSession2 !== null) return
       if (skipped2) {
-        skipContinue2()
+        nextChallenge2()
         return
       }
       ctx2.setGazeModeActive(false)
+      skipHadSolution2 = isTautology(ws2.currentConjecture().derivation.result)
       skipped2 = true
       rerenderHalf2()
       return
@@ -1336,6 +1451,14 @@ export const mountVersus = (
     index2 = fresh + 1
     ws1 = makeWorkspace(fresh)
     ws2 = makeWorkspace(fresh)
+    // Conjecture beats open with the entry flow instead of the generated
+    // board; leaving one drops any half-built draft.
+    lemmaSession1 = null
+    lemmaSession2 = null
+    if (beatAt(beatIdx).conjecture) {
+      openConjecture1()
+      openConjecture2()
+    }
   }
   // Jump the tutorial to a stop (chapter intro page or beat), forward or
   // back. Landing on a beat re-roots the boards under its clamp; landing on
@@ -1375,6 +1498,7 @@ export const mountVersus = (
     branching: 'tutorialShape4',
     branchingCrossing: 'tutorialShape5',
     unsolvable: 'tutorialSkipping',
+    conjecture: 'tutorialConjecture',
   }
   const chapterKey: Record<TutorialBeat['chapter'], MessageKey> = {
     basics: 'tutorialBasics',
@@ -1801,7 +1925,9 @@ export const mountVersus = (
     }
     if (action !== 'menu') return
     // First menu press cancels an open lemma editor; otherwise it pauses.
-    if (lemmaSession1 !== null || lemmaSession2 !== null) {
+    // The conjecture entry is a persistent state, not a modal — there menu
+    // pauses directly (cancel would only restart the draft, trapping menu).
+    if (!onConjecture() && (lemmaSession1 !== null || lemmaSession2 !== null)) {
       lemmaSession1?.cancel()
       lemmaSession2?.cancel()
     } else {
@@ -1991,6 +2117,13 @@ export const mountVersus = (
   )
 
   const unsubGamepad = subscribeGamepad(rerender)
+
+  // A mount that lands directly on a conjecture beat (tutorial_stop URL)
+  // opens with the entry flow, like a beat jump would.
+  if (onConjecture()) {
+    openConjecture1()
+    openConjecture2()
+  }
 
   rerender()
 
