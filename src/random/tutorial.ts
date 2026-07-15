@@ -49,7 +49,7 @@ export type Notch = {
 
 // Cut is the one rule the generative clamp cannot make inapplicable (it applies
 // in any state), so it is excluded here and its button hidden — Cut belongs to
-// the tutorial's Input chapter.
+// a later beat of the tutorial's Solvability chapter.
 const tutorialRules: ReadonlyArray<RuleId> = rkRules.filter((r) => r !== 'cut')
 
 // A small atom pool keeps generated goals readable; no constants — ⊥/⊤ are
@@ -464,12 +464,88 @@ export const generateBasicsChallenge = (
   return { ...res, challenge: { ...res.challenge, start: prune(solution) } }
 }
 
+// --- Solvability chapter: verifiably unsolvable challenges ---------------
+
+// Everything taught by the end of the Logic chapter (constant closings
+// included) — the Skip beat adds no new rules, only the exit.
+const solvabilityTaught: ReadonlyArray<RuleId> = [
+  ...logicNotches[4].taught,
+  'f',
+  'v',
+]
+
+const connectiveRules: ReadonlyArray<RuleId> = [
+  'nl',
+  'nr',
+  'cl',
+  'cr',
+  'dl',
+  'dr',
+  'il',
+  'ir',
+]
+
+const UNSOLVABLE_WEIGHTS: ConnectiveWeights = {
+  negation: 1,
+  implication: 1,
+  conjunction: 1,
+  disjunction: 1,
+}
+
+// Fixed fallback: p ∨ q ⊢ p ∧ q — invalid (take p true, q false), with a
+// connective on each side to take apart.
+const UNSOLVABLE_FALLBACK: AnySequent = sequent(
+  [prop.disjunction(P, Q)],
+  [prop.conjunction(P, Q)],
+)
+
+// No solution attached: the goal is verifiably invalid, hence unprovable.
+// A missing solution is already a normal state elsewhere (chaos-mode
+// challenges arrive the same way), so downstream display code copes.
+const asUnsolvableResult = (
+  goal: AnySequent,
+  formulasTried: number,
+): ChallengeResult => ({
+  challenge: { rules: tutorialRules, goal },
+  nonStructuralCount: 0,
+  bypassed: true,
+  formulasTried,
+})
+
+// Generate a verifiably unsolvable challenge for the Skip beat: sampled like
+// the notch goals but accepted only when the sequent is NOT valid — classical
+// completeness then guarantees no proof exists. The closure clamp keeps every
+// formula decomposable with taught rules, so play always bottoms out at an
+// atomic dead end (a leaf where nothing closes and nothing destructs), which
+// is exactly what the beat wants the player to see; requiring at least one
+// connective ensures reaching that dead end takes actual play.
+export const generateUnsolvableChallenge = (): ChallengeResult => {
+  for (let tries = 0; tries < MAX_TRIES; tries += 1) {
+    const nAnte = randomCount()
+    const nSucc = randomCount()
+    if (nAnte + nSucc === 0 || nAnte + nSucc > MAX_FORMULAS) continue
+    const draw = (): prop.Prop => {
+      const size = Math.floor(Math.random() * 3)
+      return prop.randomWeighted(size, UNSOLVABLE_WEIGHTS, ATOMS)()
+    }
+    const antecedent = Array.from({ length: nAnte }, draw)
+    const succedent = Array.from({ length: nSucc }, draw)
+    const goal = sequent(antecedent, succedent)
+    if (isValidSequent(goal)) continue
+    const closure = reachableRules(goal)
+    if (!closure.every((r) => solvabilityTaught.includes(r))) continue
+    if (!closure.some((r) => connectiveRules.includes(r))) continue
+    return asUnsolvableResult(goal, tries + 1)
+  }
+  return asUnsolvableResult(UNSOLVABLE_FALLBACK, MAX_TRIES)
+}
+
 // --- The curriculum: the tutorial as one addressable, ordered list ------
 
 // A beat = one subchapter: a chapter tag, a name the web layer maps to i18n,
 // display glyphs, and a challenge generator for its practice stream.
 export type TutorialBeat = {
-  chapter: 'basics' | 'logic'
+  chapter: 'basics' | 'logic' | 'solvability'
   nameId:
     | 'identity'
     | 'constants'
@@ -479,11 +555,16 @@ export type TutorialBeat = {
     | 'crossing'
     | 'branching'
     | 'branchingCrossing'
+    | 'unsolvable'
   glyphs: string
   // The Close beat's only verbs are branch navigation and Close — the Gaze
   // controls (Drop/Destruct selection) aren't relevant yet, so they stay
   // hidden until the Drop beat introduces them.
   hideGaze: boolean
+  // Skip stays hidden (button and bindings both) while every goal is
+  // solvable — a give-up verb there is pointless or invites quitting; the
+  // Solvability chapter's Skip beat introduces it as the correct exit.
+  hideSkip: boolean
   generate: () => ChallengeResult
 }
 
@@ -501,6 +582,7 @@ export const tutorialCurriculum: ReadonlyArray<TutorialBeat> = [
     nameId: 'identity',
     glyphs: '',
     hideGaze: true,
+    hideSkip: true,
     generate: () => generateBasicsChallenge('identity'),
   },
   {
@@ -510,6 +592,7 @@ export const tutorialCurriculum: ReadonlyArray<TutorialBeat> = [
     nameId: 'constants',
     glyphs: '',
     hideGaze: true,
+    hideSkip: true,
     generate: () => generateBasicsChallenge('constants'),
   },
   {
@@ -517,6 +600,7 @@ export const tutorialCurriculum: ReadonlyArray<TutorialBeat> = [
     nameId: 'drop',
     glyphs: '',
     hideGaze: false,
+    hideSkip: true,
     generate: () => generateBasicsChallenge('drop'),
   },
   // No glyphs on the Logic rows: the behavior names are unique there, and
@@ -527,8 +611,21 @@ export const tutorialCurriculum: ReadonlyArray<TutorialBeat> = [
     nameId: LOGIC_NAME_IDS[i] ?? 'split',
     glyphs: '',
     hideGaze: false,
+    hideSkip: true,
     generate: () => generateSequentChallenge(notch),
   })),
+  {
+    // The Solvability chapter's Skip beat: deliberately unsolvable goals,
+    // announced as such upfront (the honest framing) — the player takes one
+    // apart, finds the dead end, and Skip makes its first appearance as the
+    // correct exit.
+    chapter: 'solvability',
+    nameId: 'unsolvable',
+    glyphs: '',
+    hideGaze: false,
+    hideSkip: false,
+    generate: generateUnsolvableChallenge,
+  },
 ]
 
 // Clamp an index into the curriculum, returning a guaranteed beat.

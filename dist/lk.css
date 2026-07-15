@@ -1652,6 +1652,17 @@ html.mode-single:not(.input-pointer) .bench-topbar .bench-zoom {
   justify-content: center;
   gap: 1em;
 }
+/* Skip completion screen: the solved screen's counterpart for skipped
+   (unsolvable) challenges — a confirmation line above the same topic
+   navigation row. */
+.tutorial-skipped {
+  flex-wrap: wrap;
+  align-content: center;
+}
+.tutorial-skipped-note {
+  flex-basis: 100%;
+  text-align: center;
+}
 /* Injected bind labels render as chips. Each chip exists once per device
    as a latent variant; the html input-* class shows the one matching the
    device the learner last touched, so switching device swaps the labels

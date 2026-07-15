@@ -89,6 +89,8 @@ const en = {
   tutorialShape3: 'Dividing',
   tutorialShape4: 'Branching',
   tutorialShape5: 'Shattering',
+  tutorialSolvability: 'Solvability',
+  tutorialSkipping: 'Skipping',
   tutorialOwlBasics:
     'Welcome to LK! In its challenges you close derivation trees built out of sequents. This first chapter teaches the essentials you need to play.',
   tutorialOwlLogic:
@@ -109,6 +111,11 @@ const en = {
     'Dropping a Conjunction ( ∧ ) on the right side of the gate, or a Disjunction ( ∨ ) on the left, makes the tree branch.',
   tutorialOwlBranchingCrossing:
     'Dropping an Implication ( → ) on the left side of the gate shatters the sentence: the most intricate of the rules combines both the parts dividing across the gate and the tree branching.',
+  tutorialOwlSolvability:
+    'The third chapter is about telling which challenges can be solved. Recognizing solvability matters if you take on chaotic ( 💀 ) challenges.',
+  tutorialOwlUnsolvable:
+    'The challenges here are deliberately unsolvable, so that you learn to recognize one. You can skip an unsolvable challenge by pressing the {skip} button.',
+  tutorialSkipped: 'Challenge skipped! It had no solution.',
   tutorialComplete: 'Graduation',
   tutorialStart: 'Start',
   tutorialOwlDone:
@@ -206,6 +213,8 @@ const fi: Record<MessageKey, string> = {
   tutorialShape3: 'Jakautuminen',
   tutorialShape4: 'Haarautuminen',
   tutorialShape5: 'Sirpaloituminen',
+  tutorialSolvability: 'Ratkeavuus',
+  tutorialSkipping: 'Ohittaminen',
   tutorialOwlBasics:
     'Tervetuloa pelaamaan LK:ta! Pelin haasteissa suljetaan sekventeistä koostuvia päättelypuita. Ensimmäisessä luvussa opimme pelaamisen kannalta välttämättömiä perusasioita.',
   tutorialOwlLogic:
@@ -226,6 +235,11 @@ const fi: Record<MessageKey, string> = {
     'Konjunktion ( ∧ ) pudottaminen portin oikealla puolella tai Disjunktion ( ∨ ) pudottaminen portin vasemmalla puolella aiheuttaa puun haarautumisen.',
   tutorialOwlBranchingCrossing:
     'Implikaation ( → ) pudottaminen portin vasemmalta puolelta sirpaloittaa lauseen: säännöistä monimutkaisin yhdistää sekä osien jakautumisen portin eri puolille että puun haarautumisen.',
+  tutorialOwlSolvability:
+    'Kolmannessa luvussa pohdimme, millaiset haasteet ovat ratkeavia. Ratkeavuuden tunnistaminen on oleellista, mikäli koitat ratkaista kaoottisia ( 💀 ) haasteita.',
+  tutorialOwlUnsolvable:
+    'Loimme tähän tarkoituksella ratkeamattomia haasteita, jotta opit tunnistamaan sellaisen. Voit ohittaa ratkeamattoman haasteen painamalla {skip} painiketta.',
+  tutorialSkipped: 'Haaste ohitettu! Sillä ei ollut ratkaisua.',
   tutorialComplete: 'Valmistujaiset',
   tutorialStart: 'Aloita',
   tutorialOwlDone:
@@ -323,6 +337,8 @@ const es: Record<MessageKey, string> = {
   tutorialShape3: 'Reparto',
   tutorialShape4: 'Ramificación',
   tutorialShape5: 'Fragmentación',
+  tutorialSolvability: 'Resolubilidad',
+  tutorialSkipping: 'Salto',
   tutorialOwlBasics:
     '¡Bienvenido a LK! En los desafíos del juego se cierran árboles de deducción compuestos de secuentes. En este primer capítulo aprendemos lo básico imprescindible para jugar.',
   tutorialOwlLogic:
@@ -343,6 +359,11 @@ const es: Record<MessageKey, string> = {
     'Soltar una Conjunción ( ∧ ) en el lado derecho de la puerta, o una Disyunción ( ∨ ) en el izquierdo, ramifica el árbol.',
   tutorialOwlBranchingCrossing:
     'Soltar una Implicación ( → ) en el lado izquierdo de la puerta fragmenta la oración: la regla más compleja combina el reparto de las partes entre ambos lados y la ramificación del árbol.',
+  tutorialOwlSolvability:
+    'En el tercer capítulo consideramos qué desafíos tienen solución. Reconocer la resolubilidad es esencial si intentas resolver desafíos caóticos ( 💀 ).',
+  tutorialOwlUnsolvable:
+    'Aquí hemos creado a propósito desafíos irresolubles, para que aprendas a reconocerlos. Puedes saltar un desafío irresoluble pulsando el botón {skip}.',
+  tutorialSkipped: '¡Desafío saltado! No tenía solución.',
   tutorialComplete: 'Graduación',
   tutorialStart: 'Empezar',
   tutorialOwlDone:
@@ -440,6 +461,8 @@ const cs: Record<MessageKey, string> = {
   tutorialShape3: 'Rozdělení',
   tutorialShape4: 'Větvení',
   tutorialShape5: 'Tříštění',
+  tutorialSolvability: 'Řešitelnost',
+  tutorialSkipping: 'Přeskakování',
   tutorialOwlBasics:
     'Vítej ve hře LK! V jejích výzvách se zavírají odvozovací stromy složené ze sekventů. V této první kapitole se naučíme základy, bez kterých se hrát nedá.',
   tutorialOwlLogic:
@@ -460,6 +483,11 @@ const cs: Record<MessageKey, string> = {
     'Puštění Konjunkce ( ∧ ) na pravé straně brány nebo Disjunkce ( ∨ ) na levé rozvětví strom.',
   tutorialOwlBranchingCrossing:
     'Puštění Implikace ( → ) na levé straně brány větu roztříští: nejsložitější z pravidel spojuje jak rozdělení částí na obě strany brány, tak větvení stromu.',
+  tutorialOwlSolvability:
+    'Ve třetí kapitole se zamýšlíme nad tím, jaké výzvy jsou řešitelné. Rozpoznat řešitelnost je zásadní, pokud se pustíš do chaotických ( 💀 ) výzev.',
+  tutorialOwlUnsolvable:
+    'Zde jsme záměrně vytvořili neřešitelné výzvy, ať se naučíš takovou rozpoznat. Neřešitelnou výzvu můžeš přeskočit tlačítkem {skip}.',
+  tutorialSkipped: 'Výzva přeskočena! Neměla řešení.',
   tutorialComplete: 'Promoce',
   tutorialStart: 'Začít',
   tutorialOwlDone:
@@ -557,6 +585,8 @@ const pl: Record<MessageKey, string> = {
   tutorialShape3: 'Rozdzielenie',
   tutorialShape4: 'Rozgałęzienie',
   tutorialShape5: 'Rozbicie',
+  tutorialSolvability: 'Rozwiązywalność',
+  tutorialSkipping: 'Pomijanie',
   tutorialOwlBasics:
     'Witaj w grze LK! W jej wyzwaniach zamyka się drzewa wnioskowania zbudowane z sekwentów. W tym pierwszym rozdziale poznajemy podstawy niezbędne do gry.',
   tutorialOwlLogic:
@@ -577,6 +607,11 @@ const pl: Record<MessageKey, string> = {
     'Upuszczenie Koniunkcji ( ∧ ) po prawej stronie bramy lub Alternatywy ( ∨ ) po lewej rozgałęzia drzewo.',
   tutorialOwlBranchingCrossing:
     'Upuszczenie Implikacji ( → ) po lewej stronie bramy rozbija zdanie: najbardziej złożona z reguł łączy rozdzielenie części na obie strony bramy i rozgałęzienie drzewa.',
+  tutorialOwlSolvability:
+    'W trzecim rozdziale zastanawiamy się, jakie wyzwania da się rozwiązać. Rozpoznawanie rozwiązywalności jest istotne, jeśli mierzysz się z chaotycznymi ( 💀 ) wyzwaniami.',
+  tutorialOwlUnsolvable:
+    'Umieściliśmy tu celowo nierozwiązywalne wyzwania, dzięki czemu nauczysz się je rozpoznawać. Nierozwiązywalne wyzwanie możesz pominąć przyciskiem {skip}.',
+  tutorialSkipped: 'Wyzwanie pominięte! Nie miało rozwiązania.',
   tutorialComplete: 'Zakończenie',
   tutorialStart: 'Rozpocznij',
   tutorialOwlDone:

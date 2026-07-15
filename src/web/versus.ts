@@ -150,6 +150,7 @@ export const mountVersus = (
 
   const advancePlayer1 = (): void => {
     scoreCommitted1 = false
+    skipped1 = false
     const [next1, ...rest1] = pending1
     if (next1 !== undefined) {
       wsIdx1 = next1
@@ -162,6 +163,7 @@ export const mountVersus = (
   }
   const advancePlayer2 = (): void => {
     scoreCommitted2 = false
+    skipped2 = false
     const [next2, ...rest2] = pending2
     if (next2 !== undefined) {
       wsIdx2 = next2
@@ -230,6 +232,13 @@ export const mountVersus = (
   // triggered by the opponent solving — with no DOM-preservation tricks.
   let lemmaSession1: LemmaEditorSession | null = null
   let lemmaSession2: LemmaEditorSession | null = null
+
+  // Tutorial skip state: whether a half currently shows the skip completion
+  // screen — the unsolvable-beat counterpart of the solved screen. Skip must
+  // resolve into a screen that carries the topic navigation, or a keyboard/
+  // gamepad learner in an all-unsolvable beat could never leave it.
+  let skipped1 = false
+  let skipped2 = false
 
   const isNpc1 = !isTutorial && versusConfig.p1Input === 'npc'
   const isNpc2 = !isTutorial && versusConfig.p2Input === 'npc'
@@ -322,8 +331,70 @@ export const mountVersus = (
     return half
   }
 
+  // Skip completion screen: what Skip resolves into in the tutorial. It
+  // mirrors the solved screen's navigation row (Previous / One More / Next,
+  // One More as the default) with a confirmation line in place of the
+  // hurray — in the Skip beat every goal is verifiably unsolvable, so the
+  // reveal is honest.
+  const buildSkippedPage = (
+    onContinue: () => void,
+    setCursor: (cursor: SolvedCursor) => void,
+    setDefault: (dflt: () => void) => void,
+  ): HTMLElement => {
+    const half = document.createElement('div')
+    half.setAttribute('class', 'versus-half')
+    const page = document.createElement('div')
+    page.setAttribute('class', 'tutorial-intro tutorial-skipped')
+    const note = document.createElement('div')
+    note.setAttribute('class', 'tutorial-skipped-note')
+    note.textContent = t('tutorialSkipped')
+    page.appendChild(note)
+    const cells: CursorCell[] = []
+    const add = (label: string, disabled: boolean, activate: () => void) => {
+      const el = createButton(label, disabled, activate)
+      page.appendChild(el)
+      cells.push({ btn: el, activate, isEnabled: () => !disabled })
+    }
+    add(t('tutorialPrevious'), stopIdx <= 0, () => jumpToStop(stopIdx - 1))
+    add(t('tutorialOneMore'), false, onContinue)
+    add(t('tutorialAdvance'), stopIdx >= tutorialStops.length - 1, () =>
+      jumpToStop(stopIdx + 1),
+    )
+    const cursor = createButtonCursor([cells], {
+      startCol: 1,
+      moveOnReveal: true,
+    })
+    setCursor({ onAction: cursor.onAction, isEngaged: cursor.isEngaged })
+    setDefault(() => cells[1]?.activate())
+    half.appendChild(page)
+    return half
+  }
+
+  // Continue off the skip screen: a fresh challenge in the current beat —
+  // the skip-side twin of solvePlayer, minus the (tutorial-inert) scoring.
+  const skipContinue1 = (): void => {
+    advancePlayer1()
+    rerenderHalf1()
+    rebuildThermo()
+  }
+  const skipContinue2 = (): void => {
+    advancePlayer2()
+    rerenderHalf2()
+    rebuildThermo()
+  }
+
   const buildHalf1 = (): HTMLElement => {
     if (onIntro()) return buildIntroPage()
+    if (isTutorial && skipped1)
+      return buildSkippedPage(
+        skipContinue1,
+        (c) => {
+          skipCursor1 = c
+        },
+        (d) => {
+          skipDefault1 = d
+        },
+      )
     const half = document.createElement('div')
     half.setAttribute(
       'class',
@@ -343,11 +414,13 @@ export const mountVersus = (
         refreshP1,
         undefined,
         onApplyReverse1,
-        // The tutorial hides Lemma outright (Cut belongs to the Input chapter);
-        // a permanently-disabled button would only draw the learner's eye.
+        // The tutorial hides Lemma outright (Cut belongs to a later beat of
+        // the Solvability chapter); a permanently-disabled button would only
+        // draw the learner's eye. Skip is per-beat: hidden while every goal
+        // is solvable, first shown in the Skip beat.
         isTutorial,
         ctx1,
-        isTutorial ? undefined : skipPlayer1,
+        isTutorial && beatAt(beatIdx).hideSkip ? undefined : skipPlayer1,
         isTutorial && beatAt(beatIdx).hideGaze,
         isTutorial,
         lemmaSession1,
@@ -373,6 +446,7 @@ export const mountVersus = (
   const owlChapterKey: Record<TutorialChapter, MessageKey> = {
     basics: 'tutorialOwlBasics',
     logic: 'tutorialOwlLogic',
+    solvability: 'tutorialOwlSolvability',
     done: 'tutorialOwlDone',
   }
   // Keyed by curriculum index — the two Close beats share a nameId, so the
@@ -386,6 +460,7 @@ export const mountVersus = (
     'tutorialOwlCrossing',
     'tutorialOwlBranching',
     'tutorialOwlBranchingCrossing',
+    'tutorialOwlUnsolvable',
   ]
   type OwlDevice = 'pointer' | 'keyboard' | 'gamepad'
   const owlDevices: ReadonlyArray<OwlDevice> = [
@@ -402,6 +477,7 @@ export const mountVersus = (
         ['undo', t('undo')],
         ['destruct', t('destruct')],
         ['branch', `${t('prevBranch')} / ${t('nextBranch')}`],
+        ['skip', t('skip')],
       ])
     }
     const hint = device === 'keyboard' ? gazeKeyHint : gazePadHint
@@ -413,6 +489,7 @@ export const mountVersus = (
       ['undo', label('undo')],
       ['destruct', label('gazeConnective')],
       ['branch', `${label('prevBranch')} / ${label('nextBranch')}`],
+      ['skip', label('skip')],
     ])
   }
   // Split the template on {token} boundaries; tokens become bind chips (one
@@ -477,6 +554,20 @@ export const mountVersus = (
       half.appendChild(buildOwl())
       return half
     }
+    if (isTutorial && skipped2) {
+      // The tutor rig can skip too (modeling the gesture); the owl stays.
+      const half = buildSkippedPage(
+        skipContinue2,
+        (c) => {
+          skipCursor2 = c
+        },
+        (d) => {
+          skipDefault2 = d
+        },
+      )
+      half.appendChild(buildOwl())
+      return half
+    }
     const half = document.createElement('div')
     half.setAttribute(
       'class',
@@ -495,7 +586,7 @@ export const mountVersus = (
         onApplyReverse2,
         isTutorial,
         ctx2,
-        isTutorial ? undefined : skipPlayer2,
+        isTutorial && beatAt(beatIdx).hideSkip ? undefined : skipPlayer2,
         isTutorial && beatAt(beatIdx).hideGaze,
         isTutorial,
         lemmaSession2,
@@ -1126,10 +1217,22 @@ export const mountVersus = (
 
   const skipPlayer1 = () => {
     if (gameOver) return
-    // No Skip in the tutorial: every goal is solvable and the give-up verb is
-    // taught in the Input chapter; between-subchapter motion is the Next
-    // Section button. (Also guards the keyboard/gamepad skip bindings.)
-    if (isTutorial) return
+    // Tutorial Skip: taught in the Solvability chapter's Skip beat, hidden
+    // and deadened everywhere earlier (every goal there is solvable, and
+    // between-subchapter motion is the topic navigation). Skip resolves the
+    // challenge into the skip completion screen; a second press continues
+    // to a fresh challenge, like One More.
+    if (isTutorial) {
+      if (onIntro() || beatAt(beatIdx).hideSkip || ws1.isSolved()) return
+      if (skipped1) {
+        skipContinue1()
+        return
+      }
+      ctx1.setGazeModeActive(false)
+      skipped1 = true
+      rerenderHalf1()
+      return
+    }
     const challengeIdx = wsIdx1
     resolved1.set(challengeIdx, 'skip')
 
@@ -1154,7 +1257,17 @@ export const mountVersus = (
   }
   const skipPlayer2 = () => {
     if (gameOver) return
-    if (isTutorial) return
+    if (isTutorial) {
+      if (onIntro() || beatAt(beatIdx).hideSkip || ws2.isSolved()) return
+      if (skipped2) {
+        skipContinue2()
+        return
+      }
+      ctx2.setGazeModeActive(false)
+      skipped2 = true
+      rerenderHalf2()
+      return
+    }
     const challengeIdx = wsIdx2
     resolved2.set(challengeIdx, 'skip')
 
@@ -1209,6 +1322,8 @@ export const mountVersus = (
     // Leave gaze mode on both halves — the target beat may not offer it.
     ctx1.setGazeModeActive(false)
     ctx2.setGazeModeActive(false)
+    skipped1 = false
+    skipped2 = false
     const fresh = Math.max(index1, index2, wsIdx1 + 1, wsIdx2 + 1)
     sharedChallenges.splice(fresh)
     pending1 = []
@@ -1259,10 +1374,12 @@ export const mountVersus = (
     crossing: 'tutorialShape3',
     branching: 'tutorialShape4',
     branchingCrossing: 'tutorialShape5',
+    unsolvable: 'tutorialSkipping',
   }
   const chapterKey: Record<TutorialBeat['chapter'], MessageKey> = {
     basics: 'tutorialBasics',
     logic: 'tutorialLogic',
+    solvability: 'tutorialSolvability',
   }
   // Tutorial scoreboard replacement: the curriculum ladder (every beat a
   // clickable row, current highlighted, chapter headers between groups), the
@@ -1362,6 +1479,11 @@ export const mountVersus = (
   // inputs). The default is what an unengaged axiom press activates.
   let introCursor: SolvedCursor | null = null
   let introDefault: (() => void) | null = null
+  // Ditto for each half's skip completion screen (tutorial only).
+  let skipCursor1: SolvedCursor | null = null
+  let skipDefault1: (() => void) | null = null
+  let skipCursor2: SolvedCursor | null = null
+  let skipDefault2: (() => void) | null = null
 
   // Post-solve: only the Continue action (axiom) advances; menu navigates away;
   // every other mapped key replays this player's animation on their own half.
@@ -1439,6 +1561,10 @@ export const mountVersus = (
       base: (action: Action) => void,
       getWs: () => AnyWorkspace,
       getCursor: () => SolvedCursor | null,
+      getSkipScreen: () => {
+        cursor: SolvedCursor | null
+        dflt: (() => void) | null
+      } | null,
     ) =>
     (action: Action): void => {
       // On a chapter intro page there is no board: arrows drive the topic
@@ -1457,6 +1583,29 @@ export const mountVersus = (
               cursor.onAction('axiom')
             } else {
               introDefault?.()
+            }
+            return
+          }
+        }
+        return
+      }
+      // The skip completion screen behaves like an intro page: arrows drive
+      // its buttons, axiom presses the focused one (or One More when the
+      // cursor is unengaged), and everything else is swallowed so keys
+      // can't mutate the board being left behind.
+      const skipScreen = getSkipScreen()
+      if (skipScreen !== null) {
+        const { cursor, dflt } = skipScreen
+        if (cursor !== null) {
+          if (cursorNavActions.has(action)) {
+            cursor.onAction(action)
+            return
+          }
+          if (action === 'axiom') {
+            if (cursor.isEngaged()) {
+              cursor.onAction('axiom')
+            } else {
+              dflt?.()
             }
             return
           }
@@ -1491,6 +1640,10 @@ export const mountVersus = (
     ),
     () => ws1,
     () => congrats1,
+    () =>
+      isTutorial && skipped1
+        ? { cursor: skipCursor1, dflt: skipDefault1 }
+        : null,
   )
   const dispatch2 = makeCursorDispatch(
     createDispatch(
@@ -1507,6 +1660,10 @@ export const mountVersus = (
     ),
     () => ws2,
     () => congrats2,
+    () =>
+      isTutorial && skipped2
+        ? { cursor: skipCursor2, dflt: skipDefault2 }
+        : null,
   )
 
   // In the tutorial the solved screen is also a navigation moment: Continue
