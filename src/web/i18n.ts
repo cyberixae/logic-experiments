@@ -93,7 +93,7 @@ const en = {
   tutorialClaims: 'Claims',
   tutorialSolvability: 'Solvability',
   tutorialSkipping: 'Skipping',
-  tutorialConjecture: 'Free choice',
+  tutorialConjecture: 'Sandbox',
   tutorialOwlBasics:
     'Welcome to LK! In its challenges you close derivation trees built out of sequents. This first chapter teaches the essentials you need to play.',
   tutorialOwlLogic:
@@ -122,7 +122,7 @@ const en = {
   tutorialOwlUnsolvable:
     'The challenges here are deliberately unsolvable, so that you learn to recognize one. You can skip an unsolvable challenge by pressing the {skip} button.',
   tutorialOwlConjecture:
-    'Here you can try to solve challenges of your own choosing. First pick the parts of the sentence with the {pieces} buttons, and finally press the {confirm} button. You can take back mispresses with the {undo} button.',
+    'In this sandbox you can try to solve challenges of your own choosing. First pick the parts of the sentence with the {pieces} buttons, and finally press the {confirm} button. You can take back mispresses with the {undo} button.',
   tutorialSkipped: 'Challenge skipped! It had no solution.',
   tutorialSkippedSolvable: 'Challenge skipped! It did have a solution, though.',
   tutorialComplete: 'Graduation',
@@ -226,7 +226,7 @@ const fi: Record<MessageKey, string> = {
   tutorialClaims: 'Väittämät',
   tutorialSolvability: 'Ratkeavuus',
   tutorialSkipping: 'Ohittaminen',
-  tutorialConjecture: 'Vapaavalinta',
+  tutorialConjecture: 'Hiekkalaatikko',
   tutorialOwlBasics:
     'Tervetuloa pelaamaan LK:ta! Pelin haasteissa suljetaan sekventeistä koostuvia päättelypuita. Ensimmäisessä luvussa opimme pelaamisen kannalta välttämättömiä perusasioita.',
   tutorialOwlLogic:
@@ -256,7 +256,7 @@ const fi: Record<MessageKey, string> = {
   tutorialOwlUnsolvable:
     'Loimme tähän tarkoituksella ratkeamattomia haasteita, jotta opit tunnistamaan sellaisen. Voit ohittaa ratkeamattoman haasteen painamalla {skip} painiketta.',
   tutorialOwlConjecture:
-    'Tässä voit kokeilla ratkaista vapaavalintaisia haasteita. Valitse ensin lauseen osat {pieces} painikkeilla ja paina lopuksi {confirm} painiketta. Virhepainallukset saat peruttua {undo} painikkeella.',
+    'Hiekkalaatikossa voit kokeilla ratkaista vapaavalintaisia haasteita. Valitse ensin lauseen osat {pieces} painikkeilla ja paina lopuksi {confirm} painiketta. Virhepainallukset saat peruttua {undo} painikkeella.',
   tutorialSkipped: 'Haaste ohitettu! Sillä ei ollut ratkaisua.',
   tutorialSkippedSolvable:
     'Haaste ohitettu! Sillä olisi sittenkin ollut ratkaisu.',
@@ -361,7 +361,7 @@ const es: Record<MessageKey, string> = {
   tutorialClaims: 'Afirmaciones',
   tutorialSolvability: 'Resolubilidad',
   tutorialSkipping: 'Salto',
-  tutorialConjecture: 'Libre elección',
+  tutorialConjecture: 'Arenero',
   tutorialOwlBasics:
     '¡Bienvenido a LK! En los desafíos del juego se cierran árboles de deducción compuestos de secuentes. En este primer capítulo aprendemos lo básico imprescindible para jugar.',
   tutorialOwlLogic:
@@ -391,7 +391,7 @@ const es: Record<MessageKey, string> = {
   tutorialOwlUnsolvable:
     'Aquí hemos creado a propósito desafíos irresolubles, para que aprendas a reconocerlos. Puedes saltar un desafío irresoluble pulsando el botón {skip}.',
   tutorialOwlConjecture:
-    'Aquí puedes intentar resolver desafíos de tu propia elección. Elige primero las partes de la oración con los botones {pieces} y pulsa al final el botón {confirm}. Puedes deshacer las pulsaciones erróneas con el botón {undo}.',
+    'En este arenero puedes intentar resolver desafíos de tu propia elección. Elige primero las partes de la oración con los botones {pieces} y pulsa al final el botón {confirm}. Puedes deshacer las pulsaciones erróneas con el botón {undo}.',
   tutorialSkipped: '¡Desafío saltado! No tenía solución.',
   tutorialSkippedSolvable: '¡Desafío saltado! Sin embargo, sí tenía solución.',
   tutorialComplete: 'Graduación',
@@ -495,7 +495,7 @@ const cs: Record<MessageKey, string> = {
   tutorialClaims: 'Tvrzení',
   tutorialSolvability: 'Řešitelnost',
   tutorialSkipping: 'Přeskakování',
-  tutorialConjecture: 'Vlastní volba',
+  tutorialConjecture: 'Pískoviště',
   tutorialOwlBasics:
     'Vítej ve hře LK! V jejích výzvách se zavírají odvozovací stromy složené ze sekventů. V této první kapitole se naučíme základy, bez kterých se hrát nedá.',
   tutorialOwlLogic:
@@ -524,7 +524,7 @@ const cs: Record<MessageKey, string> = {
   tutorialOwlUnsolvable:
     'Zde jsme záměrně vytvořili neřešitelné výzvy, ať se naučíš takovou rozpoznat. Neřešitelnou výzvu můžeš přeskočit tlačítkem {skip}.',
   tutorialOwlConjecture:
-    'Zde si můžeš zkusit vyřešit výzvy podle vlastní volby. Nejprve vyber části věty tlačítky {pieces} a nakonec stiskni tlačítko {confirm}. Chybná stisknutí vrátíš tlačítkem {undo}.',
+    'Na tomto pískovišti si můžeš zkusit vyřešit výzvy podle vlastní volby. Nejprve vyber části věty tlačítky {pieces} a nakonec stiskni tlačítko {confirm}. Chybná stisknutí vrátíš tlačítkem {undo}.',
   tutorialSkipped: 'Výzva přeskočena! Neměla řešení.',
   tutorialSkippedSolvable: 'Výzva přeskočena! Řešení ale měla.',
   tutorialComplete: 'Promoce',
@@ -628,7 +628,7 @@ const pl: Record<MessageKey, string> = {
   tutorialClaims: 'Twierdzenia',
   tutorialSolvability: 'Rozwiązywalność',
   tutorialSkipping: 'Pomijanie',
-  tutorialConjecture: 'Wolny wybór',
+  tutorialConjecture: 'Piaskownica',
   tutorialOwlBasics:
     'Witaj w grze LK! W jej wyzwaniach zamyka się drzewa wnioskowania zbudowane z sekwentów. W tym pierwszym rozdziale poznajemy podstawy niezbędne do gry.',
   tutorialOwlLogic:
@@ -657,7 +657,7 @@ const pl: Record<MessageKey, string> = {
   tutorialOwlUnsolvable:
     'Umieściliśmy tu celowo nierozwiązywalne wyzwania, dzięki czemu nauczysz się je rozpoznawać. Nierozwiązywalne wyzwanie możesz pominąć przyciskiem {skip}.',
   tutorialOwlConjecture:
-    'Tutaj możesz spróbować rozwiązać wyzwania własnego wyboru. Najpierw wybierz części zdania przyciskami {pieces}, a na końcu naciśnij przycisk {confirm}. Błędne naciśnięcia cofniesz przyciskiem {undo}.',
+    'W tej piaskownicy możesz spróbować rozwiązać wyzwania własnego wyboru. Najpierw wybierz części zdania przyciskami {pieces}, a na końcu naciśnij przycisk {confirm}. Błędne naciśnięcia cofniesz przyciskiem {undo}.',
   tutorialSkipped: 'Wyzwanie pominięte! Nie miało rozwiązania.',
   tutorialSkippedSolvable: 'Wyzwanie pominięte! Miało jednak rozwiązanie.',
   tutorialComplete: 'Zakończenie',
