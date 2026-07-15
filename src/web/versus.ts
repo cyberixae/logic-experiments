@@ -50,11 +50,11 @@ import {
   beatAt,
   stopAt,
   tutorialCurriculum,
-  tutorialRules,
   tutorialStops,
   TutorialBeat,
   TutorialChapter,
 } from '../random/tutorial'
+import { rules as rkRules } from '../systems/rk'
 
 const formatTime = (s: number): string => {
   const m = Math.floor(s / 60)
@@ -253,6 +253,11 @@ export const mountVersus = (
   let skipped2 = false
   let skipHadSolution1 = false
   let skipHadSolution2 = false
+  // Whether a half's live lemma session is the conjecture ENTRY (composing
+  // a goal) rather than a mid-proof Claim on the confirmed board — the two
+  // share the session slot but render and cancel differently.
+  let conjectureEntry1 = false
+  let conjectureEntry2 = false
 
   const isNpc1 = !isTutorial && versusConfig.p1Input === 'npc'
   const isNpc2 = !isTutorial && versusConfig.p2Input === 'npc'
@@ -394,11 +399,15 @@ export const mountVersus = (
   // authored `⊢ φ` challenge, bypassing the shared challenge list. Cancel
   // (Back / undo past the beginning) starts the draft over.
   const openConjecture1 = (): void => {
+    conjectureEntry1 = true
     lemmaSession1 = createLemmaEditorSession(
       (formula) => {
+        conjectureEntry1 = false
         lemmaSession1 = null
+        // Full rule set: Claim is taught by the Optimization chapter, so
+        // authored goals keep it available.
         ws1 = new Workspace({
-          challenge: { rules: tutorialRules, goal: sequent([], [formula]) },
+          challenge: { rules: rkRules, goal: sequent([], [formula]) },
         })
         refreshP1()
       },
@@ -411,11 +420,13 @@ export const mountVersus = (
     )
   }
   const openConjecture2 = (): void => {
+    conjectureEntry2 = true
     lemmaSession2 = createLemmaEditorSession(
       (formula) => {
+        conjectureEntry2 = false
         lemmaSession2 = null
         ws2 = new Workspace({
-          challenge: { rules: tutorialRules, goal: sequent([], [formula]) },
+          challenge: { rules: rkRules, goal: sequent([], [formula]) },
         })
         refreshP2()
       },
@@ -487,7 +498,7 @@ export const mountVersus = (
           skipDefault1 = d
         },
       )
-    if (onConjecture() && lemmaSession1 !== null)
+    if (conjectureEntry1 && lemmaSession1 !== null)
       return buildConjecturePage(lemmaSession1, refreshP1)
     const half = document.createElement('div')
     half.setAttribute(
@@ -508,11 +519,10 @@ export const mountVersus = (
         refreshP1,
         undefined,
         onApplyReverse1,
-        // The tutorial hides Lemma outright (Cut belongs to a later beat of
-        // the Solvability chapter); a permanently-disabled button would only
-        // draw the learner's eye. Skip is per-beat: hidden while every goal
-        // is solvable, first shown in the Skip beat.
-        isTutorial,
+        // Claim and Skip are per-beat: each stays hidden (not shown-disabled,
+        // which would only draw the learner's eye) until its teaching beat —
+        // Claim from the Optimization chapter on, Skip from the Skip beat on.
+        isTutorial && beatAt(beatIdx).hideLemma,
         ctx1,
         isTutorial && beatAt(beatIdx).hideSkip ? undefined : skipPlayer1,
         isTutorial && beatAt(beatIdx).hideGaze,
@@ -540,6 +550,7 @@ export const mountVersus = (
   const owlChapterKey: Record<TutorialChapter, MessageKey> = {
     basics: 'tutorialOwlBasics',
     logic: 'tutorialOwlLogic',
+    optimization: 'tutorialOwlOptimization',
     solvability: 'tutorialOwlSolvability',
     done: 'tutorialOwlDone',
   }
@@ -554,6 +565,7 @@ export const mountVersus = (
     'tutorialOwlCrossing',
     'tutorialOwlBranching',
     'tutorialOwlBranchingCrossing',
+    'tutorialOwlClaims',
     'tutorialOwlUnsolvable',
     'tutorialOwlConjecture',
   ]
@@ -577,6 +589,7 @@ export const mountVersus = (
         // sample stands in for the row of piece buttons.
         ['pieces', '🐧 ¬ ∧ …'],
         ['confirm', t('lemmaConfirm')],
+        ['lemma', t('lemma')],
       ])
     }
     const hint = device === 'keyboard' ? gazeKeyHint : gazePadHint
@@ -596,6 +609,7 @@ export const mountVersus = (
         `${label('gazeLeft')} ${label('gazeRight')} ${label('axiom')}`,
       ],
       ['confirm', label('axiom')],
+      ['lemma', label('lemma')],
     ])
   }
   // Split the template on {token} boundaries; tokens become bind chips (one
@@ -675,7 +689,7 @@ export const mountVersus = (
       half.appendChild(buildOwl())
       return half
     }
-    if (onConjecture() && lemmaSession2 !== null) {
+    if (conjectureEntry2 && lemmaSession2 !== null) {
       const half = buildConjecturePage(lemmaSession2, refreshP2)
       half.setAttribute(
         'class',
@@ -702,7 +716,7 @@ export const mountVersus = (
         refreshP2,
         undefined,
         onApplyReverse2,
-        isTutorial,
+        isTutorial && beatAt(beatIdx).hideLemma,
         ctx2,
         isTutorial && beatAt(beatIdx).hideSkip ? undefined : skipPlayer2,
         isTutorial && beatAt(beatIdx).hideGaze,
@@ -1455,9 +1469,11 @@ export const mountVersus = (
     ws1 = makeWorkspace(fresh)
     ws2 = makeWorkspace(fresh)
     // Conjecture beats open with the entry flow instead of the generated
-    // board; leaving one drops any half-built draft.
+    // board; leaving one drops any half-built draft or open lemma editor.
     lemmaSession1 = null
     lemmaSession2 = null
+    conjectureEntry1 = false
+    conjectureEntry2 = false
     if (beatAt(beatIdx).conjecture) {
       openConjecture1()
       openConjecture2()
@@ -1500,12 +1516,14 @@ export const mountVersus = (
     crossing: 'tutorialShape3',
     branching: 'tutorialShape4',
     branchingCrossing: 'tutorialShape5',
+    claims: 'tutorialClaims',
     unsolvable: 'tutorialSkipping',
     conjecture: 'tutorialConjecture',
   }
   const chapterKey: Record<TutorialBeat['chapter'], MessageKey> = {
     basics: 'tutorialBasics',
     logic: 'tutorialLogic',
+    optimization: 'tutorialOptimization',
     solvability: 'tutorialSolvability',
   }
   // Tutorial scoreboard replacement: the curriculum ladder (every beat a
@@ -1928,11 +1946,15 @@ export const mountVersus = (
     }
     if (action !== 'menu') return
     // First menu press cancels an open lemma editor; otherwise it pauses.
-    // The conjecture entry is a persistent state, not a modal — there menu
-    // pauses directly (cancel would only restart the draft, trapping menu).
-    if (!onConjecture() && (lemmaSession1 !== null || lemmaSession2 !== null)) {
-      lemmaSession1?.cancel()
-      lemmaSession2?.cancel()
+    // The conjecture entry is a persistent state, not a modal — its session
+    // doesn't count as cancellable (cancel would only restart the draft,
+    // trapping menu); a mid-proof Claim editor does, even on a conjecture
+    // board.
+    const cancellable1 = lemmaSession1 !== null && !conjectureEntry1
+    const cancellable2 = lemmaSession2 !== null && !conjectureEntry2
+    if (cancellable1 || cancellable2) {
+      if (cancellable1) lemmaSession1?.cancel()
+      if (cancellable2) lemmaSession2?.cancel()
     } else {
       setPaused(true)
     }

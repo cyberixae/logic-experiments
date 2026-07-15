@@ -1,4 +1,8 @@
-import { generateUnsolvableChallenge, tutorialCurriculum } from '../tutorial'
+import {
+  generateClaimChallenge,
+  generateUnsolvableChallenge,
+  tutorialCurriculum,
+} from '../tutorial'
 import { isTautology } from '../../model/sequent'
 import { reachableRules } from '../../model/closure'
 
@@ -19,9 +23,20 @@ describe('generateUnsolvableChallenge', () => {
     }
   })
 
-  it('never allows Cut', () => {
+  it('allows Cut (Claim is taught by the chapter before)', () => {
     const result = generateUnsolvableChallenge()
-    expect(result.challenge.rules.includes('cut')).toBe(false)
+    expect(result.challenge.rules.includes('cut')).toBe(true)
+  })
+})
+
+describe('generateClaimChallenge', () => {
+  it('yields solvable goals carrying the full rule set including cut', () => {
+    for (let i = 0; i < 10; i += 1) {
+      const result = generateClaimChallenge()
+      expect(isTautology(result.challenge.goal)).toBe(true)
+      expect(result.challenge.solution).toBeDefined()
+      expect(result.challenge.rules.includes('cut')).toBe(true)
+    }
   })
 })
 
@@ -32,6 +47,15 @@ describe('tutorialCurriculum', () => {
     expect(tutorialCurriculum[firstShown]?.chapter).toBe('solvability')
     tutorialCurriculum.forEach((beat, i) => {
       expect(beat.hideSkip).toBe(i < firstShown)
+    })
+  })
+
+  it('shows Claim only from the Optimization chapter on', () => {
+    const firstShown = tutorialCurriculum.findIndex((b) => !b.hideLemma)
+    expect(firstShown).toBeGreaterThan(-1)
+    expect(tutorialCurriculum[firstShown]?.chapter).toBe('optimization')
+    tutorialCurriculum.forEach((beat, i) => {
+      expect(beat.hideLemma).toBe(i < firstShown)
     })
   })
 })

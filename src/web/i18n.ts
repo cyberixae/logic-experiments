@@ -89,6 +89,8 @@ const en = {
   tutorialShape3: 'Dividing',
   tutorialShape4: 'Branching',
   tutorialShape5: 'Shattering',
+  tutorialOptimization: 'Optimization',
+  tutorialClaims: 'Claims',
   tutorialSolvability: 'Solvability',
   tutorialSkipping: 'Skipping',
   tutorialConjecture: 'Free choice',
@@ -112,8 +114,11 @@ const en = {
     'Dropping a Conjunction ( ∧ ) on the right side of the gate, or a Disjunction ( ∨ ) on the left, makes the tree branch.',
   tutorialOwlBranchingCrossing:
     'Dropping an Implication ( → ) on the left side of the gate shatters the sentence: the most intricate of the rules combines both the parts dividing across the gate and the tree branching.',
+  tutorialOwlOptimization: 'The third chapter is about optimizing solutions.',
+  tutorialOwlClaims:
+    'You can add a claim to the selected branch by pressing the {lemma} button. Pick the parts of the sentence with the {pieces} buttons and finally press the {confirm} button. Claims never affect whether a challenge can be solved, but they can sometimes shorten the solution.',
   tutorialOwlSolvability:
-    'The third chapter is about telling which challenges can be solved. Recognizing solvability matters if you take on chaotic ( 💀 ) challenges.',
+    'The fourth chapter is about telling which challenges can be solved. Recognizing solvability matters if you take on chaotic ( 💀 ) challenges.',
   tutorialOwlUnsolvable:
     'The challenges here are deliberately unsolvable, so that you learn to recognize one. You can skip an unsolvable challenge by pressing the {skip} button.',
   tutorialOwlConjecture:
@@ -217,6 +222,8 @@ const fi: Record<MessageKey, string> = {
   tutorialShape3: 'Jakautuminen',
   tutorialShape4: 'Haarautuminen',
   tutorialShape5: 'Sirpaloituminen',
+  tutorialOptimization: 'Optimointi',
+  tutorialClaims: 'Väittämät',
   tutorialSolvability: 'Ratkeavuus',
   tutorialSkipping: 'Ohittaminen',
   tutorialConjecture: 'Vapaavalinta',
@@ -240,8 +247,12 @@ const fi: Record<MessageKey, string> = {
     'Konjunktion ( ∧ ) pudottaminen portin oikealla puolella tai Disjunktion ( ∨ ) pudottaminen portin vasemmalla puolella aiheuttaa puun haarautumisen.',
   tutorialOwlBranchingCrossing:
     'Implikaation ( → ) pudottaminen portin vasemmalta puolelta sirpaloittaa lauseen: säännöistä monimutkaisin yhdistää sekä osien jakautumisen portin eri puolille että puun haarautumisen.',
+  tutorialOwlOptimization:
+    'Kolmannessa luvussa tutustumme ratkaisujen optimointiin.',
+  tutorialOwlClaims:
+    'Voit lisätä valittuun oksaan väittämän painamalla {lemma} painiketta. Valitse lauseen osat {pieces} painikkeilla ja paina lopuksi {confirm} painiketta. Väittämät eivät vaikuta haasteen ratkeavuuteen, mutta ne voivat joskus lyhentää ratkaisua.',
   tutorialOwlSolvability:
-    'Kolmannessa luvussa pohdimme, millaiset haasteet ovat ratkeavia. Ratkeavuuden tunnistaminen on oleellista, mikäli koitat ratkaista kaoottisia ( 💀 ) haasteita.',
+    'Neljännessä luvussa pohdimme, millaiset haasteet ovat ratkeavia. Ratkeavuuden tunnistaminen on oleellista, mikäli koitat ratkaista kaoottisia ( 💀 ) haasteita.',
   tutorialOwlUnsolvable:
     'Loimme tähän tarkoituksella ratkeamattomia haasteita, jotta opit tunnistamaan sellaisen. Voit ohittaa ratkeamattoman haasteen painamalla {skip} painiketta.',
   tutorialOwlConjecture:
@@ -346,6 +357,8 @@ const es: Record<MessageKey, string> = {
   tutorialShape3: 'Reparto',
   tutorialShape4: 'Ramificación',
   tutorialShape5: 'Fragmentación',
+  tutorialOptimization: 'Optimización',
+  tutorialClaims: 'Afirmaciones',
   tutorialSolvability: 'Resolubilidad',
   tutorialSkipping: 'Salto',
   tutorialConjecture: 'Libre elección',
@@ -369,8 +382,12 @@ const es: Record<MessageKey, string> = {
     'Soltar una Conjunción ( ∧ ) en el lado derecho de la puerta, o una Disyunción ( ∨ ) en el izquierdo, ramifica el árbol.',
   tutorialOwlBranchingCrossing:
     'Soltar una Implicación ( → ) en el lado izquierdo de la puerta fragmenta la oración: la regla más compleja combina el reparto de las partes entre ambos lados y la ramificación del árbol.',
+  tutorialOwlOptimization:
+    'El tercer capítulo trata de optimizar las soluciones.',
+  tutorialOwlClaims:
+    'Puedes añadir una afirmación a la rama elegida pulsando el botón {lemma}. Elige las partes de la oración con los botones {pieces} y pulsa al final el botón {confirm}. Las afirmaciones nunca afectan a la resolubilidad del desafío, pero a veces pueden acortar la solución.',
   tutorialOwlSolvability:
-    'En el tercer capítulo consideramos qué desafíos tienen solución. Reconocer la resolubilidad es esencial si intentas resolver desafíos caóticos ( 💀 ).',
+    'En el cuarto capítulo consideramos qué desafíos tienen solución. Reconocer la resolubilidad es esencial si intentas resolver desafíos caóticos ( 💀 ).',
   tutorialOwlUnsolvable:
     'Aquí hemos creado a propósito desafíos irresolubles, para que aprendas a reconocerlos. Puedes saltar un desafío irresoluble pulsando el botón {skip}.',
   tutorialOwlConjecture:
@@ -474,6 +491,8 @@ const cs: Record<MessageKey, string> = {
   tutorialShape3: 'Rozdělení',
   tutorialShape4: 'Větvení',
   tutorialShape5: 'Tříštění',
+  tutorialOptimization: 'Optimalizace',
+  tutorialClaims: 'Tvrzení',
   tutorialSolvability: 'Řešitelnost',
   tutorialSkipping: 'Přeskakování',
   tutorialConjecture: 'Vlastní volba',
@@ -497,8 +516,11 @@ const cs: Record<MessageKey, string> = {
     'Puštění Konjunkce ( ∧ ) na pravé straně brány nebo Disjunkce ( ∨ ) na levé rozvětví strom.',
   tutorialOwlBranchingCrossing:
     'Puštění Implikace ( → ) na levé straně brány větu roztříští: nejsložitější z pravidel spojuje jak rozdělení částí na obě strany brány, tak větvení stromu.',
+  tutorialOwlOptimization: 'Třetí kapitola se věnuje optimalizaci řešení.',
+  tutorialOwlClaims:
+    'Na vybranou větev můžeš přidat tvrzení tlačítkem {lemma}. Vyber části věty tlačítky {pieces} a nakonec stiskni tlačítko {confirm}. Tvrzení nikdy neovlivní řešitelnost výzvy, ale někdy mohou řešení zkrátit.',
   tutorialOwlSolvability:
-    'Ve třetí kapitole se zamýšlíme nad tím, jaké výzvy jsou řešitelné. Rozpoznat řešitelnost je zásadní, pokud se pustíš do chaotických ( 💀 ) výzev.',
+    'Ve čtvrté kapitole se zamýšlíme nad tím, jaké výzvy jsou řešitelné. Rozpoznat řešitelnost je zásadní, pokud se pustíš do chaotických ( 💀 ) výzev.',
   tutorialOwlUnsolvable:
     'Zde jsme záměrně vytvořili neřešitelné výzvy, ať se naučíš takovou rozpoznat. Neřešitelnou výzvu můžeš přeskočit tlačítkem {skip}.',
   tutorialOwlConjecture:
@@ -602,6 +624,8 @@ const pl: Record<MessageKey, string> = {
   tutorialShape3: 'Rozdzielenie',
   tutorialShape4: 'Rozgałęzienie',
   tutorialShape5: 'Rozbicie',
+  tutorialOptimization: 'Optymalizacja',
+  tutorialClaims: 'Twierdzenia',
   tutorialSolvability: 'Rozwiązywalność',
   tutorialSkipping: 'Pomijanie',
   tutorialConjecture: 'Wolny wybór',
@@ -625,8 +649,11 @@ const pl: Record<MessageKey, string> = {
     'Upuszczenie Koniunkcji ( ∧ ) po prawej stronie bramy lub Alternatywy ( ∨ ) po lewej rozgałęzia drzewo.',
   tutorialOwlBranchingCrossing:
     'Upuszczenie Implikacji ( → ) po lewej stronie bramy rozbija zdanie: najbardziej złożona z reguł łączy rozdzielenie części na obie strony bramy i rozgałęzienie drzewa.',
+  tutorialOwlOptimization: 'Trzeci rozdział dotyczy optymalizacji rozwiązań.',
+  tutorialOwlClaims:
+    'Do wybranej gałęzi możesz dodać twierdzenie przyciskiem {lemma}. Wybierz części zdania przyciskami {pieces}, a na końcu naciśnij przycisk {confirm}. Twierdzenia nigdy nie wpływają na rozwiązywalność wyzwania, ale czasem mogą skrócić rozwiązanie.',
   tutorialOwlSolvability:
-    'W trzecim rozdziale zastanawiamy się, jakie wyzwania da się rozwiązać. Rozpoznawanie rozwiązywalności jest istotne, jeśli mierzysz się z chaotycznymi ( 💀 ) wyzwaniami.',
+    'W czwartym rozdziale zastanawiamy się, jakie wyzwania da się rozwiązać. Rozpoznawanie rozwiązywalności jest istotne, jeśli mierzysz się z chaotycznymi ( 💀 ) wyzwaniami.',
   tutorialOwlUnsolvable:
     'Umieściliśmy tu celowo nierozwiązywalne wyzwania, dzięki czemu nauczysz się je rozpoznawać. Nierozwiązywalne wyzwanie możesz pominąć przyciskiem {skip}.',
   tutorialOwlConjecture:

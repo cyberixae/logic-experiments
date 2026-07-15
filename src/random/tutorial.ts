@@ -48,8 +48,9 @@ export type Notch = {
 }
 
 // Cut is the one rule the generative clamp cannot make inapplicable (it applies
-// in any state), so it is excluded here and its button hidden — Cut belongs to
-// a later beat of the tutorial's Solvability chapter.
+// in any state), so the pre-Optimization chapters exclude it from their
+// challenges' rule sets and hide its button; the Optimization chapter's
+// Claims beat introduces it, and later beats keep it.
 export const tutorialRules: ReadonlyArray<RuleId> = rkRules.filter(
   (r) => r !== 'cut',
 )
@@ -466,6 +467,46 @@ export const generateBasicsChallenge = (
   return { ...res, challenge: { ...res.challenge, start: prune(solution) } }
 }
 
+// --- Optimization chapter: ordinary challenges with Claim available -------
+
+// The Claims beat teaches cut, and cut can never be made necessary (it is
+// admissible — any lemma can be Dropped on both premises, recovering the
+// original goal). So unlike every other beat there is no lesson-necessity
+// guarantee: the stream is ordinary valid goals over everything taught,
+// requiring some connective rule (the structural-only dodge check rejects
+// goals that close by drops alone), with the full rule set INCLUDING cut so
+// the Claim button is live. Mastery framing, not a gate.
+const claimNotch: Notch = {
+  glyphs: '',
+  featured: ['nl', 'nr', 'cl', 'cr', 'dl', 'dr', 'il', 'ir'],
+  taught: ['nl', 'nr', 'cl', 'cr', 'dl', 'dr', 'il', 'ir', 'f', 'v'],
+  anteConnectives: {
+    conjunction: 1,
+    disjunction: 1,
+    negation: 1,
+    implication: 1,
+  },
+  succConnectives: {
+    conjunction: 1,
+    disjunction: 1,
+    negation: 1,
+    implication: 1,
+  },
+  symbols: ATOMS,
+  maxFormulaSize: 2,
+  minAnte: 0,
+  // Hypothetical syllogism — the classic goal a mid-proof claim helps.
+  fallback: sequent(
+    [prop.implication(P, Q), prop.implication(Q, prop.atom('r'))],
+    [prop.implication(P, prop.atom('r'))],
+  ),
+}
+
+export const generateClaimChallenge = (): ChallengeResult => {
+  const res = generateSequentChallenge(claimNotch)
+  return { ...res, challenge: { ...res.challenge, rules: rkRules } }
+}
+
 // --- Solvability chapter: verifiably unsolvable challenges ---------------
 
 // Everything taught by the end of the Logic chapter (constant closings
@@ -503,12 +544,15 @@ const UNSOLVABLE_FALLBACK: AnySequent = sequent(
 
 // No solution attached: the goal is verifiably invalid, hence unprovable.
 // A missing solution is already a normal state elsewhere (chaos-mode
-// challenges arrive the same way), so downstream display code copes.
+// challenges arrive the same way), so downstream display code copes. The
+// full rule set (cut included — Claim is taught by the chapter before
+// this one, and no claim can rescue an invalid goal) keeps the taught
+// verbs available.
 const asUnsolvableResult = (
   goal: AnySequent,
   formulasTried: number,
 ): ChallengeResult => ({
-  challenge: { rules: tutorialRules, goal },
+  challenge: { rules: rkRules, goal },
   nonStructuralCount: 0,
   bypassed: true,
   formulasTried,
@@ -547,7 +591,7 @@ export const generateUnsolvableChallenge = (): ChallengeResult => {
 // A beat = one subchapter: a chapter tag, a name the web layer maps to i18n,
 // display glyphs, and a challenge generator for its practice stream.
 export type TutorialBeat = {
-  chapter: 'basics' | 'logic' | 'solvability'
+  chapter: 'basics' | 'logic' | 'optimization' | 'solvability'
   nameId:
     | 'identity'
     | 'constants'
@@ -557,6 +601,7 @@ export type TutorialBeat = {
     | 'crossing'
     | 'branching'
     | 'branchingCrossing'
+    | 'claims'
     | 'unsolvable'
     | 'conjecture'
   glyphs: string
@@ -568,6 +613,10 @@ export type TutorialBeat = {
   // solvable — a give-up verb there is pointless or invites quitting; the
   // Solvability chapter's Skip beat introduces it as the correct exit.
   hideSkip: boolean
+  // Claim (cut) stays hidden until the Optimization chapter teaches it;
+  // from there on the button shows and challenges carry cut in their rule
+  // set (the allow-list is the enforcement backstop before that).
+  hideLemma: boolean
   // Conjecture beats replace the generated board with the conjecture entry
   // flow: the player composes a formula φ and plays the goal `⊢ φ` they
   // authored. The web layer owns that flow; `generate` is never shown.
@@ -590,6 +639,7 @@ export const tutorialCurriculum: ReadonlyArray<TutorialBeat> = [
     glyphs: '',
     hideGaze: true,
     hideSkip: true,
+    hideLemma: true,
     conjecture: false,
     generate: () => generateBasicsChallenge('identity'),
   },
@@ -601,6 +651,7 @@ export const tutorialCurriculum: ReadonlyArray<TutorialBeat> = [
     glyphs: '',
     hideGaze: true,
     hideSkip: true,
+    hideLemma: true,
     conjecture: false,
     generate: () => generateBasicsChallenge('constants'),
   },
@@ -610,6 +661,7 @@ export const tutorialCurriculum: ReadonlyArray<TutorialBeat> = [
     glyphs: '',
     hideGaze: false,
     hideSkip: true,
+    hideLemma: true,
     conjecture: false,
     generate: () => generateBasicsChallenge('drop'),
   },
@@ -622,9 +674,24 @@ export const tutorialCurriculum: ReadonlyArray<TutorialBeat> = [
     glyphs: '',
     hideGaze: false,
     hideSkip: true,
+    hideLemma: true,
     conjecture: false,
     generate: () => generateSequentChallenge(notch),
   })),
+  {
+    // The Optimization chapter's Claims beat: ordinary challenges with the
+    // Claim button making its first appearance. Claims are optional by
+    // nature (cut is admissible), so this is the one beat whose featured
+    // verb the goals cannot force.
+    chapter: 'optimization',
+    nameId: 'claims',
+    glyphs: '',
+    hideGaze: false,
+    hideSkip: true,
+    hideLemma: false,
+    conjecture: false,
+    generate: generateClaimChallenge,
+  },
   {
     // The Solvability chapter's Skip beat: deliberately unsolvable goals,
     // announced as such upfront (the honest framing) — the player takes one
@@ -635,6 +702,7 @@ export const tutorialCurriculum: ReadonlyArray<TutorialBeat> = [
     glyphs: '',
     hideGaze: false,
     hideSkip: false,
+    hideLemma: false,
     conjecture: false,
     generate: generateUnsolvableChallenge,
   },
@@ -648,6 +716,7 @@ export const tutorialCurriculum: ReadonlyArray<TutorialBeat> = [
     glyphs: '',
     hideGaze: false,
     hideSkip: false,
+    hideLemma: false,
     conjecture: true,
     // Never shown: the web layer swaps this beat's boards for the entry
     // flow; a fixed cheap result keeps the challenge buffer machinery fed.
