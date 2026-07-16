@@ -1627,6 +1627,35 @@ html.input-gamepad .owl-bind.for-gamepad {
   font-weight: normal;
   font-variant-numeric: tabular-nums;
 }
+/* --- Solo tutorial screen --- */
+/* One board filling the viewport; the positioned ancestor for the owl and
+   the breadcrumb. */
+.tutorial-screen {
+  position: relative;
+  height: 100dvh;
+  background: #ffeedd;
+  overflow: hidden;
+}
+/* Current-position breadcrumb: the ambient "where am I" indicator in the
+   top-right corner; clicking it opens the chapter index overlay. */
+.tutorial-crumb {
+  position: absolute;
+  top: 0.5em;
+  right: 0.6em;
+  z-index: 4;
+  font-size: 0.85em;
+}
+/* The chapter index as an on-demand overlay (the ladder markup unchanged);
+   reuses the pause popup's panel look. */
+.tutorial-ladder-popup {
+  padding: 1.5em 2em;
+  min-width: 16em;
+  max-height: 85dvh;
+  overflow-y: auto;
+}
+.tutorial-ladder-popup .tutorial-ladder {
+  font-size: 1em;
+}
 /* Presolved foundation: the frozen part of the tree the player can't undo.
    Only the node's own sequent and inference line dim, so nested frozen
    nodes don't compound their opacity. */

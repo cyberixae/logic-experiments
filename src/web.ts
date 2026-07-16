@@ -14,7 +14,6 @@ import {
   mountVersusConfig,
   parseVersusConfigFromParams,
   setVersusConfigParams,
-  TutorInput,
 } from './web/versus-config'
 import {
   mountRandomConfig,
@@ -40,21 +39,6 @@ let current: MountResult = { cleanup: () => {}, rerender: () => {} }
 
 const enterMode = (mode: GameMode) => {
   session.enter(mode, factory[mode]())
-}
-
-// The tutorial's tutor device comes from a URL param (no NPC — the tutor is
-// a human until the NPC-tutor era). Absent or unrecognized means off: a solo
-// learner with every input device.
-const pickTutorInput = (params: URLSearchParams): TutorInput => {
-  const raw = params.get('tutorial_tutor')
-  if (
-    raw === 'mouse' ||
-    raw === 'keyboard' ||
-    raw === 'gamepad1' ||
-    raw === 'gamepad2'
-  )
-    return raw
-  return 'off'
 }
 
 const navigate = (screen: Screen) => {
@@ -107,10 +91,8 @@ const navigate = (screen: Screen) => {
       }
     }
     if (screen === 'tutorial') {
-      for (const key of ['tutorial_stop', 'tutorial_tutor']) {
-        const val = currentParams.get(key)
-        if (val !== null) nextParams.set(key, val)
-      }
+      const val = currentParams.get('tutorial_stop')
+      if (val !== null) nextParams.set('tutorial_stop', val)
     }
     url = `?${nextParams.toString()}`
   }
@@ -152,13 +134,7 @@ const mount = (screen: Screen) => {
       const params = new URLSearchParams(window.location.search)
       const raw = parseInt(params.get('tutorial_stop') ?? '0', 10)
       const stop = Number.isFinite(raw) ? raw : 0
-      current = mountTutorial(
-        body,
-        navigate,
-        pool,
-        stop,
-        pickTutorInput(params),
-      )
+      current = mountTutorial(body, navigate, stop)
       break
     }
     case 'versus-config':
