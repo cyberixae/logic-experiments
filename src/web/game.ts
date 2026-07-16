@@ -74,7 +74,7 @@ export {
   subscribeGamepad,
 } from './input-mode'
 
-const ghostToDerivation = <J extends AnySequent>(
+export const ghostToDerivation = <J extends AnySequent>(
   chain: GhostStep[],
   activeSequent: J,
 ): Derivation<J> => {

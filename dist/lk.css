@@ -847,6 +847,11 @@ html.mode-single:not(.input-pointer) .bench-topbar .bench-zoom {
   font-size: 0.9em;
   opacity: 0.7;
 }
+/* Tree specimens: same markup as the playarea, at a smaller documentation
+   scale (the playarea sizes its tree via .playarea > .tree-node). */
+.gallery-tree > .tree-node {
+  font-size: 1.4em;
+}
 .menu-title {
   font-size: 5em;
   font-weight: bold;

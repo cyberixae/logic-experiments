@@ -1,7 +1,15 @@
 import { MountResult, Navigate } from './types'
 import { t } from './i18n'
-import { createBareRuleCard, createButton } from './game'
+import { createBareRuleCard, createButton, ghostToDerivation } from './game'
 import { center, left, right } from '../rules'
+import { rk, rules } from '../systems/rk'
+import { sequent } from '../model/sequent'
+import type { AnySequent } from '../model/sequent'
+import { editDerivation, premise } from '../model/derivation'
+import { computeGhostChain } from '../interactive/ghost'
+import type { GhostKind } from '../interactive/ghost'
+import { renderDerivation, layoutTree } from './tree'
+import type { GazeMark } from '../render/print'
 
 // Design-system gallery, reached via the secret menu. Specimens are built with
 // the production constructors and class names so they track the real styles.
@@ -167,6 +175,107 @@ const ruleCardSection = (): HTMLElement => {
   )
 }
 
+const treeSpecimen = (el: HTMLElement, caption: string): HTMLElement => {
+  const wrap = document.createElement('div')
+  wrap.setAttribute('class', 'gallery-tree')
+  wrap.appendChild(el)
+  return specimen(wrap, caption)
+}
+
+const treeSection = (): HTMLElement => {
+  const strip = document.createElement('div')
+  strip.setAttribute('class', 'gallery-strip')
+
+  // The same small proof as challenge ch6-branching-2: p, q ⊢ p ∧ q.
+  const { a, z, i } = rk
+  const proof = z.cr(
+    z.swl(a('q'), i.i(a('p'))),
+    z.sRotLB(z.swl(a('p'), i.i(a('q')))),
+  )
+  // Mid-solve state: the right branch reopened into an active goal.
+  const partial = editDerivation(proof, [1], (d) => premise(d.result))
+  if (partial !== null) {
+    strip.appendChild(
+      treeSpecimen(renderDerivation(partial, [1]), 'in progress'),
+    )
+  }
+  strip.appendChild(treeSpecimen(renderDerivation(proof, [-1]), 'solved'))
+
+  return section(
+    'Proof tree',
+    'The proof tree is the play surface. The goal sequent sits at the ' +
+      'bottom; each backward rule application draws an inference line above ' +
+      'its conclusion, labelled with the rule on the right, and stacks the ' +
+      'new premises on top. The highlighted sequent is the active goal that ' +
+      'the next move applies to; a solved tree has no open goals left. The ' +
+      'solve animation states (verify sweep, fading) are not documented ' +
+      'here.',
+    strip,
+  )
+}
+
+const gazeGhostSection = (): HTMLElement => {
+  const strip = document.createElement('div')
+  strip.setAttribute('class', 'gallery-strip')
+
+  const { a, o } = rk
+  const goal = sequent(
+    [o.p2.conjunction(a('p'), a('q'))],
+    [o.p2.conjunction(a('q'), a('p'))],
+  )
+  const gaze: GazeMark = { side: 'left', index: 0 }
+
+  strip.appendChild(
+    treeSpecimen(renderDerivation(premise(goal), [], gaze), 'gaze cursor'),
+  )
+
+  const ghostSpecimen = (
+    kind: GhostKind,
+    caption: string,
+    seq: AnySequent = goal,
+    mark: GazeMark = gaze,
+  ): HTMLElement | null => {
+    const chain = computeGhostChain(seq, mark, kind, rules)
+    if (chain === null) return null
+    const tree = renderDerivation(
+      ghostToDerivation(chain, seq),
+      [],
+      mark,
+      [],
+      [],
+    )
+    return treeSpecimen(tree, caption)
+  }
+
+  const destruct = ghostSpecimen('connective', t('destruct') + ' ghost')
+  if (destruct !== null) strip.appendChild(destruct)
+  const drop = ghostSpecimen('weakening', t('drop') + ' ghost')
+  if (drop !== null) strip.appendChild(drop)
+
+  // Gazing a formula that is not in the active position: the ghost chain
+  // includes the rotations needed to bring it there.
+  const rotated = ghostSpecimen(
+    'connective',
+    'ghost with rotation',
+    sequent([o.p2.conjunction(a('p'), a('q')), a('r')], [a('s')]),
+    { side: 'left', index: 0 },
+  )
+  if (rotated !== null) strip.appendChild(rotated)
+
+  return section(
+    'Gaze ghost',
+    'With the gaze cursor on a formula (underlined), the tree previews what ' +
+      'the pending verb would do: the premises that Destruct or Drop would ' +
+      'create appear as a dimmed blue ghost above the active sequent, ' +
+      'inference line included. When the gazed formula is not in the active ' +
+      'position, the ghost also shows the rotations needed to bring it ' +
+      'there. Nothing is applied until the verb is pressed. The Claim (cut) ' +
+      'ghost and the presolve display are still in flux and intentionally ' +
+      'undocumented.',
+    strip,
+  )
+}
+
 export const mountGallery = (
   container: HTMLElement,
   navigate: Navigate,
@@ -193,9 +302,17 @@ export const mountGallery = (
     doc.appendChild(inertSection())
     doc.appendChild(mutatingSection())
     doc.appendChild(ruleCardSection())
+    doc.appendChild(treeSection())
+    doc.appendChild(gazeGhostSection())
     panel.appendChild(doc)
 
     container.appendChild(panel)
+    requestAnimationFrame(() => {
+      const trees = panel.querySelectorAll<HTMLElement>(
+        '.gallery-tree > .tree-node',
+      )
+      trees.forEach((tree) => layoutTree(tree, { skipActiveScroll: true }))
+    })
   }
 
   render()
