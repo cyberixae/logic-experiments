@@ -9,6 +9,7 @@ import { editDerivation, premise } from '../model/derivation'
 import { computeGhostChain } from '../interactive/ghost'
 import type { GhostKind } from '../interactive/ghost'
 import { renderDerivation, layoutTree } from './tree'
+import { fromDerivation } from '../render/print'
 import type { GazeMark } from '../render/print'
 
 // Design-system gallery, reached via the secret menu. Specimens are built with
@@ -373,6 +374,53 @@ const swatches: Swatch[] = [
   },
 ]
 
+const fontsSection = (): HTMLElement => {
+  const strip = document.createElement('div')
+  strip.setAttribute('class', 'gallery-strip gallery-strip-top')
+
+  const sans = document.createElement('div')
+  sans.setAttribute('class', 'gallery-type-sample')
+  for (const weight of [300, 400, 700]) {
+    const line = document.createElement('div')
+    line.style.fontWeight = String(weight)
+    line.textContent = `Drop · Destruct · Close · Claim (${String(weight)})`
+    sans.appendChild(line)
+  }
+  strip.appendChild(specimen(sans, 'Noto Sans · variable 100–900'))
+
+  const math = document.createElement('div')
+  math.setAttribute('class', 'gallery-type-sample')
+  math.textContent = 'Γ, Δ ⊢ ¬(p → q) ∧ ⊥ ∨ ⊤'
+  strip.appendChild(specimen(math, 'Noto Sans Math · logic glyphs'))
+
+  const mono = document.createElement('pre')
+  mono.setAttribute('class', 'gallery-mono-sample')
+  mono.textContent = fromDerivation(
+    right.ir.example,
+    t('sideLeft'),
+    t('sideRight'),
+    true,
+  )
+  strip.appendChild(specimen(mono, 'system monospace · schema grid'))
+
+  return section(
+    'Fonts',
+    'Two typefaces load from Google Fonts. Noto Sans, a variable font ' +
+      '(weights 100–900, with italics), sets all UI text. Noto Sans Math ' +
+      'sits behind it in the font stack: wherever Noto Sans lacks a glyph — ' +
+      'the turnstile and the connectives — the character falls through to ' +
+      'the math font, so logic notation in the proof tree is a fallback ' +
+      'effect, not a separate style. Button labels, rule cards and the ' +
+      'system docs are pre elements and render in the platform default ' +
+      'monospace; the schema pretty-printer aligns its layouts on the ' +
+      'character grid, so monospace is a functional requirement there, not ' +
+      'a taste. The bird emoji standing in for atoms come from the platform ' +
+      'color-emoji font — placeholders until the game gets real graphics, ' +
+      'deliberately unspecified.',
+    strip,
+  )
+}
+
 const colorsSection = (): HTMLElement => {
   const strip = document.createElement('div')
   strip.setAttribute('class', 'gallery-strip gallery-strip-top')
@@ -441,6 +489,7 @@ export const mountGallery = (
     doc.appendChild(treeSection())
     doc.appendChild(gazeGhostSection())
     doc.appendChild(colorsSection())
+    doc.appendChild(fontsSection())
     panel.appendChild(doc)
 
     container.appendChild(panel)
