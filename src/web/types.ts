@@ -5,6 +5,7 @@ export type Screen =
   | 'menu'
   | 'secret'
   | 'system'
+  | 'gallery'
   | 'random-config'
   | 'versus'
   | 'versus-config'

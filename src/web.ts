@@ -8,6 +8,7 @@ import { mountCampaign } from './web/campaign'
 import { mountRandom } from './web/random'
 import { mountSystem } from './web/system'
 import { mountSecret } from './web/secret'
+import { mountGallery } from './web/gallery'
 import { mountVersus } from './web/versus'
 import { mountTutorial } from './web/tutorial'
 import {
@@ -122,6 +123,9 @@ const mount = (screen: Screen) => {
     case 'system':
       current = mountSystem(body, navigate)
       break
+    case 'gallery':
+      current = mountGallery(body, navigate)
+      break
     case 'versus': {
       const vConfig = parseVersusConfigFromParams(
         new URLSearchParams(window.location.search),
@@ -185,6 +189,8 @@ const init = () => {
     mount('secret')
   } else if (mode === 'system') {
     mount('system')
+  } else if (mode === 'gallery') {
+    mount('gallery')
   } else if (mode === 'versus') {
     mount('versus')
   } else if (mode === 'tutorial') {

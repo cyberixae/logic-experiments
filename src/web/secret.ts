@@ -28,6 +28,12 @@ export const mountSecret = (
     systemsBtn.onclick = () => navigate('system')
     modes.appendChild(systemsBtn)
 
+    const galleryBtn = document.createElement('div')
+    galleryBtn.setAttribute('class', 'button menu-mode')
+    galleryBtn.innerHTML = t('gallery')
+    galleryBtn.onclick = () => navigate('gallery')
+    modes.appendChild(galleryBtn)
+
     // The legacy Campaign track is archived here (not deleted) since the
     // tutorial took its main-menu slot.
     const campaignBtn = document.createElement('div')
