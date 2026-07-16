@@ -24,7 +24,7 @@ This project implements **Bird Kalkulus**, a propositional-logic proof game buil
 
 ### The logic system
 
-- **RK** (`src/systems/rk.ts`, display name `RK`): a sequent calculus for classical propositional logic. Full language (¬, →, ∧, ∨) with ~20 rules including structural rules (weakening, contraction, exchange, rotation). This is the only system the game surfaces.
+- **RK** (`src/systems/rk.ts`, display name `RK`): a sequent calculus for classical propositional logic. Full language (¬, →, ∧, ∨) with 16 rules including structural rules (weakening, contraction, exchange, rotation). This is the only system the game surfaces.
 
 ### Core domain model (`src/model/`)
 
@@ -38,7 +38,7 @@ This project implements **Bird Kalkulus**, a propositional-logic proof game buil
 
 ### Rules (`src/rules/`)
 
-~35 individual rule files (e.g., `i.ts`, `ir.ts`, `il.ts`, `cut.ts`). Each exports a rule object with `apply()`, `tryReverse()`, and an `example` derivation. RK selects a subset of these. Some primitives are **dormant** — the axiom rules (`a1`/`a2`/`a3`), modus ponens (`mp`), and the `fcut`/`cl1`/`dr1`/… family remain in the shared rule union (`src/model/rule.ts`) after the systems that used them (LA3, FK) were removed from this product; no current system references them. They are recoverable in git history if those systems are ever revived.
+16 individual rule files (e.g., `i.ts`, `ir.ts`, `il.ts`, `cut.ts`) — exactly RK's rule set; the `RuleId` union in `src/model/rule.ts` matches them one-to-one. Each exports a rule object with `apply()`, `tryReverse()`, and an `example` derivation. The primitives that served the removed systems (LA3, FK) — the axiom rules, modus ponens, and the `fcut` family — are deleted, recoverable in git history if those systems are ever revived.
 
 ### Interactive proof system (`src/interactive/`)
 
@@ -60,7 +60,7 @@ The proof engine is driven directly by the web UI via events (there is no comman
 The web app has two top-level `GameMode`s declared in `src/model/mode.ts` (`'random' | 'campaign'`), plus the Versus flow and auxiliary screens:
 
 - **Campaign** (`src/web/campaign.ts`) — sequential progression through curated challenges; embeds the tutorial via the `Tutorial` type with `pinned` rules.
-- **Random** (`src/web/random.ts`, `src/random/`) — endless randomly-generated challenges. `src/random/challenge.ts` builds challenges; `src/random/config.ts` exposes config (rule selection, difficulty).
+- **Random** (`src/web/random.ts`, `src/random/`) — endless randomly-generated challenges; the player-facing name is **Zen**, while code and URLs keep the `random` identifier. `src/random/challenge.ts` builds challenges; `src/random/config.ts` exposes config (rule selection, difficulty).
 - **Versus** (`src/web/versus.ts`, `versus-config.ts`) — 5-minute head-to-head where two slots solve the same challenge pool side-by-side. P2 defaults to NPC; either slot can be `'human'` or `'npc'` via the input picker / URL params.
 - **Secret menu** (`src/web/secret.ts`) — hidden screen (reached by repeatedly clicking the title) linking to the system docs.
 - **System docs** (`src/web/system.ts`) — per-system reference shown via `?mode=system`.
