@@ -1608,13 +1608,16 @@ html.input-gamepad .owl-bind.for-gamepad {
   overflow: hidden;
 }
 /* Current-position breadcrumb: the ambient "where am I" indicator in the
-   top-right corner; clicking it opens the chapter index overlay. */
+   top-right corner; clicking it opens the chapter index overlay. Not a
+   gameplay control, so it wears the topbar chrome look (transparent
+   border) like the menu and zoom buttons. */
 .tutorial-crumb {
   position: absolute;
   top: 0.5em;
   right: 0.6em;
   z-index: 4;
   font-size: 0.85em;
+  border-color: transparent;
 }
 /* The chapter index as an on-demand overlay (the ladder markup unchanged);
    reuses the pause popup's panel look. */
