@@ -62,8 +62,9 @@ The web app has two top-level `GameMode`s declared in `src/model/mode.ts` (`'ran
 - **Campaign** (`src/web/campaign.ts`) — sequential progression through curated challenges; embeds the tutorial via the `Tutorial` type with `pinned` rules.
 - **Random** (`src/web/random.ts`, `src/random/`) — endless randomly-generated challenges; the player-facing name is **Zen**, while code and URLs keep the `random` identifier. `src/random/challenge.ts` builds challenges; `src/random/config.ts` exposes config (rule selection, difficulty).
 - **Versus** (`src/web/versus.ts`, `versus-config.ts`) — 5-minute head-to-head where two slots solve the same challenge pool side-by-side. P2 defaults to NPC; either slot can be `'human'` or `'npc'` via the input picker / URL params.
-- **Secret menu** (`src/web/secret.ts`) — hidden screen (reached by repeatedly clicking the title) linking to the system docs.
+- **Secret menu** (`src/web/secret.ts`) — hidden screen (reached by repeatedly clicking the title) linking to the system docs, the design-system gallery, and the archived Campaign.
 - **System docs** (`src/web/system.ts`) — per-system reference shown via `?mode=system`.
+- **Design-system gallery** (`src/web/gallery.ts`) — living documentation of stable UI elements via `?mode=gallery`; specimens are built with the production constructors/classes so they track the real styles. Chapter prose stays English (system-docs precedent); only production labels go through `t()`.
 
 ### Random configuration (`src/random/`)
 
