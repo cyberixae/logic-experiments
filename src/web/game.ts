@@ -563,6 +563,24 @@ const createRuleCard = (
   return pre
 }
 
+// Bare rule card for the design-system gallery: production markup with the
+// key/gaze badges suppressed.
+export const createBareRuleCard = (
+  key: RuleId,
+  rule: Rule<AnySequent>,
+  disabled: boolean,
+): HTMLElement =>
+  createRuleCard(
+    key,
+    rule,
+    disabled,
+    [],
+    true,
+    { connective: null, weakening: null },
+    'main',
+    () => undefined,
+  )
+
 const createPanel = <K extends RuleId>(
   className: string,
   ruleRecord: Record<K, Rule<AnySequent>>,

@@ -1,6 +1,7 @@
 import { MountResult, Navigate } from './types'
 import { t } from './i18n'
-import { createButton } from './game'
+import { createBareRuleCard, createButton } from './game'
+import { center, left, right } from '../rules'
 
 // Design-system gallery, reached via the secret menu. Specimens are built with
 // the production constructors and class names so they track the real styles.
@@ -136,6 +137,36 @@ const mutatingSection = (): HTMLElement => {
   )
 }
 
+const ruleCardSection = (): HTMLElement => {
+  const strip = document.createElement('div')
+  strip.setAttribute('class', 'gallery-strip')
+
+  strip.appendChild(specimen(createBareRuleCard('i', center.i, false), 'axiom'))
+  strip.appendChild(
+    specimen(createBareRuleCard('swl', left.swl, false), 'structural'),
+  )
+  strip.appendChild(
+    specimen(createBareRuleCard('ir', right.ir, false), 'logical'),
+  )
+  strip.appendChild(
+    specimen(createBareRuleCard('cut', center.cut, false), 'meta'),
+  )
+  strip.appendChild(
+    specimen(createBareRuleCard('nl', left.nl, true), 'disabled'),
+  )
+
+  return section(
+    'Rule cards',
+    'Rule cards are not buttons: they are a non-interactive display of each ' +
+      'rule schema, addressed to specialists who already read the notation. ' +
+      'Together the cards give a concise description of the proof system. ' +
+      'A dimmed card means the rule is not available in the current ' +
+      'challenge. In play the cards may carry key and gaze badges; those are ' +
+      'documented with the input hints, not here.',
+    strip,
+  )
+}
+
 export const mountGallery = (
   container: HTMLElement,
   navigate: Navigate,
@@ -161,6 +192,7 @@ export const mountGallery = (
     doc.appendChild(metaSection())
     doc.appendChild(inertSection())
     doc.appendChild(mutatingSection())
+    doc.appendChild(ruleCardSection())
     panel.appendChild(doc)
 
     container.appendChild(panel)
