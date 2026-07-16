@@ -1235,42 +1235,42 @@ export const mountVersus = (
       }
       dispatch1(action)
     }, gpIndex(versusConfig.p1Input))
+  }
 
-    if (versusConfig.p2Input === 'keyboard') {
-      document.addEventListener('keydown', handleKey2)
-      cleanupP2 = () => document.removeEventListener('keydown', handleKey2)
-    } else if (versusConfig.p2Input === 'mouse') {
-      cleanupP2 = () => {}
-    } else if (versusConfig.p2Input === 'npc') {
-      const driver = createNpcDriver({
-        getWorkspace: () => ws2,
-        getChallengeIdx: () => wsIdx2,
-        getTotalMoves: () => totalMoves(ws2),
-        applyEvent: (ev) => {
-          ws2.applyEvent(ev)
-          if (ws2.isSolved()) {
-            solvePlayer2()
-          } else {
-            refreshP2()
-          }
-        },
-        skip: skipPlayer2,
-        knobs: versusConfig.npc2Knobs,
-        isGameOver: () => gameOver,
-        isPaused: () => paused,
-      })
-      cleanupP2 = driver.cleanup
-    } else {
-      cleanupP2 = setupGamepad((action) => {
-        if (gameOver || paused || action === 'menu') return
-        if (handleEditorInput2(action)) return
-        if (action === 'skip') {
-          skipPlayer2()
-          return
+  if (versusConfig.p2Input === 'keyboard') {
+    document.addEventListener('keydown', handleKey2)
+    cleanupP2 = () => document.removeEventListener('keydown', handleKey2)
+  } else if (versusConfig.p2Input === 'mouse') {
+    cleanupP2 = () => {}
+  } else if (versusConfig.p2Input === 'npc') {
+    const driver = createNpcDriver({
+      getWorkspace: () => ws2,
+      getChallengeIdx: () => wsIdx2,
+      getTotalMoves: () => totalMoves(ws2),
+      applyEvent: (ev) => {
+        ws2.applyEvent(ev)
+        if (ws2.isSolved()) {
+          solvePlayer2()
+        } else {
+          refreshP2()
         }
-        dispatch2(action)
-      }, gpIndex(versusConfig.p2Input))
-    }
+      },
+      skip: skipPlayer2,
+      knobs: versusConfig.npc2Knobs,
+      isGameOver: () => gameOver,
+      isPaused: () => paused,
+    })
+    cleanupP2 = driver.cleanup
+  } else {
+    cleanupP2 = setupGamepad((action) => {
+      if (gameOver || paused || action === 'menu') return
+      if (handleEditorInput2(action)) return
+      if (action === 'skip') {
+        skipPlayer2()
+        return
+      }
+      dispatch2(action)
+    }, gpIndex(versusConfig.p2Input))
   }
 
   // Match control (open/close the pause menu, plus end-of-match navigation) is
