@@ -1629,6 +1629,10 @@ html.input-gamepad .owl-bind.for-gamepad {
 }
 .tutorial-ladder-popup .tutorial-ladder {
   font-size: 1em;
+  /* The ladder is width:100% + own padding; content-box sizing would push
+     the padding past the popup's content area and summon a horizontal
+     scrollbar. */
+  box-sizing: border-box;
 }
 /* Presolved foundation: the frozen part of the tree the player can't undo.
    Only the node's own sequent and inference line dim, so nested frozen
