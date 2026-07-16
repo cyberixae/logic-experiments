@@ -848,7 +848,12 @@ html.mode-single:not(.input-pointer) .bench-topbar .bench-zoom {
   opacity: 0.7;
 }
 /* Tree specimens: same markup as the playarea, at a smaller documentation
-   scale (the playarea sizes its tree via .playarea > .tree-node). */
+   scale (the playarea sizes its tree via .playarea > .tree-node). The right
+   padding reserves room for the rule labels, which hang off the inference
+   lines (absolutely positioned) and don't contribute layout width. */
+.gallery-tree {
+  padding-right: 3.5em;
+}
 .gallery-tree > .tree-node {
   font-size: 1.4em;
 }
