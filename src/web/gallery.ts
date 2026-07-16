@@ -276,6 +276,142 @@ const gazeGhostSection = (): HTMLElement => {
   )
 }
 
+type Swatch = {
+  label: string
+  css: string
+  value: string
+  note: string
+}
+
+// Only --gaze-color and --branch-color are named custom properties; the other
+// values are transcribed from lk.css literals and can drift — the stylesheet
+// stays the source of truth.
+const swatches: Swatch[] = [
+  {
+    label: 'paper',
+    css: '#ffeedd',
+    value: '#ffeedd',
+    note: 'page background, overlays; text on mutating buttons (#fed)',
+  },
+  {
+    label: 'ink',
+    css: '#000',
+    value: '#000',
+    note: 'text, borders, mutating button fill',
+  },
+  {
+    label: 'button fill',
+    css: '#fff8',
+    value: '#fff8',
+    note: 'inert/meta button body; opaque #fff on hover',
+  },
+  {
+    label: 'gaze',
+    css: 'var(--gaze-color)',
+    value: '--gaze-color · #48f',
+    note: 'gaze cursor underline; gaze controls group',
+  },
+  {
+    label: 'branch',
+    css: 'var(--branch-color)',
+    value: '--branch-color · #fca',
+    note: 'branch controls group; rule-card key badges',
+  },
+  {
+    label: 'goal highlight',
+    css: '#fcaa',
+    value: '#fcaa',
+    note: 'active sequent in the tree — the branch color at ⅔ alpha',
+  },
+  {
+    label: 'selection',
+    css: '#f80',
+    value: '#f80',
+    note: 'button cursor outline; active toggle border (fill #ffeedd)',
+  },
+  {
+    label: 'hot',
+    css: '#c33',
+    value: '#c33',
+    note: 'gaze controls group while the cursor is parked',
+  },
+  {
+    label: 'LED on',
+    css: '#f22',
+    value: '#f22',
+    note: 'toggle LED lit (plus glow)',
+  },
+  {
+    label: 'LED off',
+    css: '#400',
+    value: '#400',
+    note: 'toggle LED dark',
+  },
+  {
+    label: 'keycap',
+    css: '#36c',
+    value: '#36c',
+    note: 'cold key-hint badges (input hints get their own chapter later)',
+  },
+  {
+    label: 'card',
+    css: '#d4b896',
+    value: '#d4b896',
+    note: 'rule card body',
+  },
+  {
+    label: 'card border',
+    css: '#8a6f4a',
+    value: '#8a6f4a',
+    note: 'rule card border',
+  },
+  {
+    label: 'card text',
+    css: '#3a2a14',
+    value: '#3a2a14',
+    note: 'rule card schema text',
+  },
+]
+
+const colorsSection = (): HTMLElement => {
+  const strip = document.createElement('div')
+  strip.setAttribute('class', 'gallery-strip gallery-strip-top')
+
+  for (const s of swatches) {
+    const box = document.createElement('div')
+    box.setAttribute('class', 'gallery-specimen')
+    const block = document.createElement('div')
+    block.setAttribute('class', 'gallery-swatch')
+    block.style.backgroundColor = s.css
+    box.appendChild(block)
+    const label = document.createElement('div')
+    label.setAttribute('class', 'gallery-caption')
+    label.textContent = s.label
+    box.appendChild(label)
+    const value = document.createElement('div')
+    value.setAttribute('class', 'gallery-caption')
+    value.textContent = s.value
+    box.appendChild(value)
+    const note = document.createElement('div')
+    note.setAttribute('class', 'gallery-swatch-note')
+    note.textContent = s.note
+    box.appendChild(note)
+    strip.appendChild(box)
+  }
+
+  return section(
+    'Colors',
+    'The game is drawn in ink on parchment; interactive chrome adds ' +
+      'translucent whites, and a small set of accents carries meaning: blue ' +
+      'for the gaze, peach for branches, orange for selection, red for hot ' +
+      'and lit states. Ghost and solved trees are not separate pigments — ' +
+      'they are CSS filters over these same colors. Only the gaze and ' +
+      'branch accents are named custom properties; the other values are ' +
+      'transcribed literals, so treat lk.css as the source of truth.',
+    strip,
+  )
+}
+
 export const mountGallery = (
   container: HTMLElement,
   navigate: Navigate,
@@ -304,6 +440,7 @@ export const mountGallery = (
     doc.appendChild(ruleCardSection())
     doc.appendChild(treeSection())
     doc.appendChild(gazeGhostSection())
+    doc.appendChild(colorsSection())
     panel.appendChild(doc)
 
     container.appendChild(panel)
