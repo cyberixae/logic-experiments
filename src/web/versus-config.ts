@@ -26,19 +26,6 @@ import {
 
 export type PlayerInput = 'mouse' | 'keyboard' | 'gamepad1' | 'gamepad2' | 'npc'
 
-// The tutorial's Wizard-of-Oz rig: which device drives the tutor half. The
-// learner half takes every other connected device, so 'off' (the default)
-// means a solo learner with all inputs.
-export type TutorInput = 'off' | 'mouse' | 'keyboard' | 'gamepad1' | 'gamepad2'
-
-// When present, the Versus arena runs as the tutorial: untimed, drawing
-// clamped practice challenges from the current curriculum beat instead of
-// the pool, with the curriculum ladder in place of the scoreboard.
-// startStop indexes the tutorial's stop list (chapter intro pages
-// interleaved with beats). p1Input / p2Input are ignored — the learner
-// gets every human input device except the tutor's.
-export type VersusTutorial = { startStop: number; tutorInput: TutorInput }
-
 export type VersusConfig = {
   randomConfig: RandomConfig
   gameDurationSeconds: number
@@ -46,7 +33,6 @@ export type VersusConfig = {
   p2Input: PlayerInput
   npc1Knobs: NpcKnobs
   npc2Knobs: NpcKnobs
-  tutorial?: VersusTutorial
 }
 
 export const defaultVersusConfig = (): VersusConfig => ({

@@ -1332,19 +1332,10 @@ html.mode-single:not(.input-pointer) .bench-topbar .bench-zoom {
 .versus-half-npc .controls {
   visibility: hidden;
 }
-/* Tutorial with the tutor rig off: the half is fully idle, so hide the
-   proof tree too (versus-half-npc leaves the playarea visible because an
-   NPC's board is worth watching; an unmanned board is just confusing).
-   visibility keeps the half's footprint, so enabling the tutor later
-   doesn't reflow the learner's side. */
-.versus-half-off .playarea {
-  visibility: hidden;
-}
 /* The tutorial's owl tutor: a portrait (bigger than the proposition birds)
-   pinned to the tutor half's lower-right corner, speech bubble above it
-   with the current chapter's message. Sits outside .bench so the NPC-half
-   treatment of a tutor-less half doesn't hide it; pointer-events off so it
-   never eats the tutor board's clicks. */
+   pinned to the board's lower-right corner, speech bubble above it with the
+   current stop's message. Sits outside .bench; pointer-events off so it
+   never eats the board's clicks. */
 .tutor-owl {
   position: absolute;
   right: 0.8em;
@@ -1372,8 +1363,8 @@ html.mode-single:not(.input-pointer) .bench-topbar .bench-zoom {
 .tutor-owl-para + .tutor-owl-para {
   margin-top: 0.5em;
 }
-/* Chapter intro page: no board, just the topic navigation centered in the
-   learner half. */
+/* Chapter intro page: no board, just the topic navigation centered on the
+   screen. */
 .tutorial-intro {
   height: 100%;
   display: flex;
@@ -1393,7 +1384,7 @@ html.mode-single:not(.input-pointer) .bench-topbar .bench-zoom {
   text-align: center;
 }
 /* Conjecture entry: the live goal preview centered above the formula
-   editor bar. The tutor-off half hides and deadens it like the board. */
+   editor bar. */
 .conjecture-entry {
   height: 100%;
   display: flex;
@@ -1407,12 +1398,6 @@ html.mode-single:not(.input-pointer) .bench-topbar .bench-zoom {
 }
 .conjecture-preview {
   font-size: 1.6em;
-}
-.versus-half-off .conjecture-entry {
-  visibility: hidden;
-}
-.versus-half-npc .conjecture-entry {
-  pointer-events: none;
 }
 /* Injected bind labels render as chips. Each chip exists once per device
    as a latent variant; the html input-* class shows the one matching the
@@ -1553,20 +1538,6 @@ html.input-gamepad .owl-bind.for-gamepad {
   font-size: 1.4em;
   font-weight: bold;
   padding: 0.3em 0;
-}
-/* Tutorial flavor: the center column is a curriculum indicator, not a
-   scoreboard, so it needs room for the subchapter label + the advance control. */
-.versus-thermo-tutorial {
-  width: 9em;
-  align-items: center;
-  justify-content: flex-start;
-  gap: 0.8em;
-  padding-top: 1em;
-}
-/* Pin the pause button to the column bottom, where Versus has it (there the
-   flexing score rows push it down; the ladder doesn't flex). */
-.versus-thermo-tutorial .versus-menu-btn {
-  margin-top: auto;
 }
 /* Curriculum ladder: the tutorial's roadmap and navigation in one — every
    beat is a clickable row, the current one highlighted, chapters as muted

@@ -21,40 +21,13 @@ import {
 import { createLangSwitcher } from './lang-switcher'
 import { createButtonCursor, cursorNavActions } from './button-cursor'
 import type { CursorCell } from './button-cursor'
-import {
-  createLemmaEditorBar,
-  createLemmaEditorSession,
-  editorKeyPieces,
-} from './lemma-editor'
+import { createLemmaEditorSession, editorKeyPieces } from './lemma-editor'
 import type { LemmaEditorSession } from './lemma-editor'
 import { basic, fromSequent } from '../render/print'
-import { conjectureGhost } from '../render/draft'
 import { html } from '../render/segment'
-import { isTautology, sequent } from '../model/sequent'
 import { MountResult, Navigate } from './types'
-import { MessageKey, t } from './i18n'
-import {
-  getActionHint,
-  getActionHintPure,
-  gazeKeyHint,
-  gazePadHint,
-} from './input-mode'
-import {
-  inputLabel,
-  isInputAvailable,
-  PlayerInput,
-  TutorInput,
-  VersusConfig,
-} from './versus-config'
-import {
-  beatAt,
-  stopAt,
-  tutorialCurriculum,
-  tutorialStops,
-  TutorialBeat,
-  TutorialChapter,
-} from '../random/tutorial'
-import { rules as rkRules } from '../systems/rk'
+import { t } from './i18n'
+import { PlayerInput, VersusConfig } from './versus-config'
 
 const formatTime = (s: number): string => {
   const m = Math.floor(s / 60)
@@ -80,44 +53,10 @@ export const mountVersus = (
   const root = document.createElement('div')
   container.appendChild(root)
 
-  // Tutorial flavor: when present, the arena runs untimed and sources clamped
-  // practice challenges from the current curriculum beat (generated on the
-  // spot) instead of the pool. The clamp is purely generative — untaught rules
-  // are never applicable because goals only contain taught connectives and
-  // backward play only decomposes (Cut, the exception, is hidden until the
-  // Input chapter). Non-tutorial Versus is unchanged.
-  const isTutorial = versusConfig.tutorial !== undefined
-  const untimed = isTutorial
-  // Navigation cursor: an index into tutorialStops (chapter intro pages +
-  // beats). beatIdx tracks the beat the boards are rooted at — on an intro
-  // page it stays at the upcoming chapter's first beat, so stepping forward
-  // onto that beat needs no re-root.
-  let stopIdx = versusConfig.tutorial?.startStop ?? 0
-  const beatForStop = (s: number): number => {
-    for (let i = s; i < tutorialStops.length; i += 1) {
-      const stop = tutorialStops[i]
-      if (stop !== undefined && stop.kind === 'beat') return stop.beatIdx
-    }
-    return tutorialCurriculum.length - 1
-  }
-  let beatIdx = isTutorial ? beatForStop(stopIdx) : 0
-  const onIntro = (): boolean => isTutorial && stopAt(stopIdx).kind === 'intro'
-  const onConjecture = (): boolean => isTutorial && beatAt(beatIdx).conjecture
-  // Tutorial input model: the learner (P1) gets every connected human input
-  // device; the tutor (P2) is the opt-in Wizard-of-Oz rig, claiming at most
-  // one device. p1Input / p2Input are Versus-only. Mutable because the
-  // tutor is switched LIVE from the pause menu: a tutor is typically
-  // summoned mid-challenge, in response to a learner's question about the
-  // exact position on the board — a remount would destroy the question.
-  let tutorInput: TutorInput = versusConfig.tutorial?.tutorInput ?? 'off'
-  const takeChallenge = (): ChallengeResult =>
-    isTutorial ? beatAt(beatIdx).generate() : pool.take()
-
   // Shared challenge list — same challenges in same order for both players
   const sharedChallenges: ChallengeResult[] = []
   const ensureChallenge = (i: number) => {
-    while (sharedChallenges.length <= i + 2)
-      sharedChallenges.push(takeChallenge())
+    while (sharedChallenges.length <= i + 2) sharedChallenges.push(pool.take())
   }
   ensureChallenge(0)
 
@@ -158,7 +97,6 @@ export const mountVersus = (
 
   const advancePlayer1 = (): void => {
     scoreCommitted1 = false
-    skipped1 = false
     const [next1, ...rest1] = pending1
     if (next1 !== undefined) {
       wsIdx1 = next1
@@ -171,7 +109,6 @@ export const mountVersus = (
   }
   const advancePlayer2 = (): void => {
     scoreCommitted2 = false
-    skipped2 = false
     const [next2, ...rest2] = pending2
     if (next2 !== undefined) {
       wsIdx2 = next2
@@ -190,34 +127,13 @@ export const mountVersus = (
   // Auto-zoom capped at 1.0: in the half-viewport split it only ever shrinks long
   // sequents to fit; zooming in past 1.0 overshoots downward, so 1.0 is the ceiling.
   // showPar disabled: revealing par while the other player is still solving gives an unfair hint.
-  const makeCtx = (input: PlayerInput | TutorInput): BenchCtx => {
+  const makeCtx = (input: PlayerInput): BenchCtx => {
     const base = createBenchCtx(input !== 'keyboard', true, false, false, 1)
     if (input !== 'mouse') return base
     return { ...base, getActionHint: () => undefined }
   }
-  // The rules sheet stays closed throughout the tutorial: it's a quick
-  // reference for rules already learned, not something to reach for
-  // mid-lesson. The button is hidden (hideRulesButton) and this no-op
-  // deadens the toggle bindings too — the state simply can't flip.
-  const noRulesToggle = { toggleRulesVisible: () => {} }
-  // The learner half accepts every input device, so its hints follow the
-  // device last touched (the global input mode) instead of a fixed one.
-  const learnerCtx = (): BenchCtx => ({
-    ...createBenchCtx(false, true, false, false, 1),
-    ...noRulesToggle,
-    getActionHint,
-  })
-  // The tutor's hints track the live tutor device (switchable mid-session).
-  const tutorCtx = (): BenchCtx => ({
-    ...createBenchCtx(false, true, false, false, 1),
-    ...noRulesToggle,
-    getActionHint: (action) =>
-      tutorInput === 'off' || tutorInput === 'mouse'
-        ? undefined
-        : getActionHintPure(action, tutorInput !== 'keyboard'),
-  })
-  const ctx1 = isTutorial ? learnerCtx() : makeCtx(versusConfig.p1Input)
-  const ctx2 = isTutorial ? tutorCtx() : makeCtx(versusConfig.p2Input)
+  const ctx1 = makeCtx(versusConfig.p1Input)
+  const ctx2 = makeCtx(versusConfig.p2Input)
 
   // Timer
   let timeLeft = versusConfig.gameDurationSeconds
@@ -241,45 +157,14 @@ export const mountVersus = (
   let lemmaSession1: LemmaEditorSession | null = null
   let lemmaSession2: LemmaEditorSession | null = null
 
-  // Tutorial skip state: whether a half currently shows the skip completion
-  // screen — the unsolvable-beat counterpart of the solved screen. Skip must
-  // resolve into a screen that carries the topic navigation, or a keyboard/
-  // gamepad learner in an all-unsolvable beat could never leave it.
-  // The verdict flags pick the screen's confirmation line: goals are small
-  // enough that a truth-table check at skip time settles honestly whether a
-  // proof existed (in the Skip beat it never does; a conjecture may go
-  // either way).
-  let skipped1 = false
-  let skipped2 = false
-  let skipHadSolution1 = false
-  let skipHadSolution2 = false
-  // Whether a half's live lemma session is the conjecture ENTRY (composing
-  // a goal) rather than a mid-proof Claim on the confirmed board — the two
-  // share the session slot but render and cancel differently.
-  let conjectureEntry1 = false
-  let conjectureEntry2 = false
-
-  const isNpc1 = !isTutorial && versusConfig.p1Input === 'npc'
-  const isNpc2 = !isTutorial && versusConfig.p2Input === 'npc'
-  // A tutor with no device is a dead half: reuse the NPC half's treatment
-  // (controls hidden, pointer events off) so stray clicks can't drive it.
-  // A function, not a const: the tutor device switches live from the pause
-  // menu and buildHalf2 re-reads it on every rebuild.
-  const tutorOff = () => isTutorial && tutorInput === 'off'
+  const isNpc1 = versusConfig.p1Input === 'npc'
+  const isNpc2 = versusConfig.p2Input === 'npc'
 
   // The on-screen control bar / topbar buttons are the pointer/touch UI. A
   // keyboard or gamepad slot drives the game with physical keys/buttons, so hide
   // them there (NPC halves are already fully hidden via .versus-half-npc).
-  // The learner half always shows them — the mouse is never taken away.
-  const hideControls1 = isTutorial
-    ? false
-    : versusConfig.p1Input !== 'mouse' && !isNpc1
-  const hideControls2 = () =>
-    isTutorial
-      ? tutorInput === 'keyboard' ||
-        tutorInput === 'gamepad1' ||
-        tutorInput === 'gamepad2'
-      : versusConfig.p2Input !== 'mouse' && !isNpc2
+  const hideControls1 = versusConfig.p1Input !== 'mouse' && !isNpc1
+  const hideControls2 = versusConfig.p2Input !== 'mouse' && !isNpc2
 
   // Refs to the current arena regions, refreshed every full rerender. Surgical
   // updates swap just one of these so the opposite player's in-flight animation
@@ -310,196 +195,7 @@ export const mountVersus = (
     return el
   }
 
-  // Chapter intro page: replaces the learner's bench with just the topic
-  // navigation. No board, no controls — the owl on the other half does the
-  // speaking. The buttons form a cursor row so keyboard / gamepad can
-  // drive them like the solved screen's. The edge pages have a single
-  // purpose and a single button: the welcome page starts the tutorial, the
-  // completion page exits to the main menu; middle intros navigate both
-  // ways.
-  const buildIntroPage = (): HTMLElement => {
-    const half = document.createElement('div')
-    half.setAttribute('class', 'versus-half')
-    const page = document.createElement('div')
-    page.setAttribute('class', 'tutorial-intro')
-    const cells: CursorCell[] = []
-    const add = (label: string, activate: () => void) => {
-      const el = createButton(label, false, activate)
-      page.appendChild(el)
-      cells.push({ btn: el, activate })
-    }
-    const stop = stopAt(stopIdx)
-    if (stopIdx <= 0) {
-      add(t('tutorialStart'), () => jumpToStop(stopIdx + 1))
-    } else if (stop.kind === 'intro' && stop.chapter === 'done') {
-      add(t('exitToMainMenu'), () => navigate('menu'))
-    } else {
-      add(t('tutorialPrevious'), () => jumpToStop(stopIdx - 1))
-      add(t('tutorialAdvance'), () => jumpToStop(stopIdx + 1))
-    }
-    // The last button is the page's default (an unengaged axiom presses
-    // it), so the cursor starts there and the first arrow moves
-    // immediately.
-    const cursor = createButtonCursor([cells], {
-      startCol: cells.length - 1,
-      moveOnReveal: true,
-    })
-    introCursor = { onAction: cursor.onAction, isEngaged: cursor.isEngaged }
-    introDefault = cells[cells.length - 1]?.activate ?? null
-    half.appendChild(page)
-    return half
-  }
-
-  // Skip completion screen: what Skip resolves into in the tutorial. It
-  // mirrors the solved screen's navigation row (Previous / One More / Next,
-  // One More as the default) with a confirmation line in place of the
-  // hurray — in the Skip beat every goal is verifiably unsolvable, so the
-  // reveal is honest.
-  const buildSkippedPage = (
-    hadSolution: boolean,
-    onContinue: () => void,
-    setCursor: (cursor: SolvedCursor) => void,
-    setDefault: (dflt: () => void) => void,
-  ): HTMLElement => {
-    const half = document.createElement('div')
-    half.setAttribute('class', 'versus-half')
-    const page = document.createElement('div')
-    page.setAttribute('class', 'tutorial-intro tutorial-skipped')
-    const note = document.createElement('div')
-    note.setAttribute('class', 'tutorial-skipped-note')
-    note.textContent = t(
-      hadSolution ? 'tutorialSkippedSolvable' : 'tutorialSkipped',
-    )
-    page.appendChild(note)
-    const cells: CursorCell[] = []
-    const add = (label: string, disabled: boolean, activate: () => void) => {
-      const el = createButton(label, disabled, activate)
-      page.appendChild(el)
-      cells.push({ btn: el, activate, isEnabled: () => !disabled })
-    }
-    add(t('tutorialPrevious'), stopIdx <= 0, () => jumpToStop(stopIdx - 1))
-    add(t('tutorialOneMore'), false, onContinue)
-    add(t('tutorialAdvance'), stopIdx >= tutorialStops.length - 1, () =>
-      jumpToStop(stopIdx + 1),
-    )
-    const cursor = createButtonCursor([cells], {
-      startCol: 1,
-      moveOnReveal: true,
-    })
-    setCursor({ onAction: cursor.onAction, isEngaged: cursor.isEngaged })
-    setDefault(() => cells[1]?.activate())
-    half.appendChild(page)
-    return half
-  }
-
-  // Conjecture entry: in a conjecture beat each half composes its own goal.
-  // The entry reuses the lemma editor session slot, so all the existing
-  // input routing (bar clicks, editor pro keys, cursor actions) drives it
-  // unchanged; on confirm the half's workspace is replaced with the
-  // authored `⊢ φ` challenge, bypassing the shared challenge list. Cancel
-  // (Back / undo past the beginning) starts the draft over.
-  const openConjecture1 = (): void => {
-    conjectureEntry1 = true
-    lemmaSession1 = createLemmaEditorSession(
-      (formula) => {
-        conjectureEntry1 = false
-        lemmaSession1 = null
-        // Full rule set: Claim is taught by the Optimization chapter, so
-        // authored goals keep it available.
-        ws1 = new Workspace({
-          challenge: { rules: rkRules, goal: sequent([], [formula]) },
-        })
-        refreshP1()
-      },
-      () => {
-        openConjecture1()
-        refreshP1()
-      },
-      // No board behind the entry to back out to — hide the Back cell.
-      true,
-    )
-  }
-  const openConjecture2 = (): void => {
-    conjectureEntry2 = true
-    lemmaSession2 = createLemmaEditorSession(
-      (formula) => {
-        conjectureEntry2 = false
-        lemmaSession2 = null
-        ws2 = new Workspace({
-          challenge: { rules: rkRules, goal: sequent([], [formula]) },
-        })
-        refreshP2()
-      },
-      () => {
-        openConjecture2()
-        refreshP2()
-      },
-      true,
-    )
-  }
-
-  // The next challenge in the current beat: fresh entry in a conjecture
-  // beat, the shared stream everywhere else. Both the solved screen's One
-  // More and the skip screen's continue land here.
-  const nextChallenge1 = (): void => {
-    if (onConjecture()) {
-      skipped1 = false
-      openConjecture1()
-    } else {
-      advancePlayer1()
-    }
-    rerenderHalf1()
-    rebuildThermo()
-  }
-  const nextChallenge2 = (): void => {
-    if (onConjecture()) {
-      skipped2 = false
-      openConjecture2()
-    } else {
-      advancePlayer2()
-    }
-    rerenderHalf2()
-    rebuildThermo()
-  }
-
-  // Conjecture entry page: the live `⊢ φ` preview above the formula editor
-  // bar. The board (and its Skip/Undo controls) only exists once the player
-  // confirms; menu/pause stay reachable through the global bindings.
-  const buildConjecturePage = (
-    session: LemmaEditorSession,
-    refresh: () => void,
-  ): HTMLElement => {
-    const half = document.createElement('div')
-    half.setAttribute('class', 'versus-half')
-    const page = document.createElement('div')
-    page.setAttribute('class', 'conjecture-entry')
-    const previewArea = document.createElement('div')
-    previewArea.setAttribute('class', 'conjecture-preview-area')
-    const preview = document.createElement('div')
-    preview.setAttribute('class', 'tree-sequent ghost conjecture-preview')
-    preview.innerHTML = html(conjectureGhost(session.draft())(basic))
-    previewArea.appendChild(preview)
-    page.appendChild(previewArea)
-    page.appendChild(createLemmaEditorBar(session, refresh))
-    half.appendChild(page)
-    return half
-  }
-
   const buildHalf1 = (): HTMLElement => {
-    if (onIntro()) return buildIntroPage()
-    if (isTutorial && skipped1)
-      return buildSkippedPage(
-        skipHadSolution1,
-        nextChallenge1,
-        (c) => {
-          skipCursor1 = c
-        },
-        (d) => {
-          skipDefault1 = d
-        },
-      )
-    if (conjectureEntry1 && lemmaSession1 !== null)
-      return buildConjecturePage(lemmaSession1, refreshP1)
     const half = document.createElement('div')
     half.setAttribute(
       'class',
@@ -519,194 +215,24 @@ export const mountVersus = (
         refreshP1,
         undefined,
         onApplyReverse1,
-        // Claim and Skip are per-beat: each stays hidden (not shown-disabled,
-        // which would only draw the learner's eye) until its teaching beat —
-        // Claim from the Optimization chapter on, Skip from the Skip beat on.
-        isTutorial && beatAt(beatIdx).hideLemma,
+        undefined,
         ctx1,
-        isTutorial && beatAt(beatIdx).hideSkip ? undefined : skipPlayer1,
-        isTutorial && beatAt(beatIdx).hideGaze,
-        isTutorial,
+        skipPlayer1,
+        undefined,
+        undefined,
         lemmaSession1,
       ),
     )
     return half
   }
 
-  // The owl: the tutor character's portrait in the tutor half's lower-right
-  // corner, with a speech bubble of two paragraphs — the current chapter's
-  // framing and the current beat's lesson. Rebuilt with the half, so beat
-  // jumps swap the text.
-  //
-  // Both paragraphs are i18n templates with {pick}/{drop}/… placeholders
-  // for keybinds. Each placeholder renders as a chip holding all three
-  // device variants as latent spans — mouse gets the localized button
-  // words, keyboard / gamepad get labels derived from the live keymaps
-  // (gazeKeyHint / gazePadHint), so rebindable keys flow through with no
-  // copy changes. CSS shows the variant matching the html input-* class,
-  // so the chips follow the device last touched instantly, without a
-  // re-render (pointer↔keyboard flips never re-render by design — see
-  // setActiveInput).
-  const owlChapterKey: Record<TutorialChapter, MessageKey> = {
-    basics: 'tutorialOwlBasics',
-    logic: 'tutorialOwlLogic',
-    optimization: 'tutorialOwlOptimization',
-    solvability: 'tutorialOwlSolvability',
-    done: 'tutorialOwlDone',
-  }
-  // Keyed by curriculum index — the two Close beats share a nameId, so the
-  // name alone cannot address a beat.
-  const owlBeatKey: ReadonlyArray<MessageKey> = [
-    'tutorialOwlClose',
-    'tutorialOwlCloseConstants',
-    'tutorialOwlDrop',
-    'tutorialOwlSplit',
-    'tutorialOwlSideFlip',
-    'tutorialOwlCrossing',
-    'tutorialOwlBranching',
-    'tutorialOwlBranchingCrossing',
-    'tutorialOwlClaims',
-    'tutorialOwlUnsolvable',
-    'tutorialOwlConjecture',
-  ]
-  type OwlDevice = 'pointer' | 'keyboard' | 'gamepad'
-  const owlDevices: ReadonlyArray<OwlDevice> = [
-    'pointer',
-    'keyboard',
-    'gamepad',
-  ]
-  const owlBindLabels = (device: OwlDevice): Map<string, string> => {
-    if (device === 'pointer') {
-      return new Map([
-        ['pick', `${t('left')} / ${t('right')}`],
-        ['drop', t('drop')],
-        ['close', t('axiom')],
-        ['undo', t('undo')],
-        ['destruct', t('destruct')],
-        ['branch', `${t('prevBranch')} / ${t('nextBranch')}`],
-        ['skip', t('skip')],
-        // The formula editor's palette has no single button word; a glyph
-        // sample stands in for the row of piece buttons.
-        ['pieces', '🐧 ¬ ∧ …'],
-        ['confirm', t('lemmaConfirm')],
-        ['lemma', t('lemma')],
-      ])
-    }
-    const hint = device === 'keyboard' ? gazeKeyHint : gazePadHint
-    const label = (action: Action): string => hint(action) ?? '?'
-    return new Map([
-      ['pick', `${label('gazeLeft')} ${label('gazeRight')}`],
-      ['drop', label('gazeWeakening')],
-      ['close', label('axiom')],
-      ['undo', label('undo')],
-      ['destruct', label('gazeConnective')],
-      ['branch', `${label('prevBranch')} / ${label('nextBranch')}`],
-      ['skip', label('skip')],
-      // In the editor the gaze keys drive the bar cursor: aim with the
-      // arrows / D-pad, take the aimed piece with the confirm press.
-      [
-        'pieces',
-        `${label('gazeLeft')} ${label('gazeRight')} ${label('axiom')}`,
-      ],
-      ['confirm', label('axiom')],
-      ['lemma', label('lemma')],
-    ])
-  }
-  // Split the template on {token} boundaries; tokens become bind chips (one
-  // latent variant per device), everything else stays plain text.
-  const appendOwlTemplate = (into: HTMLElement, template: string): void => {
-    const binds: ReadonlyArray<[OwlDevice, Map<string, string>]> =
-      owlDevices.map((device) => [device, owlBindLabels(device)])
-    for (const part of template.split(/(\{\w+\})/)) {
-      if (part === '') continue
-      const token =
-        part.startsWith('{') && part.endsWith('}') ? part.slice(1, -1) : null
-      if (token === null || !(binds[0]?.[1].has(token) ?? false)) {
-        into.appendChild(document.createTextNode(part))
-        continue
-      }
-      for (const [device, labels] of binds) {
-        const label = labels.get(token)
-        if (label === undefined) continue
-        const chip = document.createElement('span')
-        chip.setAttribute('class', `owl-bind for-${device}`)
-        chip.textContent = label
-        into.appendChild(chip)
-      }
-    }
-  }
-  const buildOwl = (): HTMLElement => {
-    const owl = document.createElement('div')
-    owl.setAttribute('class', 'tutor-owl')
-    const bubble = document.createElement('div')
-    bubble.setAttribute('class', 'tutor-owl-bubble')
-    // Chapter intro pages carry the chapter's framing; beats carry only
-    // their own lesson (the intro page exists so the framing text doesn't
-    // haunt every beat).
-    const stop = stopAt(stopIdx)
-    const beatKey = stop.kind === 'beat' ? owlBeatKey[stop.beatIdx] : undefined
-    const paragraphs =
-      stop.kind === 'intro'
-        ? [t(owlChapterKey[stop.chapter])]
-        : beatKey === undefined
-          ? []
-          : [t(beatKey)]
-    for (const text of paragraphs) {
-      const para = document.createElement('div')
-      para.setAttribute('class', 'tutor-owl-para')
-      appendOwlTemplate(para, text)
-      bubble.appendChild(para)
-    }
-    const face = document.createElement('div')
-    face.setAttribute('class', 'tutor-owl-face')
-    face.textContent = '🦉'
-    owl.appendChild(bubble)
-    owl.appendChild(face)
-    return owl
-  }
-
   const buildHalf2 = (): HTMLElement => {
-    if (onIntro()) {
-      // On an intro page the tutor half carries only the owl reading the
-      // chapter text — no board even when the tutor rig has a device.
-      const half = document.createElement('div')
-      half.setAttribute('class', 'versus-half versus-half-npc versus-half-off')
-      half.appendChild(buildOwl())
-      return half
-    }
-    if (isTutorial && skipped2) {
-      // The tutor rig can skip too (modeling the gesture); the owl stays.
-      const half = buildSkippedPage(
-        skipHadSolution2,
-        nextChallenge2,
-        (c) => {
-          skipCursor2 = c
-        },
-        (d) => {
-          skipDefault2 = d
-        },
-      )
-      half.appendChild(buildOwl())
-      return half
-    }
-    if (conjectureEntry2 && lemmaSession2 !== null) {
-      const half = buildConjecturePage(lemmaSession2, refreshP2)
-      half.setAttribute(
-        'class',
-        'versus-half' +
-          (tutorOff() ? ' versus-half-npc versus-half-off' : '') +
-          (hideControls2() ? ' versus-half-keys' : ''),
-      )
-      half.appendChild(buildOwl())
-      return half
-    }
     const half = document.createElement('div')
     half.setAttribute(
       'class',
       'versus-half' +
-        (isNpc2 || tutorOff() ? ' versus-half-npc' : '') +
-        (tutorOff() ? ' versus-half-off' : '') +
-        (hideControls2() ? ' versus-half-keys' : ''),
+        (isNpc2 ? ' versus-half-npc' : '') +
+        (hideControls2 ? ' versus-half-keys' : ''),
     )
     half.appendChild(
       createBench(
@@ -716,22 +242,18 @@ export const mountVersus = (
         refreshP2,
         undefined,
         onApplyReverse2,
-        isTutorial && beatAt(beatIdx).hideLemma,
+        undefined,
         ctx2,
-        isTutorial && beatAt(beatIdx).hideSkip ? undefined : skipPlayer2,
-        isTutorial && beatAt(beatIdx).hideGaze,
-        isTutorial,
+        skipPlayer2,
+        undefined,
+        undefined,
         lemmaSession2,
       ),
     )
-    // Appended after the bench (and outside it), so the owl draws on top
-    // and the NPC-half treatment of a tutor-less half never touches it.
-    if (isTutorial) half.appendChild(buildOwl())
     return half
   }
 
   const buildThermo = (): HTMLElement => {
-    if (isTutorial) return buildTutorialThermo()
     const thermo = document.createElement('div')
     thermo.setAttribute('class', 'versus-thermo')
 
@@ -899,21 +421,8 @@ export const mountVersus = (
       cells.push({ btn: el, activate })
     }
     addButton(t('resumeGame'), () => setPaused(false))
-    if (isTutorial) {
-      // The tutorial owns its pause menu: instead of Versus's Play Again /
-      // Match Setup (which would launch a real match), a single cycler for
-      // the tutor's device — the Wizard-of-Oz rig, off by default. The
-      // learner needs no picker: their half takes every remaining device.
-      // Cycling switches the tutor live (no remount — see applyTutorialTutor).
-      const tutorLabel =
-        tutorInput === 'off' ? t('inputOff') : inputLabel(tutorInput)
-      addButton(`${t('tutor')}: ${tutorLabel}`, () =>
-        applyTutorialTutor(nextTutorInput(tutorInput)),
-      )
-    } else {
-      addButton(t('playAgain'), () => navigate('versus'))
-      addButton(t('matchSetup'), () => navigate('versus-config'))
-    }
+    addButton(t('playAgain'), () => navigate('versus'))
+    addButton(t('matchSetup'), () => navigate('versus-config'))
     addButton(t('exitToMainMenu'), () => navigate('menu'))
 
     panel.appendChild(buttons)
@@ -922,44 +431,6 @@ export const mountVersus = (
 
     const cursor = createButtonCursor(cells.map((c) => [c]))
     return { el: shroud, onAction: cursor.onAction }
-  }
-
-  // Tutor cycling: off → next connected device → … → off. Claiming a device
-  // takes it from the learner (who keeps everything else); the mouse is
-  // shareable since each half has its own buttons.
-  const TUTOR_INPUTS: ReadonlyArray<TutorInput> = [
-    'off',
-    'mouse',
-    'keyboard',
-    'gamepad1',
-    'gamepad2',
-  ]
-  const nextTutorInput = (current: TutorInput): TutorInput => {
-    const start = TUTOR_INPUTS.indexOf(current)
-    for (let step = 1; step <= TUTOR_INPUTS.length; step += 1) {
-      const candidate = TUTOR_INPUTS[(start + step) % TUTOR_INPUTS.length]
-      if (candidate === undefined) continue
-      if (candidate !== 'off' && !isInputAvailable(candidate)) continue
-      return candidate
-    }
-    return current
-  }
-  // Switch the tutor device LIVE — no remount, both boards untouched. A
-  // tutor is typically summoned mid-challenge to answer a question about
-  // the exact position on the board; a remount would destroy the question.
-  // The input listeners are all attached at mount and route by reading
-  // tutorInput, so flipping the variable re-routes them; the rerender
-  // refreshes the tutor half's visibility and the pause-menu label (menu
-  // stays open — cycling should feel like a settings panel). The URL param
-  // is kept in sync so the session setup stays a shareable link.
-  const applyTutorialTutor = (tutor: TutorInput) => {
-    tutorInput = tutor
-    const params = new URLSearchParams(window.location.search)
-    params.set('tutorial_stop', String(stopIdx))
-    params.set('tutorial_tutor', tutor)
-    history.replaceState(history.state, '', `?${params.toString()}`)
-    pauseMenu = null
-    rerender()
   }
 
   // rerender is defined before solvePlayer* so they can reference it
@@ -1231,7 +702,6 @@ export const mountVersus = (
   }
 
   const commitScore1 = () => {
-    if (isTutorial) return // no scoring / re-queue in the tutorial
     if (scoreCommitted1) return
     scoreCommitted1 = true
     const challengeIdx = currentChallengeIdx1()
@@ -1284,11 +754,12 @@ export const mountVersus = (
   }
   const solvePlayer1 = () => {
     commitScore1()
-    nextChallenge1()
+    advancePlayer1()
+    rerenderHalf1()
+    rebuildThermo()
   }
 
   const commitScore2 = () => {
-    if (isTutorial) return // no scoring / re-queue in the tutorial
     if (scoreCommitted2) return
     scoreCommitted2 = true
     const challengeIdx = currentChallengeIdx2()
@@ -1340,29 +811,13 @@ export const mountVersus = (
   }
   const solvePlayer2 = () => {
     commitScore2()
-    nextChallenge2()
+    advancePlayer2()
+    rerenderHalf2()
+    rebuildThermo()
   }
 
   const skipPlayer1 = () => {
     if (gameOver) return
-    // Tutorial Skip: taught in the Solvability chapter's Skip beat, hidden
-    // and deadened everywhere earlier (every goal there is solvable, and
-    // between-subchapter motion is the topic navigation). Skip resolves the
-    // challenge into the skip completion screen; a second press continues
-    // to a fresh challenge, like One More.
-    if (isTutorial) {
-      if (onIntro() || beatAt(beatIdx).hideSkip || ws1.isSolved()) return
-      if (lemmaSession1 !== null) return
-      if (skipped1) {
-        nextChallenge1()
-        return
-      }
-      ctx1.setGazeModeActive(false)
-      skipHadSolution1 = isTautology(ws1.currentConjecture().derivation.result)
-      skipped1 = true
-      rerenderHalf1()
-      return
-    }
     const challengeIdx = wsIdx1
     resolved1.set(challengeIdx, 'skip')
 
@@ -1387,19 +842,6 @@ export const mountVersus = (
   }
   const skipPlayer2 = () => {
     if (gameOver) return
-    if (isTutorial) {
-      if (onIntro() || beatAt(beatIdx).hideSkip || ws2.isSolved()) return
-      if (lemmaSession2 !== null) return
-      if (skipped2) {
-        nextChallenge2()
-        return
-      }
-      ctx2.setGazeModeActive(false)
-      skipHadSolution2 = isTautology(ws2.currentConjecture().derivation.result)
-      skipped2 = true
-      rerenderHalf2()
-      return
-    }
     const challengeIdx = wsIdx2
     resolved2.set(challengeIdx, 'skip')
 
@@ -1444,158 +886,6 @@ export const mountVersus = (
     thermoEl.replaceWith(fresh)
     thermoEl = fresh
   }
-  // Re-root the tutorial onto a curriculum beat: switch the clamp and root
-  // BOTH players onto a fresh challenge generated under the new beat,
-  // dropping anything buffered under the old one.
-  const rerootAtBeat = (target: number) => {
-    const clamped = Math.max(0, Math.min(target, tutorialCurriculum.length - 1))
-    if (clamped === beatIdx) return
-    beatIdx = clamped
-    // Leave gaze mode on both halves — the target beat may not offer it.
-    ctx1.setGazeModeActive(false)
-    ctx2.setGazeModeActive(false)
-    skipped1 = false
-    skipped2 = false
-    const fresh = Math.max(index1, index2, wsIdx1 + 1, wsIdx2 + 1)
-    sharedChallenges.splice(fresh)
-    pending1 = []
-    pending2 = []
-    scoreCommitted1 = false
-    scoreCommitted2 = false
-    wsIdx1 = fresh
-    index1 = fresh + 1
-    wsIdx2 = fresh
-    index2 = fresh + 1
-    ws1 = makeWorkspace(fresh)
-    ws2 = makeWorkspace(fresh)
-    // Conjecture beats open with the entry flow instead of the generated
-    // board; leaving one drops any half-built draft or open lemma editor.
-    lemmaSession1 = null
-    lemmaSession2 = null
-    conjectureEntry1 = false
-    conjectureEntry2 = false
-    if (beatAt(beatIdx).conjecture) {
-      openConjecture1()
-      openConjecture2()
-    }
-  }
-  // Jump the tutorial to a stop (chapter intro page or beat), forward or
-  // back. Landing on a beat re-roots the boards under its clamp; landing on
-  // an intro page leaves the boards as they are (hidden behind the page).
-  const jumpToStop = (target: number) => {
-    const clamped = Math.max(0, Math.min(target, tutorialStops.length - 1))
-    if (clamped === stopIdx) return
-    stopIdx = clamped
-    const stop = stopAt(stopIdx)
-    if (stop.kind === 'beat') {
-      rerootAtBeat(stop.beatIdx)
-    } else {
-      // Pre-root the boards at the chapter's first beat so stepping forward
-      // from the intro needs no re-root.
-      rerootAtBeat(beatForStop(stopIdx))
-    }
-    rerenderHalf1()
-    rerenderHalf2()
-    rebuildThermo()
-  }
-  // stop index addressing: beat i / a chapter's intro page.
-  const stopIndexOfBeat = (beat: number): number =>
-    tutorialStops.findIndex((s) => s.kind === 'beat' && s.beatIdx === beat)
-  const stopIndexOfIntro = (chapter: TutorialChapter): number =>
-    tutorialStops.findIndex((s) => s.kind === 'intro' && s.chapter === chapter)
-  // Beat rows name the concept, never the schema: Basics rows name what
-  // you find on the branch (identity, constants, extras), Logic rows the
-  // consequence of the drop. Each name's word appears in its own owl beat
-  // text and nowhere else.
-  const beatNameKey: Record<TutorialBeat['nameId'], MessageKey> = {
-    identity: 'tutorialIdentity',
-    constants: 'tutorialConstants',
-    drop: 'tutorialExtras',
-    split: 'tutorialShape1',
-    sideFlip: 'tutorialShape2',
-    crossing: 'tutorialShape3',
-    branching: 'tutorialShape4',
-    branchingCrossing: 'tutorialShape5',
-    claims: 'tutorialClaims',
-    unsolvable: 'tutorialSkipping',
-    conjecture: 'tutorialConjecture',
-  }
-  const chapterKey: Record<TutorialBeat['chapter'], MessageKey> = {
-    basics: 'tutorialBasics',
-    logic: 'tutorialLogic',
-    optimization: 'tutorialOptimization',
-    solvability: 'tutorialSolvability',
-  }
-  // Tutorial scoreboard replacement: the curriculum ladder (every beat a
-  // clickable row, current highlighted, chapter headers between groups), the
-  // forward control, and the shared pause button. No clock or scores.
-  const buildTutorialThermo = (): HTMLElement => {
-    const thermo = document.createElement('div')
-    thermo.setAttribute('class', 'versus-thermo versus-thermo-tutorial')
-
-    const ladder = document.createElement('div')
-    ladder.setAttribute('class', 'tutorial-ladder')
-    let lastChapter: TutorialBeat['chapter'] | null = null
-    let chapterNo = 0
-    let beatNo = 0
-    tutorialCurriculum.forEach((beat, i) => {
-      if (beat.chapter !== lastChapter) {
-        lastChapter = beat.chapter
-        chapterNo += 1
-        beatNo = 0
-        // Chapter headers are the intro pages' ladder rows: clickable, and
-        // highlighted while their intro page is the current stop.
-        const chapter = beat.chapter
-        const introIdx = stopIndexOfIntro(chapter)
-        const header = document.createElement('div')
-        header.setAttribute(
-          'class',
-          'tutorial-ladder-chapter' + (introIdx === stopIdx ? ' current' : ''),
-        )
-        header.textContent = `${chapterNo} · ${t(chapterKey[chapter])}`
-        header.onclick = () => jumpToStop(introIdx)
-        ladder.appendChild(header)
-      }
-      beatNo += 1
-      const currentStop = stopAt(stopIdx)
-      const isCurrent = currentStop.kind === 'beat' && currentStop.beatIdx === i
-      const row = document.createElement('div')
-      row.setAttribute(
-        'class',
-        'tutorial-ladder-row' + (isCurrent ? ' current' : ''),
-      )
-      const number = document.createElement('span')
-      number.setAttribute('class', 'tutorial-ladder-number')
-      number.textContent = `${chapterNo}.${beatNo}`
-      row.appendChild(number)
-      row.appendChild(document.createTextNode(t(beatNameKey[beat.nameId])))
-      if (beat.glyphs !== '') {
-        const glyphs = document.createElement('span')
-        glyphs.setAttribute('class', 'tutorial-ladder-glyphs')
-        glyphs.textContent = beat.glyphs
-        row.appendChild(glyphs)
-      }
-      row.onclick = () => jumpToStop(stopIndexOfBeat(i))
-      ladder.appendChild(row)
-    })
-    // The beat-less completion chapter: a header row only.
-    const doneIdx = stopIndexOfIntro('done')
-    const doneHeader = document.createElement('div')
-    doneHeader.setAttribute(
-      'class',
-      'tutorial-ladder-chapter' + (doneIdx === stopIdx ? ' current' : ''),
-    )
-    doneHeader.textContent = `${chapterNo + 1} · ${t('tutorialComplete')}`
-    doneHeader.onclick = () => jumpToStop(doneIdx)
-    ladder.appendChild(doneHeader)
-    thermo.appendChild(ladder)
-
-    const menuBtn = createButton('⋮', false, () => setPaused(true))
-    menuBtn.classList.add('versus-menu-btn')
-    menuBtn.setAttribute('aria-label', t('menu'))
-    thermo.appendChild(menuBtn)
-    return thermo
-  }
   // refreshP{1,2}: the dispatch callback for that player's regular moves.
   // Commits score on the move that solves the level (so the scoreboard reflects
   // the win), refreshes that player's bench, and rebuilds the thermometer.
@@ -1619,16 +909,6 @@ export const mountVersus = (
   }
   let congrats1: SolvedCursor | null = null
   let congrats2: SolvedCursor | null = null
-  // The chapter intro page's button cursor and default action, captured
-  // when the page is built (there is one page, shared by both players'
-  // inputs). The default is what an unengaged axiom press activates.
-  let introCursor: SolvedCursor | null = null
-  let introDefault: (() => void) | null = null
-  // Ditto for each half's skip completion screen (tutorial only).
-  let skipCursor1: SolvedCursor | null = null
-  let skipDefault1: (() => void) | null = null
-  let skipCursor2: SolvedCursor | null = null
-  let skipDefault2: (() => void) | null = null
 
   // Post-solve: only the Continue action (axiom) advances; menu navigates away;
   // every other mapped key replays this player's animation on their own half.
@@ -1693,70 +973,17 @@ export const mountVersus = (
   // Independent dispatch per player. Each player's regular-move rerender
   // callback is scoped to their own half + the thermometer, so an opponent's
   // moves can never disturb this player's in-flight animation.
-  // In tutorial beats that hide the Gaze controls, the keyboard/gamepad gaze
-  // actions must be inert too — checked per dispatch since the beat changes
-  // at runtime.
-  const gazeBlocked = () => isTutorial && beatAt(beatIdx).hideGaze
   // On the solved screen, arrow / D-pad actions drive the congrats button
   // cursor and axiom activates the focused button once engaged — mirroring
   // the other completion screens. This must run BEFORE createDispatch, whose
-  // gaze handling (and the tutorial's gaze block) would swallow the arrows.
+  // gaze handling would swallow the arrows.
   const makeCursorDispatch =
     (
       base: (action: Action) => void,
       getWs: () => AnyWorkspace,
       getCursor: () => SolvedCursor | null,
-      getSkipScreen: () => {
-        cursor: SolvedCursor | null
-        dflt: (() => void) | null
-      } | null,
     ) =>
     (action: Action): void => {
-      // On a chapter intro page there is no board: arrows drive the topic
-      // buttons, axiom presses the focused one (or Next Topic when the
-      // cursor is unengaged), and every gameplay action is swallowed so
-      // keys can't mutate the hidden workspaces.
-      if (onIntro()) {
-        const cursor = introCursor
-        if (cursor !== null) {
-          if (cursorNavActions.has(action)) {
-            cursor.onAction(action)
-            return
-          }
-          if (action === 'axiom') {
-            if (cursor.isEngaged()) {
-              cursor.onAction('axiom')
-            } else {
-              introDefault?.()
-            }
-            return
-          }
-        }
-        return
-      }
-      // The skip completion screen behaves like an intro page: arrows drive
-      // its buttons, axiom presses the focused one (or One More when the
-      // cursor is unengaged), and everything else is swallowed so keys
-      // can't mutate the board being left behind.
-      const skipScreen = getSkipScreen()
-      if (skipScreen !== null) {
-        const { cursor, dflt } = skipScreen
-        if (cursor !== null) {
-          if (cursorNavActions.has(action)) {
-            cursor.onAction(action)
-            return
-          }
-          if (action === 'axiom') {
-            if (cursor.isEngaged()) {
-              cursor.onAction('axiom')
-            } else {
-              dflt?.()
-            }
-            return
-          }
-        }
-        return
-      }
       const cursor = getCursor()
       if (getWs().isSolved() && cursor !== null) {
         if (cursorNavActions.has(action)) {
@@ -1780,15 +1007,9 @@ export const mountVersus = (
       undefined,
       onApplyReverse1,
       ctx1,
-      undefined,
-      gazeBlocked,
     ),
     () => ws1,
     () => congrats1,
-    () =>
-      isTutorial && skipped1
-        ? { cursor: skipCursor1, dflt: skipDefault1 }
-        : null,
   )
   const dispatch2 = makeCursorDispatch(
     createDispatch(
@@ -1800,23 +1021,14 @@ export const mountVersus = (
       undefined,
       onApplyReverse2,
       ctx2,
-      undefined,
-      gazeBlocked,
     ),
     () => ws2,
     () => congrats2,
-    () =>
-      isTutorial && skipped2
-        ? { cursor: skipCursor2, dflt: skipDefault2 }
-        : null,
   )
 
-  // In the tutorial the solved screen is also a navigation moment: Continue
-  // stays in the current section (fresh challenge), flanked by section jumps
-  // so the natural "I've got this" step forward happens right where the win
-  // lands, without reaching for the ladder. The buttons form one cursor row
-  // (registered via setCursor) so keyboard / gamepad players can pick them
-  // like on the other completion screens.
+  // The solved screen's Continue forms a one-button cursor row (registered
+  // via setCursor) so keyboard / gamepad players can pick it like on the
+  // other completion screens.
   const makeCongrats =
     (onContinue: () => void, setCursor: (cursor: SolvedCursor) => void) =>
     () => {
@@ -1832,21 +1044,11 @@ export const mountVersus = (
         buttons.appendChild(el)
         cells.push({ btn: el, activate, isEnabled: () => !disabled })
       }
-      if (isTutorial) {
-        add(t('tutorialPrevious'), stopIdx <= 0, () => jumpToStop(stopIdx - 1))
-      }
-      add(isTutorial ? t('tutorialOneMore') : t('continue'), false, onContinue)
-      if (isTutorial) {
-        add(t('tutorialAdvance'), stopIdx >= tutorialStops.length - 1, () =>
-          jumpToStop(stopIdx + 1),
-        )
-      }
+      add(t('continue'), false, onContinue)
       // Continue is the screen's default (an unengaged axiom presses it), so
-      // the cursor starts there and the first arrow moves immediately —
-      // one press right lands on Next Section, not on a swallowed reveal.
-      const continueCol = isTutorial ? 1 : 0
+      // the cursor starts there and the first arrow moves immediately.
       const cursor = createButtonCursor([cells], {
-        startCol: continueCol,
+        startCol: 0,
         moveOnReveal: true,
       })
       setCursor({ onAction: cursor.onAction, isEngaged: cursor.isEngaged })
@@ -1868,7 +1070,7 @@ export const mountVersus = (
   // Only patch the timer text each tick — a full rerender would destroy the DOM
   // mid-animation and prevent the solved zoom + proof-check sweep from completing.
   const ticker = setInterval(() => {
-    if (untimed || gameOver || paused) return
+    if (gameOver || paused) return
     timeLeft -= 1
     if (timeLeft <= 0) {
       timeLeft = 0
@@ -1946,15 +1148,9 @@ export const mountVersus = (
     }
     if (action !== 'menu') return
     // First menu press cancels an open lemma editor; otherwise it pauses.
-    // The conjecture entry is a persistent state, not a modal — its session
-    // doesn't count as cancellable (cancel would only restart the draft,
-    // trapping menu); a mid-proof Claim editor does, even on a conjecture
-    // board.
-    const cancellable1 = lemmaSession1 !== null && !conjectureEntry1
-    const cancellable2 = lemmaSession2 !== null && !conjectureEntry2
-    if (cancellable1 || cancellable2) {
-      if (cancellable1) lemmaSession1?.cancel()
-      if (cancellable2) lemmaSession2?.cancel()
+    if (lemmaSession1 !== null || lemmaSession2 !== null) {
+      lemmaSession1?.cancel()
+      lemmaSession2?.cancel()
     } else {
       setPaused(true)
     }
@@ -2005,15 +1201,32 @@ export const mountVersus = (
 
   let cleanupP1: () => void
   let cleanupP2: () => void
-  if (isTutorial) {
-    // Every human input device is attached once and ROUTED per event by the
-    // live tutorInput: the tutor's claimed device drives the tutor half,
-    // everything else drives the learner ('off' and 'mouse' claim no
-    // listener — a second mouse needs none, each half has its own buttons).
-    // Event-time routing is what lets the pause menu switch the tutor
-    // without a remount. All four pad slots are wired so a pad plugged in
-    // mid-session drives the learner immediately.
-    const padHandler1 = (action: Action) => {
+  if (versusConfig.p1Input === 'keyboard') {
+    document.addEventListener('keydown', handleKey)
+    cleanupP1 = () => document.removeEventListener('keydown', handleKey)
+  } else if (versusConfig.p1Input === 'mouse') {
+    cleanupP1 = () => {}
+  } else if (versusConfig.p1Input === 'npc') {
+    const driver = createNpcDriver({
+      getWorkspace: () => ws1,
+      getChallengeIdx: () => wsIdx1,
+      getTotalMoves: () => totalMoves(ws1),
+      applyEvent: (ev) => {
+        ws1.applyEvent(ev)
+        if (ws1.isSolved()) {
+          solvePlayer1()
+        } else {
+          refreshP1()
+        }
+      },
+      skip: skipPlayer1,
+      knobs: versusConfig.npc1Knobs,
+      isGameOver: () => gameOver,
+      isPaused: () => paused,
+    })
+    cleanupP1 = driver.cleanup
+  } else {
+    cleanupP1 = setupGamepad((action) => {
       if (gameOver || paused || action === 'menu') return
       if (handleEditorInput1(action)) return
       if (action === 'skip') {
@@ -2021,72 +1234,7 @@ export const mountVersus = (
         return
       }
       dispatch1(action)
-    }
-    const padHandler2 = (action: Action) => {
-      if (gameOver || paused || action === 'menu') return
-      if (handleEditorInput2(action)) return
-      if (action === 'skip') {
-        skipPlayer2()
-        return
-      }
-      dispatch2(action)
-    }
-    const tutorPadIdx = (): number | null =>
-      tutorInput === 'gamepad1' || tutorInput === 'gamepad2'
-        ? gpIndex(tutorInput)
-        : null
-    const routeKey = (ev: KeyboardEvent) => {
-      if (tutorInput === 'keyboard') handleKey2(ev)
-      else handleKey(ev)
-    }
-    document.addEventListener('keydown', routeKey)
-    const cleanups = [
-      () => document.removeEventListener('keydown', routeKey),
-      ...[0, 1, 2, 3].map((idx) =>
-        setupGamepad((action) => {
-          if (idx === tutorPadIdx()) padHandler2(action)
-          else padHandler1(action)
-        }, idx),
-      ),
-    ]
-    cleanupP1 = () => cleanups.forEach((c) => c())
-    cleanupP2 = () => {}
-  } else {
-    if (versusConfig.p1Input === 'keyboard') {
-      document.addEventListener('keydown', handleKey)
-      cleanupP1 = () => document.removeEventListener('keydown', handleKey)
-    } else if (versusConfig.p1Input === 'mouse') {
-      cleanupP1 = () => {}
-    } else if (versusConfig.p1Input === 'npc') {
-      const driver = createNpcDriver({
-        getWorkspace: () => ws1,
-        getChallengeIdx: () => wsIdx1,
-        getTotalMoves: () => totalMoves(ws1),
-        applyEvent: (ev) => {
-          ws1.applyEvent(ev)
-          if (ws1.isSolved()) {
-            solvePlayer1()
-          } else {
-            refreshP1()
-          }
-        },
-        skip: skipPlayer1,
-        knobs: versusConfig.npc1Knobs,
-        isGameOver: () => gameOver,
-        isPaused: () => paused,
-      })
-      cleanupP1 = driver.cleanup
-    } else {
-      cleanupP1 = setupGamepad((action) => {
-        if (gameOver || paused || action === 'menu') return
-        if (handleEditorInput1(action)) return
-        if (action === 'skip') {
-          skipPlayer1()
-          return
-        }
-        dispatch1(action)
-      }, gpIndex(versusConfig.p1Input))
-    }
+    }, gpIndex(versusConfig.p1Input))
 
     if (versusConfig.p2Input === 'keyboard') {
       document.addEventListener('keydown', handleKey2)
@@ -2142,13 +1290,6 @@ export const mountVersus = (
   )
 
   const unsubGamepad = subscribeGamepad(rerender)
-
-  // A mount that lands directly on a conjecture beat (tutorial_stop URL)
-  // opens with the entry flow, like a beat jump would.
-  if (onConjecture()) {
-    openConjecture1()
-    openConjecture2()
-  }
 
   rerender()
 
