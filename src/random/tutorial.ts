@@ -188,12 +188,6 @@ export const logicNotches: readonly [Notch, Notch, Notch, Notch, Notch] = [
   },
 ]
 
-// Clamp an index into the notch list, returning a guaranteed notch.
-export const notchAt = (i: number): Notch => {
-  const clamped = Math.max(0, Math.min(i, logicNotches.length - 1))
-  return logicNotches[clamped] ?? logicNotches[0]
-}
-
 // Source clamp for the Basics constants beat: like the branching notch but
 // with ⊥/⊤ in the symbol pool and the constant closings featured — the
 // necessity check then guarantees every accepted goal has some branch that
