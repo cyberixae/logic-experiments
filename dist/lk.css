@@ -1466,6 +1466,10 @@ html.mode-single:not(.input-pointer) .bench-topbar .bench-zoom {
 .tutorial-welcome {
   flex-direction: column;
   padding-bottom: 2em;
+  /* The intro page is height: 100% inside the overflow-hidden screen; the
+     padding must stay inside that height or the page overflows and every
+     active-node scrollIntoView bobs the whole layout. */
+  box-sizing: border-box;
 }
 .tutorial-demo {
   pointer-events: none;
