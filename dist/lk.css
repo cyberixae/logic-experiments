@@ -377,11 +377,12 @@ html.mode-single:not(.input-pointer) .bench-topbar .bench-zoom {
 .legend-bind {
   display: none;
   position: absolute;
-  top: -0.7em;
+  top: -1.1em;
   left: 50%;
   transform: translateX(-50%);
-  font-size: 0.75em;
-  line-height: 1.3;
+  font-size: 1em;
+  line-height: 1.4;
+  min-width: 1em;
   border: 1px solid #964;
   border-radius: 5px;
   padding: 0 0.3em;
