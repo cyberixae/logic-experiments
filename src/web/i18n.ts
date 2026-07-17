@@ -98,7 +98,7 @@ const en = {
   tutorialOwlClose:
     'A branch of the tree can be closed when the same sentence sits on both sides of the gate ( ⊢ ).',
   tutorialOwlCloseConstants:
-    'Constant sentences can sometimes close a branch on their own — Falsum ( ⊥ ) when it sits alone on the left side of the gate, and Verum ( ⊤ ) when it sits alone on the right.',
+    'Falsum ( ⊥ ) closes a branch when it sits alone on the left side of the gate, and Verum ( ⊤ ) when it sits alone on the right.',
   tutorialOwlDrop:
     'Any extra sentences on a branch must always be dropped before the branch can close.',
   tutorialOwlSplit:
@@ -234,7 +234,7 @@ const fi: Record<MessageKey, string> = {
   tutorialOwlClose:
     'Päättelypuun oksa on suljettavissa silloin, kun portin ( ⊢ ) kummallakin puolella on sama lause.',
   tutorialOwlCloseConstants:
-    'Vakiolauseet mahdollistavat joskus oksan sulkemisen yksinään — Falsum ( ⊥ ) ollessaan yksin portin vasemmalla puolella, ja Verum ( ⊤ ) ollessaan yksin portin oikealla puolella.',
+    'Falsum ( ⊥ ) sulkee oksan ollessaan yksin portin vasemmalla puolella, ja Verum ( ⊤ ) ollessaan yksin portin oikealla puolella.',
   tutorialOwlDrop:
     'Oksan sisältämät ylimääräiset lauseet on aina pudotettava ennen kuin oksan voi sulkea.',
   tutorialOwlSplit:
@@ -372,7 +372,7 @@ const es: Record<MessageKey, string> = {
   tutorialOwlClose:
     'Una rama del árbol se puede cerrar cuando a ambos lados de la puerta ( ⊢ ) está la misma oración.',
   tutorialOwlCloseConstants:
-    'Las oraciones constantes a veces permiten cerrar una rama por sí solas: Falsum ( ⊥ ) cuando está solo a la izquierda de la puerta, y Verum ( ⊤ ) cuando está solo a la derecha.',
+    'Falsum ( ⊥ ) cierra una rama cuando está solo a la izquierda de la puerta, y Verum ( ⊤ ) cuando está solo a la derecha.',
   tutorialOwlDrop:
     'Las oraciones sobrantes de una rama deben soltarse siempre antes de poder cerrarla.',
   tutorialOwlSplit:
@@ -509,7 +509,7 @@ const cs: Record<MessageKey, string> = {
   tutorialOwlClose:
     'Větev stromu lze zavřít, když na obou stranách brány ( ⊢ ) stojí stejná věta.',
   tutorialOwlCloseConstants:
-    'Konstantní věty někdy dokážou zavřít větev samy — Falsum ( ⊥ ), když stojí samo vlevo od brány, a Verum ( ⊤ ), když stojí samo vpravo.',
+    'Falsum ( ⊥ ) zavře větev, když stojí samo vlevo od brány, a Verum ( ⊤ ), když stojí samo vpravo.',
   tutorialOwlDrop:
     'Přebytečné věty na větvi je vždy nutné pustit, než ji lze zavřít.',
   tutorialOwlSplit:
@@ -645,7 +645,7 @@ const pl: Record<MessageKey, string> = {
   tutorialOwlClose:
     'Gałąź drzewa można zamknąć, gdy po obu stronach bramy ( ⊢ ) stoi to samo zdanie.',
   tutorialOwlCloseConstants:
-    'Zdania stałe czasem pozwalają zamknąć gałąź samodzielnie — Falsum ( ⊥ ), gdy stoi samo po lewej stronie bramy, i Verum ( ⊤ ), gdy stoi samo po prawej.',
+    'Falsum ( ⊥ ) zamyka gałąź, gdy stoi samo po lewej stronie bramy, i Verum ( ⊤ ), gdy stoi samo po prawej.',
   tutorialOwlDrop:
     'Zbędne zdania na gałęzi trzeba zawsze upuścić, zanim da się ją zamknąć.',
   tutorialOwlSplit:
