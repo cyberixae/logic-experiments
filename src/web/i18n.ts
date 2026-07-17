@@ -100,7 +100,7 @@ const en = {
   tutorialOwlCloseConstants:
     'Constant sentences can sometimes close a branch on their own — Falsum ( ⊥ ) when it sits alone on the left side of the gate, and Verum ( ⊤ ) when it sits alone on the right.',
   tutorialOwlDrop:
-    'Any extra sentences on a branch must always be dropped before the branch can close. If you drop a sentence the branch needs for closing, you can undo your move.',
+    'Any extra sentences on a branch must always be dropped before the branch can close.',
   tutorialOwlSplit:
     'Destructing a sentence drops its outermost connective off the tree. Dropping a Conjunction ( ∧ ) on the left side of the gate, or a Disjunction ( ∨ ) on the right, causes no further consequences — the pieces stay where they were.',
   tutorialOwlSideFlip:
@@ -236,7 +236,7 @@ const fi: Record<MessageKey, string> = {
   tutorialOwlCloseConstants:
     'Vakiolauseet mahdollistavat joskus oksan sulkemisen yksinään — Falsum ( ⊥ ) ollessaan yksin portin vasemmalla puolella, ja Verum ( ⊤ ) ollessaan yksin portin oikealla puolella.',
   tutorialOwlDrop:
-    'Oksan sisältämät ylimääräiset lauseet on aina pudotettava ennen kuin oksan voi sulkea. Mikäli pudotat oksan sulkemiseen tarvittavan lauseen, voit perua siirtosi.',
+    'Oksan sisältämät ylimääräiset lauseet on aina pudotettava ennen kuin oksan voi sulkea.',
   tutorialOwlSplit:
     'Lauseen purkaminen pudottaa sen uloimman konnektiivin puusta. Konjunktion ( ∧ ) pudottaminen portin vasemmalla puolella tai Disjunktion ( ∨ ) pudottaminen portin oikealla puolella ei aiheuta sen kummempia seuraamuksia — osat jäävät paikoilleen.',
   tutorialOwlSideFlip:
@@ -374,7 +374,7 @@ const es: Record<MessageKey, string> = {
   tutorialOwlCloseConstants:
     'Las oraciones constantes a veces permiten cerrar una rama por sí solas: Falsum ( ⊥ ) cuando está solo a la izquierda de la puerta, y Verum ( ⊤ ) cuando está solo a la derecha.',
   tutorialOwlDrop:
-    'Las oraciones sobrantes de una rama deben soltarse siempre antes de poder cerrarla. Si sueltas una oración necesaria para cerrar la rama, puedes deshacer el movimiento.',
+    'Las oraciones sobrantes de una rama deben soltarse siempre antes de poder cerrarla.',
   tutorialOwlSplit:
     'Destruir una oración suelta del árbol su conectivo más externo. Soltar una Conjunción ( ∧ ) en el lado izquierdo de la puerta, o una Disyunción ( ∨ ) en el derecho, no tiene mayores consecuencias: las piezas se quedan donde estaban.',
   tutorialOwlSideFlip:
@@ -511,7 +511,7 @@ const cs: Record<MessageKey, string> = {
   tutorialOwlCloseConstants:
     'Konstantní věty někdy dokážou zavřít větev samy — Falsum ( ⊥ ), když stojí samo vlevo od brány, a Verum ( ⊤ ), když stojí samo vpravo.',
   tutorialOwlDrop:
-    'Přebytečné věty na větvi je vždy nutné pustit, než ji lze zavřít. Pokud pustíš větu potřebnou k zavření větve, můžeš tah vrátit.',
+    'Přebytečné věty na větvi je vždy nutné pustit, než ji lze zavřít.',
   tutorialOwlSplit:
     'Zničení věty pustí ze stromu její vnější spojku. Puštění Konjunkce ( ∧ ) na levé straně brány nebo Disjunkce ( ∨ ) na pravé nemá žádné zvláštní následky — části zůstávají na místě.',
   tutorialOwlSideFlip:
@@ -647,7 +647,7 @@ const pl: Record<MessageKey, string> = {
   tutorialOwlCloseConstants:
     'Zdania stałe czasem pozwalają zamknąć gałąź samodzielnie — Falsum ( ⊥ ), gdy stoi samo po lewej stronie bramy, i Verum ( ⊤ ), gdy stoi samo po prawej.',
   tutorialOwlDrop:
-    'Zbędne zdania na gałęzi trzeba zawsze upuścić, zanim da się ją zamknąć. Jeśli upuścisz zdanie potrzebne do zamknięcia gałęzi, możesz cofnąć ruch.',
+    'Zbędne zdania na gałęzi trzeba zawsze upuścić, zanim da się ją zamknąć.',
   tutorialOwlSplit:
     'Zniszczenie zdania upuszcza z drzewa jego zewnętrzny spójnik. Upuszczenie Koniunkcji ( ∧ ) po lewej stronie bramy lub Alternatywy ( ∨ ) po prawej nie ma szczególnych następstw — części zostają na miejscu.',
   tutorialOwlSideFlip:
