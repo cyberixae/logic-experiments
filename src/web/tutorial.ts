@@ -9,6 +9,7 @@ import {
   createBenchCtx,
   createButton,
   createDispatch,
+  addLegendBind,
   createPausePopup,
   createPlayArea,
   markKeyboardInput,
@@ -31,7 +32,7 @@ import { html } from '../render/segment'
 import { AnySequent, isTautology, sequent } from '../model/sequent'
 import { MountResult, Navigate } from './types'
 import { MessageKey, t } from './i18n'
-import { getActionHint, gazeKeyHint, gazePadHint } from './input-mode'
+import { getActionHint } from './input-mode'
 import {
   beatAt,
   generateDemoChallenge,
@@ -81,16 +82,10 @@ const chapterKey: Record<TutorialBeat['chapter'], MessageKey> = {
 
 // The owl: the tutor character's portrait in the board's lower-right corner,
 // with a speech bubble of the current stop's message — the chapter's framing
-// on an intro page, the beat's lesson on a beat.
-//
-// The messages are i18n templates with {pick}/{drop}/… placeholders for
-// keybinds. Each placeholder renders as a chip holding all three device
-// variants as latent spans — mouse gets the localized button words,
-// keyboard / gamepad get labels derived from the live keymaps (gazeKeyHint /
-// gazePadHint), so rebindable keys flow through with no copy changes. CSS
-// shows the variant matching the html input-* class, so the chips follow the
-// device last touched instantly, without a re-render (pointer↔keyboard flips
-// never re-render by design — see setActiveInput).
+// on an intro page, the beat's lesson on a beat. The owl speaks gameplay
+// only, never keybinds: control mastery is player-paced while the owl is
+// beat-paced, so key hints live in the control-bar legend instead (see
+// addLegendBind in game.ts).
 const owlChapterKey: Record<TutorialChapter, MessageKey> = {
   basics: 'tutorialOwlBasics',
   logic: 'tutorialOwlLogic',
@@ -144,67 +139,6 @@ const isClosingEvent = (ev: Event): boolean =>
 // played, not told.
 const PRESOLVE_DWELL_MS = 1800
 const PRESOLVE_MOVE_MS = 550
-
-type OwlDevice = 'pointer' | 'keyboard' | 'gamepad'
-const owlDevices: ReadonlyArray<OwlDevice> = ['pointer', 'keyboard', 'gamepad']
-const owlBindLabels = (device: OwlDevice): Map<string, string> => {
-  if (device === 'pointer') {
-    return new Map([
-      ['pick', `${t('left')} / ${t('right')}`],
-      ['drop', t('drop')],
-      ['close', t('axiom')],
-      ['undo', t('undo')],
-      ['destruct', t('destruct')],
-      ['branch', `${t('prevBranch')} / ${t('nextBranch')}`],
-      ['skip', t('skip')],
-      // The formula editor's palette has no single button word; a glyph
-      // sample stands in for the row of piece buttons.
-      ['pieces', '🐧 ¬ ∧ …'],
-      ['confirm', t('lemmaConfirm')],
-      ['lemma', t('lemma')],
-    ])
-  }
-  const hint = device === 'keyboard' ? gazeKeyHint : gazePadHint
-  const label = (action: Action): string => hint(action) ?? '?'
-  return new Map([
-    ['pick', `${label('gazeLeft')} ${label('gazeRight')}`],
-    ['drop', label('gazeWeakening')],
-    ['close', label('axiom')],
-    ['undo', label('undo')],
-    ['destruct', label('gazeConnective')],
-    ['branch', `${label('prevBranch')} / ${label('nextBranch')}`],
-    ['skip', label('skip')],
-    // In the editor the gaze keys drive the bar cursor: aim with the
-    // arrows / D-pad, take the aimed piece with the confirm press.
-    ['pieces', `${label('gazeLeft')} ${label('gazeRight')} ${label('axiom')}`],
-    ['confirm', label('axiom')],
-    ['lemma', label('lemma')],
-  ])
-}
-// Split the template on {token} boundaries; tokens become bind chips (one
-// latent variant per device), everything else stays plain text.
-const appendOwlTemplate = (into: HTMLElement, template: string): void => {
-  const binds: ReadonlyArray<[OwlDevice, Map<string, string>]> = owlDevices.map(
-    (device) => [device, owlBindLabels(device)],
-  )
-  for (const part of template.split(/(\{\w+\})/)) {
-    if (part === '') continue
-    const token =
-      part.startsWith('{') && part.endsWith('}') ? part.slice(1, -1) : null
-    if (token === null || !(binds[0]?.[1].has(token) ?? false)) {
-      into.appendChild(document.createTextNode(part))
-      continue
-    }
-    for (const [device, labels] of binds) {
-      const label = labels.get(token)
-      if (label === undefined) continue
-      const chip = document.createElement('span')
-      chip.setAttribute('class', `owl-bind for-${device}`)
-      chip.textContent = label
-      into.appendChild(chip)
-    }
-  }
-}
 
 export const mountTutorial = (
   container: HTMLElement,
@@ -557,6 +491,7 @@ export const mountTutorial = (
       rerender()
     })
     undoBtn.classList.add('mutating')
+    addLegendBind(undoBtn, 'undo')
     el.appendChild(undoBtn)
     return el
   }
@@ -685,7 +620,7 @@ export const mountTutorial = (
     for (const text of paragraphs) {
       const para = document.createElement('div')
       para.setAttribute('class', 'tutor-owl-para')
-      appendOwlTemplate(para, text)
+      para.textContent = text
       bubble.appendChild(para)
     }
     const face = document.createElement('div')

@@ -10,6 +10,7 @@ import { Action } from '../interactive/action'
 import {
   AnyWorkspace,
   ApplyReverse1,
+  addLegendBind,
   createBench,
   createButton,
   createDispatch,
@@ -132,6 +133,7 @@ const createControls = (
     rerender()
   })
   undoBtn.classList.add('mutating')
+  addLegendBind(undoBtn, 'undo')
   panel.appendChild(undoBtn)
   return panel
 }

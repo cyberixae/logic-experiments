@@ -96,13 +96,13 @@ const en = {
   tutorialOwlLogic:
     'The second chapter walks through the consequences of dropping each connective ( → ∧ ∨ ¬ ) in different situations, one at a time. If you would rather jump straight into the deep end, you already know every move — feel free to head for the real game.',
   tutorialOwlClose:
-    'A branch of the tree can be closed when the same sentence sits on both sides of the gate ( ⊢ ) — this situation is called an identity. You can switch branches with the {branch} buttons and close the chosen branch with the {close} button.',
+    'A branch of the tree can be closed when the same sentence sits on both sides of the gate ( ⊢ ) — this situation is called an identity.',
   tutorialOwlCloseConstants:
     'Constant sentences can sometimes close a branch on their own — Falsum ( ⊥ ) when it sits alone on the left side of the gate, and Verum ( ⊤ ) when it sits alone on the right.',
   tutorialOwlDrop:
-    'Any extra sentences on a branch must always be dropped before the branch can close. Remove them by picking the sentence to drop with the {pick} buttons, then pressing the {drop} button repeatedly until the picked sentence falls off the tree. If you drop a sentence the branch needs for closing, you can undo your move by pressing {undo}.',
+    'Any extra sentences on a branch must always be dropped before the branch can close. If you drop a sentence the branch needs for closing, you can undo your move.',
   tutorialOwlSplit:
-    'You can drop a connective by picking a sentence with the {pick} buttons, then pressing {destruct} repeatedly until the outermost connective of the picked sentence falls off the tree. Dropping a Conjunction ( ∧ ) on the left side of the gate, or a Disjunction ( ∨ ) on the right, causes no further consequences — the pieces stay where they were.',
+    'Destructing a sentence drops its outermost connective off the tree. Dropping a Conjunction ( ∧ ) on the left side of the gate, or a Disjunction ( ∨ ) on the right, causes no further consequences — the pieces stay where they were.',
   tutorialOwlSideFlip:
     'Dropping a Negation ( ¬ ) makes the remaining sentence move to the other side of the gate.',
   tutorialOwlCrossing:
@@ -113,13 +113,13 @@ const en = {
     'Dropping an Implication ( → ) on the left side of the gate shatters the sentence: the most intricate of the rules combines both the parts dividing across the gate and the tree branching.',
   tutorialOwlOptimization: 'The third chapter is about optimizing solutions.',
   tutorialOwlClaims:
-    'You can add a claim to the selected branch by pressing the {lemma} button. Pick the parts of the sentence with the {pieces} buttons and finally press the {confirm} button. Claims never affect whether a challenge can be solved, but they can sometimes shorten the solution.',
+    'You can add a claim of your own choosing to the selected branch. Claims never affect whether a challenge can be solved, but they can sometimes shorten the solution.',
   tutorialOwlSolvability:
     'The fourth chapter is about telling which challenges can be solved. Recognizing solvability matters if you take on chaotic ( 💀 ) challenges.',
   tutorialOwlUnsolvable:
-    'The challenges here are deliberately unsolvable, so that you learn to recognize one. You can skip an unsolvable challenge by pressing the {skip} button.',
+    'The challenges here are deliberately unsolvable, so that you learn to recognize one. A challenge you deem unsolvable can be skipped.',
   tutorialOwlConjecture:
-    'In this sandbox you can try to solve challenges of your own choosing. First pick the parts of the sentence with the {pieces} buttons, and finally press the {confirm} button. You can take back mispresses with the {undo} button.',
+    'In this sandbox you can try to solve challenges of your own choosing.',
   tutorialSkipped: 'Challenge skipped! It had no solution.',
   tutorialSkippedSolvable: 'Challenge skipped! It did have a solution, though.',
   tutorialComplete: 'Graduation',
@@ -232,13 +232,13 @@ const fi: Record<MessageKey, string> = {
   tutorialOwlLogic:
     'Toisessa luvussa käydään yksitellen läpi eri konnektiivien ( → ∧ ∨ ¬ ) pudottamisen seuraamuksia eri tilanteissa. Mikäli haluat hypätä suoraan syvään päätyyn, osaat jo kaikki siirrot — voit siirtyä pelaamaan varsinaista peliä vaikka heti.',
   tutorialOwlClose:
-    'Päättelypuun oksa on suljettavissa silloin, kun portin ( ⊢ ) kummallakin puolella on sama lause — tällaista tilannetta kutsutaan identiteetiksi. Voit vaihtaa oksaa {branch} painikkeilla ja sulkea valitun oksan {close} painikkeella.',
+    'Päättelypuun oksa on suljettavissa silloin, kun portin ( ⊢ ) kummallakin puolella on sama lause — tällaista tilannetta kutsutaan identiteetiksi.',
   tutorialOwlCloseConstants:
     'Vakiolauseet mahdollistavat joskus oksan sulkemisen yksinään — Falsum ( ⊥ ) ollessaan yksin portin vasemmalla puolella, ja Verum ( ⊤ ) ollessaan yksin portin oikealla puolella.',
   tutorialOwlDrop:
-    'Oksan sisältämät ylimääräiset lauseet on aina pudotettava ennen kuin oksan voi sulkea. Saat ylimääräiset lauseet poistettua valitsemalla pudotettavan lauseen {pick} painikkeilla, ja painamalla sen jälkeen {drop} painiketta toistuvasti, kunnes valittu lause putoaa puusta. Mikäli pudotat oksan sulkemiseen tarvittavan lauseen, voit perua siirtosi painamalla {undo} painiketta.',
+    'Oksan sisältämät ylimääräiset lauseet on aina pudotettava ennen kuin oksan voi sulkea. Mikäli pudotat oksan sulkemiseen tarvittavan lauseen, voit perua siirtosi.',
   tutorialOwlSplit:
-    'Voit pudottaa konnektiivin valitsemalla lauseen {pick} painikkeilla, ja painamalla sen jälkeen {destruct} toistuvasti, kunnes valitun lauseen uloin konnektiivi putoaa puusta. Konjunktion ( ∧ ) pudottaminen portin vasemmalla puolella tai Disjunktion ( ∨ ) pudottaminen portin oikealla puolella ei aiheuta sen kummempia seuraamuksia — osat jäävät paikoilleen.',
+    'Lauseen purkaminen pudottaa sen uloimman konnektiivin puusta. Konjunktion ( ∧ ) pudottaminen portin vasemmalla puolella tai Disjunktion ( ∨ ) pudottaminen portin oikealla puolella ei aiheuta sen kummempia seuraamuksia — osat jäävät paikoilleen.',
   tutorialOwlSideFlip:
     'Negaation ( ¬ ) pudottaminen aiheuttaa jäljelle jäävän lauseen siirtymisen portin toiselle puolelle.',
   tutorialOwlCrossing:
@@ -250,13 +250,13 @@ const fi: Record<MessageKey, string> = {
   tutorialOwlOptimization:
     'Kolmannessa luvussa tutustumme ratkaisujen optimointiin.',
   tutorialOwlClaims:
-    'Voit lisätä valittuun oksaan väittämän painamalla {lemma} painiketta. Valitse lauseen osat {pieces} painikkeilla ja paina lopuksi {confirm} painiketta. Väittämät eivät vaikuta haasteen ratkeavuuteen, mutta ne voivat joskus lyhentää ratkaisua.',
+    'Voit lisätä valittuun oksaan vapaavalintaisen väittämän. Väittämät eivät vaikuta haasteen ratkeavuuteen, mutta ne voivat joskus lyhentää ratkaisua.',
   tutorialOwlSolvability:
     'Neljännessä luvussa pohdimme, millaiset haasteet ovat ratkeavia. Ratkeavuuden tunnistaminen on oleellista, mikäli koitat ratkaista kaoottisia ( 💀 ) haasteita.',
   tutorialOwlUnsolvable:
-    'Loimme tähän tarkoituksella ratkeamattomia haasteita, jotta opit tunnistamaan sellaisen. Voit ohittaa ratkeamattoman haasteen painamalla {skip} painiketta.',
+    'Loimme tähän tarkoituksella ratkeamattomia haasteita, jotta opit tunnistamaan sellaisen. Ratkeamattomaksi toteamasi haasteen voi ohittaa.',
   tutorialOwlConjecture:
-    'Hiekkalaatikossa voit kokeilla ratkaista vapaavalintaisia haasteita. Valitse ensin lauseen osat {pieces} painikkeilla ja paina lopuksi {confirm} painiketta. Virhepainallukset saat peruttua {undo} painikkeella.',
+    'Hiekkalaatikossa voit kokeilla ratkaista vapaavalintaisia haasteita.',
   tutorialSkipped: 'Haaste ohitettu! Sillä ei ollut ratkaisua.',
   tutorialSkippedSolvable:
     'Haaste ohitettu! Sillä olisi sittenkin ollut ratkaisu.',
@@ -370,13 +370,13 @@ const es: Record<MessageKey, string> = {
   tutorialOwlLogic:
     'El segundo capítulo repasa una a una las consecuencias de soltar cada conectivo ( → ∧ ∨ ¬ ) en distintas situaciones. Si prefieres lanzarte a lo hondo, ya conoces todos los movimientos: puedes pasar directamente al juego de verdad.',
   tutorialOwlClose:
-    'Una rama del árbol se puede cerrar cuando a ambos lados de la puerta ( ⊢ ) está la misma oración — esta situación se llama identidad. Puedes cambiar de rama con los botones {branch} y cerrar la rama elegida con el botón {close}.',
+    'Una rama del árbol se puede cerrar cuando a ambos lados de la puerta ( ⊢ ) está la misma oración — esta situación se llama identidad.',
   tutorialOwlCloseConstants:
     'Las oraciones constantes a veces permiten cerrar una rama por sí solas: Falsum ( ⊥ ) cuando está solo a la izquierda de la puerta, y Verum ( ⊤ ) cuando está solo a la derecha.',
   tutorialOwlDrop:
-    'Las oraciones sobrantes de una rama deben soltarse siempre antes de poder cerrarla. Elimínalas eligiendo la oración a soltar con los botones {pick} y pulsando después el botón {drop} repetidamente, hasta que la oración elegida caiga del árbol. Si sueltas una oración necesaria para cerrar la rama, puedes deshacer el movimiento pulsando {undo}.',
+    'Las oraciones sobrantes de una rama deben soltarse siempre antes de poder cerrarla. Si sueltas una oración necesaria para cerrar la rama, puedes deshacer el movimiento.',
   tutorialOwlSplit:
-    'Puedes soltar un conectivo eligiendo una oración con los botones {pick} y pulsando después {destruct} repetidamente, hasta que el conectivo más externo de la oración elegida caiga del árbol. Soltar una Conjunción ( ∧ ) en el lado izquierdo de la puerta, o una Disyunción ( ∨ ) en el derecho, no tiene mayores consecuencias: las piezas se quedan donde estaban.',
+    'Destruir una oración suelta del árbol su conectivo más externo. Soltar una Conjunción ( ∧ ) en el lado izquierdo de la puerta, o una Disyunción ( ∨ ) en el derecho, no tiene mayores consecuencias: las piezas se quedan donde estaban.',
   tutorialOwlSideFlip:
     'Soltar una Negación ( ¬ ) hace que la oración restante pase al otro lado de la puerta.',
   tutorialOwlCrossing:
@@ -388,13 +388,13 @@ const es: Record<MessageKey, string> = {
   tutorialOwlOptimization:
     'El tercer capítulo trata de optimizar las soluciones.',
   tutorialOwlClaims:
-    'Puedes añadir una afirmación a la rama elegida pulsando el botón {lemma}. Elige las partes de la oración con los botones {pieces} y pulsa al final el botón {confirm}. Las afirmaciones nunca afectan a la resolubilidad del desafío, pero a veces pueden acortar la solución.',
+    'Puedes añadir una afirmación de tu elección a la rama elegida. Las afirmaciones nunca afectan a la resolubilidad del desafío, pero a veces pueden acortar la solución.',
   tutorialOwlSolvability:
     'En el cuarto capítulo consideramos qué desafíos tienen solución. Reconocer la resolubilidad es esencial si intentas resolver desafíos caóticos ( 💀 ).',
   tutorialOwlUnsolvable:
-    'Aquí hemos creado a propósito desafíos irresolubles, para que aprendas a reconocerlos. Puedes saltar un desafío irresoluble pulsando el botón {skip}.',
+    'Aquí hemos creado a propósito desafíos irresolubles, para que aprendas a reconocerlos. Un desafío que consideres irresoluble se puede saltar.',
   tutorialOwlConjecture:
-    'En este arenero puedes intentar resolver desafíos de tu propia elección. Elige primero las partes de la oración con los botones {pieces} y pulsa al final el botón {confirm}. Puedes deshacer las pulsaciones erróneas con el botón {undo}.',
+    'En este arenero puedes intentar resolver desafíos de tu propia elección.',
   tutorialSkipped: '¡Desafío saltado! No tenía solución.',
   tutorialSkippedSolvable: '¡Desafío saltado! Sin embargo, sí tenía solución.',
   tutorialComplete: 'Graduación',
@@ -507,13 +507,13 @@ const cs: Record<MessageKey, string> = {
   tutorialOwlLogic:
     'Druhá kapitola probírá jeden po druhém důsledky puštění jednotlivých spojek ( → ∧ ∨ ¬ ) v různých situacích. Chceš-li skočit rovnou do hlubin, všechny tahy už znáš — můžeš přejít ke skutečné hře hned.',
   tutorialOwlClose:
-    'Větev stromu lze zavřít, když na obou stranách brány ( ⊢ ) stojí stejná věta — takové situaci se říká identita. Větev přepneš tlačítky {branch} a vybranou větev zavřeš tlačítkem {close}.',
+    'Větev stromu lze zavřít, když na obou stranách brány ( ⊢ ) stojí stejná věta — takové situaci se říká identita.',
   tutorialOwlCloseConstants:
     'Konstantní věty někdy dokážou zavřít větev samy — Falsum ( ⊥ ), když stojí samo vlevo od brány, a Verum ( ⊤ ), když stojí samo vpravo.',
   tutorialOwlDrop:
-    'Přebytečné věty na větvi je vždy nutné pustit, než ji lze zavřít. Odstraníš je tak, že tlačítky {pick} vybereš větu k puštění a pak opakovaně mačkáš tlačítko {drop}, dokud vybraná věta nespadne ze stromu. Pokud pustíš větu potřebnou k zavření větve, můžeš tah vrátit tlačítkem {undo}.',
+    'Přebytečné věty na větvi je vždy nutné pustit, než ji lze zavřít. Pokud pustíš větu potřebnou k zavření větve, můžeš tah vrátit.',
   tutorialOwlSplit:
-    'Spojku pustíš tak, že tlačítky {pick} vybereš větu a pak opakovaně mačkáš {destruct}, dokud vnější spojka vybrané věty nespadne ze stromu. Puštění Konjunkce ( ∧ ) na levé straně brány nebo Disjunkce ( ∨ ) na pravé nemá žádné zvláštní následky — části zůstávají na místě.',
+    'Zničení věty pustí ze stromu její vnější spojku. Puštění Konjunkce ( ∧ ) na levé straně brány nebo Disjunkce ( ∨ ) na pravé nemá žádné zvláštní následky — části zůstávají na místě.',
   tutorialOwlSideFlip:
     'Puštění Negace ( ¬ ) přesune zbývající větu na druhou stranu brány.',
   tutorialOwlCrossing:
@@ -524,13 +524,13 @@ const cs: Record<MessageKey, string> = {
     'Puštění Implikace ( → ) na levé straně brány větu roztříští: nejsložitější z pravidel spojuje jak rozdělení částí na obě strany brány, tak větvení stromu.',
   tutorialOwlOptimization: 'Třetí kapitola se věnuje optimalizaci řešení.',
   tutorialOwlClaims:
-    'Na vybranou větev můžeš přidat tvrzení tlačítkem {lemma}. Vyber části věty tlačítky {pieces} a nakonec stiskni tlačítko {confirm}. Tvrzení nikdy neovlivní řešitelnost výzvy, ale někdy mohou řešení zkrátit.',
+    'Na vybranou větev můžeš přidat tvrzení podle vlastní volby. Tvrzení nikdy neovlivní řešitelnost výzvy, ale někdy mohou řešení zkrátit.',
   tutorialOwlSolvability:
     'Ve čtvrté kapitole se zamýšlíme nad tím, jaké výzvy jsou řešitelné. Rozpoznat řešitelnost je zásadní, pokud se pustíš do chaotických ( 💀 ) výzev.',
   tutorialOwlUnsolvable:
-    'Zde jsme záměrně vytvořili neřešitelné výzvy, ať se naučíš takovou rozpoznat. Neřešitelnou výzvu můžeš přeskočit tlačítkem {skip}.',
+    'Zde jsme záměrně vytvořili neřešitelné výzvy, ať se naučíš takovou rozpoznat. Výzvu, kterou uznáš za neřešitelnou, lze přeskočit.',
   tutorialOwlConjecture:
-    'Na tomto pískovišti si můžeš zkusit vyřešit výzvy podle vlastní volby. Nejprve vyber části věty tlačítky {pieces} a nakonec stiskni tlačítko {confirm}. Chybná stisknutí vrátíš tlačítkem {undo}.',
+    'Na tomto pískovišti si můžeš zkusit vyřešit výzvy podle vlastní volby.',
   tutorialSkipped: 'Výzva přeskočena! Neměla řešení.',
   tutorialSkippedSolvable: 'Výzva přeskočena! Řešení ale měla.',
   tutorialComplete: 'Promoce',
@@ -643,13 +643,13 @@ const pl: Record<MessageKey, string> = {
   tutorialOwlLogic:
     'Drugi rozdział omawia po kolei skutki upuszczania poszczególnych spójników ( → ∧ ∨ ¬ ) w różnych sytuacjach. Jeśli wolisz skoczyć na głęboką wodę, znasz już wszystkie ruchy — możesz przejść do właściwej gry od razu.',
   tutorialOwlClose:
-    'Gałąź drzewa można zamknąć, gdy po obu stronach bramy ( ⊢ ) stoi to samo zdanie — taką sytuację nazywamy tożsamością. Gałąź zmieniasz przyciskami {branch}, a wybraną gałąź zamykasz przyciskiem {close}.',
+    'Gałąź drzewa można zamknąć, gdy po obu stronach bramy ( ⊢ ) stoi to samo zdanie — taką sytuację nazywamy tożsamością.',
   tutorialOwlCloseConstants:
     'Zdania stałe czasem pozwalają zamknąć gałąź samodzielnie — Falsum ( ⊥ ), gdy stoi samo po lewej stronie bramy, i Verum ( ⊤ ), gdy stoi samo po prawej.',
   tutorialOwlDrop:
-    'Zbędne zdania na gałęzi trzeba zawsze upuścić, zanim da się ją zamknąć. Usuniesz je, wybierając zdanie do upuszczenia przyciskami {pick}, a następnie naciskając przycisk {drop} wielokrotnie, aż wybrane zdanie spadnie z drzewa. Jeśli upuścisz zdanie potrzebne do zamknięcia gałęzi, możesz cofnąć ruch przyciskiem {undo}.',
+    'Zbędne zdania na gałęzi trzeba zawsze upuścić, zanim da się ją zamknąć. Jeśli upuścisz zdanie potrzebne do zamknięcia gałęzi, możesz cofnąć ruch.',
   tutorialOwlSplit:
-    'Spójnik upuszczasz, wybierając zdanie przyciskami {pick}, a następnie naciskając {destruct} wielokrotnie, aż zewnętrzny spójnik wybranego zdania spadnie z drzewa. Upuszczenie Koniunkcji ( ∧ ) po lewej stronie bramy lub Alternatywy ( ∨ ) po prawej nie ma szczególnych następstw — części zostają na miejscu.',
+    'Zniszczenie zdania upuszcza z drzewa jego zewnętrzny spójnik. Upuszczenie Koniunkcji ( ∧ ) po lewej stronie bramy lub Alternatywy ( ∨ ) po prawej nie ma szczególnych następstw — części zostają na miejscu.',
   tutorialOwlSideFlip:
     'Upuszczenie Negacji ( ¬ ) przenosi pozostałe zdanie na drugą stronę bramy.',
   tutorialOwlCrossing:
@@ -660,13 +660,13 @@ const pl: Record<MessageKey, string> = {
     'Upuszczenie Implikacji ( → ) po lewej stronie bramy rozbija zdanie: najbardziej złożona z reguł łączy rozdzielenie części na obie strony bramy i rozgałęzienie drzewa.',
   tutorialOwlOptimization: 'Trzeci rozdział dotyczy optymalizacji rozwiązań.',
   tutorialOwlClaims:
-    'Do wybranej gałęzi możesz dodać twierdzenie przyciskiem {lemma}. Wybierz części zdania przyciskami {pieces}, a na końcu naciśnij przycisk {confirm}. Twierdzenia nigdy nie wpływają na rozwiązywalność wyzwania, ale czasem mogą skrócić rozwiązanie.',
+    'Do wybranej gałęzi możesz dodać twierdzenie własnego wyboru. Twierdzenia nigdy nie wpływają na rozwiązywalność wyzwania, ale czasem mogą skrócić rozwiązanie.',
   tutorialOwlSolvability:
     'W czwartym rozdziale zastanawiamy się, jakie wyzwania da się rozwiązać. Rozpoznawanie rozwiązywalności jest istotne, jeśli mierzysz się z chaotycznymi ( 💀 ) wyzwaniami.',
   tutorialOwlUnsolvable:
-    'Umieściliśmy tu celowo nierozwiązywalne wyzwania, dzięki czemu nauczysz się je rozpoznawać. Nierozwiązywalne wyzwanie możesz pominąć przyciskiem {skip}.',
+    'Umieściliśmy tu celowo nierozwiązywalne wyzwania, dzięki czemu nauczysz się je rozpoznawać. Wyzwanie, które uznasz za nierozwiązywalne, można pominąć.',
   tutorialOwlConjecture:
-    'W tej piaskownicy możesz spróbować rozwiązać wyzwania własnego wyboru. Najpierw wybierz części zdania przyciskami {pieces}, a na końcu naciśnij przycisk {confirm}. Błędne naciśnięcia cofniesz przyciskiem {undo}.',
+    'W tej piaskownicy możesz spróbować rozwiązać wyzwania własnego wyboru.',
   tutorialSkipped: 'Wyzwanie pominięte! Nie miało rozwiązania.',
   tutorialSkippedSolvable: 'Wyzwanie pominięte! Miało jednak rozwiązanie.',
   tutorialComplete: 'Zakończenie',

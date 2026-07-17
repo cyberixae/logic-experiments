@@ -53,6 +53,8 @@ import {
   activePadKeyMap,
   getActionHint,
   getActionHintPure,
+  gazeKeyHint,
+  gazePadHint,
   isGazeModeActive,
   markGamepadInput,
   onGamepadConnected,
@@ -154,6 +156,27 @@ export const createButton = (
     el.appendChild(shortSpan)
   }
   return el
+}
+
+// The single-player control bar doubles as the keyboard/gamepad controls
+// legend: with pointer/touch active the bar is the clickable button row, and
+// on the other devices the buttons drop their pressable chrome (see lk.css)
+// while these chips reveal each verb's gaze-family binding in the same
+// reserved slot. Latent spans per device keep pointer↔keyboard flips
+// render-free (see setActiveInput), and a rebind flows through the live
+// keymap with no copy changes.
+export const addLegendBind = (btn: HTMLElement, action: Action): void => {
+  const binds: ReadonlyArray<['keyboard' | 'gamepad', string | undefined]> = [
+    ['keyboard', gazeKeyHint(action)],
+    ['gamepad', gazePadHint(action)],
+  ]
+  for (const [device, label] of binds) {
+    if (label === undefined) continue
+    const chip = document.createElement('span')
+    chip.setAttribute('class', `legend-bind for-${device}`)
+    chip.textContent = label
+    btn.appendChild(chip)
+  }
 }
 
 let rulesVisible = false
@@ -970,6 +993,7 @@ export const createBench = (
   if (onSkip !== undefined) {
     const skipBtn = createButton(t('skip'), false, onSkip)
     skipBtn.classList.add('mutating')
+    addLegendBind(skipBtn, 'skip')
     miscGroup.appendChild(skipBtn)
   }
 
@@ -1012,6 +1036,15 @@ export const createBench = (
   gazeWeakeningBtn.classList.add('mutating')
   gazeConnectiveBtn.classList.add('mutating')
   axiomBtn.classList.add('mutating')
+
+  addLegendBind(gazeLeftBtn, 'gazeLeft')
+  addLegendBind(gazeRightBtn, 'gazeRight')
+  addLegendBind(gazeWeakeningBtn, 'gazeWeakening')
+  addLegendBind(gazeConnectiveBtn, 'gazeConnective')
+  addLegendBind(axiomBtn, 'axiom')
+  addLegendBind(lemmaBtn, 'lemma')
+  addLegendBind(prevBranchBtn, 'prevBranch')
+  addLegendBind(nextBranchBtn, 'nextBranch')
 
   const navGroup = makeGroup('controls-nav')
   navGroup.appendChild(prevBranchBtn)

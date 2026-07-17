@@ -39,12 +39,13 @@ const browser = await chromium.launch({
 
 ## Gotchas
 
-- **Keyboard input hides on-screen controls** in single-player:
-  `html.mode-single:not(.input-pointer) .controls` is
-  `visibility: hidden` (lk.css). If a button "exists but isn't
-  visible" after keyboard presses, that's the input-mode feature, not
-  a bug. Click something first (pointer marks input-pointer) or test
-  the keyboard path via `page.keyboard`.
+- **Keyboard/gamepad input turns the control bar into a legend** in
+  single-player: the buttons keep their place but lose their pressable
+  chrome and get `pointer-events: none`, and `.legend-bind` keycap
+  chips appear above the verbs (lk.css). If a button "exists but isn't
+  clickable" after keyboard presses, that's the input-mode feature,
+  not a bug. Click something first (pointer marks input-pointer) or
+  test the keyboard path via `page.keyboard`.
 - Each page load generates a fresh random challenge — assertions must
   not depend on the goal formula.
 - A stray 404 (favicon) appears in the console on load; pre-existing.

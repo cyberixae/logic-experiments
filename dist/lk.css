@@ -312,20 +312,21 @@ html.loading body {
   left: 20px;
 }
 
-/* Single-player (Random/Campaign): the on-screen control bar and topbar */
-/* buttons are the pointer/touch UI. Show them only while pointer/touch is the */
-/* active device; a keyboard or gamepad player uses physical keys/buttons and */
-/* gets a cleaner view. Scoped to .mode-single so Versus is unaffected. */
-/* visibility (not display) so the buttons reserve their space and the layout */
-/* stays put when the active device changes. */
-html.mode-single:not(.input-pointer) .controls:not(:has(.congrabuttons)) {
-  visibility: hidden;
-}
-/* The inline lemma editor bar stays visible on every input device: it is the
-   editor, not an on-screen mirror of physical keys. Revisit for keyboard
-   once the editor grows its own key layer (digit atoms + operator keys). */
-html.mode-single:not(.input-pointer) .controls.lemma-editor {
-  visibility: visible;
+/* Single-player: the control bar doubles as the controls legend. With
+   pointer/touch active it is the clickable button row; when a keyboard or
+   gamepad is the active device the same bar drops its pressable chrome and
+   reveals each verb's gaze-family binding via .legend-bind chips — same
+   slot, same verbs, same disabled-state dimming, so the layout never shifts
+   on a device flip. The lemma editor bar is exempt: it is the editor
+   itself, interactive on every device. Congrats buttons likewise stay
+   interactive. Scoped to .mode-single so Versus is unaffected. */
+html.mode-single:not(.input-pointer)
+  .controls:not(:has(.congrabuttons)):not(.lemma-editor)
+  .button {
+  pointer-events: none;
+  background-color: transparent;
+  border-color: transparent;
+  color: inherit;
 }
 html.mode-single:not(.input-pointer) .bench-topbar .quiz-menu-btn,
 html.mode-single:not(.input-pointer) .bench-topbar .bench-rules-btn,
@@ -336,6 +337,7 @@ html.mode-single:not(.input-pointer) .bench-topbar .bench-zoom {
 .button {
   user-select: none;
   cursor: pointer;
+  position: relative;
   background-color: #fff8;
   border: 3px solid #000;
   border-radius: 10px;
@@ -366,6 +368,30 @@ html.mode-single:not(.input-pointer) .bench-topbar .bench-zoom {
 .button.disabled {
   cursor: default;
   opacity: 0.5;
+}
+/* Key-legend chips inside control-bar buttons: latent while pointer/touch is
+   active (the buttons are self-evident), revealed per device otherwise —
+   keyboard shows key labels, gamepad shows pad glyphs. Absolutely positioned
+   above the verb so the chips never participate in layout: a device flip
+   swaps chrome for chips without reflowing the bar. Keycap look. */
+.legend-bind {
+  display: none;
+  position: absolute;
+  top: -0.7em;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.75em;
+  line-height: 1.3;
+  border: 1px solid #964;
+  border-radius: 5px;
+  padding: 0 0.3em;
+  background-color: #ffeedd;
+  color: #000;
+  white-space: nowrap;
+}
+html.mode-single.input-keyboard .controls .legend-bind.for-keyboard,
+html.mode-single.input-gamepad .controls .legend-bind.for-gamepad {
+  display: inline-block;
 }
 .rule.hint {
   user-select: text;
@@ -1528,29 +1554,6 @@ html.mode-single:not(.input-pointer) .bench-topbar .bench-zoom {
 }
 .conjecture-preview {
   font-size: 1.6em;
-}
-/* Injected bind labels render as chips. Each chip exists once per device
-   as a latent variant; the html input-* class shows the one matching the
-   device the learner last touched, so switching device swaps the labels
-   without a re-render. Key / pad glyphs get a keycap look, button words a
-   button look. */
-.owl-bind {
-  display: none;
-  border: 1px solid #964;
-  border-radius: 5px;
-  padding: 0 0.3em;
-  background-color: #ffeedd;
-  white-space: nowrap;
-}
-html.input-pointer .owl-bind.for-pointer,
-html.input-keyboard .owl-bind.for-keyboard,
-html.input-gamepad .owl-bind.for-gamepad {
-  display: inline-block;
-}
-.owl-bind.for-pointer {
-  border-radius: 999px;
-  background-color: #fff;
-  box-shadow: 0 1px 0 #964;
 }
 .tutor-owl-face {
   font-size: 3.5em;
