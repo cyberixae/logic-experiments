@@ -1494,9 +1494,13 @@ html.mode-single:not(.input-pointer) .bench-topbar .bench-zoom {
   }
 }
 /* While the owl plays a presolved foundation, the board ignores the
-   pointer; keyboard and gamepad actions are swallowed in the dispatch. */
+   pointer; keyboard and gamepad actions are swallowed in the dispatch.
+   The topbar chrome (menu, zoom) is not gameplay — it stays live. */
 .tutorial-presolving .bench {
   pointer-events: none;
+}
+.tutorial-presolving .bench .bench-topbar {
+  pointer-events: auto;
 }
 /* Skip completion screen: the solved screen's counterpart for skipped
    (unsolvable) challenges — a confirmation line above the same topic
