@@ -127,7 +127,7 @@ const en = {
   tutorialDemoGrow: 'Each move grows the tree.',
   tutorialDemoClosed: 'This branch is closed — it cannot grow.',
   tutorialDemoOther: "Let's close the other branch.",
-  tutorialDemoDone: 'The tree is done. Now you try!',
+  tutorialDemoDone: "The tree is done. Let's solve the next one together!",
   tutorialStart: 'Start',
   tutorialOwlDone:
     'The tutorial is complete! You now know everything you need to play. Have fun!',
@@ -264,7 +264,7 @@ const fi: Record<MessageKey, string> = {
   tutorialDemoGrow: 'Jokainen siirto kasvattaa puuta.',
   tutorialDemoClosed: 'Tämä oksa on suljettu — se ei voi enää kasvaa.',
   tutorialDemoOther: 'Suljetaan toinenkin oksa.',
-  tutorialDemoDone: 'Puu on valmis. Kokeile itse!',
+  tutorialDemoDone: 'Puu on valmis. Ratkaistaan seuraava yhdessä!',
   tutorialStart: 'Aloita',
   tutorialOwlDone:
     'Opastus on suoritettu! Tiedät nyt kaiken, mitä pelaamiseen tarvitaan. Pidä hauskaa!',
@@ -400,7 +400,7 @@ const es: Record<MessageKey, string> = {
   tutorialDemoGrow: 'Cada movimiento hace crecer el árbol.',
   tutorialDemoClosed: 'Esta rama está cerrada: ya no puede crecer.',
   tutorialDemoOther: 'Cerremos la otra rama.',
-  tutorialDemoDone: 'El árbol está listo. ¡Inténtalo tú!',
+  tutorialDemoDone: 'El árbol está listo. ¡Resolvamos el siguiente juntos!',
   tutorialStart: 'Empezar',
   tutorialOwlDone:
     '¡Tutorial completado! Ya sabes todo lo que necesitas para jugar. ¡Diviértete!',
@@ -535,7 +535,7 @@ const cs: Record<MessageKey, string> = {
   tutorialDemoGrow: 'Každým tahem strom roste.',
   tutorialDemoClosed: 'Tato větev je uzavřená — už nemůže růst.',
   tutorialDemoOther: 'Zavřeme i druhou větev.',
-  tutorialDemoDone: 'Strom je hotový. Teď zkus ty!',
+  tutorialDemoDone: 'Strom je hotový. Další vyřešíme spolu!',
   tutorialStart: 'Začít',
   tutorialOwlDone:
     'Návod je u konce! Teď víš vše, co ke hraní potřebuješ. Bav se!',
@@ -670,7 +670,7 @@ const pl: Record<MessageKey, string> = {
   tutorialDemoGrow: 'Z każdym ruchem drzewo rośnie.',
   tutorialDemoClosed: 'Ta gałąź jest zamknięta — już nie urośnie.',
   tutorialDemoOther: 'Zamknijmy drugą gałąź.',
-  tutorialDemoDone: 'Drzewo jest gotowe. Teraz ty!',
+  tutorialDemoDone: 'Drzewo jest gotowe. Rozwiążmy następne razem!',
   tutorialStart: 'Rozpocznij',
   tutorialOwlDone:
     'Samouczek ukończony! Wiesz już wszystko, czego potrzeba do gry. Miłej zabawy!',
