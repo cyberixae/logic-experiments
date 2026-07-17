@@ -104,13 +104,13 @@ const en = {
   tutorialOwlSplit:
     'Destructing a sentence removes its outermost connective ( → ∧ ∨ ¬ ) from the tree. Where the remaining parts end up depends on the situation. More about that in the next chapter.',
   tutorialOwlSideFlip:
-    'Dropping a Negation ( ¬ ) makes the remaining sentence move to the other side of the gate.',
+    'Destructing a Negation ( ¬ ) makes the remaining sentence move to the other side of the gate.',
   tutorialOwlCrossing:
-    'Dropping an Implication ( → ) on the right side of the gate divides its parts across the two sides of the gate.',
+    'Destructing an Implication ( → ) on the right side of the gate divides its parts across the two sides of the gate.',
   tutorialOwlBranching:
-    'Dropping a Conjunction ( ∧ ) on the right side of the gate, or a Disjunction ( ∨ ) on the left, makes the tree branch.',
+    'Destructing a Conjunction ( ∧ ) on the right side of the gate, or a Disjunction ( ∨ ) on the left, makes the tree branch.',
   tutorialOwlBranchingCrossing:
-    'Dropping an Implication ( → ) on the left side of the gate shatters the sentence: the most intricate of the rules combines both the parts dividing across the gate and the tree branching.',
+    'Destructing an Implication ( → ) on the left side of the gate shatters the sentence: the most intricate of the rules combines both the parts dividing across the gate and the tree branching.',
   tutorialOwlOptimization: 'The third chapter is about optimizing solutions.',
   tutorialOwlClaims:
     'You can add a claim of your own choosing to the selected branch. Claims never affect whether a challenge can be solved, but they can sometimes shorten the solution.',
@@ -240,13 +240,13 @@ const fi: Record<MessageKey, string> = {
   tutorialOwlSplit:
     'Lauseen purkaminen irrottaa sen uloimman konnektiivin ( → ∧ ∨ ¬ ) puusta. Jäljelle jäävien osien sijoittuminen riippuu tilanteesta. Lisää siitä seuraavassa luvussa.',
   tutorialOwlSideFlip:
-    'Negaation ( ¬ ) pudottaminen aiheuttaa jäljelle jäävän lauseen siirtymisen portin toiselle puolelle.',
+    'Negaation ( ¬ ) purkaminen aiheuttaa jäljelle jäävän lauseen siirtymisen portin toiselle puolelle.',
   tutorialOwlCrossing:
-    'Implikaation ( → ) pudottaminen portin oikealta puolelta aiheuttaa lauseen osien jakautumisen kahdelle puolelle porttia.',
+    'Implikaation ( → ) purkaminen portin oikealta puolelta aiheuttaa lauseen osien jakautumisen kahdelle puolelle porttia.',
   tutorialOwlBranching:
-    'Konjunktion ( ∧ ) pudottaminen portin oikealla puolella tai Disjunktion ( ∨ ) pudottaminen portin vasemmalla puolella aiheuttaa puun haarautumisen.',
+    'Konjunktion ( ∧ ) purkaminen portin oikealla puolella tai Disjunktion ( ∨ ) purkaminen portin vasemmalla puolella aiheuttaa puun haarautumisen.',
   tutorialOwlBranchingCrossing:
-    'Implikaation ( → ) pudottaminen portin vasemmalta puolelta sirpaloittaa lauseen: säännöistä monimutkaisin yhdistää sekä osien jakautumisen portin eri puolille että puun haarautumisen.',
+    'Implikaation ( → ) purkaminen portin vasemmalta puolelta sirpaloittaa lauseen: säännöistä monimutkaisin yhdistää sekä osien jakautumisen portin eri puolille että puun haarautumisen.',
   tutorialOwlOptimization:
     'Kolmannessa luvussa tutustumme ratkaisujen optimointiin.',
   tutorialOwlClaims:
@@ -378,13 +378,13 @@ const es: Record<MessageKey, string> = {
   tutorialOwlSplit:
     'Destruir una oración desprende del árbol su conectivo más externo ( → ∧ ∨ ¬ ). Dónde acaban las partes restantes depende de la situación. Más sobre eso en el siguiente capítulo.',
   tutorialOwlSideFlip:
-    'Soltar una Negación ( ¬ ) hace que la oración restante pase al otro lado de la puerta.',
+    'Destruir una Negación ( ¬ ) hace que la oración restante pase al otro lado de la puerta.',
   tutorialOwlCrossing:
-    'Soltar una Implicación ( → ) en el lado derecho de la puerta reparte sus partes entre los dos lados de la puerta.',
+    'Destruir una Implicación ( → ) en el lado derecho de la puerta reparte sus partes entre los dos lados de la puerta.',
   tutorialOwlBranching:
-    'Soltar una Conjunción ( ∧ ) en el lado derecho de la puerta, o una Disyunción ( ∨ ) en el izquierdo, ramifica el árbol.',
+    'Destruir una Conjunción ( ∧ ) en el lado derecho de la puerta, o una Disyunción ( ∨ ) en el izquierdo, ramifica el árbol.',
   tutorialOwlBranchingCrossing:
-    'Soltar una Implicación ( → ) en el lado izquierdo de la puerta fragmenta la oración: la regla más compleja combina el reparto de las partes entre ambos lados y la ramificación del árbol.',
+    'Destruir una Implicación ( → ) en el lado izquierdo de la puerta fragmenta la oración: la regla más compleja combina el reparto de las partes entre ambos lados y la ramificación del árbol.',
   tutorialOwlOptimization:
     'El tercer capítulo trata de optimizar las soluciones.',
   tutorialOwlClaims:
@@ -515,13 +515,13 @@ const cs: Record<MessageKey, string> = {
   tutorialOwlSplit:
     'Zničení věty odlomí ze stromu její vnější spojku ( → ∧ ∨ ¬ ). Kam se zbývající části umístí, závisí na situaci. Více o tom v další kapitole.',
   tutorialOwlSideFlip:
-    'Puštění Negace ( ¬ ) přesune zbývající větu na druhou stranu brány.',
+    'Zničení Negace ( ¬ ) přesune zbývající větu na druhou stranu brány.',
   tutorialOwlCrossing:
-    'Puštění Implikace ( → ) na pravé straně brány rozdělí její části na obě strany brány.',
+    'Zničení Implikace ( → ) na pravé straně brány rozdělí její části na obě strany brány.',
   tutorialOwlBranching:
-    'Puštění Konjunkce ( ∧ ) na pravé straně brány nebo Disjunkce ( ∨ ) na levé rozvětví strom.',
+    'Zničení Konjunkce ( ∧ ) na pravé straně brány nebo Disjunkce ( ∨ ) na levé rozvětví strom.',
   tutorialOwlBranchingCrossing:
-    'Puštění Implikace ( → ) na levé straně brány větu roztříští: nejsložitější z pravidel spojuje jak rozdělení částí na obě strany brány, tak větvení stromu.',
+    'Zničení Implikace ( → ) na levé straně brány větu roztříští: nejsložitější z pravidel spojuje jak rozdělení částí na obě strany brány, tak větvení stromu.',
   tutorialOwlOptimization: 'Třetí kapitola se věnuje optimalizaci řešení.',
   tutorialOwlClaims:
     'Na vybranou větev můžeš přidat tvrzení podle vlastní volby. Tvrzení nikdy neovlivní řešitelnost výzvy, ale někdy mohou řešení zkrátit.',
@@ -651,13 +651,13 @@ const pl: Record<MessageKey, string> = {
   tutorialOwlSplit:
     'Zniszczenie zdania odrywa od drzewa jego zewnętrzny spójnik ( → ∧ ∨ ¬ ). Gdzie trafiają pozostałe części, zależy od sytuacji. Więcej o tym w następnym rozdziale.',
   tutorialOwlSideFlip:
-    'Upuszczenie Negacji ( ¬ ) przenosi pozostałe zdanie na drugą stronę bramy.',
+    'Zniszczenie Negacji ( ¬ ) przenosi pozostałe zdanie na drugą stronę bramy.',
   tutorialOwlCrossing:
-    'Upuszczenie Implikacji ( → ) po prawej stronie bramy rozdziela jej części na obie strony bramy.',
+    'Zniszczenie Implikacji ( → ) po prawej stronie bramy rozdziela jej części na obie strony bramy.',
   tutorialOwlBranching:
-    'Upuszczenie Koniunkcji ( ∧ ) po prawej stronie bramy lub Alternatywy ( ∨ ) po lewej rozgałęzia drzewo.',
+    'Zniszczenie Koniunkcji ( ∧ ) po prawej stronie bramy lub Alternatywy ( ∨ ) po lewej rozgałęzia drzewo.',
   tutorialOwlBranchingCrossing:
-    'Upuszczenie Implikacji ( → ) po lewej stronie bramy rozbija zdanie: najbardziej złożona z reguł łączy rozdzielenie części na obie strony bramy i rozgałęzienie drzewa.',
+    'Zniszczenie Implikacji ( → ) po lewej stronie bramy rozbija zdanie: najbardziej złożona z reguł łączy rozdzielenie części na obie strony bramy i rozgałęzienie drzewa.',
   tutorialOwlOptimization: 'Trzeci rozdział dotyczy optymalizacji rozwiązań.',
   tutorialOwlClaims:
     'Do wybranej gałęzi możesz dodać twierdzenie własnego wyboru. Twierdzenia nigdy nie wpływają na rozwiązywalność wyzwania, ale czasem mogą skrócić rozwiązanie.',
