@@ -1,4 +1,4 @@
-import { undo } from '../interactive/event'
+import { Event, undo } from '../interactive/event'
 import { Workspace } from '../interactive/workspace'
 import { Action } from '../interactive/action'
 import {
@@ -10,6 +10,7 @@ import {
   createButton,
   createDispatch,
   createPausePopup,
+  createPlayArea,
   markKeyboardInput,
   markPointerInput,
   qwertyKeyMap,
@@ -33,12 +34,14 @@ import { MessageKey, t } from './i18n'
 import { getActionHint, gazeKeyHint, gazePadHint } from './input-mode'
 import {
   beatAt,
+  generateDemoChallenge,
   stopAt,
   tutorialCurriculum,
   tutorialStops,
   TutorialBeat,
   TutorialChapter,
 } from '../random/tutorial'
+import { linearize } from '../npc/proof-walker'
 import { rules as rkRules } from '../systems/rk'
 
 // The tutorial: a single-board, untimed mode sourcing clamped practice
@@ -108,6 +111,28 @@ const owlBeatKey: ReadonlyArray<MessageKey> = [
   'tutorialOwlUnsolvable',
   'tutorialOwlConjecture',
 ]
+// The welcome demo: before anything is asked of the player, the owl solves
+// one fixed exemplar on the welcome page — the whole game in one look: a
+// sequent, moves growing it into a tree, a branch closing, the tree
+// finishing. The board is watch-only, and the owl's narration advances by
+// phase rather than by move, so the player reads four short lines instead
+// of a move list. The demo loops until the player moves on.
+type DemoPhase = 'sequent' | 'grow' | 'closed' | 'done'
+const demoPhaseKey: Record<DemoPhase, MessageKey> = {
+  sequent: 'tutorialDemoSequent',
+  grow: 'tutorialDemoGrow',
+  closed: 'tutorialDemoClosed',
+  done: 'tutorialDemoDone',
+}
+const DEMO_MOVE_MS = 1300
+// Dwell after a narration change, so the new line gets read before the
+// next move draws the eye back to the board.
+const DEMO_PHASE_MS = 3600
+// Dwell on the finished tree: the solve celebration sweep plays here.
+const DEMO_DONE_MS = 8000
+const isClosingEvent = (ev: Event): boolean =>
+  ev.kind === 'reverse0' && (ev.rev === 'i' || ev.rev === 'f' || ev.rev === 'v')
+
 type OwlDevice = 'pointer' | 'keyboard' | 'gamepad'
 const owlDevices: ReadonlyArray<OwlDevice> = ['pointer', 'keyboard', 'gamepad']
 const owlBindLabels = (device: OwlDevice): Map<string, string> => {
@@ -203,6 +228,72 @@ export const mountTutorial = (
     ...createBenchCtx(false, true, false, false),
     getActionHint,
     toggleRulesVisible: () => {},
+  }
+
+  // Welcome-demo state: the owl's board, the remaining moves of its solve,
+  // and the narration phase. Lives only while the welcome page is showing.
+  const onWelcome = (): boolean => stopIdx === 0
+  let demoWs: AnyWorkspace | null = null
+  let demoQueue: ReadonlyArray<Event> = []
+  let demoPhase: DemoPhase = 'sequent'
+  let demoTimer: number | null = null
+  // The demo board's own zoom/scroll state, independent of the beat board's.
+  const demoCtx: BenchCtx = {
+    ...createBenchCtx(false, true, false, false),
+    getActionHint,
+    toggleRulesVisible: () => {},
+  }
+
+  const scheduleDemo = (ms: number): void => {
+    if (demoTimer !== null) window.clearTimeout(demoTimer)
+    demoTimer = window.setTimeout(() => demoStep(), ms)
+  }
+  const startDemo = (): void => {
+    const challenge = generateDemoChallenge().challenge
+    const solution = challenge.solution
+    demoWs = new Workspace({ challenge })
+    demoQueue =
+      solution === undefined ? [] : linearize(solution, { shuffle: false })
+    demoPhase = 'sequent'
+  }
+  const stopDemo = (): void => {
+    if (demoTimer !== null) window.clearTimeout(demoTimer)
+    demoTimer = null
+    demoWs = null
+  }
+  const demoStep = (): void => {
+    demoTimer = null
+    if (!onWelcome() || demoWs === null) return
+    // Hold still while the pause menu covers the page.
+    if (paused) {
+      scheduleDemo(DEMO_MOVE_MS)
+      return
+    }
+    const ev = demoQueue[0]
+    if (demoWs.isSolved() || ev === undefined) {
+      startDemo()
+      rerender()
+      scheduleDemo(DEMO_PHASE_MS)
+      return
+    }
+    demoQueue = demoQueue.slice(1)
+    demoWs.applyEvent(ev)
+    let dwell = DEMO_MOVE_MS
+    if (demoPhase === 'sequent') {
+      demoPhase = 'grow'
+      dwell = DEMO_PHASE_MS
+    }
+    if (isClosingEvent(ev)) {
+      if (demoWs.isSolved()) {
+        demoPhase = 'done'
+        dwell = DEMO_DONE_MS
+      } else if (demoPhase === 'grow') {
+        demoPhase = 'closed'
+        dwell = DEMO_PHASE_MS
+      }
+    }
+    rerender()
+    scheduleDemo(dwell)
   }
 
   let paused = false
@@ -325,6 +416,7 @@ export const mountTutorial = (
     const clamped = Math.max(0, Math.min(target, tutorialStops.length - 1))
     if (clamped === stopIdx) return
     stopIdx = clamped
+    if (!onWelcome()) stopDemo()
     const stop = stopAt(stopIdx)
     rerootAtBeat(stop.kind === 'beat' ? stop.beatIdx : beatForStop(stopIdx))
     syncUrl()
@@ -376,6 +468,21 @@ export const mountTutorial = (
   const buildIntroPage = (): HTMLElement => {
     const page = document.createElement('div')
     page.setAttribute('class', 'tutorial-intro')
+    // The welcome page carries the owl's demo above the Start button. The
+    // demo (re)starts whenever the page is entered without one running.
+    if (onWelcome()) {
+      page.classList.add('tutorial-welcome')
+      if (demoWs === null) {
+        startDemo()
+        scheduleDemo(DEMO_PHASE_MS)
+      }
+      if (demoWs !== null) {
+        const demo = document.createElement('div')
+        demo.setAttribute('class', 'tutorial-demo')
+        demo.appendChild(createPlayArea(demoWs, demoCtx))
+        page.appendChild(demo)
+      }
+    }
     const cells: CursorCell[] = []
     const add = (label: string, activate: () => void) => {
       const el = createButton(label, false, activate)
@@ -458,13 +565,15 @@ export const mountTutorial = (
     owl.setAttribute('class', 'tutor-owl')
     const bubble = document.createElement('div')
     bubble.setAttribute('class', 'tutor-owl-bubble')
-    // Chapter intro pages carry the chapter's framing; beats carry only
-    // their own lesson (the intro page exists so the framing text doesn't
-    // haunt every beat).
+    // The welcome page narrates the demo phase by phase; other chapter
+    // intro pages carry the chapter's framing; beats carry only their own
+    // lesson (the intro page exists so the framing text doesn't haunt
+    // every beat).
     const stop = stopAt(stopIdx)
     const beatKey = stop.kind === 'beat' ? owlBeatKey[stop.beatIdx] : undefined
-    const paragraphs =
-      stop.kind === 'intro'
+    const paragraphs = onWelcome()
+      ? [t(demoPhaseKey[demoPhase])]
+      : stop.kind === 'intro'
         ? [t(owlChapterKey[stop.chapter])]
         : beatKey === undefined
           ? []
@@ -871,6 +980,7 @@ export const mountTutorial = (
 
   return {
     cleanup: () => {
+      stopDemo()
       document.documentElement.classList.remove('mode-single')
       document.removeEventListener('keydown', handleKey)
       document.removeEventListener('pointerdown', markPointerInput)

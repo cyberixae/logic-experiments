@@ -1460,6 +1460,35 @@ html.mode-single:not(.input-pointer) .bench-topbar .bench-zoom {
   justify-content: center;
   gap: 1em;
 }
+/* Welcome page: the owl solves a fixed exemplar before anything is asked
+   of the player. The board is watch-only — pointer events off — and fills
+   the space above the Start button. */
+.tutorial-welcome {
+  flex-direction: column;
+  padding-bottom: 2em;
+}
+.tutorial-demo {
+  pointer-events: none;
+  align-self: stretch;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+.tutorial-demo .playarea {
+  flex: 1;
+  padding: 2em 4em;
+  scroll-padding: 2em 4em;
+}
+/* On small screens the demo tree must stay whole in view — the player
+   cannot pan a watch-only board, and the narration points at branches. */
+@media (max-width: 600px) {
+  .tutorial-demo .playarea {
+    --base-tree-zoom: 0.4;
+    padding: 1em 0.5em 8em 0.5em;
+    scroll-padding: 1em 0.5em 8em 0.5em;
+  }
+}
 /* Skip completion screen: the solved screen's counterpart for skipped
    (unsolvable) challenges — a confirmation line above the same topic
    navigation row. */

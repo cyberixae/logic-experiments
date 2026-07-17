@@ -319,6 +319,23 @@ export const generateSequentChallenge = (notch: Notch): ChallengeResult => {
   return fallbackChallenge(notch)
 }
 
+// --- Welcome demo: the owl's opening solve --------------------------------
+
+// The fixed exemplar the owl solves on the welcome page. Authored, not
+// sampled: the owl's narration phases sync to the moves, so the demo must
+// tell the same little story every time — a destruct, a branch, then a
+// drop and a close on each side. Brute search on a fixed goal is
+// deterministic, so the proof needs no hand encoding.
+const DEMO_GOAL: AnySequent = sequent(
+  [prop.conjunction(P, Q)],
+  [prop.conjunction(Q, P)],
+)
+
+export const generateDemoChallenge = (): ChallengeResult => {
+  const [solution] = brute({ goal: DEMO_GOAL, rules: tutorialRules })
+  return asResult(solution, 0)
+}
+
 // --- Basics chapter: presolved challenges -------------------------------
 
 const frontierLeaves = (start: AnyDerivation): ReadonlyArray<AnySequent> =>

@@ -334,7 +334,7 @@ const runProofCheckSweep = (tree: HTMLElement): void => {
 let lastScrollTop = 0
 let lastScrollLeft = 0
 
-const createPlayArea = (
+export const createPlayArea = (
   workspace: AnyWorkspace,
   ctx: BenchCtx,
   draftPremises: DraftPremises | null = null,

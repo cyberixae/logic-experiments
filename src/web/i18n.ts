@@ -123,6 +123,13 @@ const en = {
   tutorialSkipped: 'Challenge skipped! It had no solution.',
   tutorialSkippedSolvable: 'Challenge skipped! It did have a solution, though.',
   tutorialComplete: 'Graduation',
+  tutorialDemoSequent:
+    'Welcome to LK! Let me show you one challenge first. This here is a sequent.',
+  tutorialDemoGrow: 'Each move performed on a sequent grows the tree.',
+  tutorialDemoClosed:
+    'This branch is now closed — it has no sequent, so it can never grow again.',
+  tutorialDemoDone:
+    'The whole tree is done: no branch left that can grow. The challenge is solved! Ready to try it yourself?',
   tutorialStart: 'Start',
   tutorialOwlDone:
     'The tutorial is complete! You now know everything you need to play. Have fun!',
@@ -255,6 +262,14 @@ const fi: Record<MessageKey, string> = {
   tutorialSkippedSolvable:
     'Haaste ohitettu! Sillä olisi sittenkin ollut ratkaisu.',
   tutorialComplete: 'Valmistujaiset',
+  tutorialDemoSequent:
+    'Tervetuloa pelaamaan LK:ta! Katso ensin, kun ratkaisen yhden haasteen. Tämä on sekventti.',
+  tutorialDemoGrow:
+    'Jokainen sekventtiin tehty siirto kasvattaa päättelypuuta.',
+  tutorialDemoClosed:
+    'Tämä oksa on nyt suljettu — siinä ei ole enää sekventtiä, joten se ei voi enää kasvaa.',
+  tutorialDemoDone:
+    'Koko puu on valmis: yksikään oksa ei voi enää kasvaa. Haaste on ratkaistu! Kokeile seuraavaksi itse.',
   tutorialStart: 'Aloita',
   tutorialOwlDone:
     'Opastus on suoritettu! Tiedät nyt kaiken, mitä pelaamiseen tarvitaan. Pidä hauskaa!',
@@ -386,6 +401,14 @@ const es: Record<MessageKey, string> = {
   tutorialSkipped: '¡Desafío saltado! No tenía solución.',
   tutorialSkippedSolvable: '¡Desafío saltado! Sin embargo, sí tenía solución.',
   tutorialComplete: 'Graduación',
+  tutorialDemoSequent:
+    '¡Bienvenido a LK! Primero mira cómo resuelvo un desafío. Esto es un secuente.',
+  tutorialDemoGrow:
+    'Cada movimiento realizado sobre un secuente hace crecer el árbol.',
+  tutorialDemoClosed:
+    'Esta rama está cerrada: ya no tiene secuente, así que no puede crecer más.',
+  tutorialDemoDone:
+    'El árbol está terminado: ninguna rama puede crecer. ¡El desafío está resuelto! ¿Quieres intentarlo?',
   tutorialStart: 'Empezar',
   tutorialOwlDone:
     '¡Tutorial completado! Ya sabes todo lo que necesitas para jugar. ¡Diviértete!',
@@ -516,6 +539,13 @@ const cs: Record<MessageKey, string> = {
   tutorialSkipped: 'Výzva přeskočena! Neměla řešení.',
   tutorialSkippedSolvable: 'Výzva přeskočena! Řešení ale měla.',
   tutorialComplete: 'Promoce',
+  tutorialDemoSequent:
+    'Vítej ve hře LK! Nejdřív se podívej, jak vyřeším jednu výzvu. Tohle je sekvent.',
+  tutorialDemoGrow: 'Každý tah provedený na sekventu nechá strom vyrůst.',
+  tutorialDemoClosed:
+    'Tato větev je teď uzavřená — nemá už žádný sekvent, takže dál růst nemůže.',
+  tutorialDemoDone:
+    'Celý strom je hotový: žádná větev už nemůže růst. Výzva je vyřešena! Zkusíš to teď sám?',
   tutorialStart: 'Začít',
   tutorialOwlDone:
     'Návod je u konce! Teď víš vše, co ke hraní potřebuješ. Bav se!',
@@ -646,6 +676,14 @@ const pl: Record<MessageKey, string> = {
   tutorialSkipped: 'Wyzwanie pominięte! Nie miało rozwiązania.',
   tutorialSkippedSolvable: 'Wyzwanie pominięte! Miało jednak rozwiązanie.',
   tutorialComplete: 'Zakończenie',
+  tutorialDemoSequent:
+    'Witaj w LK! Najpierw zobacz, jak rozwiązuję jedno wyzwanie. To jest sekwent.',
+  tutorialDemoGrow:
+    'Każdy ruch wykonany na sekwencie sprawia, że drzewo rośnie.',
+  tutorialDemoClosed:
+    'Ta gałąź jest już zamknięta — nie ma w niej sekwentu, więc nie może dalej rosnąć.',
+  tutorialDemoDone:
+    'Całe drzewo jest gotowe: żadna gałąź nie może już rosnąć. Wyzwanie rozwiązane! Teraz twoja kolej.',
   tutorialStart: 'Rozpocznij',
   tutorialOwlDone:
     'Samouczek ukończony! Wiesz już wszystko, czego potrzeba do gry. Miłej zabawy!',
