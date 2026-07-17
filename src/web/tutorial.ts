@@ -881,6 +881,14 @@ export const mountTutorial = (
           lemmaSession,
         ),
       )
+      // While the owl lays the foundation, the player's controls wear the
+      // real disabled styling — the dispatch guard and the pointer block
+      // already deaden them; this makes the held state visible.
+      if (presolving) {
+        screen.querySelectorAll('.controls .button').forEach((el) => {
+          el.classList.add('disabled')
+        })
+      }
     }
     screen.appendChild(buildCrumb())
     screen.appendChild(buildOwl())
