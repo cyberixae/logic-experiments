@@ -1,5 +1,5 @@
 import { Event, nextBranch, reverse0, reverse1 } from '../interactive/event'
-import { ProofUsing } from '../model/derivation'
+import { AnyDerivation, ProofUsing } from '../model/derivation'
 import { Prop } from '../model/prop'
 import { RuleId } from '../model/rule'
 import { AnySequent } from '../model/sequent'
@@ -64,5 +64,27 @@ export const linearize = (
   const events: Event[] = []
   const shuffle = opts.shuffle ?? true
   walk(proof, events, shuffle)
+  return events
+}
+
+// Linearize a PARTIAL derivation (a presolved `start` foundation) for paced
+// replay from the bare goal. Unlike a full proof nothing ever closes, so
+// the focus never auto-advances — each open premise leaf emits an explicit
+// nextBranch to move construction onto the next leaf to the right, and the
+// cosmetic trailing hops after the last rule are trimmed. Formula-input
+// rules never appear in presolved foundations (the tutorial excludes cut),
+// so only reverse0 rules are emitted.
+export const linearizeStart = (start: AnyDerivation): Event[] => {
+  const events: Event[] = []
+  const walkStart = (node: AnyDerivation): void => {
+    if (node.kind === 'premise') {
+      events.push(nextBranch())
+      return
+    }
+    if (isReverseId0(node.rule)) events.push(reverse0(node.rule))
+    node.deps.forEach(walkStart)
+  }
+  walkStart(start)
+  while (events[events.length - 1]?.kind === 'nextBranch') events.pop()
   return events
 }

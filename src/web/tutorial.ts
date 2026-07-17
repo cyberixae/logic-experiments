@@ -28,7 +28,7 @@ import type { LemmaEditorSession } from './lemma-editor'
 import { basic } from '../render/print'
 import { conjectureGhost } from '../render/draft'
 import { html } from '../render/segment'
-import { isTautology, sequent } from '../model/sequent'
+import { AnySequent, isTautology, sequent } from '../model/sequent'
 import { MountResult, Navigate } from './types'
 import { MessageKey, t } from './i18n'
 import { getActionHint, gazeKeyHint, gazePadHint } from './input-mode'
@@ -41,7 +41,9 @@ import {
   TutorialBeat,
   TutorialChapter,
 } from '../random/tutorial'
-import { linearize } from '../npc/proof-walker'
+import { linearize, linearizeStart } from '../npc/proof-walker'
+import { Configuration } from '../model/challenge'
+import { AnyDerivation } from '../model/derivation'
 import { rules as rkRules } from '../systems/rk'
 
 // The tutorial: a single-board, untimed mode sourcing clamped practice
@@ -133,6 +135,15 @@ const DEMO_PHASE_MS = 3600
 const DEMO_DONE_MS = 8000
 const isClosingEvent = (ev: Event): boolean =>
   ev.kind === 'reverse0' && (ev.rev === 'i' || ev.rev === 'f' || ev.rev === 'v')
+
+// The presolve animation: on the presolved Basics beats the owl visibly
+// lays the foundation — the board starts at the bare goal, the foundation's
+// moves replay at a brisk pace, and at the handover the board swaps to the
+// real presolved challenge (frozen nodes, undo floor). "Let me help you get
+// started" — the owl is a participant, not a narrator, so the help is
+// played, not told.
+const PRESOLVE_DWELL_MS = 1800
+const PRESOLVE_MOVE_MS = 550
 
 type OwlDevice = 'pointer' | 'keyboard' | 'gamepad'
 const owlDevices: ReadonlyArray<OwlDevice> = ['pointer', 'keyboard', 'gamepad']
@@ -318,6 +329,69 @@ export const mountTutorial = (
     scheduleDemo(dwell)
   }
 
+  // Presolve-animation state: the pending real challenge (with `start`),
+  // the remaining foundation moves, and whether the owl currently holds the
+  // board. Each foundation animates once (tracked by identity); revisiting
+  // a board mid-challenge never replays it.
+  let presolving = false
+  let presolvePending: Configuration<AnySequent> | undefined
+  let presolveQueue: ReadonlyArray<Event> = []
+  let presolveTimer: number | null = null
+  const presolveDone = new WeakSet<AnyDerivation>()
+
+  const schedulePresolve = (ms: number): void => {
+    if (presolveTimer !== null) window.clearTimeout(presolveTimer)
+    presolveTimer = window.setTimeout(() => presolveStep(), ms)
+  }
+  // Skip to the end state: whatever remains unplayed lands at once as the
+  // real presolved board. Called when leaving the beat mid-animation.
+  const cancelPresolve = (): void => {
+    if (presolveTimer !== null) window.clearTimeout(presolveTimer)
+    presolveTimer = null
+    if (presolving && presolvePending !== undefined) {
+      ws = new Workspace({ challenge: presolvePending })
+    }
+    presolving = false
+    presolvePending = undefined
+    presolveQueue = []
+  }
+  const startPresolveIfAny = (): void => {
+    if (onIntro()) return
+    const conf = ws.listConjectures()[0]?.[1]
+    const start = conf?.start
+    if (conf === undefined || start === undefined) return
+    if (presolveDone.has(start)) return
+    presolveDone.add(start)
+    presolvePending = conf
+    presolveQueue = linearizeStart(start)
+    ws = new Workspace({ challenge: { rules: conf.rules, goal: conf.goal } })
+    presolving = true
+    schedulePresolve(PRESOLVE_DWELL_MS)
+  }
+  const presolveStep = (): void => {
+    presolveTimer = null
+    if (!presolving) return
+    if (paused) {
+      schedulePresolve(PRESOLVE_MOVE_MS)
+      return
+    }
+    const ev = presolveQueue[0]
+    if (ev === undefined) {
+      // Handover: the foundation is laid — swap in the real challenge so
+      // the frozen rendering and the undo floor take effect.
+      const pending = presolvePending
+      presolving = false
+      presolvePending = undefined
+      if (pending !== undefined) ws = new Workspace({ challenge: pending })
+      rerender()
+      return
+    }
+    presolveQueue = presolveQueue.slice(1)
+    ws.applyEvent(ev)
+    rerender()
+    schedulePresolve(PRESOLVE_MOVE_MS)
+  }
+
   let paused = false
   let pausePopup: {
     el: HTMLElement
@@ -408,9 +482,13 @@ export const mountTutorial = (
   // beat, a fresh generated board everywhere else. Both the solved screen's
   // One More and the skip screen's continue land here.
   const nextChallenge = (): void => {
+    cancelPresolve()
     skipped = false
     if (onConjecture()) openConjecture()
-    else ws = freshWorkspace()
+    else {
+      ws = freshWorkspace()
+      startPresolveIfAny()
+    }
     rerender()
   }
 
@@ -437,11 +515,13 @@ export const mountTutorial = (
   const jumpToStop = (target: number) => {
     const clamped = Math.max(0, Math.min(target, tutorialStops.length - 1))
     if (clamped === stopIdx) return
+    cancelPresolve()
     stopIdx = clamped
     if (!onWelcome()) stopDemo()
     const stop = stopAt(stopIdx)
     rerootAtBeat(stop.kind === 'beat' ? stop.beatIdx : beatForStop(stopIdx))
     syncUrl()
+    if (stop.kind === 'beat') startPresolveIfAny()
     rerender()
   }
   // Stop index addressing: beat i / a chapter's intro page.
@@ -467,7 +547,7 @@ export const mountTutorial = (
     const el = document.createElement('div')
     el.setAttribute('class', 'controls')
     const canUndo = ws.canUndo()
-    const enabled = canUndo || ctx.isGazeModeActive()
+    const enabled = !presolving && (canUndo || ctx.isGazeModeActive())
     const undoBtn = createButton(t('undo'), !enabled, () => {
       if (canUndo) {
         ws.applyEvent(undo())
@@ -595,11 +675,13 @@ export const mountTutorial = (
     const beatKey = stop.kind === 'beat' ? owlBeatKey[stop.beatIdx] : undefined
     const paragraphs = onWelcome()
       ? [t(demoPhaseKey[demoPhase])]
-      : stop.kind === 'intro'
-        ? [t(owlChapterKey[stop.chapter])]
-        : beatKey === undefined
-          ? []
-          : [t(beatKey)]
+      : presolving
+        ? [t('tutorialOwlPresolve')]
+        : stop.kind === 'intro'
+          ? [t(owlChapterKey[stop.chapter])]
+          : beatKey === undefined
+            ? []
+            : [t(beatKey)]
     for (const text of paragraphs) {
       const para = document.createElement('div')
       para.setAttribute('class', 'tutor-owl-para')
@@ -772,6 +854,7 @@ export const mountTutorial = (
     container.innerHTML = ''
     const screen = document.createElement('div')
     screen.setAttribute('class', 'tutorial-screen')
+    if (presolving) screen.classList.add('tutorial-presolving')
     if (onIntro()) {
       screen.appendChild(buildIntroPage())
     } else if (skipped) {
@@ -909,6 +992,10 @@ export const mountTutorial = (
       setPaused(true)
       return
     }
+    // While the owl lays the foundation the board is briefly the owl's —
+    // gameplay actions wait for the handover (pointer input is blocked by
+    // the tutorial-presolving class).
+    if (presolving) return
     // On a chapter intro page there is no board: arrows drive the topic
     // buttons, axiom presses the focused one (or the default when the
     // cursor is unengaged), and every gameplay action is swallowed so keys
@@ -995,14 +1082,17 @@ export const mountTutorial = (
   const unsubscribeGamepad = subscribeGamepad(rerender)
 
   // A mount that lands directly on a conjecture beat (tutorial_stop URL)
-  // opens with the entry flow, like a beat jump would.
+  // opens with the entry flow, like a beat jump would; landing on a
+  // presolved beat opens with the owl laying the foundation.
   if (onConjecture()) openConjecture()
+  if (!onIntro()) startPresolveIfAny()
 
   rerender()
 
   return {
     cleanup: () => {
       stopDemo()
+      cancelPresolve()
       document.documentElement.classList.remove('mode-single')
       document.removeEventListener('keydown', handleKey)
       document.removeEventListener('pointerdown', markPointerInput)

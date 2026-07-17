@@ -128,6 +128,7 @@ const en = {
   tutorialDemoClosed: 'This branch is closed — it cannot grow.',
   tutorialDemoOther: "Let's close the other branch.",
   tutorialDemoDone: "The tree is done. Let's solve the next one together!",
+  tutorialOwlPresolve: 'Let me help you get started.',
   tutorialStart: 'Start',
   tutorialOwlDone:
     'The tutorial is complete! You now know everything you need to play. Have fun!',
@@ -265,6 +266,7 @@ const fi: Record<MessageKey, string> = {
   tutorialDemoClosed: 'Tämä oksa on suljettu — se ei voi enää kasvaa.',
   tutorialDemoOther: 'Suljetaan toinenkin oksa.',
   tutorialDemoDone: 'Puu on valmis. Ratkaistaan seuraava yhdessä!',
+  tutorialOwlPresolve: 'Autan sinut alkuun.',
   tutorialStart: 'Aloita',
   tutorialOwlDone:
     'Opastus on suoritettu! Tiedät nyt kaiken, mitä pelaamiseen tarvitaan. Pidä hauskaa!',
@@ -401,6 +403,7 @@ const es: Record<MessageKey, string> = {
   tutorialDemoClosed: 'Esta rama está cerrada: ya no puede crecer.',
   tutorialDemoOther: 'Cerremos la otra rama.',
   tutorialDemoDone: 'El árbol está listo. ¡Resolvamos el siguiente juntos!',
+  tutorialOwlPresolve: 'Deja que te ayude a empezar.',
   tutorialStart: 'Empezar',
   tutorialOwlDone:
     '¡Tutorial completado! Ya sabes todo lo que necesitas para jugar. ¡Diviértete!',
@@ -536,6 +539,7 @@ const cs: Record<MessageKey, string> = {
   tutorialDemoClosed: 'Tato větev je uzavřená — už nemůže růst.',
   tutorialDemoOther: 'Zavřeme i druhou větev.',
   tutorialDemoDone: 'Strom je hotový. Další vyřešíme spolu!',
+  tutorialOwlPresolve: 'Pomůžu ti začít.',
   tutorialStart: 'Začít',
   tutorialOwlDone:
     'Návod je u konce! Teď víš vše, co ke hraní potřebuješ. Bav se!',
@@ -671,6 +675,7 @@ const pl: Record<MessageKey, string> = {
   tutorialDemoClosed: 'Ta gałąź jest zamknięta — już nie urośnie.',
   tutorialDemoOther: 'Zamknijmy drugą gałąź.',
   tutorialDemoDone: 'Drzewo jest gotowe. Rozwiążmy następne razem!',
+  tutorialOwlPresolve: 'Pomogę ci zacząć.',
   tutorialStart: 'Rozpocznij',
   tutorialOwlDone:
     'Samouczek ukończony! Wiesz już wszystko, czego potrzeba do gry. Miłej zabawy!',

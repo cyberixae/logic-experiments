@@ -1493,6 +1493,11 @@ html.mode-single:not(.input-pointer) .bench-topbar .bench-zoom {
     scroll-padding: 1em 0.5em 8em 0.5em;
   }
 }
+/* While the owl plays a presolved foundation, the board ignores the
+   pointer; keyboard and gamepad actions are swallowed in the dispatch. */
+.tutorial-presolving .bench {
+  pointer-events: none;
+}
 /* Skip completion screen: the solved screen's counterpart for skipped
    (unsolvable) challenges — a confirmation line above the same topic
    navigation row. */
