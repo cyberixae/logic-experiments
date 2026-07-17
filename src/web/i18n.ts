@@ -102,7 +102,7 @@ const en = {
   tutorialOwlDrop:
     'Any extra sentences on a branch must be dropped before the branch can be closed.',
   tutorialOwlSplit:
-    'Destructing a sentence drops its outermost connective off the tree. Dropping a Conjunction ( ∧ ) on the left side of the gate, or a Disjunction ( ∨ ) on the right, causes no further consequences — the pieces stay where they were.',
+    'Destructing a sentence removes its outermost connective ( → ∧ ∨ ¬ ) from the tree. Each connective comes off in its own way — that is what the next chapter is about.',
   tutorialOwlSideFlip:
     'Dropping a Negation ( ¬ ) makes the remaining sentence move to the other side of the gate.',
   tutorialOwlCrossing:
@@ -238,7 +238,7 @@ const fi: Record<MessageKey, string> = {
   tutorialOwlDrop:
     'Oksan sisältämät ylimääräiset lauseet on pudotettava ennen kuin oksan voi sulkea.',
   tutorialOwlSplit:
-    'Lauseen purkaminen pudottaa sen uloimman konnektiivin puusta. Konjunktion ( ∧ ) pudottaminen portin vasemmalla puolella tai Disjunktion ( ∨ ) pudottaminen portin oikealla puolella ei aiheuta sen kummempia seuraamuksia — osat jäävät paikoilleen.',
+    'Lauseen purkaminen irrottaa sen uloimman konnektiivin ( → ∧ ∨ ¬ ) puusta. Jokainen konnektiivi irtoaa omalla tavallaan — niistä kertoo seuraava luku.',
   tutorialOwlSideFlip:
     'Negaation ( ¬ ) pudottaminen aiheuttaa jäljelle jäävän lauseen siirtymisen portin toiselle puolelle.',
   tutorialOwlCrossing:
@@ -376,7 +376,7 @@ const es: Record<MessageKey, string> = {
   tutorialOwlDrop:
     'Las oraciones sobrantes de una rama deben soltarse antes de poder cerrarla.',
   tutorialOwlSplit:
-    'Destruir una oración suelta del árbol su conectivo más externo. Soltar una Conjunción ( ∧ ) en el lado izquierdo de la puerta, o una Disyunción ( ∨ ) en el derecho, no tiene mayores consecuencias: las piezas se quedan donde estaban.',
+    'Destruir una oración desprende del árbol su conectivo más externo ( → ∧ ∨ ¬ ). Cada conectivo se desprende a su manera — de eso trata el siguiente capítulo.',
   tutorialOwlSideFlip:
     'Soltar una Negación ( ¬ ) hace que la oración restante pase al otro lado de la puerta.',
   tutorialOwlCrossing:
@@ -513,7 +513,7 @@ const cs: Record<MessageKey, string> = {
   tutorialOwlDrop:
     'Přebytečné věty na větvi je nutné pustit, než ji lze zavřít.',
   tutorialOwlSplit:
-    'Zničení věty pustí ze stromu její vnější spojku. Puštění Konjunkce ( ∧ ) na levé straně brány nebo Disjunkce ( ∨ ) na pravé nemá žádné zvláštní následky — části zůstávají na místě.',
+    'Zničení věty odlomí ze stromu její vnější spojku ( → ∧ ∨ ¬ ). Každá spojka se odlamuje po svém — o tom je další kapitola.',
   tutorialOwlSideFlip:
     'Puštění Negace ( ¬ ) přesune zbývající větu na druhou stranu brány.',
   tutorialOwlCrossing:
@@ -649,7 +649,7 @@ const pl: Record<MessageKey, string> = {
   tutorialOwlDrop:
     'Zbędne zdania na gałęzi trzeba upuścić, zanim da się ją zamknąć.',
   tutorialOwlSplit:
-    'Zniszczenie zdania upuszcza z drzewa jego zewnętrzny spójnik. Upuszczenie Koniunkcji ( ∧ ) po lewej stronie bramy lub Alternatywy ( ∨ ) po prawej nie ma szczególnych następstw — części zostają na miejscu.',
+    'Zniszczenie zdania odrywa od drzewa jego zewnętrzny spójnik ( → ∧ ∨ ¬ ). Każdy spójnik odrywa się na swój sposób — o tym jest następny rozdział.',
   tutorialOwlSideFlip:
     'Upuszczenie Negacji ( ¬ ) przenosi pozostałe zdanie na drugą stronę bramy.',
   tutorialOwlCrossing:
