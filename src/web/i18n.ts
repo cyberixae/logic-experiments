@@ -94,7 +94,7 @@ const en = {
   tutorialOwlBasics:
     'Welcome to LK! In its challenges you close derivation trees built out of sequents. This first chapter teaches the essentials you need to play.',
   tutorialOwlLogic:
-    'The second chapter walks through the consequences of dropping each connective ( → ∧ ∨ ¬ ) in different situations, one at a time. If you would rather jump straight into the deep end, you already know every move — feel free to head for the real game.',
+    'You now know how to play the game. The second chapter digs into the consequences of destructing in various situations. Knowing the consequences by heart should help you hone your tactics.',
   tutorialOwlClose:
     'A branch of the tree can be closed when the same sentence sits on both sides of the gate ( ⊢ ).',
   tutorialOwlCloseConstants:
@@ -230,7 +230,7 @@ const fi: Record<MessageKey, string> = {
   tutorialOwlBasics:
     'Tervetuloa pelaamaan LK:ta! Pelin haasteissa suljetaan sekventeistä koostuvia päättelypuita. Ensimmäisessä luvussa opimme pelaamisen kannalta välttämättömiä perusasioita.',
   tutorialOwlLogic:
-    'Toisessa luvussa käydään yksitellen läpi eri konnektiivien ( → ∧ ∨ ¬ ) pudottamisen seuraamuksia eri tilanteissa. Mikäli haluat hypätä suoraan syvään päätyyn, osaat jo kaikki siirrot — voit siirtyä pelaamaan varsinaista peliä vaikka heti.',
+    'Osaat nyt pelata peliä. Toinen luku syventyy purkamisen seuraamuksiin erilaisissa tilanteissa. Seuraamusten osaaminen ulkoa auttaa hiomaan taktiikkaasi.',
   tutorialOwlClose:
     'Päättelypuun oksa on suljettavissa silloin, kun portin ( ⊢ ) kummallakin puolella on sama lause.',
   tutorialOwlCloseConstants:
@@ -368,7 +368,7 @@ const es: Record<MessageKey, string> = {
   tutorialOwlBasics:
     '¡Bienvenido a LK! En los desafíos del juego se cierran árboles de deducción compuestos de secuentes. En este primer capítulo aprendemos lo básico imprescindible para jugar.',
   tutorialOwlLogic:
-    'El segundo capítulo repasa una a una las consecuencias de soltar cada conectivo ( → ∧ ∨ ¬ ) en distintas situaciones. Si prefieres lanzarte a lo hondo, ya conoces todos los movimientos: puedes pasar directamente al juego de verdad.',
+    'Ahora ya sabes jugar. El segundo capítulo profundiza en las consecuencias de destruir en distintas situaciones. Conocer de memoria las consecuencias te ayudará a afinar tu táctica.',
   tutorialOwlClose:
     'Una rama del árbol se puede cerrar cuando a ambos lados de la puerta ( ⊢ ) está la misma oración.',
   tutorialOwlCloseConstants:
@@ -505,7 +505,7 @@ const cs: Record<MessageKey, string> = {
   tutorialOwlBasics:
     'Vítej ve hře LK! V jejích výzvách se zavírají odvozovací stromy složené ze sekventů. V této první kapitole se naučíme základy, bez kterých se hrát nedá.',
   tutorialOwlLogic:
-    'Druhá kapitola probírá jeden po druhém důsledky puštění jednotlivých spojek ( → ∧ ∨ ¬ ) v různých situacích. Chceš-li skočit rovnou do hlubin, všechny tahy už znáš — můžeš přejít ke skutečné hře hned.',
+    'Teď už umíš hrát. Druhá kapitola se noří do důsledků ničení v různých situacích. Znát důsledky nazpaměť ti pomůže vypilovat taktiku.',
   tutorialOwlClose:
     'Větev stromu lze zavřít, když na obou stranách brány ( ⊢ ) stojí stejná věta.',
   tutorialOwlCloseConstants:
@@ -641,7 +641,7 @@ const pl: Record<MessageKey, string> = {
   tutorialOwlBasics:
     'Witaj w grze LK! W jej wyzwaniach zamyka się drzewa wnioskowania zbudowane z sekwentów. W tym pierwszym rozdziale poznajemy podstawy niezbędne do gry.',
   tutorialOwlLogic:
-    'Drugi rozdział omawia po kolei skutki upuszczania poszczególnych spójników ( → ∧ ∨ ¬ ) w różnych sytuacjach. Jeśli wolisz skoczyć na głęboką wodę, znasz już wszystkie ruchy — możesz przejść do właściwej gry od razu.',
+    'Teraz już umiesz grać. Drugi rozdział zagłębia się w skutki niszczenia w różnych sytuacjach. Znajomość skutków na pamięć pomoże ci wyostrzyć taktykę.',
   tutorialOwlClose:
     'Gałąź drzewa można zamknąć, gdy po obu stronach bramy ( ⊢ ) stoi to samo zdanie.',
   tutorialOwlCloseConstants:
