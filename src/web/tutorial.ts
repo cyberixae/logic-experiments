@@ -1,4 +1,4 @@
-import { Event, undo } from '../interactive/event'
+import { Event, nextBranch, prevBranch, undo } from '../interactive/event'
 import { Workspace } from '../interactive/workspace'
 import { Action } from '../interactive/action'
 import {
@@ -117,11 +117,12 @@ const owlBeatKey: ReadonlyArray<MessageKey> = [
 // finishing. The board is watch-only, and the owl's narration advances by
 // phase rather than by move, so the player reads four short lines instead
 // of a move list. The demo loops until the player moves on.
-type DemoPhase = 'sequent' | 'grow' | 'closed' | 'done'
+type DemoPhase = 'sequent' | 'grow' | 'closed' | 'other' | 'done'
 const demoPhaseKey: Record<DemoPhase, MessageKey> = {
   sequent: 'tutorialDemoSequent',
   grow: 'tutorialDemoGrow',
   closed: 'tutorialDemoClosed',
+  other: 'tutorialDemoOther',
   done: 'tutorialDemoDone',
 }
 const DEMO_MOVE_MS = 1300
@@ -237,6 +238,9 @@ export const mountTutorial = (
   let demoQueue: ReadonlyArray<Event> = []
   let demoPhase: DemoPhase = 'sequent'
   let demoTimer: number | null = null
+  // Set while the closed-branch pause is showing: the next tick returns
+  // focus to the open branch instead of consuming a move.
+  let demoReturn = false
   // The demo board's own zoom/scroll state, independent of the beat board's.
   const demoCtx: BenchCtx = {
     ...createBenchCtx(false, true, false, false),
@@ -255,6 +259,7 @@ export const mountTutorial = (
     demoQueue =
       solution === undefined ? [] : linearize(solution, { shuffle: false })
     demoPhase = 'sequent'
+    demoReturn = false
   }
   const stopDemo = (): void => {
     if (demoTimer !== null) window.clearTimeout(demoTimer)
@@ -267,6 +272,16 @@ export const mountTutorial = (
     // Hold still while the pause menu covers the page.
     if (paused) {
       scheduleDemo(DEMO_MOVE_MS)
+      return
+    }
+    // Second half of the closed-branch beat: after dwelling on the closed
+    // branch, step over to the open one and announce it before playing on.
+    if (demoReturn) {
+      demoReturn = false
+      demoWs.applyEvent(nextBranch())
+      demoPhase = 'other'
+      rerender()
+      scheduleDemo(DEMO_PHASE_MS)
       return
     }
     const ev = demoQueue[0]
@@ -287,7 +302,14 @@ export const mountTutorial = (
       if (demoWs.isSolved()) {
         demoPhase = 'done'
         dwell = DEMO_DONE_MS
-      } else if (demoPhase === 'grow') {
+      } else {
+        // Closing auto-advances focus to the next open branch, but the
+        // narration is about the branch that just closed — step back so
+        // the highlight and the words point at the same place. Exact for
+        // the two-branch exemplar, where the closed branch is one step
+        // back from the auto-advanced focus.
+        demoWs.applyEvent(prevBranch())
+        demoReturn = true
         demoPhase = 'closed'
         dwell = DEMO_PHASE_MS
       }
