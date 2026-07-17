@@ -100,7 +100,7 @@ const en = {
   tutorialOwlCloseConstants:
     'Falsum ( ⊥ ) closes a branch when it sits alone on the left side of the gate, and Verum ( ⊤ ) when it sits alone on the right.',
   tutorialOwlDrop:
-    'Any extra sentences on a branch must always be dropped before the branch can close.',
+    'Any extra sentences on a branch must be dropped before the branch can be closed.',
   tutorialOwlSplit:
     'Destructing a sentence drops its outermost connective off the tree. Dropping a Conjunction ( ∧ ) on the left side of the gate, or a Disjunction ( ∨ ) on the right, causes no further consequences — the pieces stay where they were.',
   tutorialOwlSideFlip:
@@ -236,7 +236,7 @@ const fi: Record<MessageKey, string> = {
   tutorialOwlCloseConstants:
     'Falsum ( ⊥ ) sulkee oksan ollessaan yksin portin vasemmalla puolella, ja Verum ( ⊤ ) ollessaan yksin portin oikealla puolella.',
   tutorialOwlDrop:
-    'Oksan sisältämät ylimääräiset lauseet on aina pudotettava ennen kuin oksan voi sulkea.',
+    'Oksan sisältämät ylimääräiset lauseet on pudotettava ennen kuin oksan voi sulkea.',
   tutorialOwlSplit:
     'Lauseen purkaminen pudottaa sen uloimman konnektiivin puusta. Konjunktion ( ∧ ) pudottaminen portin vasemmalla puolella tai Disjunktion ( ∨ ) pudottaminen portin oikealla puolella ei aiheuta sen kummempia seuraamuksia — osat jäävät paikoilleen.',
   tutorialOwlSideFlip:
@@ -374,7 +374,7 @@ const es: Record<MessageKey, string> = {
   tutorialOwlCloseConstants:
     'Falsum ( ⊥ ) cierra una rama cuando está solo a la izquierda de la puerta, y Verum ( ⊤ ) cuando está solo a la derecha.',
   tutorialOwlDrop:
-    'Las oraciones sobrantes de una rama deben soltarse siempre antes de poder cerrarla.',
+    'Las oraciones sobrantes de una rama deben soltarse antes de poder cerrarla.',
   tutorialOwlSplit:
     'Destruir una oración suelta del árbol su conectivo más externo. Soltar una Conjunción ( ∧ ) en el lado izquierdo de la puerta, o una Disyunción ( ∨ ) en el derecho, no tiene mayores consecuencias: las piezas se quedan donde estaban.',
   tutorialOwlSideFlip:
@@ -511,7 +511,7 @@ const cs: Record<MessageKey, string> = {
   tutorialOwlCloseConstants:
     'Falsum ( ⊥ ) zavře větev, když stojí samo vlevo od brány, a Verum ( ⊤ ), když stojí samo vpravo.',
   tutorialOwlDrop:
-    'Přebytečné věty na větvi je vždy nutné pustit, než ji lze zavřít.',
+    'Přebytečné věty na větvi je nutné pustit, než ji lze zavřít.',
   tutorialOwlSplit:
     'Zničení věty pustí ze stromu její vnější spojku. Puštění Konjunkce ( ∧ ) na levé straně brány nebo Disjunkce ( ∨ ) na pravé nemá žádné zvláštní následky — části zůstávají na místě.',
   tutorialOwlSideFlip:
@@ -647,7 +647,7 @@ const pl: Record<MessageKey, string> = {
   tutorialOwlCloseConstants:
     'Falsum ( ⊥ ) zamyka gałąź, gdy stoi samo po lewej stronie bramy, i Verum ( ⊤ ), gdy stoi samo po prawej.',
   tutorialOwlDrop:
-    'Zbędne zdania na gałęzi trzeba zawsze upuścić, zanim da się ją zamknąć.',
+    'Zbędne zdania na gałęzi trzeba upuścić, zanim da się ją zamknąć.',
   tutorialOwlSplit:
     'Zniszczenie zdania upuszcza z drzewa jego zewnętrzny spójnik. Upuszczenie Koniunkcji ( ∧ ) po lewej stronie bramy lub Alternatywy ( ∨ ) po prawej nie ma szczególnych następstw — części zostają na miejscu.',
   tutorialOwlSideFlip:
