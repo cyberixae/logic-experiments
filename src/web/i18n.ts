@@ -96,7 +96,7 @@ const en = {
   tutorialOwlLogic:
     'The second chapter walks through the consequences of dropping each connective ( → ∧ ∨ ¬ ) in different situations, one at a time. If you would rather jump straight into the deep end, you already know every move — feel free to head for the real game.',
   tutorialOwlClose:
-    'A branch of the tree can be closed when the same sentence sits on both sides of the gate ( ⊢ ) — this situation is called an identity.',
+    'A branch of the tree can be closed when the same sentence sits on both sides of the gate ( ⊢ ).',
   tutorialOwlCloseConstants:
     'Constant sentences can sometimes close a branch on their own — Falsum ( ⊥ ) when it sits alone on the left side of the gate, and Verum ( ⊤ ) when it sits alone on the right.',
   tutorialOwlDrop:
@@ -232,7 +232,7 @@ const fi: Record<MessageKey, string> = {
   tutorialOwlLogic:
     'Toisessa luvussa käydään yksitellen läpi eri konnektiivien ( → ∧ ∨ ¬ ) pudottamisen seuraamuksia eri tilanteissa. Mikäli haluat hypätä suoraan syvään päätyyn, osaat jo kaikki siirrot — voit siirtyä pelaamaan varsinaista peliä vaikka heti.',
   tutorialOwlClose:
-    'Päättelypuun oksa on suljettavissa silloin, kun portin ( ⊢ ) kummallakin puolella on sama lause — tällaista tilannetta kutsutaan identiteetiksi.',
+    'Päättelypuun oksa on suljettavissa silloin, kun portin ( ⊢ ) kummallakin puolella on sama lause.',
   tutorialOwlCloseConstants:
     'Vakiolauseet mahdollistavat joskus oksan sulkemisen yksinään — Falsum ( ⊥ ) ollessaan yksin portin vasemmalla puolella, ja Verum ( ⊤ ) ollessaan yksin portin oikealla puolella.',
   tutorialOwlDrop:
@@ -370,7 +370,7 @@ const es: Record<MessageKey, string> = {
   tutorialOwlLogic:
     'El segundo capítulo repasa una a una las consecuencias de soltar cada conectivo ( → ∧ ∨ ¬ ) en distintas situaciones. Si prefieres lanzarte a lo hondo, ya conoces todos los movimientos: puedes pasar directamente al juego de verdad.',
   tutorialOwlClose:
-    'Una rama del árbol se puede cerrar cuando a ambos lados de la puerta ( ⊢ ) está la misma oración — esta situación se llama identidad.',
+    'Una rama del árbol se puede cerrar cuando a ambos lados de la puerta ( ⊢ ) está la misma oración.',
   tutorialOwlCloseConstants:
     'Las oraciones constantes a veces permiten cerrar una rama por sí solas: Falsum ( ⊥ ) cuando está solo a la izquierda de la puerta, y Verum ( ⊤ ) cuando está solo a la derecha.',
   tutorialOwlDrop:
@@ -507,7 +507,7 @@ const cs: Record<MessageKey, string> = {
   tutorialOwlLogic:
     'Druhá kapitola probírá jeden po druhém důsledky puštění jednotlivých spojek ( → ∧ ∨ ¬ ) v různých situacích. Chceš-li skočit rovnou do hlubin, všechny tahy už znáš — můžeš přejít ke skutečné hře hned.',
   tutorialOwlClose:
-    'Větev stromu lze zavřít, když na obou stranách brány ( ⊢ ) stojí stejná věta — takové situaci se říká identita.',
+    'Větev stromu lze zavřít, když na obou stranách brány ( ⊢ ) stojí stejná věta.',
   tutorialOwlCloseConstants:
     'Konstantní věty někdy dokážou zavřít větev samy — Falsum ( ⊥ ), když stojí samo vlevo od brány, a Verum ( ⊤ ), když stojí samo vpravo.',
   tutorialOwlDrop:
@@ -643,7 +643,7 @@ const pl: Record<MessageKey, string> = {
   tutorialOwlLogic:
     'Drugi rozdział omawia po kolei skutki upuszczania poszczególnych spójników ( → ∧ ∨ ¬ ) w różnych sytuacjach. Jeśli wolisz skoczyć na głęboką wodę, znasz już wszystkie ruchy — możesz przejść do właściwej gry od razu.',
   tutorialOwlClose:
-    'Gałąź drzewa można zamknąć, gdy po obu stronach bramy ( ⊢ ) stoi to samo zdanie — taką sytuację nazywamy tożsamością.',
+    'Gałąź drzewa można zamknąć, gdy po obu stronach bramy ( ⊢ ) stoi to samo zdanie.',
   tutorialOwlCloseConstants:
     'Zdania stałe czasem pozwalają zamknąć gałąź samodzielnie — Falsum ( ⊥ ), gdy stoi samo po lewej stronie bramy, i Verum ( ⊤ ), gdy stoi samo po prawej.',
   tutorialOwlDrop:

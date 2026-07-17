@@ -59,7 +59,9 @@ import { rules as rkRules } from '../systems/rk'
 // Beat rows name the concept, never the schema: Basics rows name what you
 // find on the branch (identity, constants, extras), Consequences rows the
 // consequence of the drop. Each name's word appears in its own owl beat
-// text and nowhere else.
+// text and nowhere else — except Identity, whose owl line states the
+// closing condition without naming it: the row title alone carries the
+// term, and a player who never connects the two loses nothing.
 const beatNameKey: Record<TutorialBeat['nameId'], MessageKey> = {
   identity: 'tutorialIdentity',
   constants: 'tutorialConstants',
