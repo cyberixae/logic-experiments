@@ -1474,6 +1474,11 @@ html.mode-single.input-gamepad .controls .legend-bind.for-gamepad {
   /* Shift the bubble left of the portrait so its sharp corner points at
      the owl's mouth — reads more like the owl is talking. */
   margin-right: 5em;
+  /* The owl overlay is pointer-transparent (.tutor-owl) so clicks fall
+     through to the board; re-enable events on just the bubble rectangle so
+     its text can be selected without the face or margins capturing input. */
+  pointer-events: auto;
+  user-select: text;
 }
 .tutor-owl-para + .tutor-owl-para {
   margin-top: 0.5em;
